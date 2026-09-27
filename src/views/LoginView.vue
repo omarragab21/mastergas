@@ -3,11 +3,8 @@
     <!-- القسم الأيسر: نموذج تسجيل الدخول -->
     <div class="login-left">
       <div class="login-form-wrapper">
-        <!-- الشعار والعنوان -->
+        <!-- العنوان -->
         <div class="login-header">
-          <div class="login-brand-top">
-            <img src="/logo.png" alt="Mastergas" class="login-brand-logo-img" />
-          </div>
           <h2 class="login-title">تسجيل الدخول</h2>
           <p class="login-subtitle">لوحة التحكم الإدارية — ماستر غاز</p>
         </div>
@@ -134,7 +131,7 @@
     <div class="login-right">
       <!-- اللوجو والشارة -->
       <div class="brand-logo">
-        <img src="/logo-dashboard.png" alt="ماستر غاز" class="brand-logo-img" />
+        <img src="/images/logo_white.png" alt="ماستر غاز" class="brand-logo-img" />
         <span class="brand-badge">
           <svg class="admin-badge-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -199,7 +196,7 @@ onMounted(() => {
     link.rel = 'icon';
     document.head.appendChild(link);
   }
-  link.href = '/logo.png';
+  link.href = '/images/logo_white.png';
   document.title = 'ماستر غاز | تسجيل الدخول للوحة التحكم';
 });
 
@@ -288,32 +285,22 @@ const handleLogin = async () => {
   width: 100%;
 }
 
-/* ===== رأس صفحة تسجيل الدخول والشعار ===== */
+/* ===== رأس صفحة تسجيل الدخول ===== */
 .login-header {
   text-align: right;
   margin-bottom: 2rem;
 }
 
-.login-brand-top {
-  margin-bottom: 1.25rem;
-}
-
-.login-brand-logo-img {
-  height: 38px;
-  width: auto;
-  object-fit: contain;
-}
-
 .login-title {
-  font-size: 1.65rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #111827;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
   letter-spacing: -0.4px;
 }
 
 .login-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: #64748b;
   line-height: 1.5;
 }
@@ -561,7 +548,7 @@ const handleLogin = async () => {
 }
 
 .brand-logo-img {
-  height: 38px;
+  height: 34px;
   width: auto;
   object-fit: contain;
 }

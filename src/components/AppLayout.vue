@@ -13,7 +13,7 @@
       <!-- Logo -->
       <div class="sidebar-logo">
         <div class="logo-icon">
-          <img src="/logo-dashboard.png" alt="Mastergas" class="logo-img" />
+          <img src="/images/logo_white.png" alt="Mastergas" class="logo-img" />
         </div>
         <button
           class="mobile-close-btn"
