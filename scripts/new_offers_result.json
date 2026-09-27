@@ -1,0 +1,158 @@
+[
+  {
+    "id": 2,
+    "name": "Master Chef Complete Italian Deal - 20% OFF",
+    "name_i18n": {
+      "ar": "باقة الطهي الإيطالي المتكامل - خصم 20%",
+      "en": "Master Chef Complete Italian Deal - 20% OFF"
+    },
+    "description": "Exclusive bundle deal combining luxury Italian built-in ovens, 5-burner gas hobs, and cooker hoods with a 20% discount plus free installation.",
+    "description_i18n": {
+      "ar": "عرض حصري متكامل يجمع أفضل أفران ومسطحات الغاز والشفاطات الإيطالية الفاخرة بخصم استثنائي 20% مع شحن وتركيب مجاني.",
+      "en": "Exclusive bundle deal combining luxury Italian built-in ovens, 5-burner gas hobs, and cooker hoods with a 20% discount plus free installation."
+    },
+    "image": "http://backend-mastergas.be-kite.com/storage/offers/1789988153_23KOtgZuUw.jpg",
+    "type": "percentage",
+    "value": "20.00",
+    "buy_x": null,
+    "get_y": null,
+    "code": null,
+    "start_date": "2026-09-01T00:00:00.000000Z",
+    "end_date": "2027-12-31T00:00:00.000000Z",
+    "total_uses": 0,
+    "max_uses": null,
+    "max_per_customer": null,
+    "min_order_value": null,
+    "max_discount": null,
+    "min_order_enabled": false,
+    "applies_to": "products",
+    "selected_categories": null,
+    "selected_products": [
+      "7",
+      "8",
+      "9"
+    ],
+    "status": "active",
+    "is_active": true,
+    "usage_percentage": 0,
+    "is_valid": true,
+    "created_at": "2026-09-21T10:55:53.000000Z",
+    "updated_at": "2026-09-21T10:55:53.000000Z"
+  },
+  {
+    "id": 3,
+    "name": "Smart Gas Safety & Protection Pack - 15% OFF",
+    "name_i18n": {
+      "ar": "منظومة الأمان والسلامة الذكية - خصم 15%",
+      "en": "Smart Gas Safety & Protection Pack - 15% OFF"
+    },
+    "description": "Secure your home and kitchen with the complete safety bundle: smart gas detector, automatic shutoff valve, and high-precision Italian regulator.",
+    "description_i18n": {
+      "ar": "احمِ منزلك وعائلتك مع باقة الأمان الشاملة: كاشف تسريب الغاز الذكي مع صمام الغلق التلقائي ومنظم الغاز الإيطالي المانومتر.",
+      "en": "Secure your home and kitchen with the complete safety bundle: smart gas detector, automatic shutoff valve, and high-precision Italian regulator."
+    },
+    "image": "http://backend-mastergas.be-kite.com/storage/offers/1789988154_WhoXLcZxMZ.jpg",
+    "type": "percentage",
+    "value": "15.00",
+    "buy_x": null,
+    "get_y": null,
+    "code": null,
+    "start_date": "2026-09-01T00:00:00.000000Z",
+    "end_date": "2027-12-31T00:00:00.000000Z",
+    "total_uses": 0,
+    "max_uses": null,
+    "max_per_customer": null,
+    "min_order_value": null,
+    "max_discount": null,
+    "min_order_enabled": false,
+    "applies_to": "products",
+    "selected_categories": null,
+    "selected_products": [
+      "12",
+      "13"
+    ],
+    "status": "active",
+    "is_active": true,
+    "usage_percentage": 0,
+    "is_valid": true,
+    "created_at": "2026-09-21T10:55:54.000000Z",
+    "updated_at": "2026-09-21T10:55:54.000000Z"
+  },
+  {
+    "id": 4,
+    "name": "Smart Instant Water Heaters - 10% OFF",
+    "name_i18n": {
+      "ar": "سخانات المياه الفورية الذكية - خصم 10%",
+      "en": "Smart Instant Water Heaters - 10% OFF"
+    },
+    "description": "Experience limitless instant hot water with Mastergas smart energy-saving digital gas water heaters with pure copper exchangers.",
+    "description_i18n": {
+      "ar": "تمتع بمياه ساخنة فورية غير محدودة مع سخانات ماسترجاز الذكية الموفرة للطاقة وشاشات اللمس الرقمية ومبادل النحاس النقي.",
+      "en": "Experience limitless instant hot water with Mastergas smart energy-saving digital gas water heaters with pure copper exchangers."
+    },
+    "image": "http://backend-mastergas.be-kite.com/storage/offers/1789988154_xzdxKih38h.jpg",
+    "type": "percentage",
+    "value": "10.00",
+    "buy_x": null,
+    "get_y": null,
+    "code": null,
+    "start_date": "2026-09-01T00:00:00.000000Z",
+    "end_date": "2027-12-31T00:00:00.000000Z",
+    "total_uses": 0,
+    "max_uses": null,
+    "max_per_customer": null,
+    "min_order_value": null,
+    "max_discount": null,
+    "min_order_enabled": false,
+    "applies_to": "products",
+    "selected_categories": null,
+    "selected_products": [
+      "10"
+    ],
+    "status": "active",
+    "is_active": true,
+    "usage_percentage": 0,
+    "is_valid": true,
+    "created_at": "2026-09-21T10:55:54.000000Z",
+    "updated_at": "2026-09-21T10:55:54.000000Z"
+  },
+  {
+    "id": 5,
+    "name": "Luxury Outdoor BBQ & Patio Grills - 25% OFF",
+    "name_i18n": {
+      "ar": "عروض شوايات الحدائق والمزارع - خصم 25%",
+      "en": "Luxury Outdoor BBQ & Patio Grills - 25% OFF"
+    },
+    "description": "Exceptional open-air barbecue experience with commercial-grade stainless steel grills and explosion-proof composite cylinders.",
+    "description_i18n": {
+      "ar": "تجربة شواء استثنائية في الهواء الطلق مع شوايات الغاز المصنوعة من الستانلس ستيل المقاوم للطقس وأسطوانات الفيبر جلاس الخفيفة المقاومة للانفجار.",
+      "en": "Exceptional open-air barbecue experience with commercial-grade stainless steel grills and explosion-proof composite cylinders."
+    },
+    "image": "http://backend-mastergas.be-kite.com/storage/offers/1789988155_48bLR9OHwN.jpg",
+    "type": "percentage",
+    "value": "25.00",
+    "buy_x": null,
+    "get_y": null,
+    "code": null,
+    "start_date": "2026-09-01T00:00:00.000000Z",
+    "end_date": "2027-12-31T00:00:00.000000Z",
+    "total_uses": 0,
+    "max_uses": null,
+    "max_per_customer": null,
+    "min_order_value": null,
+    "max_discount": null,
+    "min_order_enabled": false,
+    "applies_to": "products",
+    "selected_categories": null,
+    "selected_products": [
+      "11",
+      "14"
+    ],
+    "status": "active",
+    "is_active": true,
+    "usage_percentage": 0,
+    "is_valid": true,
+    "created_at": "2026-09-21T10:55:55.000000Z",
+    "updated_at": "2026-09-21T10:55:55.000000Z"
+  }
+]

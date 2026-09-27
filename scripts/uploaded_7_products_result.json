@@ -1,0 +1,121 @@
+[
+  {
+    "id": "8",
+    "sku": "MG-HOB90-5B",
+    "name_ar": "مسطح غاز إيطالي بلت إن 5 شعلات مع شعلة ووك ثلاثية 90 سم",
+    "name_en": "Mastergas 90cm 5-Burner Built-in Gas Hob with Triple Wok",
+    "price": "2199",
+    "discount": "10",
+    "category": "57",
+    "stock": "30",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987076_hfQU3CdP7g.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987076_5ASqAk5Wsj.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987076_mPgX7XPV4w.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987076_a9DZImxOMQ.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987076_hfQU3CdP7g.jpg"
+  },
+  {
+    "id": "9",
+    "sku": "MG-HOOD90-IT",
+    "name_ar": "شفاط مطبخ إيطالي هرمي فاخر 90 سم بقوة سحب 1000 م³/ساعة",
+    "name_en": "Mastergas Luxury 90cm Pyramid Chimney Hood 1000 m³/h",
+    "price": "1650",
+    "discount": "12",
+    "category": "57",
+    "stock": "20",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987078_yPA8v1S6cs.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987078_Ktn4KZhhav.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987078_Ii1tjzvGZs.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987078_npNNsKGAbk.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987078_yPA8v1S6cs.jpg"
+  },
+  {
+    "id": "10",
+    "sku": "MG-WH12L-SMART",
+    "name_ar": "سخان مياه غاز فوري ذكي ديجيتال 12 لتر مع شاشة لمس",
+    "name_en": "Mastergas Smart 12L Digital Instant Gas Water Heater",
+    "price": "1280",
+    "discount": "8",
+    "category": "58",
+    "stock": "40",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987080_VwMS2HmODZ.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987080_y0pn2qlqYF.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987080_UimDzjt50P.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987080_n51lzGhrzT.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987080_VwMS2HmODZ.jpg"
+  },
+  {
+    "id": "11",
+    "sku": "MG-BBQ4B-PRO",
+    "name_ar": "شواية باربيكيو غاز فاخرة 4 شعلات للمزارع والحدائق مع شعلة جانبية",
+    "name_en": "Mastergas Professional 4-Burner Outdoor Gas BBQ Grill",
+    "price": "4250",
+    "discount": "15",
+    "category": "59",
+    "stock": "15",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987082_ez2JKBtkfU.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987082_fZxeGQkyGQ.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987082_nULJlAQt5L.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987082_QDNvRTEHNB.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987082_ez2JKBtkfU.jpg"
+  },
+  {
+    "id": "12",
+    "sku": "MG-DET-SHUT01",
+    "name_ar": "نظام كاشف تسريب الغاز الذكي مع صمام إغلاق كهرومغناطيسي تلقائي",
+    "name_en": "Mastergas Smart Gas Leak Detector with Auto Shutoff Valve",
+    "price": "385",
+    "discount": "5",
+    "category": "56",
+    "stock": "60",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987083_cyPLbgYvbI.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987083_oXDXggpGIn.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987083_66sBW9B5XX.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987083_c3eZjyOuBU.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987083_cyPLbgYvbI.jpg"
+  },
+  {
+    "id": "13",
+    "sku": "MG-REG-MANO90",
+    "name_ar": "منظم غاز إيطالي عالي الجودة مع ساعة ضغط مانومتر وصمام أمان",
+    "name_en": "Mastergas Certified Italian Gas Regulator with Pressure Gauge",
+    "price": "185",
+    "discount": "0",
+    "category": "52",
+    "stock": "100",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987084_Z3oUpzEDcP.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987084_sFkTEMfyKj.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987084_gwJYyUhqgF.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987084_eyYTaUbMxw.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987084_Z3oUpzEDcP.jpg"
+  },
+  {
+    "id": "14",
+    "sku": "MG-CYL-COMP24",
+    "name_ar": "أسطوانة غاز فيبر جلاس خفيفة الوزن ومضادة للانفجار 24.5 لتر",
+    "name_en": "Mastergas Ultra-Light Composite LPG Gas Cylinder 24.5L",
+    "price": "449",
+    "discount": "10",
+    "category": "51",
+    "stock": "50",
+    "images": [
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987086_ihhAa9wvXu.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987086_a0uscxgprX.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987086_IwFWbB66Ad.jpg",
+      "https://backend-mastergas.be-kite.com/public/storage/products/1789987086_RngdzLh41v.jpg"
+    ],
+    "primary_image": "https://backend-mastergas.be-kite.com/public/storage/products/1789987086_ihhAa9wvXu.jpg"
+  }
+]

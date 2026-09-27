@@ -1,0 +1,35 @@
+{
+  "name": "mastergas",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "clean": "rm -rf dist node_modules/.vite",
+    "generate:feed": "node --dns-result-order=ipv4first scripts/generateFeed.js",
+    "build": "node --dns-result-order=ipv4first scripts/generateFeed.js && vite build",
+    "build:clean": "rm -rf dist node_modules/.vite && node --dns-result-order=ipv4first scripts/generateFeed.js && vite build",
+    "build:cpanel": "npm run build && (cd dist && zip -r -q ../cpanel-public_html.zip .) && echo '✓ cPanel package ready: cpanel-public_html.zip'",
+    "test": "node --test --test-concurrency=1",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "axios": "^1.13.6",
+    "chart.js": "^4.5.1",
+    "cors": "^2.8.6",
+    "dompurify": "^3.4.15",
+    "express": "^5.2.1",
+    "vue": "^3.5.25",
+    "vue-i18n": "^9.14.5",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.3.1"
+  }
+}
