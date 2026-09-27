@@ -6,10 +6,10 @@
         <!-- الشعار والعنوان -->
         <div class="login-header">
           <div class="login-brand-top">
-            <img src="/logo.png" alt="ماستر غاز" class="login-brand-logo-img" />
+            <img src="/logo.png" alt="Mastergas" class="login-brand-logo-img" />
           </div>
-          <h2 class="login-title">مرحباً بك في ماستر غاز</h2>
-          <p class="login-subtitle">أدخل بيانات الاعتماد للوصول إلى لوحة التحكم الإدارية</p>
+          <h2 class="login-title">تسجيل الدخول</h2>
+          <p class="login-subtitle">لوحة التحكم الإدارية — ماستر غاز</p>
         </div>
 
         <!-- نموذج تسجيل الدخول -->
@@ -23,7 +23,7 @@
                 v-model="form.email"
                 type="email"
                 required
-                placeholder="admin@tijara.com"
+                placeholder="admin@mastergas.sa"
                 class="form-input"
                 :class="{ 'input-error': errors.email }"
                 autocomplete="email"
@@ -47,7 +47,7 @@
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 required
-                placeholder="أدخل كلمة المرور"
+                placeholder="••••••••"
                 class="form-input"
                 :class="{ 'input-error': errors.password }"
                 autocomplete="current-password"
@@ -63,6 +63,7 @@
                 class="toggle-password"
                 @click="showPassword = !showPassword"
                 tabindex="-1"
+                aria-label="إظهار أو إخفاء كلمة المرور"
               >
                 <svg v-if="!showPassword" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -121,24 +122,6 @@
             </span>
           </button>
         </form>
-
-        <!-- بطاقة بيانات الدخول السريع / الافتراضية -->
-        <div class="demo-credentials-box" @click="fillDemoCredentials" title="انقر لتعبئة الحقول تلقائياً">
-          <div class="demo-credentials-header">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="16" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12.01" y2="8" />
-            </svg>
-            <span>بيانات تسجيل الدخول للوحة التحكم:</span>
-          </div>
-          <div class="demo-credentials-body">
-            <code>admin@tijara.com</code>
-            <span class="dot-sep">&bull;</span>
-            <code>password123</code>
-          </div>
-          <span class="demo-click-hint">(اضغط للتعبئة التلقائية)</span>
-        </div>
       </div>
 
       <!-- Footer -->
@@ -193,12 +176,11 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-// استرجاع الإيميل المحفوظ إن وجد أو وضع البريد الافتراضي
 const savedEmail = localStorage.getItem('remembered_email');
 
 const form = ref({
-  email: savedEmail || 'admin@tijara.com',
-  password: 'password123',
+  email: savedEmail || '',
+  password: '',
   remember: Boolean(savedEmail),
 });
 
@@ -209,30 +191,17 @@ const showPassword = ref(false);
 
 const currentYear = computed(() => new Date().getFullYear());
 
-const fillDemoCredentials = () => {
-  form.value.email = 'admin@tijara.com';
-  form.value.password = 'password123';
-};
-
-const updateFaviconFromSettings = async () => {
-  try {
-    const res = await api.get('/dashboard/settings');
-    const logoEntry = res.data.data.find(s => s.key === 'logo');
-    if (logoEntry && logoEntry.value && logoEntry.value !== '[]') {
-      let link = document.querySelector("link[rel*='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.head.appendChild(link);
-      }
-      link.href = logoEntry.value;
-    }
-  } catch (err) {
-    console.error('Failed to update favicon', err);
+onMounted(() => {
+  // الحفاظ الدائم على أيقونة ماستر غاز وعنوان التاب ومنع استرجاع أيقونات قديمة
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
   }
-};
-
-onMounted(updateFaviconFromSettings);
+  link.href = '/logo.png';
+  document.title = 'ماستر غاز | تسجيل الدخول للوحة التحكم';
+});
 
 const validate = () => {
   errors.value = {};
@@ -314,7 +283,7 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 400px;
+  max-width: 380px;
   margin: auto;
   width: 100%;
 }
@@ -322,7 +291,7 @@ const handleLogin = async () => {
 /* ===== رأس صفحة تسجيل الدخول والشعار ===== */
 .login-header {
   text-align: right;
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
 }
 
 .login-brand-top {
@@ -330,7 +299,7 @@ const handleLogin = async () => {
 }
 
 .login-brand-logo-img {
-  height: 40px;
+  height: 38px;
   width: auto;
   object-fit: contain;
 }
@@ -558,65 +527,6 @@ const handleLogin = async () => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-/* ===== بطاقة بيانات الدخول التوضيحية ===== */
-.demo-credentials-box {
-  margin-top: 1.25rem;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
-  border-radius: 9px;
-  padding: 0.75rem 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.demo-credentials-box:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-  transform: translateY(-1px);
-}
-
-.demo-credentials-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 0.3rem;
-}
-
-.demo-credentials-body {
-  font-size: 0.8rem;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.demo-credentials-body code {
-  background: #e2e8f0;
-  padding: 0.15rem 0.45rem;
-  border-radius: 5px;
-  font-size: 0.76rem;
-  font-family: monospace;
-  color: #0f172a;
-  font-weight: 700;
-}
-
-.dot-sep {
-  color: #94a3b8;
-}
-
-.demo-click-hint {
-  display: block;
-  font-size: 0.68rem;
-  color: #64748b;
-  margin-top: 0.25rem;
 }
 
 /* ===== فوتر القسم الأيسر ===== */
