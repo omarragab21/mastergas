@@ -3,10 +3,13 @@
     <!-- القسم الأيسر: نموذج تسجيل الدخول -->
     <div class="login-left">
       <div class="login-form-wrapper">
-        <!-- العنوان -->
+        <!-- الشعار والعنوان -->
         <div class="login-header">
-          <h2 class="login-title">مرحباً بك في تجارة</h2>
-          <p class="login-subtitle">أدخل بيانات الاعتماد للوصول إلى لوحة التحكم</p>
+          <div class="login-brand-top">
+            <img src="/logo.png" alt="ماستر غاز" class="login-brand-logo-img" />
+          </div>
+          <h2 class="login-title">مرحباً بك في ماستر غاز</h2>
+          <p class="login-subtitle">أدخل بيانات الاعتماد للوصول إلى لوحة التحكم الإدارية</p>
         </div>
 
         <!-- نموذج تسجيل الدخول -->
@@ -20,7 +23,7 @@
                 v-model="form.email"
                 type="email"
                 required
-                placeholder="admin@example.com"
+                placeholder="admin@tijara.com"
                 class="form-input"
                 :class="{ 'input-error': errors.email }"
                 autocomplete="email"
@@ -118,29 +121,53 @@
             </span>
           </button>
         </form>
+
+        <!-- بطاقة بيانات الدخول السريع / الافتراضية -->
+        <div class="demo-credentials-box" @click="fillDemoCredentials" title="انقر لتعبئة الحقول تلقائياً">
+          <div class="demo-credentials-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span>بيانات تسجيل الدخول للوحة التحكم:</span>
+          </div>
+          <div class="demo-credentials-body">
+            <code>admin@tijara.com</code>
+            <span class="dot-sep">&bull;</span>
+            <code>password123</code>
+          </div>
+          <span class="demo-click-hint">(اضغط للتعبئة التلقائية)</span>
+        </div>
       </div>
 
       <!-- Footer -->
       <div class="login-footer">
-        <p>جميع الحقوق محفوظة © Tijara {{ currentYear }}</p>
+        <p>جميع الحقوق محفوظة © ماستر غاز Mastergas {{ currentYear }}</p>
       </div>
     </div>
 
     <!-- القسم الأيمن: لوحة العلامة التجارية -->
     <div class="login-right">
-      <!-- اللوجو -->
+      <!-- اللوجو والشارة -->
       <div class="brand-logo">
-        <img src="/logo.png" alt="تجارة" class="brand-logo-img" />
-        <span>لوحة الإدارة</span>
+        <img src="/logo-dashboard.png" alt="ماستر غاز" class="brand-logo-img" />
+        <span class="brand-badge">
+          <svg class="admin-badge-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          لوحة الإدارة
+        </span>
       </div>
 
       <!-- المحتوى الرئيسي -->
       <div class="brand-content">
+        <span class="brand-pill">نظام إدارة الأجهزة الإيطالية الفاخرة</span>
         <h1 class="brand-title">
-          إدارة منصة<br />التجارة الإلكترونية
+          أجهزة مطبخ بمعايير<br />إيطالية فاخرة
         </h1>
         <p class="brand-desc">
-          الوصول إلى لوحة التحكم لمتابعة المنتجات، وإدارة المشتريات وتتبع المبيعات وخدمة عملائك.
+          لوحة التحكم الإدارية المركزية لمتابعة المنتجات، إدارة المخزون، تتبع طلبات العملاء، وضبط أسعار الشحن ومؤشرات الأداء.
         </p>
       </div>
 
@@ -153,23 +180,26 @@
 
       <!-- Footer للقسم الأيمن -->
       <div class="brand-footer">
-        <p>جميع الحقوق محفوظة © Tijara {{ currentYear }}</p>
+        <p>جميع الحقوق محفوظة © ماستر غاز Mastergas {{ currentYear }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import api from '../config/axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+// استرجاع الإيميل المحفوظ إن وجد أو وضع البريد الافتراضي
+const savedEmail = localStorage.getItem('remembered_email');
+
 const form = ref({
-  email: '',
-  password: '',
-  remember: false,
+  email: savedEmail || 'admin@tijara.com',
+  password: 'password123',
+  remember: Boolean(savedEmail),
 });
 
 const loading = ref(false);
@@ -179,34 +209,30 @@ const showPassword = ref(false);
 
 const currentYear = computed(() => new Date().getFullYear());
 
-import { onMounted } from 'vue';
+const fillDemoCredentials = () => {
+  form.value.email = 'admin@tijara.com';
+  form.value.password = 'password123';
+};
 
 const updateFaviconFromSettings = async () => {
-    try {
-        const res = await api.get('/dashboard/settings');
-        const logoEntry = res.data.data.find(s => s.key === 'logo');
-        if (logoEntry && logoEntry.value && logoEntry.value !== '[]') {
-            let link = document.querySelector("link[rel*='icon']");
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'icon';
-                document.head.appendChild(link);
-            }
-            link.href = logoEntry.value;
-        }
-    } catch (err) {
-        console.error('Failed to update favicon', err);
+  try {
+    const res = await api.get('/dashboard/settings');
+    const logoEntry = res.data.data.find(s => s.key === 'logo');
+    if (logoEntry && logoEntry.value && logoEntry.value !== '[]') {
+      let link = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = logoEntry.value;
     }
+  } catch (err) {
+    console.error('Failed to update favicon', err);
+  }
 };
 
 onMounted(updateFaviconFromSettings);
-
-// استرجاع الإيميل المحفوظ إن وجد
-const savedEmail = localStorage.getItem('remembered_email');
-if (savedEmail) {
-  form.value.email = savedEmail;
-  form.value.remember = true;
-}
 
 const validate = () => {
   errors.value = {};
@@ -267,6 +293,7 @@ const handleLogin = async () => {
   min-height: 100vh;
   direction: ltr; /* LTR على الحاوية لترتيب الأعمدة: نموذج يسار، براند يمين */
   font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: var(--bg-main, #ffffff);
 }
 
 /* ===== القسم الأيسر (النموذج) ===== */
@@ -275,7 +302,7 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: var(--bg-main);
+  background: var(--bg-main, #ffffff);
   padding: 3rem;
   position: relative;
   min-height: 100vh;
@@ -287,28 +314,38 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 380px;
+  max-width: 400px;
   margin: auto;
   width: 100%;
 }
 
-/* ===== رأس صفحة تسجيل الدخول ===== */
+/* ===== رأس صفحة تسجيل الدخول والشعار ===== */
 .login-header {
   text-align: right;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
+}
+
+.login-brand-top {
+  margin-bottom: 1.25rem;
+}
+
+.login-brand-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .login-title {
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 0.4rem;
-  letter-spacing: -0.3px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.4px;
 }
 
 .login-subtitle {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  font-size: 0.85rem;
+  color: #64748b;
   line-height: 1.5;
 }
 
@@ -316,19 +353,19 @@ const handleLogin = async () => {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.15rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .form-label {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: #1f2937;
   text-align: right;
 }
 
@@ -340,13 +377,13 @@ const handleLogin = async () => {
 
 .form-input {
   width: 100%;
-  padding: 0.65rem 2.4rem 0.65rem 2.4rem;
-  border: 1.5px solid var(--input-border);
-  border-radius: 7px;
-  font-size: 0.82rem;
+  padding: 0.72rem 2.5rem 0.72rem 2.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  color: var(--text-main);
-  background: var(--input-bg);
+  color: #0f172a;
+  background: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   direction: ltr;
   text-align: right;
@@ -354,14 +391,14 @@ const handleLogin = async () => {
 }
 
 .form-input::placeholder {
-  color: #9ca3af;
+  color: #94a3b8;
   direction: ltr;
   text-align: right;
 }
 
 .form-input:focus {
-  border-color: #873260;
-  box-shadow: 0 0 0 3px rgba(139, 34, 82, 0.1);
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
 }
 
 .form-input.input-error {
@@ -371,8 +408,8 @@ const handleLogin = async () => {
 
 .input-icon {
   position: absolute;
-  right: 0.75rem;
-  color: #9ca3af;
+  right: 0.85rem;
+  color: #94a3b8;
   display: flex;
   align-items: center;
   pointer-events: none;
@@ -380,8 +417,8 @@ const handleLogin = async () => {
 
 .toggle-password {
   position: absolute;
-  left: 0.75rem;
-  color: #9ca3af;
+  left: 0.85rem;
+  color: #94a3b8;
   cursor: pointer;
   background: none;
   border: none;
@@ -392,7 +429,7 @@ const handleLogin = async () => {
 }
 
 .toggle-password:hover {
-  color: #873260;
+  color: #111827;
 }
 
 .error-msg {
@@ -406,35 +443,35 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
 }
 
 .remember-label {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   cursor: pointer;
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: #475569;
   user-select: none;
 }
 
 .remember-checkbox {
-  width: 14px;
-  height: 14px;
-  accent-color: #873260;
+  width: 15px;
+  height: 15px;
+  accent-color: #111827;
   cursor: pointer;
 }
 
 .forgot-link {
-  font-size: 0.78rem;
-  color: #873260;
+  font-size: 0.8rem;
+  color: #475569;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .forgot-link:hover {
-  color: #6E1A41;
+  color: #0f172a;
   text-decoration: underline;
 }
 
@@ -446,25 +483,25 @@ const handleLogin = async () => {
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #dc2626;
-  padding: 0.6rem 0.8rem;
-  border-radius: 7px;
-  font-size: 0.78rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 
-/* ===== زر تسجيل الدخول ===== */
+/* ===== زر تسجيل الدخول (لون ماستر غاز الفاخر) ===== */
 .login-btn {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: #873260;
+  padding: 0.82rem 1rem;
+  background: #111827;
   color: #ffffff;
-  border: none;
-  border-radius: 7px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
   cursor: pointer;
   transition: all 0.25s ease;
-  margin-top: 0.5rem;
+  margin-top: 0.35rem;
   position: relative;
   overflow: hidden;
 }
@@ -473,14 +510,14 @@ const handleLogin = async () => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 100%);
   pointer-events: none;
 }
 
 .login-btn:hover:not(:disabled) {
-  background: #6E1A41;
+  background: #000000;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(139, 34, 82, 0.35);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.25);
 }
 
 .login-btn:active:not(:disabled) {
@@ -523,22 +560,81 @@ const handleLogin = async () => {
   to { transform: rotate(360deg); }
 }
 
+/* ===== بطاقة بيانات الدخول التوضيحية ===== */
+.demo-credentials-box {
+  margin-top: 1.25rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-credentials-box:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.demo-credentials-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.3rem;
+}
+
+.demo-credentials-body {
+  font-size: 0.8rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.demo-credentials-body code {
+  background: #e2e8f0;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  font-size: 0.76rem;
+  font-family: monospace;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.dot-sep {
+  color: #94a3b8;
+}
+
+.demo-click-hint {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
 /* ===== فوتر القسم الأيسر ===== */
 .login-footer {
   text-align: center;
-  font-size: 0.72rem;
-  color: #9ca3af;
+  font-size: 0.75rem;
+  color: #94a3b8;
   padding-top: 1rem;
 }
 
-/* ===== القسم الأيمن (البراندينج) ===== */
+/* ===== القسم الأيمن (البراندينج بلون وهوية ماستر غاز) ===== */
 .login-right {
-  width: 42%;
-  background: #873260;
+  width: 44%;
+  background: linear-gradient(145deg, #090d16 0%, #111827 50%, #1e293b 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2rem 2.5rem;
+  padding: 2.75rem 3rem;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
@@ -548,22 +644,37 @@ const handleLogin = async () => {
 .brand-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  justify-content: flex-start; /* في RTL flex-start = يمين */
-}
-
-.brand-logo span {
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  gap: 16px;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 2;
 }
 
 .brand-logo-img {
-  height: 52px;
+  height: 38px;
   width: auto;
   object-fit: contain;
-  opacity: 0.95;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.32rem 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-badge-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
 }
 
 /* المحتوى الرئيسي للبراند */
@@ -572,27 +683,41 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start; /* في RTL: flex-start = يمين ✓ */
+  align-items: flex-start;
   text-align: right;
   position: relative;
   z-index: 2;
 }
 
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.2px;
+}
+
 .brand-title {
-  font-size: 2.4rem;
+  font-size: 2.35rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.35;
-  margin-bottom: 1rem;
-  letter-spacing: -0.5px;
+  margin-bottom: 1.15rem;
+  letter-spacing: -0.6px;
   text-align: right;
 }
 
 .brand-desc {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.75;
-  max-width: 320px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.8;
+  max-width: 360px;
   text-align: right;
 }
 
@@ -607,53 +732,46 @@ const handleLogin = async () => {
 .deco-circle {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .deco-circle-1 {
-  width: 350px;
-  height: 350px;
-  top: -80px;
-  left: -120px;
-  background: rgba(255, 255, 255, 0.03);
+  width: 420px;
+  height: 420px;
+  top: -100px;
+  left: -140px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .deco-circle-2 {
-  width: 200px;
-  height: 200px;
-  bottom: 80px;
-  right: -60px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 260px;
+  height: 260px;
+  bottom: 60px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .deco-circle-3 {
-  width: 120px;
-  height: 120px;
-  top: 40%;
-  left: 20%;
-  background: rgba(255, 255, 255, 0.03);
+  width: 160px;
+  height: 160px;
+  top: 42%;
+  left: 15%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 /* فوتر القسم الأيمن */
 .brand-footer {
   text-align: center;
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
   position: relative;
   z-index: 2;
 }
 
-/* فوتر القسم الأيسر */
-.login-footer {
-  text-align: center;
-  font-size: 0.72rem;
-  color: #9ca3af;
-  padding-top: 1rem;
-}
-
 /* ===== Responsive ===== */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .login-page {
     flex-direction: column;
   }
@@ -663,7 +781,7 @@ const handleLogin = async () => {
   }
 
   .login-left {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
     min-height: 100vh;
   }
 
