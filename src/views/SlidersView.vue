@@ -11,9 +11,24 @@ const showViewModal = ref(false);
 const isEditing = ref(false);
 const isSubmitting = ref(false);
 const currentSlider = ref(null);
+const deleteTarget = ref(null);
+const isDeleting = ref(false);
 const previewImage = ref(null);
 const imageFile = ref(null);
 const activeLang = ref('ar');
+
+const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+    .replace(/\/api\/?$/, '');
+
+const normalizeSliderImage = (value) => {
+    if (!value) return value;
+    const raw = String(value);
+    if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
+    if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
+        return raw.replace('/storage/', '/public/storage/');
+    }
+    return raw;
+};
 
 const form = ref({
     title_ar: '',
@@ -72,7 +87,7 @@ const openEditModal = (slider) => {
         status: slider.status,
         order: slider.order
     };
-    previewImage.value = slider.image;
+    previewImage.value = normalizeSliderImage(slider.image);
     imageFile.value = null;
     activeLang.value = 'ar';
     showFormModal.value = true;
@@ -148,15 +163,29 @@ const submitForm = async () => {
     }
 };
 
-const confirmDelete = async (slider) => {
-    if (confirm(`هل أنت متأكد من حذف الشريحة "${slider.title_i18n?.ar || slider.title}"؟`)) {
-        try {
-            await api.delete(`/dashboard/sliders/${slider.id}`);
-            triggerAlert('تم حذف الشريحة بنجاح');
-            fetchSliders();
-        } catch (error) {
-            triggerAlert('فشل عملية الحذف', 'error');
-        }
+const confirmDelete = (slider) => {
+    deleteTarget.value = slider;
+};
+
+const cancelDelete = () => {
+    if (!isDeleting.value) deleteTarget.value = null;
+};
+
+const executeDelete = async () => {
+    if (!deleteTarget.value || isDeleting.value) return;
+
+    const target = deleteTarget.value;
+    isDeleting.value = true;
+    try {
+        await api.delete(`/dashboard/sliders/${target.id}`);
+        sliders.value = sliders.value.filter((slider) => slider.id !== target.id);
+        deleteTarget.value = null;
+        triggerAlert('تم حذف الشريحة بنجاح');
+    } catch (error) {
+        const message = error.response?.data?.message || 'فشل حذف الشريحة. حاول مرة أخرى.';
+        triggerAlert(message, 'error');
+    } finally {
+        isDeleting.value = false;
     }
 };
 
@@ -253,7 +282,7 @@ const copyLink = (text) => {
               <td class="col-info text-right">
                 <div class="image-title-cell">
                    <div class="slider-thumb">
-                      <img :src="slider.image" v-if="slider.image" />
+                      <img :src="normalizeSliderImage(slider.image)" v-if="slider.image" />
                       <div class="img-placeholder" v-else>
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><polyline points="10 13 13 10 21 18"/><circle cx="8" cy="8" r="3"/></svg>
                       </div>
@@ -382,7 +411,7 @@ const copyLink = (text) => {
         </div>
         <div class="modal-body p-0">
            <div class="view-image-full" v-if="currentSlider.image">
-              <img :src="currentSlider.image" alt="Slider" />
+              <img :src="normalizeSliderImage(currentSlider.image)" alt="Slider" />
            </div>
            <div class="modal-body p-8">
               <div class="info-row">
@@ -411,6 +440,28 @@ const copyLink = (text) => {
         </div>
         <div class="modal-footer">
            <button class="btn-save-alt" @click="showViewModal = false">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div class="modal-overlay" v-if="deleteTarget" @click.self="cancelDelete">
+      <div class="modal-content delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+        <div class="delete-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.6 2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/>
+          </svg>
+        </div>
+        <div class="delete-copy">
+          <h2 id="delete-title">تأكيد حذف الشريحة</h2>
+          <p>هل أنت متأكد من حذف شريحة «{{ deleteTarget.title_i18n?.ar || deleteTarget.title }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+        </div>
+        <div class="modal-footer delete-footer">
+          <button class="btn-cancel" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
+            <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
+            {{ isDeleting ? 'جاري الحذف...' : 'حذف الشريحة' }}
+          </button>
         </div>
       </div>
     </div>
@@ -543,6 +594,18 @@ const copyLink = (text) => {
 .info-item { display: flex; align-items: center; gap: 10px; }
 .info-item label { color: #6b7280; font-weight: 600; }
 .btn-save-alt { width: 100%; background: #1f2937; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+.delete-modal { max-width: 460px; padding: 28px; text-align: center; }
+.delete-icon { width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #dc2626; background: #fef2f2; }
+.delete-copy h2 { margin: 0 0 8px; color: var(--text-main); font-size: 1.2rem; }
+.delete-copy p { margin: 0; color: var(--text-muted); line-height: 1.7; font-size: 0.92rem; }
+.delete-footer { padding: 24px 0 0; background: transparent; border-top: 0; }
+.delete-footer button { min-height: 44px; }
+.btn-delete-confirm { background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-delete-confirm:hover { background: #b91c1c; }
+.btn-delete-confirm:disabled, .btn-cancel:disabled { opacity: 0.6; cursor: not-allowed; }
+.delete-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.45); border-top-color: white; border-radius: 50%; animation: delete-spin 0.7s linear infinite; }
+@keyframes delete-spin { to { transform: rotate(360deg); } }
 
 /* Utils */
 .mb-6 { margin-bottom: 24px; }

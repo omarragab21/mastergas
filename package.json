@@ -11,6 +11,7 @@
     "build:clean": "rm -rf dist node_modules/.vite && node --dns-result-order=ipv4first scripts/generateFeed.js && vite build",
     "build:cpanel": "npm run build && (cd dist && zip -r -q ../cpanel-public_html.zip .) && echo '✓ cPanel package ready: cpanel-public_html.zip'",
     "test": "node --test --test-concurrency=1",
+    "test:e2e": "playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -25,9 +26,11 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@vitejs/plugin-vue": "^6.0.2",
     "autoprefixer": "^10.4.27",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.1",
     "vite": "^7.3.1"

@@ -328,6 +328,24 @@ const currentHeroIndex = ref(0);
 const heroAutoplayTimer = ref(null);
 const heroTransitionName = ref('slide-right');
 
+const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+  .replace(/\/api\/?$/, '');
+
+const normalizeSliderImage = (value) => {
+  if (!value) return defaultHeroSlide.image;
+  return normalizeStorageImage(value, defaultHeroSlide.image);
+};
+
+const normalizeStorageImage = (value, fallback = value) => {
+  if (!value) return fallback;
+  const raw = String(value);
+  if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
+  if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
+    return raw.replace('/storage/', '/public/storage/');
+  }
+  return raw;
+};
+
 const defaultHeroSlide = {
   id: 0,
   tag: 'أجهزة طهي متطورة',
@@ -364,7 +382,7 @@ const displayHeroSlides = computed(() => {
         title: title,
         title_sub: '',
         description: desc,
-        image: s.image || '/images/home/hero_pristine.png',
+        image: normalizeSliderImage(s.image),
         link: s.link || '/products',
         button_text: btnText
       };
@@ -477,7 +495,7 @@ const displayOffers = computed(() => {
       id: offer.id,
       title,
       badgeText,
-      image: offer.image || '/images/home/offer_clearance_pro.jpg',
+      image: normalizeStorageImage(offer.image, '/images/home/offer_clearance_pro.jpg'),
       link: `/offers?offer=${offer.id}`
     };
   });

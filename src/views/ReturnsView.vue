@@ -16,6 +16,10 @@
             <span class="stat-label">مرفوض</span>
             <span class="stat-value rejected">{{ rejectedCount }}</span>
           </div>
+          <div class="stat-card">
+            <span class="stat-label">تم رد المبلغ</span>
+            <span class="stat-value refunded">{{ refundedCount }}</span>
+          </div>
         </div>
       </div>
     </header>
@@ -24,6 +28,11 @@
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
         <p>جاري التحميل...</p>
+      </div>
+
+      <div v-else-if="error" class="error-state">
+        <p>{{ error }}</p>
+        <button class="btn-retry" type="button" @click="fetchReturns">إعادة المحاولة</button>
       </div>
 
       <div v-else-if="returns.length === 0" class="empty-state">
@@ -40,30 +49,30 @@
         <div v-for="ret in returns" :key="ret.id" class="return-card">
           <div class="return-header">
             <div class="return-info">
-              <span class="return-id">طلب #{{ ret.id }}</span>
-              <span class="customer-name">{{ ret.customer_name }}</span>
-              <span class="order-number">{{ ret.order_number }}</span>
+              <span class="return-id">طلب #{{ ret.returnNumber }}</span>
+              <span class="customer-name">{{ ret.customerName }} · {{ ret.customerEmail }}</span>
+              <span class="order-number">{{ ret.orderNumber || ('طلب ' + ret.orderId) }}</span>
             </div>
             <span class="status-badge" :class="ret.status">{{ formatStatus(ret.status) }}</span>
           </div>
 
           <div class="return-body">
             <div class="product-info">
-              <span class="product-name">{{ ret.product_name }}</span>
-              <span class="refund-amount">{{ formatPrice(ret.refund_amount) }}</span>
+              <span class="product-name">{{ ret.productName }}</span>
+              <span class="refund-amount">{{ formatPrice(ret.refundAmount) }}</span>
             </div>
             <div class="reason-section">
               <span class="reason-label">السبب:</span>
               <span class="reason-text">{{ ret.reason }}</span>
             </div>
-            <div v-if="ret.admin_notes" class="admin-notes">
+            <div v-if="ret.adminNotes" class="admin-notes">
               <span class="notes-label">ملاحظة الإدارة:</span>
-              <span class="notes-text">{{ ret.admin_notes }}</span>
+              <span class="notes-text">{{ ret.adminNotes }}</span>
             </div>
           </div>
 
           <div class="return-footer">
-            <span class="return-date">{{ ret.date }}</span>
+            <span class="return-date">{{ ret.date ? formatDate(ret.date) : '—' }}</span>
             <div v-if="ret.status === 'pending'" class="action-buttons">
               <button class="btn-approve" @click="handleApprove(ret.id)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -103,10 +112,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import api from '../config/axios';
+import returnsService from '../services/returnsService';
 
 const returns = ref([]);
 const loading = ref(false);
+const error = ref('');
 const showRejectModal = ref(false);
 const rejectReason = ref('');
 const selectedReturnId = ref(null);
@@ -114,12 +124,14 @@ const selectedReturnId = ref(null);
 const pendingCount = computed(() => returns.value.filter(r => r.status === 'pending').length);
 const approvedCount = computed(() => returns.value.filter(r => r.status === 'approved').length);
 const rejectedCount = computed(() => returns.value.filter(r => r.status === 'rejected').length);
+const refundedCount = computed(() => returns.value.filter(r => r.status === 'refunded').length);
 
 const formatStatus = (status) => {
   const labels = {
     pending: 'قيد المراجعة',
     approved: 'تم القبول',
-    rejected: 'مرفوض'
+    rejected: 'مرفوض',
+    refunded: 'تم رد المبلغ'
   };
   return labels[status] || status;
 };
@@ -128,13 +140,16 @@ const formatPrice = (price) => {
   return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' د.أ';
 };
 
+const formatDate = (date) => new Date(date).toLocaleDateString('ar-JO');
+
 const fetchReturns = async () => {
   loading.value = true;
+  error.value = '';
   try {
-    const res = await api.get('/dashboard/returns');
-    returns.value = res.data.data || [];
+    returns.value = await returnsService.listAll();
   } catch (err) {
     console.error('Failed to fetch returns:', err);
+    error.value = err.response?.data?.message || 'فشل تحميل طلبات الإرجاع';
   } finally {
     loading.value = false;
   }
@@ -144,7 +159,7 @@ const handleApprove = async (id) => {
   if (!confirm('هل أنت متأكد من قبول هذا الطلب؟ سيتم إضافة المبلغ إلى رصيد العميل.')) return;
   
   try {
-    await api.patch(`/dashboard/returns/${id}/status`, {
+    await returnsService.updateStatus(id, {
       status: 'approved'
     });
     alert('تم قبول طلب الإرجاع بنجاح');
@@ -173,7 +188,7 @@ const handleReject = async () => {
   }
 
   try {
-    await api.patch(`/dashboard/returns/${selectedReturnId.value}/status`, {
+    await returnsService.updateStatus(selectedReturnId.value, {
       status: 'rejected',
       admin_notes: rejectReason.value.trim()
     });
@@ -252,6 +267,10 @@ onMounted(() => {
   color: #ef4444;
 }
 
+.stat-value.refunded {
+  color: #2563eb;
+}
+
 .returns-table-container {
   background: #fff;
   border-radius: 16px;
@@ -290,6 +309,26 @@ onMounted(() => {
   padding: 60px;
   gap: 15px;
   color: #9ca3af;
+}
+
+.error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 280px;
+  color: #b91c1c;
+}
+
+.btn-retry {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 18px;
+  background: #873260;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .returns-list {
@@ -365,6 +404,11 @@ onMounted(() => {
 .status-badge.rejected {
   background: #fee2e2;
   color: #dc2626;
+}
+
+.status-badge.refunded {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .return-body {

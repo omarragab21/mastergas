@@ -398,6 +398,28 @@
       </div>
     </div>
 
+    <!-- Delete Confirmation -->
+    <div class="modal-overlay" v-if="deleteTarget" @click.self="cancelDelete">
+      <div class="modal-content delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-offer-title">
+        <div class="delete-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.6 2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/>
+          </svg>
+        </div>
+        <div class="delete-copy">
+          <h2 id="delete-offer-title">تأكيد حذف العرض</h2>
+          <p>هل أنت متأكد من حذف عرض «{{ deleteTarget.name_i18n?.ar || deleteTarget.name }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+        </div>
+        <div class="modal-footer delete-footer">
+          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
+            <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
+            {{ isDeleting ? 'جاري الحذف...' : 'حذف العرض' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Alert Message -->
     <div class="alert-toast" :class="[alertType, { show: showAlert }]">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alert-icon">
@@ -432,6 +454,21 @@ const totalOffersCount = ref(0);
 const showFormModal = ref(false);
 const isEdit = ref(false);
 const currentId = ref(null);
+const deleteTarget = ref(null);
+const isDeleting = ref(false);
+
+const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+    .replace(/\/api\/?$/, '');
+
+const normalizeOfferImage = (value) => {
+    if (!value) return value;
+    const raw = String(value);
+    if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
+    if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
+        return raw.replace('/storage/', '/public/storage/');
+    }
+    return raw;
+};
 
 const activeLang = ref('ar');
 
@@ -639,17 +676,12 @@ const fetchOffers = async () => {
         per_page: perPage.value
       }
     });
-    if (res.data?.data && res.data.data.length > 0) {
-      offers.value = res.data.data;
-      totalOffersCount.value = res.data.total || res.data.data?.length || 0;
-    } else {
-      offers.value = defaultDashboardOffers;
-      totalOffersCount.value = defaultDashboardOffers.length;
-    }
+    offers.value = Array.isArray(res.data?.data) ? res.data.data : [];
+    totalOffersCount.value = res.data?.meta?.total ?? res.data?.total ?? offers.value.length;
   } catch (err) {
-    // Graceful fallback to PRO offers
-    offers.value = defaultDashboardOffers;
-    totalOffersCount.value = defaultDashboardOffers.length;
+    offers.value = [];
+    totalOffersCount.value = 0;
+    triggerAlert('فشل تحميل العروض من الخادم', 'error');
   } finally {
     loading.value = false;
   }
@@ -726,7 +758,7 @@ const openEditModal = (offer) => {
         end_date: offer.end_date ? formatDate(offer.end_date) : '',
         no_end_date: !offer.end_date
     };
-    imagePreview.value = offer.image ? `/storage/${offer.image}` : null;
+    imagePreview.value = normalizeOfferImage(offer.image);
     activeLang.value = 'ar';
     showFormModal.value = true;
 };
@@ -855,15 +887,30 @@ const toggleOfferStatus = async (offer) => {
     }
 };
 
-const confirmDelete = async (offer) => {
-    if (confirm(`هل أنت متأكد من حذف العرض "${offer.name}"؟`)) {
-        try {
-            await api.delete(`/dashboard/offers/${offer.id}`);
-            triggerAlert('تم حذف العرض بنجاح');
-            fetchOffers();
-        } catch (err) {
-            triggerAlert('فشل حذف العرض', 'error');
-        }
+const confirmDelete = (offer) => {
+    deleteTarget.value = offer;
+};
+
+const cancelDelete = () => {
+    if (!isDeleting.value) deleteTarget.value = null;
+};
+
+const executeDelete = async () => {
+    if (!deleteTarget.value || isDeleting.value) return;
+
+    const target = deleteTarget.value;
+    isDeleting.value = true;
+    try {
+        await api.delete(`/dashboard/offers/${target.id}`);
+        offers.value = offers.value.filter((offer) => offer.id !== target.id);
+        totalOffersCount.value = Math.max(0, totalOffersCount.value - 1);
+        deleteTarget.value = null;
+        triggerAlert('تم حذف العرض بنجاح');
+    } catch (err) {
+        const message = err.response?.data?.message || 'فشل حذف العرض. حاول مرة أخرى.';
+        triggerAlert(message, 'error');
+    } finally {
+        isDeleting.value = false;
     }
 };
 </script>
@@ -961,6 +1008,17 @@ const confirmDelete = async (offer) => {
 .view-btn { background: #fdf2f8; color: #db2777; }
 .edit-btn { background: #eff6ff; color: #2563eb; }
 .delete-btn { background: #fef2f2; color: #dc2626; }
+.delete-modal { max-width: 460px; padding: 28px; text-align: center; }
+.delete-icon { width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #dc2626; background: #fef2f2; }
+.delete-copy h2 { margin: 0 0 8px; color: #111827; font-size: 1.2rem; }
+.delete-copy p { margin: 0; color: #6b7280; line-height: 1.7; font-size: 0.92rem; }
+.delete-footer { padding: 24px 0 0; background: transparent; border-top: 0; }
+.delete-footer button { min-height: 44px; }
+.btn-delete-confirm { background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-delete-confirm:hover { background: #b91c1c; }
+.btn-delete-confirm:disabled, .btn-cancel-form:disabled { opacity: 0.6; cursor: not-allowed; }
+.delete-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.45); border-top-color: white; border-radius: 50%; animation: delete-spin 0.7s linear infinite; }
+@keyframes delete-spin { to { transform: rotate(360deg); } }
 .copy-btn-action { background: #f9fafb; color: #6b7280; }
 .action-btn:hover { opacity: 0.8; transform: translateY(-1px); }
 

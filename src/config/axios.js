@@ -9,6 +9,7 @@ const isLocalhost = isBrowser &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 const forceRemote = import.meta.env.VITE_USE_PROXY === 'false';
+const frappeMode = import.meta.env.VITE_FRAPPE_MODE === 'true';
 
 // When running in a browser locally, route through Vite dev server proxy '/api'
 // to eliminate browser Cross-Origin Request Blocked (CORS) errors.
@@ -132,6 +133,19 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  if (frappeMode && cleanPath.startsWith('/frontend') && config.method?.toLowerCase() === 'get') {
+    const parts = cleanPath.split('/').filter(Boolean);
+    const resource = parts[1];
+    const methodMap = { products: 'get_products', categories: 'get_categories', offers: 'get_offers', brands: 'get_brands', settings: 'get_settings', sliders: 'get_sliders', reviews: 'get_product_reviews', coupons: 'get_coupons', topics: 'get_topics' };
+    if (resource === 'products' && parts[2]) {
+      config.baseURL = '/api';
+      config.url = '/method/mastergas_core.api.frontend.get_product_detail';
+      config.params = { ...(config.params || {}), id_or_slug: decodeURIComponent(parts[2]) };
+    } else if (methodMap[resource]) {
+      config.baseURL = '/api';
+      config.url = `/method/mastergas_core.api.frontend.${methodMap[resource]}`;
+    }
+  }
   return config;
 });
 
@@ -175,6 +189,7 @@ let isRedirectingToAdminLogin = false;
 api.interceptors.response.use(
   response => {
     finalizeMetric(response.config, { status: response.status });
+    if (frappeMode && response.data?.message?.success) response.data = response.data.message;
     if (getRequestPath(response.config).startsWith('/frontend/products')) {
       performanceMark('mastergas:products-api-complete');
     }

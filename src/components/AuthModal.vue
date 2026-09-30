@@ -40,37 +40,37 @@
         </div>
 
         <!-- Custom Alerts -->
-        <div v-if="globalSuccess" class="custom-alert success-alert" :dir="currentDir">
+        <div v-if="globalSuccess" class="custom-alert success-alert" :dir="currentDir" role="status" aria-live="polite">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
           <span>{{ globalSuccess }}</span>
         </div>
 
-        <div v-if="globalError" class="custom-alert error-alert" :dir="currentDir">
+        <div v-if="globalError" class="custom-alert error-alert" :dir="currentDir" role="alert" aria-live="assertive">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
           <span>{{ globalError }}</span>
         </div>
 
         <!-- Login Form -->
-        <form v-if="currentTab === 'login'" @submit.prevent="handleLogin" class="auth-form" :dir="currentDir">
+        <form v-if="currentTab === 'login'" @submit.prevent="handleLogin" class="auth-form" :dir="currentDir" novalidate :aria-busy="loading">
           <div class="form-group">
             <label>{{ t('auth.email') }}</label>
             <div class="input-wrapper">
-              <input type="email" v-model="loginForm.email" :placeholder="t('auth.email_placeholder')" required />
+              <input type="email" v-model="loginForm.email" :placeholder="t('auth.email_placeholder')" autocomplete="email" :aria-invalid="Boolean(errors.loginEmail)" :aria-describedby="errors.loginEmail ? 'login-email-error' : undefined" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
             </div>
-            <span v-if="errors.loginEmail" class="inline-error-msg">{{ errors.loginEmail }}</span>
+            <span v-if="errors.loginEmail" id="login-email-error" class="inline-error-msg">{{ errors.loginEmail }}</span>
           </div>
 
           <div class="form-group">
             <label>{{ t('auth.password') }}</label>
             <div class="input-wrapper">
-              <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginForm.password" :placeholder="t('auth.password_placeholder')" required />
+              <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginForm.password" :placeholder="t('auth.password_placeholder')" autocomplete="current-password" :aria-invalid="Boolean(errors.loginPassword)" :aria-describedby="errors.loginPassword ? 'login-password-error' : undefined" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <button type="button" class="eye-btn" @click="showLoginPassword = !showLoginPassword">
                 <i :class="showLoginPassword ? 'far fa-eye-slash' : 'far fa-eye'"></i>
               </button>
             </div>
-            <span v-if="errors.loginPassword" class="inline-error-msg">{{ errors.loginPassword }}</span>
+            <span v-if="errors.loginPassword" id="login-password-error" class="inline-error-msg">{{ errors.loginPassword }}</span>
           </div>
 
           <div class="forgot-password">
@@ -78,7 +78,8 @@
           </div>
 
           <button type="submit" class="submit-btn" :disabled="loading">
-            {{ loading ? t('auth.loading') : t('auth.submit_login') }}
+            <span v-if="loading" class="loading-content"><span class="button-spinner" aria-hidden="true"></span>{{ t('auth.loading') }}</span>
+            <span v-else>{{ t('auth.submit_login') }}</span>
           </button>
 
           <div class="continue-browsing">
@@ -87,11 +88,11 @@
         </form>
 
         <!-- Register Form -->
-        <form v-else-if="currentTab === 'register'" @submit.prevent="handleRegister" class="auth-form" :dir="currentDir">
+        <form v-else-if="currentTab === 'register'" @submit.prevent="handleRegister" class="auth-form" :dir="currentDir" novalidate :aria-busy="loading">
           <div class="form-group">
             <label>{{ t('auth.name') }}</label>
             <div class="input-wrapper">
-              <input type="text" v-model="registerForm.name" :placeholder="t('auth.name_placeholder')" required />
+              <input type="text" v-model="registerForm.name" :placeholder="t('auth.name_placeholder')" autocomplete="name" :aria-invalid="Boolean(errors.name)" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
             <span v-if="errors.name" class="inline-error-msg">{{ errors.name }}</span>
@@ -100,7 +101,7 @@
           <div class="form-group">
             <label>{{ t('auth.email') }}</label>
             <div class="input-wrapper">
-              <input type="email" v-model="registerForm.email" :placeholder="t('auth.email_placeholder')" required />
+              <input type="email" v-model="registerForm.email" :placeholder="t('auth.email_placeholder')" autocomplete="email" :aria-invalid="Boolean(errors.email)" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
             </div>
             <span v-if="errors.email" class="inline-error-msg">{{ errors.email }}</span>
@@ -116,9 +117,9 @@
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
-                <select v-model="selectedCountry" class="native-country-select" :dir="currentDir">
+                <select v-model="selectedCountry" class="native-country-select" :dir="currentDir" :aria-label="t('auth.country')">
                   <option 
-                    v-for="c in countries" 
+                    v-for="c in filteredCountries"
                     :key="c.code" 
                     :value="c.code"
                   >
@@ -127,6 +128,8 @@
                 </select>
               </div>
 
+              <input v-model="countrySearch" type="search" class="country-search-input" :placeholder="t('auth.country_search')" :aria-label="t('auth.country_search')" autocomplete="off" />
+
               <!-- Phone Number Input -->
               <input 
                 type="tel" 
@@ -134,7 +137,7 @@
                 class="phone-field"
                 :placeholder="activeCountryObj.placeholder" 
                 :maxlength="activeCountryObj.maxLength" 
-                required 
+                :aria-invalid="Boolean(errors.phone)"
                 dir="ltr" 
               />
             </div>
@@ -144,17 +147,19 @@
           <div class="form-group">
             <label>{{ t('auth.password') }}</label>
             <div class="input-wrapper">
-              <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password" :placeholder="t('auth.password_placeholder')" required minlength="6" />
+              <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password" :placeholder="t('auth.password_placeholder')" autocomplete="new-password" :aria-invalid="Boolean(errors.password)" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <button type="button" class="eye-btn" @click="showRegisterPassword = !showRegisterPassword">
                 <i :class="showRegisterPassword ? 'far fa-eye-slash' : 'far fa-eye'"></i>
               </button>
             </div>
             <span v-if="errors.password" class="inline-error-msg">{{ errors.password }}</span>
+            <span class="password-hint">{{ t('auth.password_hint') }}</span>
           </div>
 
           <button type="submit" class="submit-btn" :disabled="loading">
-            {{ loading ? t('auth.loading') : t('auth.submit_register') }}
+            <span v-if="loading" class="loading-content"><span class="button-spinner" aria-hidden="true"></span>{{ t('auth.loading') }}</span>
+            <span v-else>{{ t('auth.submit_register') }}</span>
           </button>
 
           <div class="continue-browsing">
@@ -211,9 +216,21 @@ const showLoginPassword = ref(false)
 const showRegisterPassword = ref(false)
 
 const selectedCountry = ref('JO')
+const countrySearch = ref('')
 
 const activeCountryObj = computed(() => {
   return findCountryByCode(selectedCountry.value)
+})
+
+const filteredCountries = computed(() => {
+  const query = countrySearch.value.trim().toLowerCase()
+  if (!query) return countries
+  return countries.filter((country) => [
+    country.code,
+    country.dialCode,
+    country.nameAr,
+    country.nameEn,
+  ].some((value) => String(value).toLowerCase().includes(query)))
 })
 
 const loginForm = reactive({
@@ -342,7 +359,24 @@ const openModal = () => {
 const closeModal = () => {
   isOpen.value = false
   currentTab.value = 'login'
+  countrySearch.value = ''
   document.body.style.overflow = ''
+}
+
+const cleanAuthQuery = () => {
+  if (typeof window === 'undefined') return
+  const cleanUrl = `${window.location.pathname}${window.location.hash}`
+  window.history.replaceState({}, document.title, cleanUrl || '/')
+}
+
+const getServerErrorMessage = (error, fallback) => {
+  const response = error?.response?.data
+  const fieldError = response?.errors && Object.values(response.errors).flat()[0]
+  if (fieldError) return fieldError
+  if (error?.response?.status === 401 || error?.response?.status === 422) {
+    return fallback
+  }
+  return response?.message || fallback
 }
 
 const handleForgotPassword = async () => {
@@ -372,11 +406,12 @@ const handleLogin = async () => {
     globalSuccess.value = res.message || t('auth.login_success')
     setTimeout(() => {
       closeModal()
+      cleanAuthQuery()
       window.location.reload()
     }, 1000)
   } catch (error) {
     console.error(error)
-    globalError.value = error.response?.data?.message || t('auth.login_error')
+    globalError.value = getServerErrorMessage(error, t('auth.login_error'))
   }
 }
 
@@ -391,11 +426,12 @@ const handleRegister = async () => {
     globalSuccess.value = res.message || t('auth.login_success')
     setTimeout(() => {
       closeModal()
+      cleanAuthQuery()
       window.location.reload()
     }, 1000)
   } catch (error) {
     console.error(error)
-    globalError.value = error.response?.data?.message || t('auth.register_error')
+    globalError.value = getServerErrorMessage(error, t('auth.register_error'))
   }
 }
 
@@ -629,6 +665,25 @@ defineExpose({
   box-sizing: border-box;
 }
 
+.country-search-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #1f2937;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.country-search-input:focus {
+  border-color: #000;
+  background: #fff;
+}
+
 .country-dial-badge {
   font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
   font-size: 13px;
@@ -706,6 +761,14 @@ defineExpose({
   text-align: right;
 }
 
+.password-hint {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .phone-input-wrapper input {
   flex: 1;
   padding: 14px 16px;
@@ -760,6 +823,26 @@ defineExpose({
 .submit-btn:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+}
+
+.loading-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: auth-spin 0.7s linear infinite;
+}
+
+@keyframes auth-spin {
+  to { transform: rotate(360deg); }
 }
 
 .continue-browsing {

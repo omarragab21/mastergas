@@ -434,24 +434,24 @@
              <div class="returns-list" v-if="!showReturnForm">
                 <div v-for="ret in returnsList" :key="ret.id" class="return-card">
                   <div class="ret-header">
-                    <span class="ret-id">{{ t('profile.request') }} #{{ ret.id }}</span>
+                    <span class="ret-id">{{ t('profile.request') }} #{{ ret.returnNumber }}</span>
                     <span class="status-badge-v2" :class="ret.status">{{ formatReturnStatus(ret.status) }}</span>
                   </div>
                   <div class="ret-body">
-                    <img :src="ret.product_image" class="ret-img" v-if="ret.product_image" />
+                    <img :src="ret.productImage" class="ret-img" v-if="ret.productImage" />
                     <div class="ret-info">
-                      <div class="ret-pname">{{ ret.product_name }}</div>
-                      <div class="ret-order">{{ t('profile.original_order') }}: {{ ret.order_number }}</div>
+                      <div class="ret-pname">{{ ret.productName }}</div>
+                      <div class="ret-order">{{ t('profile.original_order') }}: {{ ret.orderNumber || ret.orderId || '—' }}</div>
                       <div class="ret-reason"><strong>{{ t('profile.reason') }}:</strong> {{ ret.reason }}</div>
-                      <div class="ret-notes" v-if="ret.admin_notes"><strong>{{ t('profile.admin_note') }}:</strong> {{ ret.admin_notes }}</div>
+                      <div class="ret-notes" v-if="ret.adminNotes"><strong>{{ t('profile.admin_note') }}:</strong> {{ ret.adminNotes }}</div>
                     </div>
                     <div class="ret-refund">
                       <span class="refund-label">{{ t('profile.amount') }}:</span>
-                      <span class="refund-val">{{ ret.refund_amount }} {{ currency }}</span>
+                      <span class="refund-val">{{ ret.refundAmount }} {{ currency }}</span>
                     </div>
                   </div>
                   <div class="ret-footer">
-                    <span class="ret-date">{{ ret.date }}</span>
+                    <span class="ret-date">{{ ret.date ? formatDate(ret.date) : '—' }}</span>
                   </div>
                 </div>
                 <div v-if="returnsList.length === 0" class="empty-state">{{ t('profile.no_previous_returns') }}</div>
@@ -649,6 +649,7 @@ import { useLocalized } from '../../composables/useLocalized'
 import { useSettings } from '../../composables/useSettings'
 import { findCountryByCode } from '../../data/countries'
 import { escapeHtml } from '../../utils/sanitize'
+import returnsService from '../../services/returnsService'
 
 const route = useRoute()
 const router = useRouter()
@@ -915,8 +916,7 @@ const fetchData = async () => {
     // Returns & Notifications
     fetchNotifications()
     try {
-      const retRes = await api.get('/frontend/returns')
-      returnsList.value = retRes.data.data || []
+      returnsList.value = await returnsService.listMine()
     } catch (e) {
       returnsList.value = []
     }
@@ -1102,7 +1102,8 @@ const getPaymentLabel = (method) => {
 const formatReturnStatus = (s) => ({
   pending: t('profile.return_status_pending'),
   approved: t('profile.return_status_approved'),
-  rejected: t('profile.return_status_rejected')
+  rejected: t('profile.return_status_rejected'),
+  refunded: 'تم رد المبلغ'
 }[s] || s)
 
 const openReturnForm = () => {
@@ -1125,7 +1126,7 @@ const submitReturnRequest = async () => {
       selectedItemForReturn: selectedItemForReturn.value
     })
 
-    const res = await api.post('/frontend/returns', {
+    const res = await returnsService.create({
       order_id: selectedOrderForReturn.value.id,
       order_item_id: selectedItemForReturn.value.id,
       reason: returnReason.value.trim()

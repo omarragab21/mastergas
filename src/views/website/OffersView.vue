@@ -250,6 +250,19 @@ const currentPage = ref(1);
 const perPage = ref(9);
 const sortBy = ref('relevant');
 
+const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+  .replace(/\/api\/?$/, '');
+
+const normalizeOfferImage = (value) => {
+  if (!value) return value;
+  const raw = String(value);
+  if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
+  if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
+    return raw.replace('/storage/', '/public/storage/');
+  }
+  return raw;
+};
+
 // Filters
 const inStockOnly = ref(false);
 const hasDiscountOnly = ref(false);
@@ -382,7 +395,9 @@ const fetchOffers = async () => {
   try {
     const list = await productService.getOffers({ is_active: 1 });
     const active = list.filter(isOfferActive);
-    offers.value = active.length > 0 ? active : fallbackOffers;
+    offers.value = active.length > 0
+      ? active.map((offer) => ({ ...offer, image: normalizeOfferImage(offer.image) }))
+      : fallbackOffers;
   } catch (err) {
     console.error('Failed to fetch offers from API:', err);
     offers.value = fallbackOffers;
