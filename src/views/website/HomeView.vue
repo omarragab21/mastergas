@@ -2,6 +2,7 @@
   <div class="home-view" :dir="currentLang === 'ar' ? 'rtl' : 'ltr'">
     <!-- 1. Hero Section (Home Banner Multi-Slide Carousel) -->
     <div 
+      v-if="displayHeroSlides.length > 0"
       class="hero-banner-wrapper"
       @mouseenter="stopHeroAutoplay"
       @mouseleave="startHeroAutoplay"
@@ -324,6 +325,7 @@ const rawProducts = ref([]);
 const rawCategories = ref([]);
 const rawOffers = ref([]);
 const rawSliders = ref([]);
+const slidersLoaded = ref(false);
 const currentHeroIndex = ref(0);
 const heroAutoplayTimer = ref(null);
 const heroTransitionName = ref('slide-right');
@@ -344,6 +346,21 @@ const normalizeStorageImage = (value, fallback = value) => {
     return raw.replace('/storage/', '/public/storage/');
   }
   return raw;
+};
+
+// Warm the browser cache before the carousel needs the next background image.
+// This preserves the existing carousel logic while removing first-view delays.
+const preloadedHeroImages = new Set();
+const preloadHeroImages = (slides = []) => {
+  slides.forEach((slide, index) => {
+    const imageUrl = normalizeStorageImage(slide.image, defaultHeroSlide.image);
+    if (!imageUrl || preloadedHeroImages.has(imageUrl)) return;
+    preloadedHeroImages.add(imageUrl);
+    const image = new Image();
+    image.decoding = 'async';
+    image.fetchPriority = index === 0 ? 'high' : 'low';
+    image.src = imageUrl;
+  });
 };
 
 const defaultHeroSlide = {
@@ -388,14 +405,18 @@ const displayHeroSlides = computed(() => {
       };
     });
   }
-  return [{
-    ...defaultHeroSlide,
-    tag: currentLang.value === 'ar' ? defaultHeroSlide.tag : defaultHeroSlide.tag_en,
-    title: currentLang.value === 'ar' ? defaultHeroSlide.title : defaultHeroSlide.title_en,
-    title_sub: currentLang.value === 'ar' ? defaultHeroSlide.title_sub : defaultHeroSlide.title_sub_en,
-    description: currentLang.value === 'ar' ? defaultHeroSlide.description : defaultHeroSlide.description_en,
-    button_text: currentLang.value === 'ar' ? defaultHeroSlide.button_text : defaultHeroSlide.button_text_en
-  }];
+  // Keep the hero visible while the real slider list is loading.
+  if (!slidersLoaded.value) {
+    return [{
+      ...defaultHeroSlide,
+      tag: currentLang.value === 'ar' ? defaultHeroSlide.tag : defaultHeroSlide.tag_en,
+      title: currentLang.value === 'ar' ? defaultHeroSlide.title : defaultHeroSlide.title_en,
+      title_sub: currentLang.value === 'ar' ? defaultHeroSlide.title_sub : defaultHeroSlide.title_sub_en,
+      description: currentLang.value === 'ar' ? defaultHeroSlide.description : defaultHeroSlide.description_en,
+      button_text: currentLang.value === 'ar' ? defaultHeroSlide.button_text : defaultHeroSlide.button_text_en
+    }];
+  }
+  return [];
 });
 
 const nextHeroSlide = () => {
@@ -601,10 +622,13 @@ const addToCart = (product) => {
 };
 
 const fetchSliders = async () => {
+  slidersLoaded.value = false;
   try {
     const list = await settingsService.getSliders({ is_active: 1 });
     if (Array.isArray(list) && list.length > 0) {
-      rawSliders.value = list.filter(s => s.status === 'active' || s.is_active !== 0);
+      const activeSlides = list.filter(s => s.status === 'active' || s.is_active !== 0);
+      preloadHeroImages(activeSlides);
+      rawSliders.value = activeSlides;
       startHeroAutoplay();
     } else {
       rawSliders.value = [];
@@ -612,6 +636,8 @@ const fetchSliders = async () => {
   } catch (err) {
     console.error('Failed to fetch sliders from API:', err);
     rawSliders.value = [];
+  } finally {
+    slidersLoaded.value = true;
   }
 };
 
@@ -724,7 +750,7 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 16px 36px;
+  padding: 16px 100px;
   box-sizing: border-box;
 }
 

@@ -1,0 +1,132 @@
+{
+  "total_uploaded": 6,
+  "total_in_db": 6,
+  "products": [
+    {
+      "id": "25",
+      "sku": "MG-OVEN90-LUX",
+      "name_ar": "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة",
+      "name_en": "Mastergas 90cm Italian Built-in Gas Oven Full Safety Rotisserie",
+      "price": "3899",
+      "discount": "10",
+      "category_id": "57",
+      "colors": [
+        {
+          "label": "أسود ملكي",
+          "color": "#111827"
+        },
+        {
+          "label": "فضي",
+          "color": "#9ca3af"
+        }
+      ],
+      "attributes_count": 13,
+      "images_count": 3
+    },
+    {
+      "id": "26",
+      "sku": "MG-HOB90-5B-GLASS",
+      "name_ar": "مسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك",
+      "name_en": "Mastergas 90cm 5-Burner Tempered Glass Built-in Gas Hob with Wok",
+      "price": "2349",
+      "discount": "8",
+      "category_id": "57",
+      "colors": [
+        {
+          "label": "أسود ملكي",
+          "color": "#111827"
+        },
+        {
+          "label": "ستانلس ستيل",
+          "color": "#c0c0c0"
+        }
+      ],
+      "attributes_count": 12,
+      "images_count": 3
+    },
+    {
+      "id": "27",
+      "sku": "MG-HOOD90-PYRAMID",
+      "name_ar": "شفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة",
+      "name_en": "Mastergas 90cm Italian Pyramid Cooker Hood 1200 m³/h Suction",
+      "price": "1799",
+      "discount": "12",
+      "category_id": "57",
+      "colors": [
+        {
+          "label": "فضي",
+          "color": "#9ca3af"
+        },
+        {
+          "label": "ستانلس ستيل",
+          "color": "#c0c0c0"
+        }
+      ],
+      "attributes_count": 11,
+      "images_count": 3
+    },
+    {
+      "id": "28",
+      "sku": "MG-HOB60-4B-SS",
+      "name_ar": "مسطح غاز ستانلس ستيل بلت إن ماسترجاز 4 شعلات 60 سم",
+      "name_en": "Mastergas 60cm 4-Burner Built-in Stainless Steel Gas Hob",
+      "price": "1499",
+      "discount": "5",
+      "category_id": "57",
+      "colors": [
+        {
+          "label": "ستانلس ستيل",
+          "color": "#c0c0c0"
+        },
+        {
+          "label": "أسود ملكي",
+          "color": "#111827"
+        }
+      ],
+      "attributes_count": 11,
+      "images_count": 3
+    },
+    {
+      "id": "29",
+      "sku": "MG-BBQ-4B-GRILL",
+      "name_ar": "شواية باربيكيو غاز فاخرة 4 شعلات للحدائق والمزارع مع مقياس حرارة",
+      "name_en": "Mastergas Premium 4-Burner Outdoor Gas BBQ Grill with Thermometer",
+      "price": "4499",
+      "discount": "15",
+      "category_id": "59",
+      "colors": [
+        {
+          "label": "أسود ملكي",
+          "color": "#111827"
+        },
+        {
+          "label": "فضي",
+          "color": "#9ca3af"
+        }
+      ],
+      "attributes_count": 12,
+      "images_count": 3
+    },
+    {
+      "id": "30",
+      "sku": "MG-WATER-HEATER-12L",
+      "name_ar": "سخان مياه غاز فوري رقمي ماسترجاز 12 لتر أمان كامل ODS",
+      "name_en": "Mastergas 12L Digital Instant Gas Water Heater Full ODS Safety",
+      "price": "1349",
+      "discount": "10",
+      "category_id": "58",
+      "colors": [
+        {
+          "label": "أبيض",
+          "color": "#ffffff"
+        },
+        {
+          "label": "فضي",
+          "color": "#9ca3af"
+        }
+      ],
+      "attributes_count": 12,
+      "images_count": 3
+    }
+  ]
+}

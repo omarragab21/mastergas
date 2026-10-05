@@ -16,7 +16,7 @@ const messages = {
       login: 'تسجيل الدخول',
     },
     topbar: {
-      free_shipping: 'شحن مجاني للطلبات فوق 50 دينار - توصيل سريع لجميع المناطق'
+      free_shipping: 'شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات'
     },
     home: {
       shop_by_category: 'تسوق حسب التصنيف',
@@ -356,6 +356,9 @@ const messages = {
       country_search: 'ابحث عن الدولة أو رمز الاتصال',
       password: 'كلمة المرور',
       password_placeholder: '........',
+      remember_me: 'تذكرني',
+      show_password: 'إظهار كلمة المرور',
+      hide_password: 'إخفاء كلمة المرور',
       confirm_password: 'تأكيد كلمة المرور',
       name: 'الاسم الكامل',
       name_placeholder: 'أدخل اسمك الكامل',
@@ -376,6 +379,10 @@ const messages = {
       please_fix_errors: 'الرجاء تصحيح الأخطاء أدناه',
       login_success: 'تم تسجيل الدخول بنجاح!',
       reset_link_sent: 'تم إرسال رابط إعادة تعيين كلمة المرور',
+      forgot_title: 'نسيت كلمة المرور؟',
+      forgot_subtitle: 'أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين',
+      reset_success_title: 'تم إرسال رابط إعادة التعيين بنجاح',
+      reset_success_message: 'يمكنك الآن فتح بريدك الإلكتروني واتباع الرابط لإعادة تعيين كلمة المرور',
       login_error: 'حدث خطأ أثناء تسجيل الدخول',
       register_error: 'حدث خطأ أثناء إنشاء الحساب',
       reset_error: 'حدث خطأ أثناء إرسال رابط إعادة تعيين كلمة المرور',
@@ -471,7 +478,7 @@ const messages = {
       login: 'Login',
     },
     topbar: {
-      free_shipping: 'Free shipping on orders over 50 KD - Fast delivery to all areas'
+      free_shipping: 'Free shipping on orders over 500 SAR | Comprehensive warranty on all products'
     },
     home: {
       shop_by_category: 'Shop by Category',
@@ -811,6 +818,9 @@ const messages = {
       country_search: 'Search country or dial code',
       password: 'Password',
       password_placeholder: '........',
+      remember_me: 'Remember me',
+      show_password: 'Show password',
+      hide_password: 'Hide password',
       confirm_password: 'Confirm Password',
       name: 'Full Name',
       name_placeholder: 'Enter your full name',
@@ -831,6 +841,10 @@ const messages = {
       please_fix_errors: 'Please correct the errors below',
       login_success: 'Logged in successfully!',
       reset_link_sent: 'Password reset link sent',
+      forgot_title: 'Forgot your password?',
+      forgot_subtitle: 'Enter your email to receive a password reset link',
+      reset_success_title: 'Password reset link sent successfully',
+      reset_success_message: 'Open your email and follow the link to reset your password',
       login_error: 'An error occurred during sign in',
       register_error: 'An error occurred during account creation',
       reset_error: 'An error occurred while sending reset link',

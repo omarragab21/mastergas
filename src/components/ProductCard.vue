@@ -41,7 +41,7 @@
       <!-- Badges -->
       <div class="product-badges">
         <span class="badge-new" v-if="isNewProduct">{{ currentLang === 'ar' ? 'جديد' : 'NEW' }}</span>
-        <span class="badge-sale" v-else-if="discountPercentage > 0">-{{ Math.round(discountPercentage) }}%</span>
+        <span class="badge-sale" v-if="discountPercentage > 0">-{{ Math.round(discountPercentage) }}%</span>
       </div>
 
       <!-- Multiple images indicator badge -->
@@ -71,42 +71,25 @@
         <span class="product-sku">{{ displaySku }}</span>
       </div>
 
-      <!-- Available Colors Preview -->
-      <div v-if="productColors.length > 0" class="card-colors-row">
-        <div class="card-swatches">
-          <span 
-            v-for="(c, idx) in productColors.slice(0, 5)" 
-            :key="idx" 
-            class="card-swatch-dot" 
-            :style="{ backgroundColor: c.hex }"
-            :title="c.name"
-          ></span>
-          <span v-if="productColors.length > 5" class="card-swatch-more">+{{ productColors.length - 5 }}</span>
-        </div>
-      </div>
-
       <!-- Full-width Divider Line underneath -->
       <div class="product-divider"></div>
 
-      <!-- Bottom Row: Price on the right, Add to Cart button on the left -->
+      <!-- Old Price directly under the border -->
+      <div class="old-price-row" v-if="discountPercentage > 0">
+        <span class="old-price">
+          <span class="old-price-val">{{ formatPrice(product.price) }}</span>
+          <svg width="10" height="12" viewBox="0 0 14 16" fill="currentColor" class="price-riyal-icon" aria-hidden="true">
+            <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+            <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+          </svg>
+        </span>
+      </div>
+
+      <!-- Bottom Row: New Price and Add to Cart on the exact same row level -->
       <div class="product-bottom-row">
-        <div class="price-box">
-          <span class="old-price" v-if="discountPercentage > 0">
-            {{ formatPrice(product.price) }}
-          </span>
-          <div class="current-price-row">
-            <span class="price-val">{{ formatPrice(currentPrice) }}</span>
-            <span class="currency-symbol" v-if="currentLang === 'ar'">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="currency-symbol-svg">
-                <path d="M14 4v9"/>
-                <path d="M18 4v6.5a2.5 2.5 0 0 1-2.5 2.5H14"/>
-                <path d="M5 7h13"/>
-                <path d="M5 10.5h13"/>
-                <path d="M15 18h4.5"/>
-              </svg>
-            </span>
-            <span class="currency-symbol text-cur" v-else>{{ currency }}</span>
-          </div>
+        <div class="current-price-row">
+          <span class="price-val">{{ formatPrice(currentPrice) }}</span>
+          <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg" aria-hidden="true" />
         </div>
 
         <button class="add-to-cart-btn" @click.stop="$emit('add-to-cart', product)" :aria-label="currentLang === 'ar' ? 'إضافة المنتج إلى السلة' : 'Add product to cart'">
@@ -126,8 +109,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useOffers } from '../composables/useOffers';
 import { useLocalized } from '../composables/useLocalized';
-import { useSettings } from '../composables/useSettings';
-import { colorMap, getPresetColorHex as resolveColorHex } from '../constants/colors';
+import riyalIcon from '../../assets/riyal.svg';
 
 const props = defineProps({
   product: {
@@ -145,7 +127,6 @@ defineEmits(['click', 'add-to-cart']);
 const { t } = useI18n();
 const { currentLang, localized } = useLocalized();
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer } = useOffers();
-const { currency } = useSettings();
 const secondaryVisible = ref(false);
 
 const productName = computed(() => {
@@ -276,41 +257,6 @@ const secondaryImageUrl = computed(() => {
   return null;
 });
 
-const productColors = computed(() => {
-  if (!props.product) return [];
-  if (Array.isArray(props.product.color_options) && props.product.color_options.length > 0) {
-    return props.product.color_options.map(c => {
-      if (typeof c === 'object' && c !== null) {
-        return { name: c.name || c.label || '', hex: c.hex || c.color || resolveColorHex(c.name || '') };
-      }
-      const str = String(c);
-      if (str.includes('|')) {
-        const [lbl, hx] = str.split('|');
-        return { name: lbl.trim(), hex: hx.trim() };
-      }
-      return { name: str.trim(), hex: resolveColorHex(str.trim()) };
-    });
-  }
-  const attrs = props.product.attributes;
-  if (attrs && typeof attrs === 'object') {
-    const rawColor = attrs.color || attrs['اللون'] || attrs.Color || attrs['الالوان'];
-    if (Array.isArray(rawColor) && rawColor.length > 0) {
-      return rawColor.map(c => {
-        if (typeof c === 'object' && c !== null) {
-          return { name: c.name || c.label || '', hex: c.hex || c.color || resolveColorHex(c.name || '') };
-        }
-        const str = String(c);
-        if (str.includes('|')) {
-          const [lbl, hx] = str.split('|');
-          return { name: lbl.trim(), hex: hx.trim() };
-        }
-        return { name: str.trim(), hex: resolveColorHex(str.trim()) };
-      });
-    }
-  }
-  return [];
-});
-
 const formatPrice = (price) => {
   const num = parseFloat(price) || 0;
   const hasDecimals = num % 1 !== 0;
@@ -323,15 +269,18 @@ const formatPrice = (price) => {
 
 <style scoped>
 .product-card {
+  width: 100%;
+  max-width: 308px;
+  height: 460px;
+  flex: none;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
   padding: 16px;
   transition: all 0.25s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%;
   position: relative;
   box-sizing: border-box;
 }
@@ -347,7 +296,7 @@ const formatPrice = (price) => {
   width: 100%;
   height: 240px;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   margin-bottom: 16px;
   flex-shrink: 0;
@@ -407,8 +356,24 @@ const formatPrice = (price) => {
 
 .card-swatches {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
+}
+
+.card-color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 22px;
+  padding: 2px 7px 2px 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .card-swatch-dot {
@@ -419,6 +384,19 @@ const formatPrice = (price) => {
   box-shadow: 0 0 0 1px #d1d5db;
   display: inline-block;
   flex-shrink: 0;
+}
+
+.card-color-label {
+  max-width: 94px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-color-hex {
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  direction: ltr;
 }
 
 .card-swatch-more {
@@ -432,7 +410,7 @@ const formatPrice = (price) => {
   top: 12px;
   right: 12px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
   z-index: 2;
 }
@@ -498,7 +476,7 @@ const formatPrice = (price) => {
 
 .origin-tag {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #1e293b;
   margin-bottom: 6px;
@@ -508,7 +486,7 @@ const formatPrice = (price) => {
 
 .product-name {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #000000;
   margin: 0 0 10px 0;
@@ -518,7 +496,7 @@ const formatPrice = (price) => {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 48px;
+  min-height: 46px;
 }
 
 .product-meta-row {
@@ -526,7 +504,7 @@ const formatPrice = (price) => {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .product-specs {
@@ -554,30 +532,35 @@ const formatPrice = (price) => {
   width: 100%;
   height: 1px;
   background: #e2e8f0;
-  margin-bottom: 24px;
+  margin-top: auto;
+  margin-bottom: 6px;
 }
 
-.product-bottom-row {
-  margin-top: auto;
+.old-price-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.price-box {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  margin-bottom: 6px;
 }
 
 .old-price {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
   font-size: 13px;
   color: #94a3b8;
-  text-decoration: line-through;
-  margin-bottom: 2px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.old-price-val {
+  text-decoration: line-through;
+}
+
+.product-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .current-price-row {
@@ -588,7 +571,7 @@ const formatPrice = (price) => {
 
 .price-val {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 700;
   color: #000000;
   line-height: 1;
@@ -602,25 +585,25 @@ const formatPrice = (price) => {
 }
 
 .currency-symbol-svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 16px;
   display: block;
-  stroke: #000000;
+  flex: 0 0 14px;
 }
 
-.text-cur {
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #000000;
+.price-riyal-icon {
+  width: 11px;
+  height: 13px;
+  display: block;
+  flex: 0 0 11px;
 }
 
 .add-to-cart-btn {
   background: #000000;
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 9px 15px;
+  border-radius: 6px;
+  padding: 9px 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -649,7 +632,7 @@ const formatPrice = (price) => {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 100%;
   letter-spacing: 0%;
   white-space: nowrap;
@@ -679,6 +662,9 @@ const formatPrice = (price) => {
   .product-card {
     padding: 12px;
     border-radius: 14px;
+    width: 100%;
+    height: 460px;
+    flex-basis: 100%;
   }
   .product-image-wrapper {
     height: 180px;
@@ -690,7 +676,7 @@ const formatPrice = (price) => {
     min-height: 40px;
   }
   .product-divider {
-    margin-bottom: 16px;
+    margin-bottom: 6px;
   }
   .price-val {
     font-size: 18px;

@@ -397,7 +397,7 @@ onUnmounted(() => {
 
 <style scoped>
 .products-page {
-  padding-top: 145px;
+  padding-top: 170px;
   padding-bottom: 80px;
   background-color: #ffffff;
   min-height: 100vh;

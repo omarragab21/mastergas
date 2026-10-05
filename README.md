@@ -125,12 +125,30 @@ cp .env.example .env
 # رابط الـ API للواجهة الخلفية
 VITE_API_BASE_URL=https://backend-mastergas.be-kite.com/api
 
+# نمط البيانات: local يستخدم snapshot JSON، وapi يستخدم الـ backend
+VITE_DATA_MODE=local
+
 # رابط إعادة التوجيه لبوابة PayTabs بعد إتمام الدفع (اختياري/للإنتاج)
 VITE_PAYTABS_RETURN_URL=
 
 # رابط الإلغاء لبوابة PayTabs (اختياري)
 VITE_PAYTABS_CANCEL_URL=
 ```
+
+### 🧪 تشغيل البيانات المحلية
+
+أثناء `npm run dev` يستخدم المشروع تلقائياً snapshot البيانات الموجود في [`src/data/localData.json`](src/data/localData.json)، وتعمل الصور من `public/local-assets`. لتحديث الـ snapshot من الـ API شغّل:
+
+```bash
+npm run sync:local-data
+```
+
+حسابات التجربة المحلية:
+
+- عميل المتجر: `demo@mastergas.local` / `demo123`
+- لوحة التحكم: `admin@mastergas.local` / `admin123`
+
+لتشغيل الـ backend بدلاً من JSON استخدم `VITE_DATA_MODE=api`.
 
 ---
 

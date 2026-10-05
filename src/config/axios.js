@@ -1,7 +1,11 @@
 import axios from 'axios';
+import { localApiAdapter } from './localApi';
+import { getCustomerToken } from '../utils/customerSession.js';
 
 const serverUrl = 'https://backend-mastergas.be-kite.com/api';
 const envUrl = import.meta.env.VITE_API_BASE_URL;
+const dataMode = String(import.meta.env.VITE_DATA_MODE || (import.meta.env.DEV ? 'local' : 'api')).toLowerCase();
+export const isLocalDataMode = dataMode === 'local';
 
 const isBrowser = typeof window !== 'undefined';
 const isLocalhost = isBrowser && 
@@ -21,6 +25,7 @@ const baseURL = (!forceRemote && isBrowser && (import.meta.env.DEV || isLocalhos
 const api = axios.create({
   baseURL,
   timeout: 6000,
+  adapter: isLocalDataMode ? localApiAdapter : undefined,
   headers: {
     'Accept': 'application/json',
   },
@@ -127,7 +132,7 @@ api.interceptors.request.use(config => {
     token = storage?.getItem('token');
   } else {
     // For all customer and website routes, use strictly the customer token (never fallback to admin token)
-    token = storage?.getItem('c_token');
+    token = getCustomerToken();
   }
 
   if (token) {

@@ -1,28 +1,38 @@
 <template>
   <transition name="modal-fade">
     <div v-if="isOpen" class="auth-modal-overlay" @click.self="closeModal">
-      <div class="auth-modal-content" :dir="currentDir">
-        <button class="close-btn" @click="closeModal" :style="isRtl ? 'left: 16px; right: auto;' : 'right: 16px; left: auto;'">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="modal-header">
-          <div class="logo-wrapper">
-            <img v-if="logo" :src="logo" :alt="siteName" class="modal-logo-img" />
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
+      <div class="auth-modal-content" :class="{ 'success-modal-shell': resetSuccess }" :dir="currentDir">
+        <template v-if="resetSuccess">
+          <section class="reset-success-state" role="status" aria-live="polite">
+            <div class="checkmark-circle" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M8.5 16.5L13.5 21.5L24 10.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="reset-success-copy">
+              <h2>{{ t('auth.reset_success_title') }}</h2>
+              <p>{{ t('auth.reset_success_message') }}</p>
+            </div>
+            <button type="button" class="reset-success-btn" @click="closeModal">
+              {{ t('cart.continue_shopping') }}
+            </button>
+          </section>
+        </template>
+        <template v-else>
+        <div v-if="currentTab !== 'forgot-password'" class="modal-header">
+          <div class="modal-header-text">
+            <h2 class="title" style="font-weight: 800;">{{ t('auth.welcome') }}</h2>
+            <p class="subtitle">{{ t('auth.welcome_subtitle') }}</p>
           </div>
-          <h2 class="title" style="font-weight: 800;">{{ t('auth.welcome') }}</h2>
-          <p class="subtitle">{{ t('auth.welcome_subtitle') }}</p>
+          <button class="close-btn" @click="closeModal" type="button" :aria-label="t('common.close') || 'Close'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
-        <div class="tabs">
+        <div v-if="currentTab !== 'forgot-password'" class="tabs">
           <button 
             class="tab-btn" 
             :class="{ active: currentTab === 'login' }"
@@ -66,11 +76,32 @@
             <div class="input-wrapper">
               <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginForm.password" :placeholder="t('auth.password_placeholder')" autocomplete="current-password" :aria-invalid="Boolean(errors.loginPassword)" :aria-describedby="errors.loginPassword ? 'login-password-error' : undefined" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <button type="button" class="eye-btn" @click="showLoginPassword = !showLoginPassword">
-                <i :class="showLoginPassword ? 'far fa-eye-slash' : 'far fa-eye'"></i>
+              <button type="button" class="eye-btn" @click="showLoginPassword = !showLoginPassword" :aria-label="showLoginPassword ? t('auth.hide_password') || 'Hide password' : t('auth.show_password') || 'Show password'">
+                <transition name="eye-anim" mode="out-in">
+                  <svg v-if="showLoginPassword" key="open" width="20" height="20" viewBox="0 0 20 20" fill="none" class="eye-svg eye-open-svg" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="eye-contour" />
+                    <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" class="eye-iris" />
+                    <circle cx="10" cy="10" r="1.3" fill="currentColor" class="eye-pupil" />
+                  </svg>
+                  <svg v-else key="closed" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="eye-svg eye-closed-svg" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
+                  </svg>
+                </transition>
               </button>
             </div>
             <span v-if="errors.loginPassword" id="login-password-error" class="inline-error-msg">{{ errors.loginPassword }}</span>
+          </div>
+
+          <div class="login-options-row">
+            <label class="remember-me-label">
+              <input
+                v-model="rememberMe"
+                type="checkbox"
+                class="remember-me-checkbox"
+                :aria-label="t('auth.remember_me')"
+              />
+              <span>{{ t('auth.remember_me') }}</span>
+            </label>
           </div>
 
           <div class="forgot-password">
@@ -119,7 +150,7 @@
                 </svg>
                 <select v-model="selectedCountry" class="native-country-select" :dir="currentDir" :aria-label="t('auth.country')">
                   <option 
-                    v-for="c in filteredCountries"
+                    v-for="c in countries"
                     :key="c.code" 
                     :value="c.code"
                   >
@@ -127,8 +158,6 @@
                   </option>
                 </select>
               </div>
-
-              <input v-model="countrySearch" type="search" class="country-search-input" :placeholder="t('auth.country_search')" :aria-label="t('auth.country_search')" autocomplete="off" />
 
               <!-- Phone Number Input -->
               <input 
@@ -149,8 +178,17 @@
             <div class="input-wrapper">
               <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password" :placeholder="t('auth.password_placeholder')" autocomplete="new-password" :aria-invalid="Boolean(errors.password)" />
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <button type="button" class="eye-btn" @click="showRegisterPassword = !showRegisterPassword">
-                <i :class="showRegisterPassword ? 'far fa-eye-slash' : 'far fa-eye'"></i>
+              <button type="button" class="eye-btn" @click="showRegisterPassword = !showRegisterPassword" :aria-label="showRegisterPassword ? t('auth.hide_password') || 'Hide password' : t('auth.show_password') || 'Show password'">
+                <transition name="eye-anim" mode="out-in">
+                  <svg v-if="showRegisterPassword" key="open" width="20" height="20" viewBox="0 0 20 20" fill="none" class="eye-svg eye-open-svg" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="eye-contour" />
+                    <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" class="eye-iris" />
+                    <circle cx="10" cy="10" r="1.3" fill="currentColor" class="eye-pupil" />
+                  </svg>
+                  <svg v-else key="closed" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="eye-svg eye-closed-svg" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
+                  </svg>
+                </transition>
               </button>
             </div>
             <span v-if="errors.password" class="inline-error-msg">{{ errors.password }}</span>
@@ -169,6 +207,10 @@
 
         <!-- Forgot Password Form -->
         <form v-else-if="currentTab === 'forgot-password'" @submit.prevent="handleForgotPassword" class="auth-form" :dir="currentDir">
+          <div class="forgot-password-header">
+            <h2>{{ t('auth.forgot_title') }}</h2>
+            <p>{{ t('auth.forgot_subtitle') }}</p>
+          </div>
           <div class="form-group">
             <label>{{ t('auth.email') }}</label>
             <div class="input-wrapper">
@@ -186,6 +228,7 @@
             <a href="#" @click.prevent="currentTab = 'login'">{{ t('auth.back_to_login') }}</a>
           </div>
         </form>
+        </template>
       </div>
     </div>
   </transition>
@@ -212,25 +255,15 @@ const currentTab = ref('login')
 const loading = computed(() => authState.loading)
 const globalError = ref('')
 const globalSuccess = ref('')
+const resetSuccess = ref(false)
 const showLoginPassword = ref(false)
 const showRegisterPassword = ref(false)
+const rememberMe = ref(typeof localStorage !== 'undefined' && localStorage.getItem('c_remember') === 'true')
 
 const selectedCountry = ref('JO')
-const countrySearch = ref('')
 
 const activeCountryObj = computed(() => {
   return findCountryByCode(selectedCountry.value)
-})
-
-const filteredCountries = computed(() => {
-  const query = countrySearch.value.trim().toLowerCase()
-  if (!query) return countries
-  return countries.filter((country) => [
-    country.code,
-    country.dialCode,
-    country.nameAr,
-    country.nameEn,
-  ].some((value) => String(value).toLowerCase().includes(query)))
 })
 
 const loginForm = reactive({
@@ -352,6 +385,8 @@ const validateForgotPasswordForm = () => {
 
 const openModal = () => {
   isOpen.value = true
+  resetSuccess.value = false
+  rememberMe.value = typeof localStorage !== 'undefined' && localStorage.getItem('c_remember') === 'true'
   document.body.style.overflow = 'hidden' 
   clearMessages()
 }
@@ -359,7 +394,7 @@ const openModal = () => {
 const closeModal = () => {
   isOpen.value = false
   currentTab.value = 'login'
-  countrySearch.value = ''
+  resetSuccess.value = false
   document.body.style.overflow = ''
 }
 
@@ -379,6 +414,11 @@ const getServerErrorMessage = (error, fallback) => {
   return response?.message || fallback
 }
 
+const logUnexpectedAuthError = (error) => {
+  const status = error?.response?.status
+  if (![401, 422].includes(status)) console.error(error)
+}
+
 const handleForgotPassword = async () => {
   if (!validateForgotPasswordForm()) {
     globalError.value = t('auth.please_fix_errors');
@@ -386,11 +426,12 @@ const handleForgotPassword = async () => {
   }
   clearMessages()
   try {
-    const res = await api.post('/frontend/forgot-password', forgotPasswordForm)
-    globalSuccess.value = res.data.message || t('auth.reset_link_sent')
+    await api.post('/frontend/forgot-password', forgotPasswordForm)
+    globalSuccess.value = ''
+    resetSuccess.value = true
     forgotPasswordForm.email = ''
   } catch (error) {
-    console.error(error)
+    logUnexpectedAuthError(error)
     globalError.value = error.response?.data?.message || t('auth.reset_error')
   }
 }
@@ -402,7 +443,10 @@ const handleLogin = async () => {
   }
   clearMessages()
   try {
-    const res = await authActions.login(loginForm)
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('c_remember', String(rememberMe.value))
+    }
+    const res = await authActions.login(loginForm, { remember: rememberMe.value })
     globalSuccess.value = res.message || t('auth.login_success')
     setTimeout(() => {
       closeModal()
@@ -410,7 +454,7 @@ const handleLogin = async () => {
       window.location.reload()
     }, 1000)
   } catch (error) {
-    console.error(error)
+    logUnexpectedAuthError(error)
     globalError.value = getServerErrorMessage(error, t('auth.login_error'))
   }
 }
@@ -430,7 +474,7 @@ const handleRegister = async () => {
       window.location.reload()
     }, 1000)
   } catch (error) {
-    console.error(error)
+    logUnexpectedAuthError(error)
     globalError.value = getServerErrorMessage(error, t('auth.register_error'))
   }
 }
@@ -448,8 +492,8 @@ defineExpose({
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: none;
   z-index: 999999 !important;
   display: flex;
   align-items: center;
@@ -460,31 +504,125 @@ defineExpose({
 .auth-modal-content {
   background: #fff;
   width: 100%;
-  max-width: 480px;
-  max-height: 90vh;
-  border-radius: 16px;
-  padding: 30px;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  border-radius: 8px;
+  padding: 20px 22px;
   position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  margin: 20px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  margin: 16px;
   overflow-y: auto;
 }
 
+.auth-modal-content.success-modal-shell {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  height: 287px;
+  max-height: calc(100vh - 32px);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.101961);
+}
+
+.reset-success-state {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.checkmark-circle {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #10b981;
+  border-radius: 24px;
+}
+
+.reset-success-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: -2px;
+}
+
+.reset-success-copy h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.reset-success-copy p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.reset-success-btn {
+  width: 100%;
+  height: 48px;
+  margin-top: auto;
+  border: 0;
+  border-radius: 6px;
+  background: #000000;
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.reset-success-btn:hover {
+  background: #161616;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.modal-header-text {
+  flex: 1;
+  text-align: right;
+}
+
+.auth-modal-content[dir="ltr"] .modal-header-text {
+  text-align: left;
+}
+
 .close-btn {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: #f3f4f6;
+  background: #f1f5f9;
   border: none;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #6b7280;
   transition: all 0.2s;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .close-btn:hover {
@@ -492,58 +630,39 @@ defineExpose({
   color: #374151;
 }
 
-.modal-header {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.logo-wrapper {
-  background: transparent;
-  width: 140px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 15px;
-}
-
-.modal-logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 5px;
-}
-
 .title {
-  font-size: 24px;
+  font-size: 20px;
+  line-height: 1.3;
   color: #111827;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
 }
 
 .subtitle {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.4;
   margin: 0;
 }
 
 .tabs {
   display: flex;
-  background: #f9fafb;
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 25px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 16px;
   direction: rtl;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px 0;
   border: none;
   background: transparent;
   color: #6b7280;
   font-size: 15px;
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -551,7 +670,7 @@ defineExpose({
 .tab-btn.active {
   background: #000000;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(135, 50, 96, 0.2);
+  box-shadow: none;
 }
 
 .custom-alert {
@@ -582,6 +701,26 @@ defineExpose({
   text-align: right;
 }
 
+.forgot-password-header {
+  margin-bottom: 24px;
+  text-align: right;
+}
+
+.forgot-password-header h2 {
+  margin: 0 0 6px;
+  color: #000000;
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 800;
+}
+
+.forgot-password-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 21px;
+}
+
 .form-group label {
   display: block;
   font-size: 14px;
@@ -596,13 +735,20 @@ defineExpose({
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 45px 14px 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  padding: 13px 45px 13px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
   outline: none;
   text-align: right;
+}
+
+.input-wrapper input:focus,
+.country-search-input:focus,
+.phone-input-wrapper:focus-within {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
 }
 
 .input-wrapper .input-icon {
@@ -622,14 +768,126 @@ defineExpose({
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #6b7280;
   cursor: pointer;
   padding: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  width: 24px;
+  height: 24px;
+  transition: color 0.2s, transform 0.15s ease;
   z-index: 2;
+}
+
+.eye-btn:hover {
+  color: #111827;
+}
+
+.eye-btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.eye-svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Eye Opening Animation */
+.eye-open-svg {
+  transform-origin: 10px 10px;
+  animation: eye-open-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.eye-open-svg .eye-contour {
+  transform-origin: 10px 10px;
+  animation: eye-lid-open 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.eye-open-svg .eye-iris,
+.eye-open-svg .eye-pupil {
+  transform-origin: 10px 10px;
+  animation: eye-pupil-reveal 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Eye Closing Animation */
+.eye-closed-svg {
+  transform-origin: 10px 10px;
+  animation: eye-lid-close 0.28s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+
+@keyframes eye-open-pop {
+  0% {
+    transform: scaleY(0.2) scaleX(0.85);
+    opacity: 0.3;
+  }
+  65% {
+    transform: scaleY(1.1) scaleX(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1) scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes eye-lid-open {
+  0% {
+    transform: scaleY(0.15);
+  }
+  65% {
+    transform: scaleY(1.12);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes eye-pupil-reveal {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.4);
+    opacity: 0.5;
+  }
+  75% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes eye-lid-close {
+  0% {
+    transform: scaleY(0.2) translateY(-2px);
+    opacity: 0.3;
+  }
+  60% {
+    transform: scaleY(1.12) translateY(1px);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Vue Eye Transition */
+.eye-anim-enter-active {
+  transition: opacity 0.15s ease-out;
+}
+.eye-anim-leave-active {
+  transition: opacity 0.1s ease-in;
+}
+.eye-anim-enter-from,
+.eye-anim-leave-to {
+  opacity: 0;
 }
 
 .phone-input-wrapper {
@@ -665,24 +923,6 @@ defineExpose({
   box-sizing: border-box;
 }
 
-.country-search-input {
-  width: 100%;
-  margin-top: 8px;
-  padding: 9px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
-  color: #1f2937;
-  font: inherit;
-  font-size: 12px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.country-search-input:focus {
-  border-color: #000;
-  background: #fff;
-}
 
 .country-dial-badge {
   font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
@@ -792,6 +1032,32 @@ defineExpose({
   margin-bottom: 20px;
 }
 
+.login-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: -4px;
+  margin-bottom: 4px;
+}
+
+.remember-me-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-me-checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #000000;
+  cursor: pointer;
+}
+
 .forgot-password a {
   color: #000000;
   font-size: 13px;
@@ -808,8 +1074,9 @@ defineExpose({
   background: #000000;
   color: #fff;
   border: none;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  min-height: 48px;
+  border-radius: 6px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -903,5 +1170,20 @@ defineExpose({
 
 .auth-modal-content[dir="ltr"] .forgot-password {
   text-align: left;
+}
+
+.auth-modal-content[dir="ltr"] .forgot-password-header {
+  text-align: left;
+}
+
+@media (max-width: 520px) {
+  .auth-modal-content.success-modal-shell {
+    height: 287px;
+    padding: 24px;
+  }
+
+  .reset-success-copy p {
+    max-width: 280px;
+  }
 }
 </style>

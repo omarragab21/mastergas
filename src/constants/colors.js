@@ -39,26 +39,48 @@ export const colorMap = {
   'purple': '#8b5cf6',
 };
 
+const HEX_COLOR_PATTERN = /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+/** Return a canonical, CSS-safe hex value or null for malformed input. */
+export const normalizeHexColor = (value) => {
+  const raw = String(value ?? '').trim();
+  if (!raw) return null;
+  const candidate = raw.startsWith('#') ? raw : `#${raw}`;
+  if (!HEX_COLOR_PATTERN.test(candidate)) return null;
+  const hex = candidate.slice(1).toLowerCase();
+  if (hex.length === 3 || hex.length === 4) {
+    return `#${hex.split('').map((part) => `${part}${part}`).join('')}`;
+  }
+  return `#${hex}`;
+};
+
 export const getPresetColorHex = (label) => {
-  if (!label) return '#6b7280';
-  if (label.startsWith('#')) return label;
-  const l = label.toLowerCase().trim();
-  return colorMap[l] || '#6b7280';
+  const raw = String(label ?? '').trim();
+  const explicitHex = normalizeHexColor(raw);
+  if (explicitHex) return explicitHex;
+  const l = raw.split('|', 1)[0].toLowerCase().trim();
+  if (!l) return '#6b7280';
+  if (colorMap[l]) return colorMap[l];
+
+  // API labels are often descriptive, e.g. "أسود ملكي" or "أسود / فضي".
+  // Match the longest known color token so every product still gets a real swatch.
+  const matchingKey = Object.keys(colorMap)
+    .sort((a, b) => b.length - a.length)
+    .find((key) => l.includes(key.toLowerCase()));
+  return matchingKey ? colorMap[matchingKey] : '#6b7280';
 };
 
 export const getActualColor = (colorName) => {
   if (!colorName) return 'transparent';
-  if (colorName.startsWith('#')) return colorName;
-  return colorMap[colorName.trim().toLowerCase()] || colorMap[colorName.trim()] || colorName;
+  return normalizeHexColor(colorName) || getPresetColorHex(colorName);
 };
 
 export const isLightColor = (hex) => {
-  if (!hex || typeof hex !== 'string') return false;
-  if (hex === '#ffffff' || hex.toLowerCase() === 'white' || hex === 'أبيض') return true;
-  if (hex.startsWith('#') && hex.length === 7) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+  const normalized = normalizeHexColor(hex) || getPresetColorHex(hex);
+  if (normalized.length >= 7) {
+    const r = parseInt(normalized.slice(1, 3), 16);
+    const g = parseInt(normalized.slice(3, 5), 16);
+    const b = parseInt(normalized.slice(5, 7), 16);
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.75;
   }

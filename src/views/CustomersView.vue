@@ -335,7 +335,8 @@ const fetchCustomers = async () => {
   loading.value = true;
   try {
     const res = await api.get('/dashboard/customers');
-    customers.value = res.data.data || res.data;
+    const payload = res.data?.data ?? res.data;
+    customers.value = Array.isArray(payload) ? payload : (payload?.data || payload?.items || []);
   } catch (err) {
     triggerAlert('فشل تحميل بيانات العملاء', 'error');
   } finally {
@@ -381,10 +382,19 @@ const confirmDelete = async (customer) => {
   if (confirm(`هل أنت متأكد من حذف العميل "${customer.name}"؟`)) {
     try {
       await api.delete(`/dashboard/customers/${customer.id}`);
+      // Remove the row immediately, then reconcile with the server response.
+      customers.value = customers.value.filter((item) => Number(item.id) !== Number(customer.id));
+      await fetchCustomers();
+      const stillExists = customers.value.some((item) => Number(item.id) === Number(customer.id));
+      if (stillExists) {
+        triggerAlert('تم تنفيذ الحذف لكن ما زال العميل ظاهرًا من السيرفر', 'error');
+        return;
+      }
       triggerAlert('تم حذف العميل بنجاح');
-      fetchCustomers();
     } catch (err) {
-      triggerAlert('فشل حذف العميل', 'error');
+      // Restore the row when the delete request or reconciliation fails.
+      await fetchCustomers();
+      triggerAlert(err.response?.data?.message || 'فشل حذف العميل', 'error');
     }
   }
 };

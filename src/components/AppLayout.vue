@@ -13,7 +13,7 @@
       <!-- Logo -->
       <div class="sidebar-logo">
         <div class="logo-icon">
-          <img src="/images/logo_white.png" alt="Mastergas" class="logo-img" />
+          <img src="/brand/mastergas-logo-white.png" alt="Mastergas" class="logo-img" />
         </div>
         <button
           class="mobile-close-btn"
@@ -305,7 +305,7 @@ const updateFaviconFromSettings = async () => {
         if (logoEntry && logoEntry.value && logoEntry.value !== '[]' && !isIrisAsset(logoEntry.value)) {
             link.href = logoEntry.value;
         } else {
-            link.href = '/logo.png';
+            link.href = '/brand/mastergas-icon.png';
         }
     } catch (err) {
         console.error('Failed to update favicon', err);

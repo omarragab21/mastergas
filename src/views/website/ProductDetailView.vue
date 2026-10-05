@@ -1,381 +1,797 @@
 <template>
-  <div class="product-detail-page" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
-    <div class="container">
-      <!-- Breadcrumbs -->
-      <nav class="breadcrumbs" v-if="product">
-        <router-link to="/">{{ t('nav.home') }}</router-link>
-        <span class="separator">›</span>
-        <router-link to="/products">{{ t('nav.products') }}</router-link>
-        <span class="separator">›</span>
-        <router-link :to="product.category_parent_id ? `/products?subcategory_id=${product.category_id}` : `/products?category_id=${product.category_id}`">
-          {{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}
-        </router-link>
-        <span class="separator">›</span>
-        <span class="current">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60cm') }}</span>
-      </nav>
-
-      <div v-if="loading" class="detail-loader">
-        <div class="spinner"></div>
+  <div class="product-detail-page mastergas-product-detail" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
+    
+    <!-- 1. Breadcrumbs Section -->
+    <div class="breadcrumb-section" v-if="product">
+      <div class="container breadcrumb-container">
+        <nav class="breadcrumbs-nav" aria-label="breadcrumb">
+          <router-link to="/" class="bc-link">{{ t('nav.home') }}</router-link>
+          <span class="bc-sep">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <router-link to="/products" class="bc-link">{{ t('nav.products') }}</router-link>
+          <span class="bc-sep">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <router-link :to="product.category_parent_id ? `/products?subcategory_id=${product.category_id}` : `/products?category_id=${product.category_id}`" class="bc-link">
+            {{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}
+          </router-link>
+          <span class="bc-sep">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="bc-current">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60cm') }}</span>
+        </nav>
       </div>
+    </div>
 
-      <div v-else-if="product" class="product-main-layout">
-        <!-- Right Column (in RTL): Image Gallery -->
-        <div class="images-section">
-          <!-- Main Display Image -->
-          <div class="main-image-wrapper" @click="openLightbox(currentImageIndex)">
-            <img 
-              :src="allImages[currentImageIndex]" 
-              :alt="localized(product, 'name')" 
-              class="main-display-image" 
-              @error="handleImageError($event, currentImageIndex)"
-            />
-          </div>
+    <!-- Loading State -->
+    <div v-if="loading" class="detail-loader">
+      <div class="spinner"></div>
+    </div>
 
-          <!-- Thumbnails Row (4 Columns Under Main Image) -->
-          <div class="thumbnails-row" v-if="allImages.length > 1">
-            <div 
-              v-for="(img, index) in allImages.slice(0, 4)" 
-              :key="index" 
-              class="thumb-item"
-              :class="{ active: currentImageIndex === index }"
-              @click="currentImageIndex = index"
-            >
+    <!-- 2. Product Main Section -->
+    <div v-else-if="product" class="product-main-section">
+      <div class="container main-section-container">
+        
+        <div class="product-grid-layout">
+          
+          <!-- Column 1 in RTL: Gallery Column (Right Side) -->
+          <div class="gallery-column">
+            <!-- Main Image Container -->
+            <div class="main-image-container" @click="openLightbox(currentImageIndex)">
               <img 
-                :src="img" 
+                :src="allImages[currentImageIndex]" 
                 :alt="localized(product, 'name')" 
-                @error="handleImageError($event, index)"
+                class="main-image"
+                @error="handleImageError($event, currentImageIndex)"
               />
             </div>
-          </div>
-        </div>
 
-        <!-- Left Column (in RTL): Product Information -->
-        <div class="info-section">
-          <!-- Category & Origin + Share Button -->
-          <div class="product-top-meta">
-            <div class="category-origin">
-              <span>{{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}</span>
-              <span class="meta-pipe">|</span>
-              <span class="origin-text">{{ product.origin || (locale === 'ar' ? 'إيطالي الصنع' : 'Made in Italy') }}</span>
-            </div>
-            <button class="share-btn" @click.stop="showShareModal = true" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-              </svg>
-              <span>{{ locale === 'ar' ? 'مشاركة' : 'Share' }}</span>
-            </button>
-          </div>
-
-          <!-- Product Title -->
-          <h1 class="product-title">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60 cm') }}</h1>
-
-          <!-- Rating & Model Row -->
-          <div class="rating-model-row">
-            <div class="stars-score">
-              <div class="stars-gold">
-                <i v-for="i in Math.floor(computedAverageRating)" :key="'h-star-'+i" class="fas fa-star"></i>
-                <i v-if="(computedAverageRating % 1) >= 0.15" class="fas fa-star-half-alt half-star-flipped"></i>
-                <i v-for="i in (5 - Math.floor(computedAverageRating) - ((computedAverageRating % 1) >= 0.15 ? 1 : 0))" :key="'h-empty-'+i" class="far fa-star"></i>
+            <!-- Thumbnail Row (4 Thumbnails) -->
+            <div class="thumbnail-row" v-if="allImages.length > 1">
+              <div 
+                v-for="(img, index) in allImages.slice(0, 4)" 
+                :key="index" 
+                class="thumb-box"
+                :class="{ 'thumb-active': currentImageIndex === index }"
+                @click="currentImageIndex = index"
+              >
+                <img 
+                  :src="img" 
+                  :alt="localized(product, 'name')" 
+                  class="thumb-img"
+                  @error="handleImageError($event, index)"
+                />
               </div>
-              <span class="score-num">{{ Number(computedAverageRating).toFixed(1) }}</span>
-              <span class="count-num">({{ locale === 'ar' ? `${computedRatingCount} تقييم` : `${computedRatingCount} reviews` }})</span>
-            </div>
-            <span class="meta-pipe">|</span>
-            <span class="model-num">{{ locale === 'ar' ? 'الموديل' : 'Model' }}: {{ product.sku || product.model_number || 'OG604S' }}</span>
-          </div>
-
-          <!-- Price & VAT -->
-          <div class="price-box">
-            <div class="price-value-row">
-              <span class="main-price">{{ formatPrice(currentPrice || 2499) }}</span>
-              <span class="currency-symbol">﷼</span>
-            </div>
-            <span class="vat-notice">{{ locale === 'ar' ? 'شامل ضريبة القيمة المضافة' : 'Includes VAT' }}</span>
-          </div>
-
-          <!-- Stock Status -->
-          <div class="stock-status" :class="isProductInStock ? 'in-stock' : 'out-of-stock'">
-            <span class="stock-dot">•</span>
-            <span>{{ isProductInStock ? (locale === 'ar' ? 'متوفر في المخزون' : 'In Stock') : (locale === 'ar' ? 'غير متوفر في المخزون' : 'Out of Stock') }}</span>
-          </div>
-
-          <!-- Key Features Checklist (6 items with diamond icon ❖) -->
-          <ul class="key-features-list">
-            <li v-for="(feat, idx) in productFeatures" :key="idx">
-              <span class="feat-icon">❖</span>
-              <span class="feat-text">{{ feat }}</span>
-            </li>
-          </ul>
-
-          <!-- Color Selection -->
-          <div class="color-selection-section" v-if="colorOptions.length > 0">
-            <div class="color-label">
-              <span class="label-title">{{ locale === 'ar' ? 'اللون:' : 'Color:' }}</span>
-              <span class="selected-color-name">{{ selectedColorName }}</span>
-            </div>
-            <div class="color-swatches-row">
-              <button 
-                v-for="c in colorOptions" 
-                :key="c.name"
-                type="button"
-                class="color-swatch-circle"
-                :class="{ 
-                  active: selectedColorName === c.name,
-                  'white-color': isLightColor(c.hex)
-                }"
-                :style="{ backgroundColor: c.hex }"
-                @click="selectColor(c.name)"
-                :title="c.name"
-                :aria-label="c.name"
-              ></button>
             </div>
           </div>
 
-          <!-- Action Row: Quantity + Add to Cart -->
-          <div class="action-row">
-            <div class="qty-selector">
-              <button type="button" class="qty-btn minus" @click="quantity > 1 ? quantity-- : null" aria-label="Decrease quantity">-</button>
-              <span class="qty-number">{{ quantity }}</span>
-              <button type="button" class="qty-btn plus" @click="quantity++" aria-label="Increase quantity">+</button>
+          <!-- Column 2 in RTL: Info Column (Left Side) -->
+          <div class="info-column">
+            
+            <!-- Brand & Title Block -->
+            <div class="brand-and-title">
+              <!-- image-actions-bar -->
+              <div class="image-actions-bar">
+                <div class="category-origin-group">
+                  <span class="category-name">{{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}</span>
+                </div>
+                <button class="share-action-btn" @click.stop="showShareModal = true" type="button" :title="locale === 'ar' ? 'مشاركة المنتج' : 'Share product'">
+                  <span>{{ locale === 'ar' ? 'مشاركة' : 'Share' }}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="share-icon-svg">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Product Title -->
+              <h1 class="main-title">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60 cm') }}</h1>
+
+              <!-- Model & Rating Row -->
+              <div class="model-rating-bar">
+                <span class="model-code">{{ locale === 'ar' ? 'الموديل' : 'Model' }}: {{ product.sku || product.model_number || 'O604S' }}</span>
+                <span class="v-line"></span>
+                <div class="rating-group">
+                  <span class="rating-count">({{ locale === 'ar' ? `${computedRatingCount} تقييم` : `${computedRatingCount} reviews` }})</span>
+                  <span class="rating-val">{{ Number(computedAverageRating).toFixed(1) }}</span>
+                  <div class="stars-cluster">
+                    <i v-for="i in Math.floor(computedAverageRating)" :key="'h-star-'+i" class="fas fa-star filled-star"></i>
+                    <i v-if="(computedAverageRating % 1) >= 0.15" class="fas fa-star-half-alt filled-star half-star-flipped"></i>
+                    <i v-for="i in (5 - Math.floor(computedAverageRating) - ((computedAverageRating % 1) >= 0.15 ? 1 : 0))" :key="'h-empty-'+i" class="fas fa-star empty-star"></i>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button 
-              type="button" 
-              class="add-to-cart-button" 
-              :disabled="!isProductInStock"
-              @click="handleAddToCart"
+
+            <!-- Divider Line -->
+            <div class="section-divider"></div>
+
+            <!-- Price Block (Aligned to the Right, Stock Pill Removed) -->
+            <div class="price-status-bar">
+              <div class="price-group">
+                <div class="price-unit">
+                  <span class="price-amount">{{ formatPrice(currentPrice || 2499) }}</span>
+                  <span class="riyal-symbol" v-if="locale === 'ar'">
+                    <img :src="riyalIcon" alt="ريال" class="riyal-svg" aria-hidden="true" />
+                  </span>
+                  <span class="currency-code" v-else>{{ currency }}</span>
+                </div>
+                <span class="vat-tag">{{ locale === 'ar' ? 'شامل ضريبة القيمة المضافة' : 'Includes VAT' }}</span>
+              </div>
+            </div>
+
+            <!-- Divider Line -->
+            <div class="section-divider"></div>
+
+            <!-- Bullet Specs List (Checkmark circle on the Right, Text on the Left) -->
+            <ul class="bullet-specs-list">
+              <li v-for="(feat, idx) in productFeatures" :key="idx" class="bullet-spec-item">
+                <span class="check-circle-icon">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip_check_circle)">
+                      <path d="M5.51866 12.3672C5.87333 12.7487 6.35924 13.2708 7.00033 13.2708L6.99976 13.2697C7.64084 13.2697 8.12675 12.7476 8.48142 12.3661C8.49209 12.3547 8.50264 12.3435 8.51308 12.3324C8.56544 12.2766 8.61489 12.2239 8.66109 12.1777C8.9825 11.8533 9.13942 11.788 9.59442 11.788C9.66277 11.788 9.73595 11.7902 9.81192 11.7924L9.82212 11.7927C10.2811 11.8067 10.9031 11.8257 11.3392 11.4368C11.3777 11.4094 11.4115 11.3756 11.4389 11.3371C11.8274 10.9001 11.8093 10.2754 11.7959 9.81401L11.7957 9.80617C11.7934 9.73253 11.7912 9.66117 11.7912 9.59469C11.7912 9.13911 11.8618 8.97577 12.2089 8.62752L12.2097 8.62671C12.8713 7.96861 13.2706 7.57146 13.2706 6.99886C13.2706 6.42621 12.8712 6.02897 12.2095 5.37076L12.2089 5.37014C12.0374 5.19981 11.7603 5.20041 11.59 5.37191C11.4197 5.54341 11.4202 5.82051 11.5917 5.99084C12.1202 6.51584 12.3956 6.79936 12.3956 6.99886C12.3956 7.19836 12.1202 7.48184 11.5906 8.00859C11.0802 8.52075 10.9162 8.90636 10.9162 9.59469C10.9162 9.6677 10.9184 9.746 10.9206 9.82762L10.921 9.84269C10.9303 10.181 10.9419 10.6003 10.7704 10.7706L10.7692 10.7718C10.5989 10.9416 10.1824 10.9287 9.84815 10.9182C9.76007 10.9153 9.67667 10.913 9.59442 10.913C8.90434 10.913 8.52632 11.0705 8.04098 11.5605C7.97565 11.6258 7.91033 11.6958 7.84092 11.7705L7.84013 11.7714C7.5952 12.0344 7.25964 12.3947 6.99976 12.3947C6.73959 12.3947 6.40356 12.0342 6.15857 11.7705C6.08973 11.6958 6.02382 11.6253 5.96024 11.5617C5.47315 11.0705 5.09515 10.913 4.40506 10.913C4.32281 10.913 4.23942 10.9153 4.15133 10.9182C3.8165 10.9293 3.40058 10.9416 3.22908 10.7713C3.05641 10.6009 3.06866 10.1786 3.07858 9.83965L3.07884 9.8301C3.08108 9.74833 3.08325 9.66938 3.08325 9.59526C3.08325 8.90693 2.91933 8.52131 2.40774 8.00739C1.87924 7.48239 1.60392 7.19893 1.60392 6.99943C1.60392 6.79993 1.87923 6.51644 2.40831 5.99027C2.87498 5.52361 3.08325 5.03418 3.08325 4.4036C3.08325 4.32935 3.08111 4.25026 3.07888 4.16792L3.07858 4.15682C3.06866 3.82024 3.05641 3.40144 3.22791 3.22935C3.39766 3.05669 3.8165 3.06949 4.1525 3.07999C4.24059 3.08291 4.32573 3.08523 4.40506 3.08523C5.03273 3.08523 5.52159 2.87643 5.99 2.40802C6.51675 1.87952 6.80084 1.6036 6.99976 1.6036C7.19867 1.6036 7.48273 1.87952 8.00948 2.40802C8.1804 2.57952 8.4575 2.57949 8.62842 2.40916C8.79933 2.23824 8.79992 1.96119 8.62959 1.79028C7.96984 1.12761 7.57141 0.728027 7.00033 0.728027C6.42954 0.728027 6.03124 1.12773 5.37269 1.78861L5.37166 1.78965C5.06541 2.0959 4.80349 2.20966 4.40566 2.20966C4.33731 2.20966 4.26466 2.2075 4.18926 2.20527L4.1799 2.20499C3.7004 2.19041 3.04357 2.17059 2.60724 2.61275C2.17098 3.05018 2.19014 3.70397 2.20414 4.18169L2.20443 4.19143C2.20667 4.26561 2.20882 4.33701 2.20882 4.4036C2.20882 4.80435 2.09509 5.06685 1.79117 5.37077L1.79035 5.37158C1.12876 6.02968 0.729492 6.42683 0.729492 6.99943C0.729492 7.57144 1.12852 7.96835 1.78715 8.62349L1.79 8.62633C2.13825 8.97633 2.20882 9.13968 2.20882 9.59526C2.20882 9.66177 2.20664 9.73316 2.20438 9.80683L2.20415 9.81458L2.20407 9.81737C2.19066 10.299 2.17233 10.957 2.61365 11.3931C3.05071 11.8284 3.70144 11.8084 4.17732 11.7939L4.17874 11.7938L4.18805 11.7935C4.26405 11.7913 4.33728 11.7891 4.40566 11.7891C4.86124 11.7891 5.01815 11.8545 5.34073 12.18C5.3944 12.2337 5.45508 12.2984 5.51866 12.3672Z" fill="currentColor"/>
+                      <path d="M6.69101 7.89251C6.77326 7.97476 6.88408 8.02086 7.00017 8.02086L7.01185 8.02029C7.13201 8.01737 7.24517 7.96484 7.32567 7.87559L12.5757 2.04226C12.7373 1.86259 12.7227 1.5861 12.543 1.42452C12.3633 1.26294 12.0868 1.27755 11.9253 1.45722L6.98385 6.9475L5.26825 5.23197C5.09734 5.06105 4.82026 5.06105 4.64935 5.23197C4.47843 5.40288 4.47843 5.67993 4.64935 5.85085L6.69101 7.89251Z" fill="currentColor"/>
+                    </g>
+                    <defs>
+                      <clipPath id="clip_check_circle">
+                        <rect width="14" height="14" fill="white"/>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </span>
+                <span class="bullet-spec-text">{{ feat }}</span>
+              </li>
+            </ul>
+
+            <!-- Divider Line -->
+            <div class="section-divider"></div>
+
+            <!-- Color Picker -->
+            <div class="color-picker-block" v-if="colorOptions.length > 0">
+              <div class="color-swatches-wrap">
+                <button 
+                  v-for="c in colorOptions" 
+                  :key="c.name"
+                  type="button"
+                  class="color-swatch-ring"
+                  :class="{ active: selectedColorName === c.label }"
+                  @click="selectColor(c.label)"
+                  :title="`${c.label} — ${c.hex}`"
+                  :aria-label="`${c.label} — ${c.hex}`"
+                >
+                  <span class="swatch-circle" :style="{ backgroundColor: c.hex }" :class="{ 'is-light': isLightColor(c.hex) }"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic selectable attributes (Size, Capacity, etc.) -->
+            <div
+              v-for="attribute in selectableAttributes"
+              :key="attribute.key"
+              class="attribute-picker-block"
             >
-              <svg class="bag-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
-              </svg>
-              <span>{{ isProductInStock ? (locale === 'ar' ? 'أضف إلى السلة' : 'Add to Cart') : (locale === 'ar' ? 'غير متوفر' : 'Out of Stock') }}</span>
-            </button>
+              <div class="attribute-picker-title">
+                <span class="ap-label">{{ attribute.label }}:</span>
+                <span class="ap-val">{{ selectedAttributes[attribute.key] || attribute.options[0] }}</span>
+              </div>
+              <div class="attribute-options-wrap">
+                <button
+                  v-for="option in attribute.options"
+                  :key="option"
+                  type="button"
+                  class="attribute-btn"
+                  :class="{ active: selectedAttributes[attribute.key] === option }"
+                  @click="selectAttribute(attribute.key, option)"
+                >{{ option }}</button>
+              </div>
+            </div>
+
+            <!-- Divider Line -->
+            <div class="section-divider"></div>
+
+            <!-- Purchase Actions: Quantity + Add to Cart -->
+            <div class="purchase-actions-bar">
+              <button 
+                type="button" 
+                class="btn-add-to-cart" 
+                :disabled="!isProductInStock"
+                @click="handleAddToCart"
+              >
+                <span>{{ isProductInStock ? (locale === 'ar' ? 'أضف إلى السلة' : 'Add to Cart') : (locale === 'ar' ? 'غير متوفر' : 'Out of Stock') }}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bag-svg">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+              </button>
+
+              <div class="qty-control-box">
+                <button type="button" class="qty-btn" @click="quantity++" aria-label="Increase quantity">+</button>
+                <span class="qty-val">{{ quantity }}</span>
+                <button type="button" class="qty-btn" @click="quantity > 1 ? quantity-- : null" aria-label="Decrease quantity">−</button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Part 3: Tabs Section -->
-      <div v-if="product" class="tabs-section">
-        <div class="tabs-header">
+    <!-- 3. Tabs Section (Full Width background #F8FAFC with borders) -->
+    <div v-if="product" class="tabs-section">
+      <div class="container tabs-container">
+        
+        <!-- Tabs Header -->
+        <div class="tabs-header-nav">
           <button 
             v-for="tab in tabOptions" 
             :key="tab.id" 
-            class="tab-btn" 
+            class="tab-nav-btn" 
             :class="{ active: activeTab === tab.id }"
             @click="activeTab = tab.id"
           >
-            {{ tab.label }}
+            <span class="tab-label">{{ tab.label }}</span>
+            <span class="tab-indicator" v-if="activeTab === tab.id"></span>
           </button>
         </div>
 
-        <div class="tab-content">
-          <!-- 1. Overview Tab -->
-          <div v-if="activeTab === 'overview'" class="tab-pane overview-pane">
-            <h2 class="pane-main-title">{{ dynamicOverviewTitle }}</h2>
-            <p class="pane-main-desc">{{ dynamicOverviewDesc }}</p>
-            <div class="overview-features-grid">
-              <div v-for="(feat, idx) in dynamicOverviewFeatures" :key="idx" class="ov-feat-item">
-                <i class="far fa-star"></i>
-                <span>{{ feat }}</span>
+        <!-- Tab 1: Overview -->
+        <div v-if="activeTab === 'overview'" class="tab-content overview-tab-content">
+          <div class="overview-text">
+            <h2 class="ov-title">{{ dynamicOverviewTitle }}</h2>
+            <p class="ov-desc">{{ dynamicOverviewDesc }}</p>
+            <div class="features-icons-grid">
+              <div v-for="(feat, idx) in dynamicOverviewFeatures" :key="idx" class="feature-item">
+                <span class="feat-ico">
+                  <!-- SVG Icon based on index -->
+                  <svg v-if="idx % 4 === 0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  <svg v-else-if="idx % 4 === 1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                  <svg v-else-if="idx % 4 === 2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                  </svg>
+                </span>
+                <span class="feat-txt">{{ feat }}</span>
               </div>
-            </div>
-          </div>
-
-          <!-- 2. Technical Specifications Tab -->
-          <div v-if="activeTab === 'specs'" class="tab-pane specs-pane" style="background: rgba(255, 255, 255, 1);">
-            <div class="specs-card" style="background: rgba(255, 255, 255, 1);">
-              <h3 class="specs-card-title">{{ locale === 'ar' ? 'المواصفات الفنية الكاملة' : 'Full Technical Specifications' }}</h3>
-              <div class="specs-grid-rows" style="background: rgba(255, 255, 255, 1);">
-                <div v-for="(r, idx) in specRows" :key="idx" class="spec-row" style="background: rgba(255, 255, 255, 1);">
-                  <div class="spec-col" style="background: rgba(255, 255, 255, 1);">
-                    <span class="spec-label">{{ r.col1.label }}</span>
-                    <span class="spec-val">{{ r.col1.value }}</span>
-                  </div>
-                  <div class="spec-col" v-if="r.col2" style="background: rgba(255, 255, 255, 1);">
-                    <span class="spec-label">{{ r.col2.label }}</span>
-                    <span class="spec-val">{{ r.col2.value }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Installation Guide Tab -->
-          <div v-if="activeTab === 'installation'" class="tab-pane installation-pane">
-            <h2 class="pane-heading">{{ locale === 'ar' ? 'دليل التركيب' : 'Installation Guide' }}</h2>
-
-            <!-- Dynamic Custom Installation Guidance If Provided from Dashboard -->
-            <div class="guide-dynamic-banner" v-if="dynamicInstallationTips">
-              <div class="dynamic-banner-header">
-                <i class="fas fa-info-circle"></i>
-                <h4>{{ locale === 'ar' ? 'إرشادات التركيب المخصصة للمنتج' : 'Product Installation Guidance' }}</h4>
-              </div>
-              <div class="dynamic-banner-body" style="white-space: pre-line;">{{ dynamicInstallationTips }}</div>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-tools"></i>
-                <h3>{{ locale === 'ar' ? 'متطلبات التركيب' : 'Installation Requirements' }}</h3>
-              </div>
-              <ul class="guide-checklist">
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'توصيلة غاز معتمدة ومطابقة للمواصفات' : 'Certified gas connection matching regulatory standards' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'مقبس كهربائي 220-240 فولت بالقرب من موقع التركيب' : '220-240V electrical outlet adjacent to installation opening' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'فتحة خزانة بأبعاد 56 × 56 × 55 سم' : 'Cabinet cutout dimensions 56 × 56 × 55 cm' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'تهوية كافية حسب متطلبات السلامة' : 'Adequate ventilation clearances per safety codes' }}</span></li>
-              </ul>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-list-ol"></i>
-                <h3>{{ locale === 'ar' ? 'خطوات التركيب' : 'Installation Steps' }}</h3>
-              </div>
-              <ol class="guide-steps-list">
-                <li><span class="step-num-txt">1.</span><span>{{ locale === 'ar' ? 'تأكد من إيقاف إمداد الغاز والكهرباء بالكامل' : 'Shut off main gas and power supplies entirely' }}</span></li>
-                <li><span class="step-num-txt">2.</span><span>{{ locale === 'ar' ? 'جهز فتحة الخزانة وفقاً للأبعاد المحددة في دليل المنتج' : 'Prepare the cabinet aperture per product guidelines' }}</span></li>
-                <li><span class="step-num-txt">3.</span><span>{{ locale === 'ar' ? 'ضع الفرن في الفتحة مع التأكد من استوائه باستخدام ميزان' : 'Mount the oven ensuring perfect leveling with spirit level' }}</span></li>
-                <li><span class="step-num-txt">4.</span><span>{{ locale === 'ar' ? 'وصل خط الغاز باستخدام الوصلات المعتمدة فقط' : 'Connect gas supply using certified high-pressure fittings' }}</span></li>
-                <li><span class="step-num-txt">5.</span><span>{{ locale === 'ar' ? 'وصل الكهرباء وتأكد من سلامة التأريض' : 'Plug power and verify ground safety connection' }}</span></li>
-                <li><span class="step-num-txt">6.</span><span>{{ locale === 'ar' ? 'اختبر جميع وظائف الفرن والتأكد من عدم وجود تسريب غاز' : 'Test all functions and perform soapy water leak inspection' }}</span></li>
-              </ol>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>{{ locale === 'ar' ? 'ملاحظات مهمة' : 'Important Notes' }}</h3>
-              </div>
-              <ul class="guide-notes-list">
-                <li><span class="warn-icon">⚠</span><span>{{ locale === 'ar' ? 'يجب أن يتم التركيب بواسطة فني معتمد من ماسترجاز' : 'Installation must be performed by certified Mastergas technician' }}</span></li>
-                <li><span class="warn-icon">⚠</span><span>{{ locale === 'ar' ? 'عدم الالتزام بتعليمات التركيب قد يؤدي إلى إلغاء الضمان' : 'Non-compliance with installation instructions may void warranty' }}</span></li>
-                <li><span class="warn-icon">⚠</span><span>{{ locale === 'ar' ? 'للحصول على خدمة التركيب، تواصل مع الدعم الفني على الرقم الموحد' : 'To request certified installation, contact support on our unified number' }}</span></li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 4. Shipping & Returns Tab -->
-          <div v-if="activeTab === 'shipping'" class="tab-pane shipping-pane">
-            <h2 class="pane-heading">{{ locale === 'ar' ? 'الشحن والإرجاع' : 'Shipping & Returns' }}</h2>
-
-            <!-- Dynamic Custom Shipping Guidance If Provided from Dashboard -->
-            <div class="guide-dynamic-banner" v-if="dynamicShippingInfo">
-              <div class="dynamic-banner-header">
-                <i class="fas fa-shipping-fast"></i>
-                <h4>{{ locale === 'ar' ? 'تفاصيل الشحن والضمان المخصصة' : 'Custom Shipping & Warranty Terms' }}</h4>
-              </div>
-              <div class="dynamic-banner-body" style="white-space: pre-line;">{{ dynamicShippingInfo }}</div>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-truck"></i>
-                <h3>{{ locale === 'ar' ? 'الشحن والتوصيل' : 'Shipping & Delivery' }}</h3>
-              </div>
-              <ul class="guide-checklist">
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'شحن مجاني للطلبات فوق 500 ريال' : 'Free shipping for orders exceeding 500 SAR' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'التوصيل خلال 3-5 أيام عمل لجميع مناطق المملكة' : 'Delivery within 3-5 business days across all regions' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'التوصيل خلال 1-2 يوم عمل للمدن الرئيسية (الرياض، جدة، الدمام)' : 'Fast 1-2 day delivery for Riyadh, Jeddah, and Dammam' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'إمكانية تتبع الشحنة عبر رقم التتبع المرسل بالبريد الإلكتروني' : 'Live tracking via tracking number sent via email' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'التوصيل حتى باب المنزل مع إمكانية الرفع للأدوار العليا' : 'Door-to-door delivery with upper-floor lifting service' }}</span></li>
-              </ul>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-undo-alt"></i>
-                <h3>{{ locale === 'ar' ? 'سياسة الإرجاع والاستبدال' : 'Return & Exchange Policy' }}</h3>
-              </div>
-              <ul class="guide-checklist">
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'إرجاع مجاني خلال 14 يوم من تاريخ الاستلام' : 'Free return within 14 days of receipt' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'يجب أن يكون المنتج في حالته الأصلية وبغلافه الكامل' : 'Product must be in original condition with complete packaging' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'لا يشمل الإرجاع المنتجات التي تم تركيبها أو استخدامها' : 'Returns do not cover installed or used appliances' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'استرداد المبلغ خلال 5-7 أيام عمل بعد استلام المنتج المرتجع' : 'Refund credited within 5-7 business days upon receipt' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'للاستبدال أو الإرجاع، تواصل مع خدمة العملاء' : 'For returns or exchanges, simply contact customer support' }}</span></li>
-              </ul>
-            </div>
-
-            <div class="guide-section">
-              <div class="guide-sec-header">
-                <i class="fas fa-shield-alt"></i>
-                <h3>{{ locale === 'ar' ? 'الضمان' : 'Warranty' }}</h3>
-              </div>
-              <ul class="guide-checklist">
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'ضمان شامل لمدة سنتين على جميع المنتجات' : 'Comprehensive 2-year warranty on all products' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'يشمل الضمان عيوب التصنيع والأعطال الفنية' : 'Covers manufacturer defects and technical malfunctions' }}</span></li>
-                <li><span class="check-icon">✓</span><span>{{ locale === 'ar' ? 'لا يشمل الضمان الأضرار الناتجة عن سوء الاستخدام أو التركيب غير المعتمد' : 'Excludes damages caused by misuse or uncertified installation' }}</span></li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 5. Reviews Tab -->
-          <div v-if="activeTab === 'reviews'" class="tab-pane reviews-pane">
-            <h2 class="pane-heading">{{ locale === 'ar' ? 'تقييمات العملاء' : 'Customer Reviews' }}</h2>
-
-            <!-- Rating Summary Box -->
-            <div class="reviews-score-summary">
-              <div class="score-left-col">
-                <span class="big-score">{{ Number(computedAverageRating).toFixed(1) }}/5</span>
-                <div class="stars-gold">
-                  <i v-for="i in Math.floor(computedAverageRating)" :key="'ts-star-'+i" class="fas fa-star"></i>
-                  <i v-if="(computedAverageRating % 1) >= 0.15" class="fas fa-star-half-alt half-star-flipped"></i>
-                  <i v-for="i in (5 - Math.floor(computedAverageRating) - ((computedAverageRating % 1) >= 0.15 ? 1 : 0))" :key="'ts-empty-'+i" class="far fa-star"></i>
-                </div>
-                <span class="total-reviews-count">{{ locale === 'ar' ? `${computedRatingCount} تقييم` : `${computedRatingCount} ratings` }}</span>
-              </div>
-
-              <div class="bars-right-col">
-                <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="rating-bar-row">
-                  <span class="bar-label">{{ star }} {{ locale === 'ar' ? (star === 1 ? 'نجمة' : 'نجوم') : (star === 1 ? 'star' : 'stars') }}</span>
-                  <div class="bar-track"><div class="bar-fill" :style="{ width: getRatingPercentage(star) + '%' }"></div></div>
-                  <span class="bar-pct">{{ getRatingPercentage(star) }}%</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Review Cards List -->
-            <div class="reviews-cards-list">
-              <div v-for="(rev, idx) in displayReviews" :key="rev.id || idx" class="review-card-item">
-                <div class="rc-header">
-                  <div class="rc-user">
-                    <i class="far fa-user-circle"></i>
-                    <span class="rc-name">{{ rev.user_name || rev.customer?.name || rev.name || (locale === 'ar' ? 'عميل ماسترجاز' : 'Mastergas Customer') }}</span>
-                  </div>
-                  <span class="rc-date">{{ rev.created_at ? formatDate(rev.created_at) : rev.date }}</span>
-                </div>
-                <div class="rc-stars">
-                  <i v-for="s in 5" :key="s" :class="s <= (rev.rating || 5) ? 'fas fa-star' : 'far fa-star'"></i>
-                </div>
-                <p class="rc-comment">{{ rev.comment }}</p>
-              </div>
-            </div>
-
-            <!-- Add Review Button -->
-            <div class="add-review-action">
-              <button type="button" class="add-review-btn" @click="showAddReviewModal = true">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                <span>{{ locale === 'ar' ? 'أضف تقييمك' : 'Add Review' }}</span>
-              </button>
             </div>
           </div>
         </div>
+
+        <!-- Tab 2: Specs -->
+        <div v-if="activeTab === 'specs'" class="tab-content specs-tab-content">
+          <div class="specs-card">
+            <h3 class="specs-title">{{ locale === 'ar' ? 'المواصفات الفنية الكاملة' : 'Full Technical Specifications' }}</h3>
+            <div class="specs-table-grid">
+              <div v-for="(r, idx) in specRows" :key="idx" class="spec-table-row">
+                <div class="spec-cell-pair">
+                  <span class="sc-label">{{ r.col1.label }}</span>
+                  <div v-if="isColorSpec(r.col1.label)" class="spec-color-val">
+                    <span v-for="(c, cIdx) in getSpecColorsList(r.col1.value)" :key="cIdx" class="spec-color-item">
+                      <span class="spec-color-circle" :style="{ backgroundColor: c.hex }"></span>
+                      <span class="sc-value">{{ c.label }}</span>
+                    </span>
+                  </div>
+                  <span v-else class="sc-value">{{ r.col1.value }}</span>
+                </div>
+                <div class="spec-cell-pair" v-if="r.col2">
+                  <span class="sc-label">{{ r.col2.label }}</span>
+                  <div v-if="isColorSpec(r.col2.label)" class="spec-color-val">
+                    <span v-for="(c, cIdx) in getSpecColorsList(r.col2.value)" :key="cIdx" class="spec-color-item">
+                      <span class="spec-color-circle" :style="{ backgroundColor: c.hex }"></span>
+                      <span class="sc-value">{{ c.label }}</span>
+                    </span>
+                  </div>
+                  <span v-else class="sc-value">{{ r.col2.value }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Installation -->
+        <div v-if="activeTab === 'installation'" class="tab-content installation-tab-content">
+          <h2 class="pane-headline">{{ locale === 'ar' ? 'دليل التركيب' : 'Installation Guide' }}</h2>
+
+          <!-- Section 1: Requirements -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 19.5H5.50996C6.06196 19.5 6.50498 19.052 6.50498 18.5C6.50498 17.948 6.052 17.5 5.5 17.5C4.948 17.5 4.5 17.948 4.5 18.5C4.5 19.052 4.948 19.5 5.5 19.5Z" fill="black"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M14.2751 15.25H13.8108L7.86007 21.2007C7.18107 21.8797 6.28208 22.2528 5.32608 22.2528V22.2517H5.31807C4.36407 22.2497 3.46908 21.8748 2.79708 21.1978C2.12408 20.5308 1.74908 19.6358 1.74708 18.6818C1.74508 17.7228 2.11813 16.8198 2.79913 16.1398L8.75015 10.1887V10.102C8.74815 6.71195 8.74711 4.47296 10.1101 3.10996C11.4689 1.75115 12.2077 1.75099 16.9845 1.75001L17.6301 1.75C18.1661 1.75 18.6442 2.06901 18.8492 2.56201C19.0542 3.05601 18.9412 3.62098 18.5612 4.00098L15.8521 6.72002C15.6591 6.91302 15.5532 7.16704 15.5532 7.43604C15.5532 7.70504 15.6591 7.95898 15.8511 8.15098C16.0431 8.34298 16.2972 8.44902 16.5662 8.44902C16.8352 8.44902 17.0891 8.34298 17.2811 8.15098L20.0021 5.44004C20.3811 5.06104 20.9462 4.94803 21.4402 5.15303C21.9332 5.35703 22.2521 5.83597 22.2521 6.37197V6.98398C22.2541 11.791 22.2541 12.531 20.8921 13.892C19.5801 15.204 17.4561 15.252 14.2771 15.252L14.2751 15.25ZM13.4996 13.75C11.7172 13.75 10.2648 12.3076 10.2493 10.5287C10.2501 10.5087 10.25 10.4886 10.2492 10.4686V10.0976C10.2482 7.08449 10.2475 5.09365 11.1702 4.171C12.0392 3.301 12.2671 3.25 16.7261 3.25L17.0171 3.25098H17.1902L14.7891 5.66104C14.3141 6.13604 14.0521 6.76704 14.0521 7.43604C14.0521 8.10504 14.3141 8.73604 14.7891 9.21104C15.2641 9.68604 15.8951 9.94805 16.5641 9.94805C17.2331 9.94805 17.8641 9.68601 18.3381 9.21201L20.7492 6.80996V6.98301C20.7502 11.723 20.7162 11.942 19.8282 12.83C18.9081 13.75 16.928 13.75 13.9272 13.75H13.4996ZM11.949 14.9899C10.5754 14.514 9.48586 13.4243 9.01007 12.0507L3.86007 17.2007C3.46407 17.5967 3.24608 18.1217 3.24708 18.6787C3.24808 19.2307 3.46514 19.7487 3.85714 20.1377C4.25114 20.5347 4.7691 20.7518 5.3211 20.7528H5.32608C5.88108 20.7528 6.40413 20.5358 6.79913 20.1398L11.949 14.9899Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'متطلبات التركيب' : 'Installation Requirements' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'توصيلة غاز معتمدة ومطابقة للمواصفات' : 'Certified gas connection matching regulatory standards' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'مقبس كهربائي 220-240 فولت بالقرب من موقع التركيب' : '220-240V electrical outlet adjacent to installation opening' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'فتحة خزانة بأبعاد 56 × 56 × 55 سم' : 'Cabinet cutout dimensions 56 × 56 × 55 cm' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'تهوية كافية حسب متطلبات السلامة' : 'Adequate ventilation clearances per safety codes' }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Section 2: Steps -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M7 9.5C7 7.42893 8.67893 5.75 10.75 5.75C12.8211 5.75 14.5 7.42893 14.5 9.5C14.5 11.5711 12.8211 13.25 10.75 13.25C8.67893 13.25 7 11.5711 7 9.5ZM10.75 7.25C9.50736 7.25 8.5 8.25736 8.5 9.5C8.5 10.7426 9.50736 11.75 10.75 11.75C11.9926 11.75 13 10.7426 13 9.5C13 8.25736 11.9926 7.25 10.75 7.25Z" fill="black"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2302 3.5758e-06L11.2698 3.5758e-06C11.5431 -3.99356e-05 11.8077 -8.20756e-05 12.031 0.0255475C12.2828 0.0544633 12.5559 0.122305 12.812 0.307913C13.0677 0.493268 13.2173 0.731485 13.3237 0.961371C13.4182 1.16566 13.5016 1.41756 13.5881 1.67861L13.5983 1.70926L13.8836 2.56455C13.959 2.7541 14.09 2.91525 14.2581 3.02696L14.5166 3.17663C14.7158 3.2754 14.942 3.30361 15.1589 3.25702L16.2029 2.96188L16.236 2.95242C16.5192 2.87174 16.7917 2.79405 17.028 2.75641C17.2939 2.71403 17.5941 2.70716 17.9066 2.8347C18.2186 2.9621 18.4284 3.17688 18.5891 3.39279C18.7321 3.58499 18.8735 3.83136 19.0207 4.08789L19.4857 4.89788C19.6237 5.13806 19.7567 5.36976 19.8465 5.5779C19.9477 5.81229 20.0254 6.08408 19.9923 6.3998C19.9593 6.71561 19.8269 6.96541 19.6793 7.17373C19.5483 7.35862 19.3701 7.55748 19.1855 7.76347L19.1641 7.78726L19.1628 7.78873L18.2845 8.77428C18.189 8.90664 18.0797 9.20973 18.0797 9.49986C18.0797 9.79032 18.189 10.0933 18.2845 10.2256L19.1628 11.2112L19.1641 11.2127L19.1855 11.2365C19.3701 11.4425 19.5483 11.6414 19.6793 11.8262C19.8269 12.0345 19.9593 12.2843 19.9923 12.6001C20.0254 12.9159 19.9477 13.1877 19.8465 13.422C19.7567 13.6302 19.6237 13.8619 19.4857 14.1021L19.0207 14.9121C18.8735 15.1686 18.7321 15.415 18.5891 15.6071C18.4284 15.823 18.2187 16.0378 17.9065 16.1652C17.5941 16.2928 17.2939 16.2859 17.028 16.2435C16.7917 16.2059 16.5192 16.1282 16.2361 16.0475L16.2028 16.038L15.1589 15.7429C14.942 15.6963 14.7158 15.7245 14.5165 15.8233L14.2581 15.973C14.09 16.0847 13.9591 16.2458 13.8836 16.4354L13.5983 17.2907L13.5881 17.3214C13.5016 17.5824 13.4182 17.8344 13.3237 18.0386C13.2173 18.2685 13.0677 18.5067 12.812 18.6921C12.5559 18.8777 12.2828 18.9456 12.031 18.9745C11.8078 19.0001 11.5431 19.0001 11.2698 19H10.2302C9.95689 19.0001 9.69228 19.0001 9.46905 18.9745C9.2172 18.9456 8.94413 18.8777 8.68806 18.6921C8.43234 18.5067 8.2827 18.2685 8.17636 18.0386C8.08185 17.8344 7.9984 17.5824 7.91191 17.3214L7.90176 17.2907L7.61641 16.4354C7.54097 16.2458 7.41008 16.0847 7.24197 15.973L6.98357 15.8233C6.78427 15.7245 6.55801 15.6963 6.34116 15.7429L5.2972 16.038L5.26399 16.0475C4.98088 16.1282 4.70832 16.2059 4.47207 16.2435C4.20612 16.2859 3.90592 16.2928 3.59348 16.1652C3.28138 16.0378 3.0716 15.823 2.91094 15.6071C2.76792 15.4149 2.62653 15.1686 2.47932 14.9121L2.0143 14.1021C1.87636 13.8619 1.74329 13.6302 1.65349 13.422C1.55237 13.1877 1.47467 12.9159 1.50772 12.6001C1.54077 12.2843 1.67313 12.0345 1.82073 11.8262C1.95174 11.6413 2.12995 11.4425 2.31455 11.2365L2.3372 11.2112L3.21551 10.2256C3.31103 10.0933 3.42032 9.79032 3.42032 9.49986C3.42032 9.20974 3.311 8.90665 3.21549 8.77428L2.3372 7.78873L2.31456 7.76347C2.12995 7.55748 1.95173 7.35862 1.82073 7.17373C1.67312 6.96541 1.54077 6.71561 1.50771 6.3998C1.47467 6.08409 1.55237 5.81229 1.65349 5.5779C1.74329 5.36976 1.87635 5.13806 2.0143 4.89787L2.47934 4.08785C2.62655 3.83134 2.76793 3.58499 2.91095 3.39279C3.07161 3.17688 3.28138 2.9621 3.59347 2.8347C3.9059 2.70716 4.20611 2.71403 4.47205 2.75641C4.7083 2.79406 4.98086 2.87173 5.26399 2.95242L5.29788 2.96208L6.34118 3.25702C6.55799 3.30361 6.78421 3.2754 6.98348 3.17663L7.24193 3.02696C7.41007 2.91525 7.54098 2.7541 7.61644 2.56455L7.90131 1.71064L7.91191 1.67863C7.9984 1.41758 8.08185 1.16566 8.17636 0.961371C8.2827 0.731485 8.43234 0.493268 8.68806 0.307913C8.94413 0.122305 9.2172 0.0544633 9.46905 0.0255475C9.69228 -8.20756e-05 9.9569 -3.99356e-05 10.2302 3.5758e-06ZM9.57104 1.52669C9.5851 1.52354 9.60724 1.51954 9.64015 1.51576C9.76735 1.50115 9.94405 1.50001 10.2641 1.50001L11.2359 1.50001C11.556 1.50001 11.7327 1.50115 11.8599 1.51576C11.8928 1.51954 11.9149 1.52354 11.929 1.52669C11.9366 1.53935 11.9478 1.55979 11.9623 1.59114C12.0166 1.70856 12.0738 1.87748 12.1749 2.18258L12.4716 3.07198L12.4774 3.08705C12.6675 3.58471 13.0114 4.00889 13.4595 4.29693L13.4742 4.30634L13.7987 4.49431L13.815 4.5027C14.3379 4.77234 14.9391 4.84766 15.5122 4.71501L15.5298 4.71095L16.6123 4.40491C16.9431 4.3107 17.1276 4.25946 17.264 4.23772C17.2983 4.23225 17.3221 4.23003 17.3376 4.22924C17.3484 4.24084 17.3643 4.25948 17.3857 4.28827C17.4688 4.4 17.5659 4.56657 17.7377 4.86578L18.168 5.61531C18.3291 5.89599 18.4176 6.05235 18.4693 6.17211C18.4839 6.20596 18.4918 6.22884 18.4961 6.24311C18.489 6.25611 18.4765 6.2767 18.4554 6.30652C18.3802 6.41269 18.2614 6.54699 18.0456 6.78781L18.0443 6.78929L17.1302 7.81503L17.116 7.83306C16.7744 8.26715 16.5797 8.92567 16.5797 9.49986C16.5797 10.0743 16.7743 10.7327 17.116 11.1669L17.1302 11.1849L18.0443 12.2107L18.0456 12.2121C18.2614 12.4529 18.3802 12.5872 18.4554 12.6934C18.4765 12.7232 18.489 12.7438 18.4961 12.7568C18.4918 12.7711 18.4839 12.794 18.4693 12.8278C18.4176 12.9476 18.3291 13.104 18.168 13.3846L17.7377 14.1341C17.5659 14.4333 17.4689 14.5999 17.3857 14.7117C17.3643 14.7404 17.3484 14.7591 17.3376 14.7707C17.3221 14.7699 17.2983 14.7677 17.264 14.7622C17.1276 14.7405 16.9431 14.6892 16.6123 14.595L15.5298 14.289L15.5123 14.2849C14.939 14.1522 14.3377 14.2276 13.8148 14.4973L13.7985 14.5057L13.474 14.6937L13.4593 14.7031C13.0114 14.9912 12.6675 15.4153 12.4774 15.9129L12.4716 15.928L12.1749 16.8174C12.0738 17.1225 12.0166 17.2915 11.9623 17.4089C11.9478 17.4402 11.9366 17.4607 11.929 17.4733C11.9149 17.4765 11.8928 17.4805 11.8599 17.4843C11.7327 17.4989 11.556 17.5 11.2359 17.5H10.2641C9.94405 17.5 9.76735 17.4989 9.64015 17.4843C9.60724 17.4805 9.5851 17.4765 9.57104 17.4733C9.56341 17.4607 9.55225 17.4402 9.53775 17.4089C9.48343 17.2915 9.42626 17.1225 9.32513 16.8174L9.0284 15.928L9.02264 15.9129C8.83249 15.4153 8.48868 14.9912 8.0407 14.7031L8.02606 14.6937L7.70152 14.5057L7.68525 14.4973C7.16232 14.2276 6.561 14.1522 5.98777 14.2849L5.97021 14.289L4.88771 14.595C4.55695 14.6892 4.37246 14.7405 4.23599 14.7622C4.20168 14.7677 4.17794 14.7699 4.16243 14.7707C4.15164 14.7591 4.13575 14.7404 4.11432 14.7117C4.03117 14.5999 3.93411 14.4333 3.76233 14.1341L3.33204 13.3846C3.1709 13.104 3.08244 12.9476 3.03078 12.8278C3.01617 12.794 3.0082 12.7711 3.00395 12.7568C3.01104 12.7438 3.02351 12.7232 3.04464 12.6934C3.11987 12.5872 3.23866 12.4529 3.45441 12.2121L3.45573 12.2107L4.36987 11.1849L4.38405 11.1669C4.72574 10.7327 4.92032 10.0743 4.92032 9.49986C4.92032 8.92567 4.72566 8.26715 4.38403 7.83306L4.36984 7.81503L3.45573 6.78929L3.45441 6.78781C3.23865 6.54699 3.11987 6.41269 3.04463 6.30652C3.02351 6.2767 3.01104 6.25612 3.00394 6.24312C3.0082 6.22885 3.01617 6.20596 3.03077 6.17211C3.08244 6.05235 3.1709 5.89599 3.33204 5.61531L3.76235 4.86578C3.93413 4.56657 4.03118 4.4 4.11433 4.28827C4.13575 4.25948 4.15164 4.24084 4.16243 4.22924C4.17794 4.23003 4.20169 4.23225 4.23599 4.23772C4.37247 4.25946 4.55695 4.3107 4.8877 4.40491L5.97026 4.71095L5.98782 4.71501C6.56095 4.84766 7.16215 4.77234 7.68502 4.5027L7.70129 4.49431L8.02588 4.30634L8.04052 4.29693C8.48859 4.00889 8.83248 3.58471 9.02266 3.08705L9.02843 3.07198L9.32513 2.18258C9.42626 1.87748 9.48343 1.70856 9.53775 1.59114C9.55225 1.55979 9.56341 1.53935 9.57104 1.52669Z" fill="black"/>
+                <path d="M1.50005 16.75C1.50005 16.3358 1.16426 16 0.750049 16C0.335836 16 4.93837e-05 16.3358 4.93837e-05 16.75L2.4171e-05 16.8658C-0.000245361 17.6838 -0.000429302 18.2419 0.127828 18.7206C0.474579 20.0147 1.48538 21.0255 2.77948 21.3722C3.25813 21.5005 3.81628 21.5003 4.63422 21.5L16.8658 21.5C17.6838 21.5003 18.242 21.5005 18.7206 21.3722C20.0147 21.0255 21.0255 20.0147 21.3723 18.7206C21.5005 18.2419 21.5003 17.6838 21.5001 16.8658L21.5 16.75C21.5 16.3358 21.1643 16 20.75 16C20.3358 16 20 16.3358 20 16.75C20 17.7283 19.9936 18.0703 19.9234 18.3323C19.7153 19.1088 19.1089 19.7153 18.3324 19.9233C18.0703 19.9936 17.7283 20 16.75 20L4.75005 20C3.77179 20 3.42979 19.9936 3.16771 19.9233C2.39125 19.7153 1.78477 19.1088 1.57672 18.3323C1.50649 18.0703 1.50005 17.7283 1.50005 16.75Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'خطوات التركيب' : 'Installation Steps' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'تأكد من إيقاف إمداد الغاز والكهرباء بالكامل' : 'Shut off main gas and power supplies entirely' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'جهّز فتحة الخزانة وفقاً للأبعاد المحددة في دليل المنتج' : 'Prepare the cabinet aperture per product guidelines' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'ضع الفرن في الفتحة مع التأكد من استوائه باستخدام ميزان' : 'Mount the oven ensuring perfect leveling with spirit level' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'وصّل خط الغاز باستخدام الوصلات المعتمدة فقط' : 'Connect gas supply using certified high-pressure fittings' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'وصّل الكهرباء وتأكد من سلامة التأريض' : 'Plug power and verify ground safety connection' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.75 0C15.3358 0 15 0.335786 15 0.75C15 1.16421 15.3358 1.5 15.75 1.5H16.5V6H15.75C15.3358 6 15 6.33579 15 6.75C15 7.16421 15.3358 7.5 15.75 7.5H18.75C19.1642 7.5 19.5 7.16421 19.5 6.75C19.5 6.33579 19.1642 6 18.75 6H18V1.05C18 0.470101 17.5299 0 16.95 0H15.75Z" fill="black"/>
+                    <path d="M0 3.75C0 3.33579 0.335786 3 0.75 3L10.75 3C11.1642 3 11.5 3.33579 11.5 3.75C11.5 4.16421 11.1642 4.5 10.75 4.5L0.75 4.5C0.335786 4.5 0 4.16421 0 3.75Z" fill="black"/>
+                    <path d="M0 9.75C0 9.33579 0.335786 9 0.75 9L10.75 9C11.1642 9 11.5 9.33579 11.5 9.75C11.5 10.1642 11.1642 10.5 10.75 10.5L0.75 10.5C0.335786 10.5 0 10.1642 0 9.75Z" fill="black"/>
+                    <path d="M0.75 15C0.335786 15 0 15.3358 0 15.75C0 16.1642 0.335786 16.5 0.75 16.5H10.75C11.1642 16.5 11.5 16.1642 11.5 15.75C11.5 15.3358 11.1642 15 10.75 15L0.75 15Z" fill="black"/>
+                    <path d="M17.6379 13.5087C17.6127 13.5037 17.5648 13.5001 17.2501 13.5001H15.7501C15.3359 13.5001 15.0001 13.1643 15.0001 12.7501C15.0001 12.3359 15.3359 12.0001 15.7501 12.0001L17.3048 12C17.5276 11.9998 17.7395 11.9995 17.9305 12.0376C18.7041 12.1914 19.3087 12.7961 19.4626 13.5697C19.5006 13.7607 19.5004 13.9725 19.5001 14.1954L19.5001 14.2501L19.5001 14.3048C19.5004 14.5276 19.5006 14.7395 19.4626 14.9305C19.3087 15.7041 18.7041 16.3087 17.9305 16.4626C17.7395 16.5006 17.5276 16.5004 17.3048 16.5001L17.2501 16.5001C16.9353 16.5001 16.8875 16.5037 16.8623 16.5087C16.6838 16.5442 16.5442 16.6838 16.5087 16.8623C16.5037 16.8875 16.5001 16.9353 16.5001 17.2501V18.0001H18.7501C19.1643 18.0001 19.5001 18.3359 19.5001 18.7501C19.5001 19.1643 19.1643 19.5001 18.7501 19.5001L16.3244 19.5001C16.207 19.5002 16.0543 19.5003 15.921 19.4824C15.7561 19.4602 15.5141 19.3991 15.3076 19.1925C15.1011 18.986 15.0399 18.7441 15.0178 18.5792C14.9998 18.4458 15 18.2932 15.0001 18.1757L15 17.1954C14.9998 16.9725 14.9995 16.7607 15.0376 16.5697C15.1914 15.7961 15.7961 15.1914 16.5697 15.0376C16.7117 15.0093 16.8653 15.0022 17.0263 15.0005C17.0818 14.9999 17.1382 15 17.1954 15L17.2501 15.0001C17.5648 15.0001 17.6127 14.9964 17.6379 14.9914C17.8164 14.9559 17.9559 14.8164 17.9914 14.6379C17.9964 14.6127 18.0001 14.5648 18.0001 14.2501C18.0001 13.9353 17.9964 13.8875 17.9914 13.8623C17.9559 13.6838 17.8164 13.5442 17.6379 13.5087Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'اختبر جميع وظائف الفرن والتأكد من عدم وجود تسريب غاز' : 'Test all functions and perform soapy water leak inspection' }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Section 3: Warnings -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.491 12.7512C11.4216 12.7501 11.3413 12.75 11.2422 12.75C10.828 12.75 10.4922 12.4142 10.4922 12C10.4922 11.5858 10.828 11.25 11.2422 11.25L11.2766 11.25C11.4817 11.2499 11.7035 11.2498 11.8908 11.275C12.1101 11.3045 12.3903 11.3803 12.6261 11.6161C12.8619 11.8519 12.9377 12.1321 12.9672 12.3514C12.9924 12.5387 12.9923 12.7605 12.9922 12.9656L12.9922 17C12.9922 17.4142 12.6564 17.75 12.2422 17.75C11.828 17.75 11.4922 17.4142 11.4922 17V13C11.4922 12.9009 11.4922 12.8206 11.491 12.7512Z" fill="black"/>
+                <path d="M11.9922 8C11.4399 8 10.9922 8.44772 10.9922 9C10.9922 9.55228 11.4399 10 11.9922 10H12.0012C12.5535 10 13.0012 9.55228 13.0012 9C13.0012 8.44772 12.5535 8 12.0012 8H11.9922Z" fill="black"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.362 2.015C11.4264 1.66167 12.5736 1.66167 13.638 2.015C14.6981 2.36687 15.5304 3.20141 16.3665 4.37395C17.1999 5.5426 18.1208 7.17206 19.3078 9.2725L19.3544 9.35496C20.5417 11.4557 21.4625 13.0851 22.0364 14.4065C22.613 15.7343 22.9002 16.8807 22.6711 17.9821C22.4403 19.0911 21.8714 20.0995 21.0428 20.8617C20.2162 21.622 19.0907 21.9428 17.6736 22.0968C16.2645 22.25 14.4212 22.25 12.0488 22.25H11.9513C9.57882 22.25 7.73554 22.25 6.32642 22.0968C4.90927 21.9428 3.78379 21.622 2.95722 20.8617C2.12862 20.0995 1.55968 19.0911 1.32895 17.9821C1.0998 16.8807 1.387 15.7343 1.96365 14.4065C2.53752 13.0851 3.45835 11.4557 4.64558 9.35495L4.69218 9.2725C5.87921 7.17207 6.80008 5.5426 7.63347 4.37395C8.46963 3.20141 9.30194 2.36687 10.362 2.015ZM13.1655 3.43862C12.4078 3.18713 11.5922 3.18713 10.8345 3.43862C10.2386 3.63645 9.63943 4.1445 8.85474 5.24486C8.07275 6.34143 7.18998 7.90144 5.97466 10.0519C4.75941 12.2023 3.87825 13.7635 3.33951 15.004C2.79983 16.2467 2.66463 17.0379 2.7975 17.6766C2.96511 18.4821 3.37754 19.2102 3.97272 19.7577C4.44016 20.1877 5.16852 20.4621 6.48854 20.6056C7.80696 20.7489 9.56861 20.75 12 20.75C14.4314 20.75 16.193 20.7489 17.5115 20.6056C18.8315 20.4621 19.5599 20.1877 20.0273 19.7577C20.6225 19.2102 21.0349 18.4821 21.2025 17.6766C21.3354 17.0379 21.2002 16.2467 20.6605 15.004C20.1218 13.7635 19.2406 12.2023 18.0254 10.0519C16.81 7.90144 15.9273 6.34143 15.1453 5.24486C14.3606 4.1445 13.7615 3.63645 13.1655 3.43862Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'ملاحظات مهمة' : 'Important Notes' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="item-alert-ico" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.491 12.7512C11.4216 12.7501 11.3413 12.75 11.2422 12.75C10.828 12.75 10.4922 12.4142 10.4922 12C10.4922 11.5858 10.828 11.25 11.2422 11.25L11.2766 11.25C11.4817 11.2499 11.7035 11.2498 11.8908 11.275C12.1101 11.3045 12.3903 11.3803 12.6261 11.6161C12.8619 11.8519 12.9377 12.1321 12.9672 12.3514C12.9924 12.5387 12.9923 12.7605 12.9922 12.9656L12.9922 17C12.9922 17.4142 12.6564 17.75 12.2422 17.75C11.828 17.75 11.4922 17.4142 11.4922 17V13C11.4922 12.9009 11.4922 12.8206 11.491 12.7512Z" fill="black"/>
+                    <path d="M11.9922 8C11.4399 8 10.9922 8.44772 10.9922 9C10.9922 9.55228 11.4399 10 11.9922 10H12.0012C12.5535 10 13.0012 9.55228 13.0012 9C13.0012 8.44772 12.5535 8 12.0012 8H11.9922Z" fill="black"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.362 2.015C11.4264 1.66167 12.5736 1.66167 13.638 2.015C14.6981 2.36687 15.5304 3.20141 16.3665 4.37395C17.1999 5.5426 18.1208 7.17206 19.3078 9.2725L19.3544 9.35496C20.5417 11.4557 21.4625 13.0851 22.0364 14.4065C22.613 15.7343 22.9002 16.8807 22.6711 17.9821C22.4403 19.0911 21.8714 20.0995 21.0428 20.8617C20.2162 21.622 19.0907 21.9428 17.6736 22.0968C16.2645 22.25 14.4212 22.25 12.0488 22.25H11.9513C9.57882 22.25 7.73554 22.25 6.32642 22.0968C4.90927 21.9428 3.78379 21.622 2.95722 20.8617C2.12862 20.0995 1.55968 19.0911 1.32895 17.9821C1.0998 16.8807 1.387 15.7343 1.96365 14.4065C2.53752 13.0851 3.45835 11.4557 4.64558 9.35495L4.69218 9.2725C5.87921 7.17207 6.80008 5.5426 7.63347 4.37395C8.46963 3.20141 9.30194 2.36687 10.362 2.015ZM13.1655 3.43862C12.4078 3.18713 11.5922 3.18713 10.8345 3.43862C10.2386 3.63645 9.63943 4.1445 8.85474 5.24486C8.07275 6.34143 7.18998 7.90144 5.97466 10.0519C4.75941 12.2023 3.87825 13.7635 3.33951 15.004C2.79983 16.2467 2.66463 17.0379 2.7975 17.6766C2.96511 18.4821 3.37754 19.2102 3.97272 19.7577C4.44016 20.1877 5.16852 20.4621 6.48854 20.6056C7.80696 20.7489 9.56861 20.75 12 20.75C14.4314 20.75 16.193 20.7489 17.5115 20.6056C18.8315 20.4621 19.5599 20.1877 20.0273 19.7577C20.6225 19.2102 21.0349 18.4821 21.2025 17.6766C21.3354 17.0379 21.2002 16.2467 20.6605 15.004C20.1218 13.7635 19.2406 12.2023 18.0254 10.0519C16.81 7.90144 15.9273 6.34143 15.1453 5.24486C14.3606 4.1445 13.7615 3.63645 13.1655 3.43862Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'يجب أن يتم التركيب بواسطة فني معتمد من ماستر غاز' : 'Installation must be performed by certified Mastergas technician' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="item-alert-ico" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.491 12.7512C11.4216 12.7501 11.3413 12.75 11.2422 12.75C10.828 12.75 10.4922 12.4142 10.4922 12C10.4922 11.5858 10.828 11.25 11.2422 11.25L11.2766 11.25C11.4817 11.2499 11.7035 11.2498 11.8908 11.275C12.1101 11.3045 12.3903 11.3803 12.6261 11.6161C12.8619 11.8519 12.9377 12.1321 12.9672 12.3514C12.9924 12.5387 12.9923 12.7605 12.9922 12.9656L12.9922 17C12.9922 17.4142 12.6564 17.75 12.2422 17.75C11.828 17.75 11.4922 17.4142 11.4922 17V13C11.4922 12.9009 11.4922 12.8206 11.491 12.7512Z" fill="black"/>
+                    <path d="M11.9922 8C11.4399 8 10.9922 8.44772 10.9922 9C10.9922 9.55228 11.4399 10 11.9922 10H12.0012C12.5535 10 13.0012 9.55228 13.0012 9C13.0012 8.44772 12.5535 8 12.0012 8H11.9922Z" fill="black"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.362 2.015C11.4264 1.66167 12.5736 1.66167 13.638 2.015C14.6981 2.36687 15.5304 3.20141 16.3665 4.37395C17.1999 5.5426 18.1208 7.17206 19.3078 9.2725L19.3544 9.35496C20.5417 11.4557 21.4625 13.0851 22.0364 14.4065C22.613 15.7343 22.9002 16.8807 22.6711 17.9821C22.4403 19.0911 21.8714 20.0995 21.0428 20.8617C20.2162 21.622 19.0907 21.9428 17.6736 22.0968C16.2645 22.25 14.4212 22.25 12.0488 22.25H11.9513C9.57882 22.25 7.73554 22.25 6.32642 22.0968C4.90927 21.9428 3.78379 21.622 2.95722 20.8617C2.12862 20.0995 1.55968 19.0911 1.32895 17.9821C1.0998 16.8807 1.387 15.7343 1.96365 14.4065C2.53752 13.0851 3.45835 11.4557 4.64558 9.35495L4.69218 9.2725C5.87921 7.17207 6.80008 5.5426 7.63347 4.37395C8.46963 3.20141 9.30194 2.36687 10.362 2.015ZM13.1655 3.43862C12.4078 3.18713 11.5922 3.18713 10.8345 3.43862C10.2386 3.63645 9.63943 4.1445 8.85474 5.24486C8.07275 6.34143 7.18998 7.90144 5.97466 10.0519C4.75941 12.2023 3.87825 13.7635 3.33951 15.004C2.79983 16.2467 2.66463 17.0379 2.7975 17.6766C2.96511 18.4821 3.37754 19.2102 3.97272 19.7577C4.44016 20.1877 5.16852 20.4621 6.48854 20.6056C7.80696 20.7489 9.56861 20.75 12 20.75C14.4314 20.75 16.193 20.7489 17.5115 20.6056C18.8315 20.4621 19.5599 20.1877 20.0273 19.7577C20.6225 19.2102 21.0349 18.4821 21.2025 17.6766C21.3354 17.0379 21.2002 16.2467 20.6605 15.004C20.1218 13.7635 19.2406 12.2023 18.0254 10.0519C16.81 7.90144 15.9273 6.34143 15.1453 5.24486C14.3606 4.1445 13.7615 3.63645 13.1655 3.43862Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'عدم الالتزام بتعليمات التركيب قد يؤدي إلى إلغاء الضمان' : 'Non-compliance with installation instructions may void warranty' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="item-alert-ico" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.491 12.7512C11.4216 12.7501 11.3413 12.75 11.2422 12.75C10.828 12.75 10.4922 12.4142 10.4922 12C10.4922 11.5858 10.828 11.25 11.2422 11.25L11.2766 11.25C11.4817 11.2499 11.7035 11.2498 11.8908 11.275C12.1101 11.3045 12.3903 11.3803 12.6261 11.6161C12.8619 11.8519 12.9377 12.1321 12.9672 12.3514C12.9924 12.5387 12.9923 12.7605 12.9922 12.9656L12.9922 17C12.9922 17.4142 12.6564 17.75 12.2422 17.75C11.828 17.75 11.4922 17.4142 11.4922 17V13C11.4922 12.9009 11.4922 12.8206 11.491 12.7512Z" fill="black"/>
+                    <path d="M11.9922 8C11.4399 8 10.9922 8.44772 10.9922 9C10.9922 9.55228 11.4399 10 11.9922 10H12.0012C12.5535 10 13.0012 9.55228 13.0012 9C13.0012 8.44772 12.5535 8 12.0012 8H11.9922Z" fill="black"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.362 2.015C11.4264 1.66167 12.5736 1.66167 13.638 2.015C14.6981 2.36687 15.5304 3.20141 16.3665 4.37395C17.1999 5.5426 18.1208 7.17206 19.3078 9.2725L19.3544 9.35496C20.5417 11.4557 21.4625 13.0851 22.0364 14.4065C22.613 15.7343 22.9002 16.8807 22.6711 17.9821C22.4403 19.0911 21.8714 20.0995 21.0428 20.8617C20.2162 21.622 19.0907 21.9428 17.6736 22.0968C16.2645 22.25 14.4212 22.25 12.0488 22.25H11.9513C9.57882 22.25 7.73554 22.25 6.32642 22.0968C4.90927 21.9428 3.78379 21.622 2.95722 20.8617C2.12862 20.0995 1.55968 19.0911 1.32895 17.9821C1.0998 16.8807 1.387 15.7343 1.96365 14.4065C2.53752 13.0851 3.45835 11.4557 4.64558 9.35495L4.69218 9.2725C5.87921 7.17207 6.80008 5.5426 7.63347 4.37395C8.46963 3.20141 9.30194 2.36687 10.362 2.015ZM13.1655 3.43862C12.4078 3.18713 11.5922 3.18713 10.8345 3.43862C10.2386 3.63645 9.63943 4.1445 8.85474 5.24486C8.07275 6.34143 7.18998 7.90144 5.97466 10.0519C4.75941 12.2023 3.87825 13.7635 3.33951 15.004C2.79983 16.2467 2.66463 17.0379 2.7975 17.6766C2.96511 18.4821 3.37754 19.2102 3.97272 19.7577C4.44016 20.1877 5.16852 20.4621 6.48854 20.6056C7.80696 20.7489 9.56861 20.75 12 20.75C14.4314 20.75 16.193 20.7489 17.5115 20.6056C18.8315 20.4621 19.5599 20.1877 20.0273 19.7577C20.6225 19.2102 21.0349 18.4821 21.2025 17.6766C21.3354 17.0379 21.2002 16.2467 20.6605 15.004C20.1218 13.7635 19.2406 12.2023 18.0254 10.0519C16.81 7.90144 15.9273 6.34143 15.1453 5.24486C14.3606 4.1445 13.7615 3.63645 13.1655 3.43862Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'للحصول على خدمة التركيب، تواصل مع الدعم الفني على الرقم الموحد' : 'To request certified installation, contact support on our unified number' }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab 4: Shipping & Returns -->
+        <div v-if="activeTab === 'shipping'" class="tab-content shipping-tab-content">
+          <h2 class="pane-headline">{{ locale === 'ar' ? 'الشحن والإرجاع' : 'Shipping & Returns' }}</h2>
+
+          <!-- Section 1: Shipping -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.179 4.45501C10.8944 4.36255 10.5189 4.35407 9.44167 4.35407L1.83334 4.35407C1.45364 4.35407 1.14584 4.04626 1.14584 3.66657C1.14584 3.28687 1.45364 2.97907 1.83334 2.97907L9.56909 2.97904C10.4692 2.97868 11.0842 2.97844 11.6039 3.14731C12.4619 3.4261 13.168 4.02785 13.5819 4.81234L14.9952 4.81234C15.6333 4.81232 16.1628 4.81231 16.5989 4.85635C17.0581 4.90272 17.4694 5.00198 17.8576 5.23384C18.2458 5.46571 18.5282 5.78076 18.7867 6.16314C19.0322 6.52621 19.2833 6.99246 19.5858 7.55423L20.7667 9.74741C20.7942 9.79647 20.8159 9.84925 20.8308 9.9048C20.8478 9.96799 20.8554 10.0324 20.8542 10.0961L20.8542 11.9658C20.8542 13.0042 20.8542 13.8528 20.7641 14.5228C20.67 15.223 20.4662 15.8302 19.9816 16.3148C19.4636 16.8328 18.802 17.0326 18.028 17.1173C17.7526 18.211 16.7625 19.0207 15.5833 19.0207C14.4295 19.0207 13.4567 18.2454 13.1574 17.1874L8.84259 17.1874C8.54331 18.2454 7.57052 19.0207 6.41667 19.0207C5.23748 19.0207 4.2474 18.211 3.97201 17.1173C3.19802 17.0326 2.53638 16.8328 2.01841 16.3148C1.37596 15.6724 1.22302 14.8089 1.17194 13.7841C1.15304 13.4049 1.44514 13.0822 1.82436 13.0633C2.20359 13.0444 2.52633 13.3364 2.54524 13.7157C2.59438 14.7016 2.74054 15.0924 2.99069 15.3426C3.18183 15.5337 3.45513 15.6641 4.01334 15.7369C4.3366 14.7176 5.29037 13.979 6.41667 13.979C7.57057 13.979 8.54339 14.7543 8.84263 15.8124L13.1574 15.8124C13.4566 14.7543 14.4294 13.979 15.5833 13.979C16.7096 13.979 17.6634 14.7176 17.9867 15.7369C18.5449 15.6641 18.8182 15.5337 19.0093 15.3426C19.1959 15.156 19.3277 14.8874 19.4014 14.3395C19.4777 13.7719 19.4792 13.0163 19.4792 11.9166V10.7707L15.7508 10.7708C15.1744 10.7712 14.7284 10.7716 14.346 10.6474C13.5786 10.398 12.9769 9.79632 12.7275 9.02888C12.6033 8.6465 12.6037 8.20047 12.6041 7.62408L12.6042 7.51657C12.6042 6.43935 12.5957 6.0638 12.5032 5.77922C12.2992 5.15132 11.8069 4.65903 11.179 4.45501ZM19.0157 9.39574L18.3913 8.23616C18.0685 7.63676 17.8498 7.2322 17.6477 6.93336C17.4543 6.64739 17.3072 6.50667 17.1525 6.4143C16.9979 6.32193 16.8042 6.25907 16.4607 6.22439C16.1018 6.18815 15.6419 6.18734 14.9611 6.18734H13.9557C13.9795 6.52841 13.9794 6.92004 13.9792 7.38914L13.9792 7.51657C13.9792 8.25255 13.9877 8.45749 14.0352 8.60398C14.1486 8.95282 14.4221 9.22631 14.7709 9.33965C14.9174 9.38725 15.1224 9.39574 15.8583 9.39574H19.0157ZM5.27084 16.4998C5.27084 15.867 5.78384 15.354 6.41667 15.354C7.0495 15.354 7.5625 15.867 7.5625 16.4998C7.5625 17.1327 7.0495 17.6457 6.41667 17.6457C5.78384 17.6457 5.27084 17.1327 5.27084 16.4998ZM14.4375 16.4998C14.4375 15.867 14.9505 15.354 15.5833 15.354C16.2162 15.354 16.7292 15.867 16.7292 16.4998C16.7292 17.1327 16.2162 17.6457 15.5833 17.6457C14.9505 17.6457 14.4375 17.1327 14.4375 16.4998Z" fill="black"/>
+                <path d="M1.83334 6.64567C1.45364 6.64567 1.14584 6.95347 1.14584 7.33317C1.14584 7.71287 1.45364 8.02067 1.83334 8.02067L7.33334 8.02067C7.71303 8.02067 8.02084 7.71287 8.02084 7.33317C8.02084 6.95347 7.71303 6.64567 7.33334 6.64567L1.83334 6.64567Z" fill="black"/>
+                <path d="M1.14584 10.0832C1.14584 9.70347 1.45364 9.39567 1.83334 9.39567H5.5C5.8797 9.39567 6.1875 9.70347 6.1875 10.0832C6.1875 10.4629 5.8797 10.7707 5.5 10.7707H1.83334C1.45364 10.7707 1.14584 10.4629 1.14584 10.0832Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'الشحن والتوصيل' : 'Shipping & Delivery' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'شحن مجاني للطلبات فوق 500 ريال' : 'Free shipping for orders exceeding 500 SAR' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'التوصيل خلال 3-5 أيام عمل لجميع مناطق المملكة' : 'Delivery within 3-5 business days across all regions' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'التوصيل خلال 1-2 يوم عمل للمدن الرئيسية (الرياض، جدة، الدمام)' : 'Fast 1-2 day delivery for Riyadh, Jeddah, and Dammam' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'إمكانية تتبع الشحنة عبر رقم التتبع المرسل بالبريد الإلكتروني' : 'Live tracking via tracking number sent via email' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'التوصيل حتى باب المنزل مع إمكانية الرفع للأدوار العليا' : 'Door-to-door delivery with upper-floor lifting service' }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Section 2: Returns -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.5299 12.0302C10.8228 11.7373 10.8228 11.2624 10.5299 10.9695C10.237 10.6766 9.76214 10.6766 9.46925 10.9695L7.46925 12.9695C7.17636 13.2624 7.17636 13.7373 7.46925 14.0302L9.46925 16.0302C9.76214 16.3231 10.237 16.3231 10.5299 16.0302C10.8228 15.7373 10.8228 15.2624 10.5299 14.9695L9.81024 14.2499L13.9996 14.2499C14.6899 14.2499 15.2496 14.8095 15.2496 15.4999C15.2496 16.1902 14.6899 16.7499 13.9996 16.7499L12.9996 16.7499C12.5854 16.7499 12.2496 17.0856 12.2496 17.4999C12.2496 17.9141 12.5854 18.2499 12.9996 18.2499L13.9996 18.2499C15.5184 18.2499 16.7496 17.0186 16.7496 15.4999C16.7496 13.9811 15.5184 12.7499 13.9996 12.7499L9.81024 12.7499L10.5299 12.0302Z" fill="black"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1882 2.24985L8.81131 2.24985C7.97149 2.24984 7.28547 2.24983 6.72649 2.30611C6.14363 2.3648 5.631 2.48963 5.15812 2.78153C4.68134 3.07584 4.35105 3.47439 4.06051 3.96321C3.78578 4.42543 3.51934 5.01757 3.1984 5.73081L2.32505 7.67158C2.28167 7.76056 2.25537 7.85941 2.25043 7.96384C2.24989 7.97525 2.2496 7.98664 2.24958 7.99802L2.24958 13.0563C2.24957 14.894 2.24955 16.3497 2.40272 17.4889C2.56034 18.6613 2.89246 19.6102 3.64083 20.3586C4.38919 21.107 5.33814 21.4391 6.51056 21.5967C7.64977 21.7499 9.10539 21.7499 10.9431 21.7499L13.056 21.7499C14.8937 21.7499 16.3494 21.7499 17.4886 21.5967C18.661 21.4391 19.61 21.107 20.3583 20.3586C21.1067 19.6102 21.4388 18.6613 21.5964 17.4889C21.7496 16.3497 21.7496 14.8941 21.7496 13.0563L21.7496 8.02292C21.7525 7.92901 21.7378 7.83332 21.7036 7.74065C21.697 7.72271 21.6897 7.70508 21.6818 7.68781L20.8011 5.73077C20.4802 5.01755 20.2137 4.42542 19.939 3.96321C19.6485 3.47439 19.3182 3.07584 18.8414 2.78153C18.3685 2.48963 17.8559 2.3648 17.273 2.30611C16.7141 2.24983 16.028 2.24984 15.1882 2.24985ZM8.84977 3.74985L11.2496 3.74985L11.2496 7.24985L4.15971 7.24985L4.54909 6.38455C4.8916 5.62342 5.12393 5.10986 5.34994 4.72961C5.56502 4.36774 5.74261 4.1835 5.94603 4.05793C6.15335 3.92996 6.41707 3.84485 6.87676 3.79857C7.35181 3.75073 7.96214 3.74985 8.84977 3.74985ZM12.7496 3.74985L12.7496 7.24985L19.8398 7.24985L19.4504 6.38455C19.1079 5.62342 18.8756 5.10986 18.6496 4.72961C18.4345 4.36774 18.2569 4.1835 18.0535 4.05793C17.8462 3.92995 17.5825 3.84485 17.1228 3.79857C16.6477 3.75074 16.0374 3.74985 15.1498 3.74985L12.7496 3.74985ZM3.74958 8.74985L20.2496 8.74985L20.2496 12.9999C20.2496 14.9067 20.248 16.2613 20.1098 17.289C19.9746 18.2951 19.7209 18.8747 19.2977 19.2979C18.8745 19.7212 18.2948 19.9748 17.2887 20.1101C16.2611 20.2483 14.9064 20.2499 12.9996 20.2499L10.9996 20.2499C9.09276 20.2499 7.73809 20.2483 6.71043 20.1101C5.70434 19.9748 5.1247 19.7212 4.70149 19.298C4.27828 18.8747 4.02461 18.2951 3.88934 17.289C3.75118 16.2613 3.74958 14.9067 3.74958 12.9999L3.74958 8.74985Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'سياسة الإرجاع والاستبدال' : 'Return & Exchange Policy' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'إرجاع مجاني خلال 14 يوم من تاريخ الاستلام' : 'Free return within 14 days of receipt' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'يجب أن يكون المنتج في حالته الأصلية وتغليفه الكامل' : 'Product must be in original condition with complete packaging' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'لا يشمل الإرجاع المنتجات التي تم تركيبها أو استخدامها' : 'Returns do not cover installed or used appliances' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'استرداد المبلغ خلال 5-7 أيام عمل بعد استلام المنتج المرتجع' : 'Refund credited within 5-7 business days upon receipt' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'للاستبدال أو الإرجاع، تواصل مع خدمة العملاء' : 'For returns or exchanges, simply contact customer support' }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Section 3: Warranty -->
+          <div class="guide-block">
+            <div class="guide-block-header">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="block-ico" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.979 14.7498H11.999C12.281 14.7498 12.54 14.5918 12.668 14.3388C12.6685 14.3379 12.6706 14.3339 12.6742 14.3268C12.7723 14.1364 14.006 11.7424 15.775 9.15977C18.151 5.69177 20.401 3.4568 22.281 2.6958C22.665 2.5398 22.85 2.10285 22.695 1.71885C22.539 1.33485 22.102 1.14979 21.718 1.30479C17.619 2.96379 13.588 9.56484 12.015 12.3858C10.163 9.29784 8 9.55085 7.898 9.56485C7.488 9.62085 7.20098 9.99977 7.25698 10.4098C7.31298 10.8198 7.692 11.1078 8.102 11.0508C8.12 11.0498 9.85599 10.9698 11.313 14.3008C11.429 14.5668 11.689 14.7418 11.979 14.7498Z" fill="black"/>
+                <path d="M9.46215 21.2009C10.0701 21.8549 10.9021 22.7498 12 22.7498H11.998C13.0959 22.7498 13.9279 21.8549 14.5358 21.2009L14.5515 21.184C14.6558 21.0722 14.7544 20.9664 14.843 20.8778C15.396 20.3258 15.665 20.2137 16.446 20.2137C16.561 20.2137 16.6844 20.2175 16.8116 20.2213L16.825 20.2217C17.615 20.2447 18.685 20.2757 19.435 19.6097C19.502 19.5617 19.56 19.5038 19.608 19.4368C20.273 18.6878 20.243 17.6178 20.22 16.8278L20.2196 16.8146C20.2158 16.6873 20.212 16.5638 20.212 16.4488C20.212 15.6678 20.332 15.3897 20.929 14.7927C22.102 13.6207 22.748 12.9737 22.748 12.0007C22.748 11.0277 22.102 10.3817 20.929 9.20874C20.636 8.91574 20.161 8.91574 19.868 9.20874C19.575 9.50174 19.575 9.97678 19.868 10.2698L19.8801 10.2819C20.7329 11.1357 21.247 11.6504 21.247 12.0017C21.247 12.3547 20.744 12.8587 19.868 13.7337C18.992 14.6087 18.711 15.2688 18.711 16.4498C18.711 16.5778 18.7147 16.7142 18.7185 16.8554L18.7192 16.8779C18.7351 17.4569 18.755 18.1749 18.46 18.4688C18.165 18.7618 17.445 18.7408 16.867 18.7238L16.8507 18.7233C16.7095 18.7195 16.5731 18.7158 16.445 18.7158C15.265 18.7158 14.618 18.9838 13.782 19.8188C13.6764 19.9244 13.57 20.0388 13.4577 20.1596L13.4332 20.1859C13.0135 20.6366 12.4406 21.2517 11.998 21.2517C11.554 21.2517 10.979 20.6338 10.559 20.1818C10.5421 20.1638 10.5254 20.1459 10.5088 20.1282C10.4072 20.0197 10.3101 19.9159 10.213 19.8188C9.37699 18.9848 8.73 18.7167 7.55 18.7167C7.42188 18.7167 7.28539 18.7205 7.14414 18.7243L7.12798 18.7248C6.54898 18.7418 5.83001 18.7618 5.53501 18.4698C5.23901 18.1748 5.25898 17.4527 5.27598 16.8717L5.27642 16.8554C5.28027 16.7142 5.28398 16.5778 5.28398 16.4498C5.28398 15.2698 4.987 14.5947 4.127 13.7337L4.11558 13.7223C3.26241 12.8682 2.748 12.3531 2.748 12.0017C2.748 11.6488 3.26679 11.13 4.12648 10.2703C4.92648 9.47129 5.28398 8.63276 5.28398 7.55376C5.28398 7.42549 5.28031 7.28988 5.27649 7.1487L5.27598 7.12974C5.25898 6.55274 5.23801 5.83372 5.53101 5.53872C5.82492 5.24381 6.54268 5.26359 7.12256 5.27956L7.14535 5.28018C7.28653 5.28403 7.42291 5.28774 7.55098 5.28774C8.62898 5.28774 9.46699 4.93071 10.267 4.13071C11.127 3.27071 11.646 2.75171 11.999 2.75171C12.352 2.75171 12.8709 3.27065 13.7308 4.13055C14.0238 4.42355 14.499 4.42371 14.792 4.13071C15.085 3.83771 15.085 3.36278 14.792 3.06978C13.62 1.89678 12.973 1.25073 12 1.25073C11.0271 1.25073 10.3811 1.89671 9.20819 3.06959C8.68519 3.59259 8.236 3.78677 7.552 3.78677C7.43697 3.78677 7.31353 3.78302 7.18619 3.77916L7.173 3.77876C6.348 3.75476 5.21899 3.72271 4.46699 4.48071C3.72199 5.23271 3.75398 6.35373 3.77798 7.17173L3.77855 7.19063C3.78235 7.31677 3.78599 7.43741 3.78599 7.55171C3.78599 8.23571 3.59199 8.68476 3.06899 9.20776C1.89599 10.3798 1.25 11.0268 1.25 11.9998C1.25 12.9728 1.89599 13.6187 3.06899 14.7917C3.66499 15.3887 3.78599 15.6668 3.78599 16.4478C3.78599 16.5627 3.78225 16.686 3.77839 16.8132L3.77798 16.8267C3.75398 17.6507 3.72201 18.7798 4.48101 19.5328C5.23149 20.2763 6.34947 20.2449 7.16803 20.2219L7.173 20.2217L7.18638 20.2213C7.31365 20.2175 7.43703 20.2137 7.552 20.2137C8.333 20.2137 8.60298 20.3247 9.15498 20.8767C9.24798 20.9707 9.35215 21.0819 9.46215 21.2009Z" fill="black"/>
+              </svg>
+              <h3 class="block-title">{{ locale === 'ar' ? 'الضمان' : 'Warranty' }}</h3>
+            </div>
+            <ul class="guide-items-list">
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'ضمان شامل لمدة سنتين على جميع المنتجات' : 'Comprehensive 2-year warranty on all products' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'يشمل الضمان عيوب التصنيع والأعطال الفنية' : 'Covers manufacturer defects and technical malfunctions' }}</span>
+              </li>
+              <li>
+                <span class="item-bullet-icon">
+                  <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.87397 5.41698C1.64231 5.41698 1.42897 5.28865 1.32064 5.08198C0.988362 4.44658 0.289917 3.98096 0.28149 3.97534C-0.00601006 3.78534 -0.0868615 3.39864 0.102305 3.1103C0.291472 2.82197 0.677304 2.74116 0.965637 2.92866C0.989804 2.94449 1.35231 3.18367 1.74148 3.58117C2.27648 2.51033 3.25231 0.849495 4.45981 0.0953279C4.75231 -0.0880054 5.13814 0.00115149 5.32064 0.293651C5.50397 0.586151 5.4148 0.971991 5.12147 1.15449C3.8998 1.91782 2.78148 4.20613 2.45398 5.02363C2.36315 5.2503 2.14897 5.40281 1.90564 5.41532H1.87397V5.41698Z" fill="black"/>
+                    <path d="M15.625 2.91707H7.29167C6.94667 2.91707 6.66667 2.63707 6.66667 2.29207C6.66667 1.94707 6.94667 1.66707 7.29167 1.66707H15.625C15.97 1.66707 16.25 1.94707 16.25 2.29207C16.25 2.63707 15.97 2.91707 15.625 2.91707Z" fill="black"/>
+                    <path d="M15.625 7.91707H7.29167C6.94667 7.91707 6.66667 7.63707 6.66667 7.29207C6.66667 6.94707 6.94667 6.66707 7.29167 6.66707H15.625C15.97 6.66707 16.25 6.94707 16.25 7.29207C16.25 7.63707 15.97 7.91707 15.625 7.91707Z" fill="black"/>
+                    <path d="M7.29167 12.9171H15.625C15.97 12.9171 16.25 12.6371 16.25 12.2921C16.25 11.9471 15.97 11.6671 15.625 11.6671H7.29167C6.94667 11.6671 6.66667 11.9471 6.66667 12.2921C6.66667 12.6371 6.94667 12.9171 7.29167 12.9171Z" fill="black"/>
+                    <path d="M1.32064 14.2486C1.42897 14.4553 1.64231 14.5836 1.87397 14.5836V14.582H1.90564C2.14897 14.5695 2.36315 14.417 2.45398 14.1903C2.78148 13.3728 3.8998 11.0845 5.12147 10.3212C5.4148 10.1387 5.50397 9.75282 5.32064 9.46032C5.13814 9.16782 4.75231 9.07866 4.45981 9.26199C3.25231 10.0162 2.27648 11.677 1.74148 12.7478C1.35231 12.3503 0.989804 12.1112 0.965637 12.0953C0.677304 11.9078 0.291472 11.9886 0.102305 12.277C-0.0868615 12.5653 -0.00602618 12.952 0.281474 13.142C0.290008 13.1477 0.988388 13.6133 1.32064 14.2486Z" fill="black"/>
+                  </svg>
+                </span>
+                <span class="item-text">{{ locale === 'ar' ? 'لا يشمل الضمان الأضرار الناتجة عن سوء الاستخدام أو التركيب غير المعتمد' : 'Excludes damages caused by misuse or uncertified installation' }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab 5: Reviews -->
+        <div v-if="activeTab === 'reviews'" class="tab-content reviews-tab-content">
+          <div class="reviews-header-block">
+            <h2 class="reviews-headline">{{ locale === 'ar' ? 'تقييمات العملاء' : 'Customer Reviews' }}</h2>
+
+            <div class="rating-summary-strip">
+              <div class="summary-stars-row">
+                <template v-for="s in 5" :key="'sum-star-' + s">
+                  <svg v-if="s <= Math.round(computedAverageRating)" class="summary-star-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.9961 1.25C13.0454 1.25 13.8719 2.04253 14.3995 3.11191L16.1616 6.66516C16.215 6.77513 16.3417 6.92998 16.5321 7.07164C16.7223 7.21315 16.9086 7.29121 17.0311 7.3118L20.2207 7.84613C21.3729 8.03973 22.3386 8.60449 22.6521 9.5879C22.9653 10.5705 22.5064 11.5916 21.6778 12.4216L21.677 12.4225L19.1991 14.9209C19.1009 15.0199 18.9909 15.2064 18.9219 15.4494C18.8534 15.6908 18.8473 15.9107 18.8784 16.0527L18.8788 16.0547L19.5877 19.1454C19.8818 20.4317 19.7843 21.7073 18.8771 22.3742C17.9667 23.0433 16.7227 22.7467 15.5925 22.0736L12.6026 20.289C12.477 20.214 12.2614 20.1532 12.0011 20.1532C11.7427 20.1532 11.5226 20.2132 11.3888 20.291L11.3869 20.2921L8.40288 22.0732C7.27405 22.7487 6.03154 23.04 5.12111 22.3702C4.21449 21.7032 4.11214 20.43 4.40711 19.1447L5.1159 16.0547L5.11633 16.0527C5.14741 15.9107 5.14133 15.6908 5.0728 15.4494C5.0038 15.2064 4.89379 15.0199 4.79558 14.9209L2.31585 12.4206C1.49265 11.5906 1.03521 10.5704 1.34595 9.58925C1.65759 8.60525 2.62143 8.0398 3.77433 7.84606L6.96132 7.31219L6.96233 7.31202C7.07917 7.29175 7.2627 7.21456 7.45248 7.07268C7.64261 6.93054 7.76959 6.77535 7.82312 6.66516L7.82582 6.65967L9.58562 3.11097L9.58632 3.10957C10.119 2.04108 10.948 1.25 11.9961 1.25Z" fill="#F59E1F"/>
+                  </svg>
+                  <svg v-else class="summary-star-ico" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.7481 0C11.7973 0 12.6238 0.792532 13.1515 1.86191L14.9135 5.41516C14.9669 5.52513 15.0936 5.67998 15.284 5.82164C15.4742 5.96315 15.6605 6.04121 15.783 6.0618L18.9727 6.59613C20.1248 6.78973 21.0905 7.35449 21.404 8.3379C21.7173 9.32049 21.2583 10.3416 20.4298 11.1716L20.429 11.1725L17.9511 13.6709C17.8529 13.7699 17.7428 13.9564 17.6738 14.1994C17.6053 14.4408 17.5992 14.6607 17.6303 14.8027L17.6307 14.8047L18.3397 17.8954C18.6337 19.1817 18.5363 20.4573 17.629 21.1242C16.7187 21.7933 15.4746 21.4967 14.3445 20.8236L11.3545 19.039C11.229 18.964 11.0133 18.9032 10.753 18.9032C10.4947 18.9032 10.2745 18.9632 10.1408 19.041L10.1389 19.0421L7.15484 20.8232C6.026 21.4987 4.78349 21.79 3.87306 21.1202C2.96644 20.4532 2.86409 19.18 3.15906 17.8947L3.86785 14.8047L3.86829 14.8027C3.89936 14.6607 3.89328 14.4408 3.82475 14.1994C3.75575 13.9564 3.64574 13.7699 3.54753 13.6709L1.0678 11.1706C0.2446 10.3406 -0.21284 9.3204 0.0979009 8.33925C0.409547 7.35525 1.37338 6.7898 2.52628 6.59606L5.71327 6.06219L5.71429 6.06202C5.83112 6.04175 6.01466 5.96456 6.20443 5.82268C6.39456 5.68054 6.52154 5.52535 6.57507 5.41516L6.57777 5.40967L8.33757 1.86097L8.33827 1.85957C8.87091 0.791076 9.69999 0 10.7481 0Z" fill="#94A3B8"/>
+                  </svg>
+                </template>
+              </div>
+              <span class="score-ratio-val">{{ Number(computedAverageRating).toFixed(1) }}/5</span>
+              <span class="reviews-count-tag">{{ computedRatingCount }} {{ locale === 'ar' ? 'تقييم' : 'reviews' }}</span>
+            </div>
+
+            <div class="rating-breakdown-list">
+              <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="breakdown-row">
+                <span class="star-title">{{ star }} {{ locale === 'ar' ? (star === 1 ? 'نجمة' : 'نجوم') : (star === 1 ? 'star' : 'stars') }}</span>
+                <div class="bar-container">
+                  <div class="bar-fill-amber" :style="{ width: getRatingPercentage(star) + '%' }"></div>
+                </div>
+                <span class="pct-val">{{ getRatingPercentage(star) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Cards List -->
+          <div class="reviews-cards-stack">
+            <div v-for="(rev, idx) in displayReviews" :key="rev.id || idx" class="review-card-figma">
+              <div class="rc-header-row">
+                <div class="rc-author-info">
+                  <span class="rc-author-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.6663 9.33337C13.6663 8.78109 14.1141 8.33337 14.6663 8.33337L22.6663 8.33338C23.2186 8.33338 23.6663 8.78109 23.6663 9.33337C23.6663 9.88566 23.2186 10.3334 22.6663 10.3334L14.6663 10.3334C14.1141 10.3334 13.6663 9.88566 13.6663 9.33337Z" fill="#64748B"/>
+                      <path d="M9.33301 8.33337C8.78072 8.33337 8.33301 8.78109 8.33301 9.33337C8.33301 9.88566 8.78072 10.3334 9.33301 10.3334H10.6663C11.2186 10.3334 11.6663 9.88566 11.6663 9.33338C11.6663 8.78109 11.2186 8.33337 10.6663 8.33337H9.33301Z" fill="#64748B"/>
+                      <path d="M8.33301 16C8.33301 15.4478 8.78072 15 9.33301 15L10.6663 15C11.2186 15 11.6663 15.4478 11.6663 16C11.6663 16.5523 11.2186 17 10.6663 17L9.33301 17C8.78072 17 8.33301 16.5523 8.33301 16Z" fill="#64748B"/>
+                      <path d="M9.33301 21.6667C8.78072 21.6667 8.33301 22.1144 8.33301 22.6667C8.33301 23.219 8.78072 23.6667 9.33301 23.6667H10.6663C11.2186 23.6667 11.6663 23.219 11.6663 22.6667C11.6663 22.1144 11.2186 21.6667 10.6663 21.6667L9.33301 21.6667Z" fill="#64748B"/>
+                      <path d="M13.6663 16C13.6663 15.4478 14.1141 15 14.6663 15L22.6663 15C23.2186 15 23.6663 15.4478 23.6663 16C23.6663 16.5523 23.2186 17 22.6663 17L14.6663 17C14.1141 17 13.6663 16.5523 13.6663 16Z" fill="#64748B"/>
+                      <path d="M14.6663 21.6667C14.1141 21.6667 13.6663 22.1144 13.6663 22.6667C13.6663 23.219 14.1141 23.6667 14.6663 23.6667L22.6663 23.6667C23.2186 23.6667 23.6663 23.219 23.6663 22.6667C23.6663 22.1144 23.2186 21.6667 22.6663 21.6667L14.6663 21.6667Z" fill="#64748B"/>
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9234 2.33337H16.0759C18.9968 2.33336 21.2911 2.33334 23.0823 2.57417C24.9179 2.82095 26.3742 3.33699 27.5185 4.48126C28.6627 5.62552 29.1788 7.08186 29.4256 8.91741C29.6664 10.7086 29.6664 13.0028 29.6663 15.9238V16.0763C29.6664 18.9972 29.6664 21.2915 29.4256 23.0827C29.1788 24.9182 28.6627 26.3746 27.5185 27.5188C26.3742 28.6631 24.9179 29.1791 23.0823 29.4259C21.2911 29.6667 18.9969 29.6667 16.0759 29.6667H15.9235C13.0025 29.6667 10.7083 29.6667 8.91704 29.4259C7.0815 29.1791 5.62516 28.6631 4.48089 27.5188C3.33663 26.3746 2.82058 24.9182 2.5738 23.0827C2.33298 21.2915 2.33299 18.9972 2.33301 16.0763V15.9238C2.33299 13.0029 2.33298 10.7086 2.5738 8.91741C2.82058 7.08186 3.33663 5.62552 4.48089 4.48126C5.62516 3.33699 7.0815 2.82095 8.91704 2.57417C10.7083 2.33334 13.0025 2.33336 15.9234 2.33337ZM9.18353 4.55633C7.56977 4.7733 6.60583 5.18475 5.89511 5.89547C5.18438 6.6062 4.77293 7.57014 4.55597 9.1839C4.33513 10.8264 4.33301 12.9862 4.33301 16C4.33301 19.0139 4.33513 21.1736 4.55597 22.8162C4.77293 24.4299 5.18438 25.3939 5.89511 26.1046C6.60583 26.8153 7.56977 27.2268 9.18353 27.4438C10.8261 27.6646 12.9858 27.6667 15.9997 27.6667C19.0135 27.6667 21.1733 27.6646 22.8158 27.4438C24.4296 27.2268 25.3935 26.8153 26.1042 26.1046C26.815 25.3939 27.2264 24.4299 27.4434 22.8162C27.6642 21.1736 27.6663 19.0139 27.6663 16C27.6663 12.9862 27.6642 10.8264 27.4434 9.1839C27.2264 7.57014 26.815 6.6062 26.1042 5.89547C25.3935 5.18475 24.4296 4.7733 22.8158 4.55633C21.1733 4.3355 19.0135 4.33337 15.9997 4.33337C12.9858 4.33337 10.8261 4.3355 9.18353 4.55633Z" fill="#64748B"/>
+                    </svg>
+                  </span>
+                  <span class="rc-author-name">{{ rev.user_name || rev.customer?.name || rev.name || (locale === 'ar' ? 'أحمد محمد' : 'Mastergas Customer') }}</span>
+                </div>
+                <div class="rc-stars-group">
+                  <template v-for="s in 5" :key="'rc-star-' + s">
+                    <svg v-if="s <= (rev.rating || 4)" class="rc-star-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.9961 1.25C13.0454 1.25 13.8719 2.04253 14.3995 3.11191L16.1616 6.66516C16.215 6.77513 16.3417 6.92998 16.5321 7.07164C16.7223 7.21315 16.9086 7.29121 17.0311 7.3118L20.2207 7.84613C21.3729 8.03973 22.3386 8.60449 22.6521 9.5879C22.9653 10.5705 22.5064 11.5916 21.6778 12.4216L21.677 12.4225L19.1991 14.9209C19.1009 15.0199 18.9909 15.2064 18.9219 15.4494C18.8534 15.6908 18.8473 15.9107 18.8784 16.0527L18.8788 16.0547L19.5877 19.1454C19.8818 20.4317 19.7843 21.7073 18.8771 22.3742C17.9667 23.0433 16.7227 22.7467 15.5925 22.0736L12.6026 20.289C12.477 20.214 12.2614 20.1532 12.0011 20.1532C11.7427 20.1532 11.5226 20.2132 11.3888 20.291L11.3869 20.2921L8.40288 22.0732C7.27405 22.7487 6.03154 23.04 5.12111 22.3702C4.21449 21.7032 4.11214 20.43 4.40711 19.1447L5.1159 16.0547L5.11633 16.0527C5.14741 15.9107 5.14133 15.6908 5.0728 15.4494C5.0038 15.2064 4.89379 15.0199 4.79558 14.9209L2.31585 12.4206C1.49265 11.5906 1.03521 10.5704 1.34595 9.58925C1.65759 8.60525 2.62143 8.0398 3.77433 7.84606L6.96132 7.31219L6.96233 7.31202C7.07917 7.29175 7.2627 7.21456 7.45248 7.07268C7.64261 6.93054 7.76959 6.77535 7.82312 6.66516L7.82582 6.65967L9.58562 3.11097L9.58632 3.10957C10.119 2.04108 10.948 1.25 11.9961 1.25Z" fill="#F59E1F"/>
+                    </svg>
+                    <svg v-else class="rc-star-ico" width="16" height="16" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.7481 0C11.7973 0 12.6238 0.792532 13.1515 1.86191L14.9135 5.41516C14.9669 5.52513 15.0936 5.67998 15.284 5.82164C15.4742 5.96315 15.6605 6.04121 15.783 6.0618L18.9727 6.59613C20.1248 6.78973 21.0905 7.35449 21.404 8.3379C21.7173 9.32049 21.2583 10.3416 20.4298 11.1716L20.429 11.1725L17.9511 13.6709C17.8529 13.7699 17.7428 13.9564 17.6738 14.1994C17.6053 14.4408 17.5992 14.6607 17.6303 14.8027L17.6307 14.8047L18.3397 17.8954C18.6337 19.1817 18.5363 20.4573 17.629 21.1242C16.7187 21.7933 15.4746 21.4967 14.3445 20.8236L11.3545 19.039C11.229 18.964 11.0133 18.9032 10.753 18.9032C10.4947 18.9032 10.2745 18.9632 10.1408 19.041L10.1389 19.0421L7.15484 20.8232C6.026 21.4987 4.78349 21.79 3.87306 21.1202C2.96644 20.4532 2.86409 19.18 3.15906 17.8947L3.86785 14.8047L3.86829 14.8027C3.89936 14.6607 3.89328 14.4408 3.82475 14.1994C3.75575 13.9564 3.64574 13.7699 3.54753 13.6709L1.0678 11.1706C0.2446 10.3406 -0.21284 9.3204 0.0979009 8.33925C0.409547 7.35525 1.37338 6.7898 2.52628 6.59606L5.71327 6.06219L5.71429 6.06202C5.83112 6.04175 6.01466 5.96456 6.20443 5.82268C6.39456 5.68054 6.52154 5.52535 6.57507 5.41516L6.57777 5.40967L8.33757 1.86097L8.33827 1.85957C8.87091 0.791076 9.69999 0 10.7481 0Z" fill="#94A3B8"/>
+                    </svg>
+                  </template>
+                </div>
+              </div>
+              <div class="rc-date-line">{{ rev.created_at ? formatDate(rev.created_at) : rev.date }}</div>
+              <p class="rc-body-comment">{{ rev.comment }}</p>
+            </div>
+          </div>
+
+          <!-- Add Review CTA -->
+          <div class="add-review-cta-wrap">
+            <button type="button" class="btn-add-review-cta" @click="handleAddReviewClick">
+              <span>{{ locale === 'ar' ? 'أضف تقييمك' : 'Add Review' }}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2v3.5l4-3.5h4a2 2 0 0 0 2-2v-3" />
+                <path d="M18 2v6m-3-3h6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
       </div>
+    </div>
 
-      <!-- Part 4: Related Products Section -->
-      <section class="related-section" v-if="relatedProducts.length > 0">
-        <div class="related-header">
-          <h2 class="related-title">{{ locale === 'ar' ? 'منتجات ذات صلة' : 'Related Products' }}</h2>
-          <p class="related-subtitle">{{ locale === 'ar' ? 'أجهزة متوافقة تكمل تصميم مطبخك الفاخر' : 'Compatible appliances to complete your luxury kitchen' }}</p>
+    <!-- 4. Related Products Section -->
+    <section class="related-products-section" v-if="relatedProducts.length > 0">
+      <div class="container related-container">
+        <div class="related-section-header">
+          <h2 class="related-heading">{{ locale === 'ar' ? 'منتجات ذات صلة' : 'Related Products' }}</h2>
+          <p class="related-subheading">{{ locale === 'ar' ? 'أجهزة مطابقة تكمل تصميم مطبخك الفاخر' : 'Compatible appliances to complete your luxury kitchen' }}</p>
         </div>
-        <div class="products-grid">
+        <div class="related-products-grid">
           <product-card 
             v-for="p in relatedProducts" 
             :key="p.id" 
@@ -384,10 +800,10 @@
             @add-to-cart="cartState.addToCart(p)"
           />
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
 
-    <!-- Image Lightbox Gallery -->
+    <!-- Lightbox Modal -->
     <transition name="fade">
       <div v-if="showLightbox" class="lightbox-overlay" @click.self="closeLightbox">
         <button class="lightbox-close" @click="closeLightbox">✕</button>
@@ -501,6 +917,7 @@
         </div>
       </transition>
     </Teleport>
+
   </div>
 </template>
 
@@ -515,10 +932,12 @@ import { useOffers } from '../../composables/useOffers';
 import { useLocalized } from '../../composables/useLocalized';
 import { useSettings } from '../../composables/useSettings';
 import { useSEO } from '../../composables/useSEO';
+import { extractColorOptions, isColorAttribute, isSizeAttribute, localizedText } from '../../utils/productAttributes';
 import { trackViewContent } from '../../utils/metaPixel';
 import ProductCard from '../../components/ProductCard.vue';
 import { productService } from '../../services/productService';
 import { getProductById, products as fallbackProducts } from '../../data/catalogData';
+import riyalIcon from '../../../assets/riyal.svg';
 
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { t, locale } = useI18n();
@@ -588,6 +1007,42 @@ const isLightColor = (hex) => {
   return false;
 };
 
+const isColorSpec = (label) => {
+  if (!label) return false;
+  const l = String(label).toLowerCase();
+  return l.includes('اللون') || l.includes('color');
+};
+
+const getSpecColorHex = (value) => {
+  if (!value) return '#18181B';
+  const val = String(value).toLowerCase();
+  const opt = colorOptions.value?.find(c => 
+    val.includes(String(c.label || '').toLowerCase()) || 
+    val.includes(String(c.name || '').toLowerCase())
+  );
+  if (opt && opt.hex) return opt.hex;
+  if (val.includes('ستانلس') || val.includes('فضي') || val.includes('stainless') || val.includes('silver') || val.includes('كروم') || val.includes('chrome')) return '#94A3B8';
+  if (val.includes('أسود') || val.includes('اسود') || val.includes('black')) return '#18181B';
+  if (val.includes('أبيض') || val.includes('ابيض') || val.includes('white')) return '#FFFFFF';
+  if (val.includes('ذهبي') || val.includes('gold')) return '#D97706';
+  if (val.includes('رمادي') || val.includes('gray') || val.includes('grey')) return '#6B7280';
+  if (val.includes('برونزي') || val.includes('bronze')) return '#92400E';
+  if (val.includes('أحمر') || val.includes('red')) return '#DC2626';
+  if (val.includes('أزرق') || val.includes('blue')) return '#2563EB';
+  return getActualColor(value) || '#64748B';
+};
+
+const getSpecColorsList = (specValue) => {
+  if (!specValue) return [];
+  if (typeof specValue === 'string' && (specValue.includes('،') || specValue.includes(','))) {
+    return specValue.split(/[،,]+/).map(s => s.trim()).filter(Boolean).map(c => ({
+      label: c,
+      hex: getSpecColorHex(c)
+    }));
+  }
+  return [{ label: String(specValue), hex: getSpecColorHex(specValue) }];
+};
+
 const route = useRoute();
 const router = useRouter();
 
@@ -600,7 +1055,6 @@ const currentImageIndex = ref(0);
 const quantity = ref(1);
 const selectedAttributes = ref({});
 const activeTab = ref('overview');
-const attributesList = ref([]);
 
 // Lightbox
 const showLightbox = ref(false);
@@ -661,7 +1115,7 @@ const prevLightbox = () => {
   }
 };
 
-// Tabs definition matching exact screenshot order and titles
+// Tabs definition matching exact Figma order and titles
 const tabOptions = computed(() => {
   return [
     { id: 'overview', label: locale.value === 'ar' ? 'نظرة عامة' : 'Overview' },
@@ -691,19 +1145,21 @@ const allImages = computed(() => {
     images.push(getImageUrl(product.value.image, pId));
   }
 
-  // Ensure every product has its 3 high-res images
+  // Ensure every product has its high-res images
   if (images.length <= 1 && pId) {
     return [
       `/catalog_images/prod_${pId}_0.jpg`,
       `/catalog_images/prod_${pId}_1.jpg`,
-      `/catalog_images/prod_${pId}_2.jpg`
+      `/catalog_images/prod_${pId}_2.jpg`,
+      `/catalog_images/prod_${pId}_3.jpg`
     ];
   }
   
   return images.length > 0 ? images : [
     '/catalog_images/prod_173_0.jpg',
     '/catalog_images/prod_173_1.jpg',
-    '/catalog_images/prod_173_2.jpg'
+    '/catalog_images/prod_173_2.jpg',
+    '/catalog_images/prod_173_3.jpg'
   ];
 });
 
@@ -759,23 +1215,23 @@ const defaultReviews = computed(() => [
   {
     id: 'def-1',
     user_name: 'أحمد محمد',
-    date: '15 أغسطس 2024',
-    rating: 5,
-    comment: locale.value === 'ar' ? 'منتج ممتاز والجودة كانت كما توقعت، التركيب كان سريعاً والأداء فاق التوقعات.' : 'Excellent product, quality was as expected, installation was fast and performance exceeded expectations.'
+    date: locale.value === 'ar' ? '15 أغسطس 2026' : 'August 15, 2026',
+    rating: 4,
+    comment: locale.value === 'ar' ? 'منتج ممتاز والجودة كانت كما توقعت، التركيب كان سهل والأداء فاق التوقعات.' : 'Excellent product, quality was as expected. Installation was easy and performance exceeded expectations.'
   },
   {
     id: 'def-2',
     user_name: 'سارة العتيبي',
-    date: '9 يوليو 2024',
-    rating: 5,
-    comment: locale.value === 'ar' ? 'فرن رائع وتصميم أنيق، الطهي متساوٍ والحرارة ممتازة، أنصح به بشدة.' : 'Wonderful oven and elegant design, uniform cooking and great heat, highly recommended.'
+    date: locale.value === 'ar' ? '3 يوليو 2026' : 'July 3, 2026',
+    rating: 4,
+    comment: locale.value === 'ar' ? 'فرن رائع بتصميم أنيق. الطهي متساوي والحرارة ممتازة. أنصح به بشدة.' : 'Wonderful oven with elegant design. Cooking is even and heat is excellent. Highly recommend.'
   },
   {
     id: 'def-3',
     user_name: 'خالد الشمري',
-    date: '22 يونيو 2024',
-    rating: 5,
-    comment: locale.value === 'ar' ? 'أفضل فرن استخدمته، الجودة الإيطالية واضحة في أدق التفاصيل، يستحق كل ريال.' : 'Best oven I have used, Italian quality is evident in every detail, worth every riyal.'
+    date: locale.value === 'ar' ? '22 يونيو 2026' : 'June 22, 2026',
+    rating: 4,
+    comment: locale.value === 'ar' ? 'أفضل فرن استخدمته. الجودة الإيطالية واضحة في كل التفاصيل. يستحق كل ريال.' : 'Best oven I have used. Italian quality is evident in every detail. Worth every riyal.'
   }
 ]);
 
@@ -793,7 +1249,7 @@ const computedRatingCount = computed(() => {
   if (Array.isArray(reviews.value) && reviews.value.length > 0) {
     return reviews.value.length;
   }
-  return 23;
+  return 24;
 });
 
 const computedAverageRating = computed(() => {
@@ -804,7 +1260,7 @@ const computedAverageRating = computed(() => {
     const sum = reviews.value.reduce((acc, r) => acc + Number(r.rating || 5), 0);
     return Number((sum / reviews.value.length).toFixed(1));
   }
-  return 4.2;
+  return 4.0;
 });
 
 const getRatingPercentage = (star) => {
@@ -827,24 +1283,37 @@ const fetchReviews = async (productId) => {
   }
 };
 
-// Bullet points matching screenshot
+// Bullet specs matching Figma inspect (excluding warranty, dimensions, materials, origin, and burner specs)
 const productFeatures = computed(() => {
   const rawFeat = localized(product.value, 'features') || product.value?.features;
+  let list = [];
   if (Array.isArray(rawFeat) && rawFeat.length > 0) {
-    return rawFeat;
+    list = [...rawFeat];
+  } else if (typeof rawFeat === 'string' && rawFeat.trim()) {
+    list = rawFeat.split(/[\n\r]+/).map(s => s.replace(/^[-•*❖]\s*/, '').trim()).filter(Boolean);
   }
-  if (typeof rawFeat === 'string' && rawFeat.trim()) {
-    const list = rawFeat.split(/[\n\r]+/).map(s => s.replace(/^[-•*❖]\s*/, '').trim()).filter(Boolean);
-    if (list.length > 0) return list;
-  }
-  return [
-    locale.value === 'ar' ? 'سعة 65 لتر طهي مريح لمختلف الوجبات' : '65L capacity for versatile and effortless cooking',
-    locale.value === 'ar' ? '4 وظائف طهي مبرمجة هندسياً لأداء متكامل' : '4 engineered preset cooking functions',
-    locale.value === 'ar' ? 'إشعال كهربائي ذاتي سهل وآمن بلمسة واحدة' : 'One-touch safe automatic electric ignition',
-    locale.value === 'ar' ? 'باب زجاجي مزدوج يحفظ الحرارة بكفاءة عالية' : 'Double-glazed door for superior heat retention',
-    locale.value === 'ar' ? 'صمام أمان كامل يضمن سلامة المطبخ والمنزل' : 'Full safety cutoff valve for kitchen protection',
-    locale.value === 'ar' ? 'صنع بالكامل في إيطاليا بمعايير جودة دقيقة' : '100% Made in Italy to exacting standards'
+
+  const excludedPatterns = [
+    /ضمان/i, /warranty/i,
+    /خامة/i, /خامات/i, /material/i,
+    /أبعاد/i, /ابعاد/i, /dimensions/i,
+    /بلد المنشأ/i, /صنع بالكامل في إيطاليا/i, /صنع في/i, /made in/i,
+    /شعلات/i, /شعلة/i, /burners/i,
+    /قدرة حرارية/i, /btu/i
   ];
+
+  list = list.filter(item => !excludedPatterns.some(regex => regex.test(item)));
+
+  if (list.length === 0) {
+    list = [
+      locale.value === 'ar' ? 'سعة 65 لتر لطهي مريح لمختلف الوجبات' : '65L capacity for versatile and effortless cooking',
+      locale.value === 'ar' ? '٤ وظائف طهي مبرمجة هندسياً لأداء متكامل' : '4 engineered preset cooking functions for integrated performance',
+      locale.value === 'ar' ? 'إشعال كهربائي ذاتي سهل وآمن بلمسة واحدة' : 'One-touch safe automatic electric ignition',
+      locale.value === 'ar' ? 'باب زجاجي مزدوج يحفظ الحرارة بكفاءة عالية' : 'Double-glazed door for superior heat retention',
+      locale.value === 'ar' ? 'صمام أمان كامل يضمن سلامة المطبخ والمنزل' : 'Full safety cutoff valve ensuring kitchen and home protection'
+    ];
+  }
+  return list.slice(0, 6);
 });
 
 // Dynamic Overview Data
@@ -856,8 +1325,8 @@ const dynamicOverviewDesc = computed(() => {
   const desc = localized(product.value, 'description');
   if (desc && desc.trim()) return desc;
   return locale.value === 'ar' 
-    ? 'صمم فرن ماسترجاز المدمج بحجم 60 سم ليقدم تجربة طهي احترافية تضاهي المطابخ العالمية. بفضل سعته الكبيرة البالغة 65 لتر، يمكنك طهي وجبات عائلية متكاملة بكل سهولة. يتميز الفرن بتصميم إيطالي فاخر معزز بأنظمة أمان ذكية وصمام أمان كامل يضمن راحة البال التامة لك ولعائلتك.'
-    : 'Engineered in 60cm built-in format for professional culinary excellence. With its 65L capacity, prepare family meals effortlessly. Italian luxury styling reinforced with smart safety systems.';
+    ? 'صمم فرن ماستر غاز المدمج بحجم 60 سم ليقدم تجربة طهي احترافية تضاهي المطابخ العالمية. بفضل سعته الكبيرة البالغة 65 لتر، يمكنك طهي وجبات عائلية متكاملة بكل سهولة. يتميز الفرن بتصميم إيطالي فاخر معزز بأنظمة أمان ذكية وصمام أمان كامل يضمن راحة البال التامة لك ولعائلتك.'
+    : 'Designed in 60cm built-in format for professional culinary excellence matching international standards. With its 65L capacity, prepare family meals effortlessly. Italian luxury styling reinforced with smart safety systems.';
 });
 
 const dynamicOverviewFeatures = computed(() => {
@@ -870,10 +1339,10 @@ const dynamicOverviewFeatures = computed(() => {
     if (list.length > 0) return list;
   }
   return [
-    locale.value === 'ar' ? 'سعة كبيرة تبلغ 65 لتر تناسب العائلات والأطباق الضخمة' : 'Spacious 65L capacity tailored for family gatherings',
-    locale.value === 'ar' ? 'تنظيف سهل وسريع بفضل طبقة المينا الداخلية المانعة للالتصاق' : 'Easy-clean enamel interior coating',
-    locale.value === 'ar' ? 'توزيع حراري متساوٍ يضمن خبزاً وتحميراً مثالياً من جميع الجهات' : 'Even convection heat distribution for flawless baking',
-    locale.value === 'ar' ? 'أمان متقدم مع صمام أمان إيطالي كامل لقطع الغاز الفوري' : 'Advanced full Italian safety cutoff valve'
+    locale.value === 'ar' ? 'تنظيف سهل وسريع بفضل طبقة المينا الداخلية المانعة للالتصاق' : 'Easy-clean non-stick enamel interior coating',
+    locale.value === 'ar' ? 'سعة كبيرة تبلغ 65 لتر تناسب العائلات والأطباق الضخمة' : 'Spacious 65L capacity tailored for family feasts',
+    locale.value === 'ar' ? 'أمان متقدم مع صمام أمان إيطالي كامل لقطع الغاز الفوري' : 'Advanced full Italian safety cutoff valve for instant gas stop',
+    locale.value === 'ar' ? 'توزيع حراري متساوٍ يضمن خبزاً وتحميراً مثالياً من جميع الجهات' : 'Even convection heat distribution for flawless baking and roasting'
   ];
 });
 
@@ -893,7 +1362,6 @@ const technicalSpecifications = computed(() => {
     return str;
   }
 
-  // Key normalization dictionary (maps Arabic / English variants to clean display keys)
   const specKeyMap = {
     'الارتفاع': { ar: 'الارتفاع', en: 'Height' },
     'height': { ar: 'الارتفاع', en: 'Height' },
@@ -938,7 +1406,6 @@ const technicalSpecifications = computed(() => {
     'weight': { ar: 'الوزن الصافي', en: 'Net Weight' }
   };
 
-  // Helper to extract dynamic attribute value from API attributes
   function getAttrValue(keyAliases) {
     if (!attrs || typeof attrs !== 'object') return null;
     for (const k of keyAliases) {
@@ -955,7 +1422,6 @@ const technicalSpecifications = computed(() => {
     return null;
   }
 
-  // Parse dimensions string if present ("59.5 × 59.5 × 55 سم")
   let dimH = null, dimW = null, dimD = null;
   const rawDims = attrs.dimensions || attrs['الأبعاد'] || attrs.Dimensions;
   if (rawDims) {
@@ -1018,27 +1484,26 @@ const technicalSpecifications = computed(() => {
       { label: isAr ? 'اللون والمظهر' : 'Color & Finish', value: selectedColorName.value || getAttrValue(['اللون والمظهر', 'material', 'المادة']) || (isAr ? 'أبيض ناصع مقاوم للصدأ' : 'Pure White') }
     ];
   } else {
-    // Standard Built-in Oven (matching reference screenshot)
+    // Built-in Oven (matching exact Figma inspect)
     const is90 = name.includes('90');
     specsList = [
-      { label: isAr ? 'الارتفاع' : 'Height', value: getAttrValue(['الارتفاع', 'height']) || dimH || '59.5 سم' },
       { label: isAr ? 'العرض' : 'Width', value: getAttrValue(['العرض', 'width']) || dimW || (is90 ? '89.5 سم' : '59.5 سم') },
-      { label: isAr ? 'السعة' : 'Capacity', value: getAttrValue(['السعة', 'capacity']) || (is90 ? '85 لتر' : '65 لتر') },
+      { label: isAr ? 'الارتفاع' : 'Height', value: getAttrValue(['الارتفاع', 'height']) || dimH || '59.5 سم' },
       { label: isAr ? 'العمق' : 'Depth', value: getAttrValue(['العمق', 'depth']) || dimD || (is90 ? '56 سم' : '55 سم') },
-      { label: isAr ? 'الجهد الكهربائي' : 'Voltage', value: getAttrValue(['الجهد الكهربائي', 'voltage']) || '220-240 فولت' },
+      { label: isAr ? 'السعة' : 'Capacity', value: getAttrValue(['السعة', 'capacity']) || (is90 ? '85 لتر' : '65 لتر') },
       { label: isAr ? 'نوع الطاقة' : 'Energy Source', value: getAttrValue(['نوع الطاقة', 'power', 'energy']) || (isAr ? 'غاز طبيعي / مسال' : 'Natural / LPG Gas') },
-      { label: isAr ? 'المؤقت الرقمي' : 'Digital Timer', value: getAttrValue(['المؤقت الرقمي', 'timer']) || (isAr ? 'نعم' : 'Yes') },
+      { label: isAr ? 'الجهد الكهربائي' : 'Voltage', value: getAttrValue(['الجهد الكهربائي', 'voltage']) || '220-240 فولت' },
       { label: isAr ? 'وظائف الطهي' : 'Cooking Functions', value: getAttrValue(['وظائف الطهي', 'functions']) || (is90 ? (isAr ? '6 وظائف' : '6 Functions') : (isAr ? '4 وظائف' : '4 Functions')) },
-      { label: isAr ? 'نظام الإشعال' : 'Ignition System', value: getAttrValue(['نظام الإشعال', 'ignition']) || (isAr ? 'إلكتروني ذاتي' : 'Electronic Auto-Ignition') },
+      { label: isAr ? 'المؤقت الرقمي' : 'Digital Timer', value: getAttrValue(['المؤقت الرقمي', 'timer']) || (isAr ? 'نعم' : 'Yes') },
       { label: isAr ? 'صمام الأمان' : 'Safety Valve', value: getAttrValue(['صمام الأمان', 'safety']) || (isAr ? 'أمان كامل' : 'Full Flame Safety') },
-      { label: isAr ? 'بلد المنشأ' : 'Country of Origin', value: getAttrValue(['بلد المنشأ', 'origin']) || (isAr ? 'إيطاليا' : 'Italy') },
-      { label: isAr ? 'اللون والمظهر' : 'Color & Finish', value: selectedColorName.value || getAttrValue(['اللون والمظهر', 'material', 'المادة']) || (isAr ? 'ستانلس ستيل' : 'Stainless Steel') }
+      { label: isAr ? 'نظام الإشعال' : 'Ignition System', value: getAttrValue(['نظام الإشعال', 'ignition']) || (isAr ? 'إلكتروني ذاتي' : 'Electronic Auto-Ignition') },
+      { label: isAr ? 'اللون والمظهر' : 'Color & Finish', value: selectedColorName.value || getAttrValue(['اللون والمظهر', 'material', 'المادة']) || (isAr ? 'ستانلس ستيل' : 'Stainless Steel') },
+      { label: isAr ? 'بلد المنشأ' : 'Country of Origin', value: getAttrValue(['بلد المنشأ', 'origin']) || (isAr ? 'إيطاليا' : 'Italy') }
     ];
   }
 
-  // Also dynamically append any additional custom specifications from API
   const handledKeys = [
-    'color', 'اللون', 'size', 'المقاس', 'الحجم', 
+    'color', 'اللون', 'الألوان', 'الوان', 'colors', 'color_options', 'size', 'المقاس', 'الحجم', 
     'images', 'image', 'dimensions', 'الأبعاد', 
     'brand', 'العلامة التجارية', 'warranty', 'الضمان',
     'material', 'المادة', 'خامة الصنع',
@@ -1068,7 +1533,23 @@ const technicalSpecifications = computed(() => {
     });
   }
 
-  return specsList;
+  const excludedSpecLabels = [
+    'بلد المنشأ', 'country of origin', 'origin',
+    'الضمان', 'warranty',
+    'الخامة', 'الخامات', 'material', 'materials',
+    'الأبعاد', 'ابعاد', 'dimensions',
+    'الارتفاع', 'height', 'العرض', 'width', 'العمق', 'depth',
+    'عدد الشعلات', 'burners count', 'burners',
+    'القدرة الحرارية', 'thermal power', 'btu',
+    'الألوان', 'colors', 'خيارات الألوان'
+  ];
+  return specsList.filter(item => {
+    const lbl = (item.label || '').toLowerCase().trim();
+    if (lbl.includes('اللون والمظهر') || lbl.includes('color & finish')) {
+      return true;
+    }
+    return !excludedSpecLabels.some(ex => lbl.includes(ex));
+  });
 });
 
 const specRows = computed(() => {
@@ -1097,41 +1578,16 @@ const dynamicShippingInfo = computed(() => {
 const normalizedAttributes = computed(() => {
   if (!product.value) return [];
   const result = [];
-  const handledTypes = new Set();
-  
-  // 1. Colors
-  let colors = [];
-  if (Array.isArray(product.value.color_options) && product.value.color_options.length > 0) {
-    colors = product.value.color_options.map(c => {
-      if (typeof c === 'object' && c !== null) {
-        return { label: c.name || c.label || '', hex: c.hex || c.color || getPresetColorHex(c.name || '') };
-      }
-      const str = String(c);
-      if (str.includes('|')) {
-        const [lbl, hx] = str.split('|');
-        return { label: lbl.trim(), hex: hx.trim() };
-      }
-      return { label: str.trim(), hex: getPresetColorHex(str.trim()) };
-    });
-  } else {
-    const rawAttrs = product.value.attributes;
-    if (rawAttrs && typeof rawAttrs === 'object') {
-      const colorVal = rawAttrs.color || rawAttrs['اللون'] || rawAttrs.Color || rawAttrs['الالوان'];
-      if (Array.isArray(colorVal) && colorVal.length > 0) {
-        colors = colorVal.map(c => {
-          if (typeof c === 'object' && c !== null) {
-            return { label: c.name || c.label || '', hex: c.hex || c.color || getPresetColorHex(c.name || '') };
-          }
-          const str = String(c);
-          if (str.includes('|')) {
-            const [lbl, hx] = str.split('|');
-            return { label: lbl.trim(), hex: hx.trim() };
-          }
-          return { label: str.trim(), hex: getPresetColorHex(str.trim()) };
-        });
-      }
-    }
-  }
+  const rawAttrs = product.value.attributes && typeof product.value.attributes === 'object'
+    ? product.value.attributes
+    : {};
+
+  const parseOption = (raw) => {
+    if (raw && typeof raw === 'object') return localizedText(raw.label ?? raw.name ?? raw.value);
+    return String(raw ?? '').split('|', 1)[0].trim();
+  };
+
+  const colors = extractColorOptions(product.value);
   
   if (colors.length > 0) {
     result.push({
@@ -1141,32 +1597,80 @@ const normalizedAttributes = computed(() => {
       options: colors
     });
   }
+
+  Object.entries(rawAttrs).forEach(([key, rawValue]) => {
+    if (['color', 'اللون', 'Color', 'الالوان'].includes(key) || isColorAttribute({ name: key, label: key })) return;
+    const options = (Array.isArray(rawValue) ? rawValue : [rawValue]).map(parseOption).filter(Boolean);
+    if (options.length > 0) {
+      result.push({
+        key,
+        label: localizedText(key),
+        isColor: false,
+        isSize: isSizeAttribute({ name: key, label: key }),
+        options: [...new Set(options)]
+      });
+    }
+  });
   return result;
 });
 
+const isBlacklistedSpec = (key) => {
+  const k = String(key || '').toLowerCase().trim();
+  const blacklisted = [
+    'خامة', 'خامات', 'material', 'materials',
+    'ضمان', 'warranty',
+    'أبعاد', 'ابعاد', 'dimension', 'dimensions',
+    'منشأ', 'origin', 'بلد', 'بلد_المنشأ',
+    'شعلة', 'شعلات', 'burner', 'burners',
+    'قدرة', 'حرارية', 'حراريه', 'btu', 'thermal', 'power',
+    'أمان', 'امان', 'safety',
+    'حامل', 'حوامل', 'pan_support', 'pan_supports',
+    'سرعة', 'speed',
+    'فلتر', 'filter',
+    'ضوضاء', 'noise',
+    'ضغط', 'pressure',
+    'وظيفة', 'وظائف', 'function', 'functions',
+    'وزن', 'weight',
+    'جهد', 'فولت', 'voltage',
+    'مؤقت', 'timer',
+    'إشعال', 'اشعال', 'ignition',
+    'طاقة', 'energy', 'energy_source',
+    'ارتفاع', 'عرض', 'عمق', 'سعة'
+  ];
+  return blacklisted.some(term => k.includes(term));
+};
+
+const selectableAttributes = computed(() => {
+  return normalizedAttributes.value.filter((attr) => {
+    if (attr.isColor) return false;
+    if (isBlacklistedSpec(attr.key) || isBlacklistedSpec(attr.label)) return false;
+    // Only real variant choices that have more than 1 option to choose from!
+    return Array.isArray(attr.options) && attr.options.length > 1;
+  });
+});
+
 const colorOptions = computed(() => {
-  const colorAttr = normalizedAttributes.value.find(a => a.isColor);
-  if (colorAttr && colorAttr.options.length > 0) {
-    return colorAttr.options.map(o => ({
-      name: o.label,
-      hex: o.hex || getActualColor(o.label)
-    }));
-  }
+  const options = extractColorOptions(product.value);
+  if (options.length > 0) return options;
   return [
-    { name: locale.value === 'ar' ? 'ستانلس ستيل' : 'Stainless Steel', hex: '#d1d5db' },
-    { name: locale.value === 'ar' ? 'أسود' : 'Black', hex: '#111827' }
+    { label: locale.value === 'ar' ? 'ستانلس ستيل' : 'Stainless Steel', name: locale.value === 'ar' ? 'ستانلس ستيل' : 'Stainless Steel', hex: '#d1d5db' },
+    { label: locale.value === 'ar' ? 'أسود' : 'Black', name: locale.value === 'ar' ? 'أسود' : 'Black', hex: '#111827' }
   ];
 });
 
 const selectedColorName = computed(() => {
   const selected = selectedAttributes.value['color'] || selectedAttributes.value['اللون'];
   if (selected) return selected;
-  return colorOptions.value[0]?.name || (locale.value === 'ar' ? 'ستانلس ستيل' : 'Stainless Steel');
+  return colorOptions.value[0]?.label || colorOptions.value[0]?.name || (locale.value === 'ar' ? 'ستانلس ستيل' : 'Stainless Steel');
 });
 
 const selectColor = (name) => {
   selectedAttributes.value['color'] = name;
   selectedAttributes.value['اللون'] = name;
+};
+
+const selectAttribute = (key, value) => {
+  selectedAttributes.value[key] = value;
 };
 
 // Calculate active offer for this product
@@ -1292,7 +1796,18 @@ const submitReview = async () => {
 };
 
 const openLoginModal = () => {
-  router.push('/login');
+  showAddReviewModal.value = false;
+  if (typeof window !== 'undefined' && typeof window.openAuthModal === 'function') {
+    window.openAuthModal();
+  }
+};
+
+const handleAddReviewClick = () => {
+  if (user.value) {
+    showAddReviewModal.value = true;
+    return;
+  }
+  openLoginModal();
 };
 
 const formatDate = (dateStr) => {
@@ -1320,61 +1835,106 @@ onUnmounted(() => {
 
 <style scoped>
 .product-detail-page {
-  background: #ffffff;
+  background: #FFFFFF;
   min-height: 100vh;
-  padding-top: 36px;
-  padding-bottom: 80px;
+  padding-top: 120px;
+  padding-bottom: 0;
+  margin: 0;
   font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #111827;
+  color: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
 }
 
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 64px;
+  box-sizing: border-box;
 }
 
-/* Breadcrumbs */
-.breadcrumbs {
+@media (max-width: 1024px) {
+  .product-detail-page {
+    padding-top: 120px;
+  }
+  .container {
+    padding: 0 24px;
+  }
+}
+@media (max-width: 768px) {
+  .product-detail-page {
+    padding-top: 100px;
+  }
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* 1. Breadcrumbs */
+.breadcrumb-section {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 0 16px 0;
+  width: 100%;
+}
+
+.breadcrumbs-nav {
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
-  font-size: 13.5px;
-  color: #6b7280;
-  margin: 10px 0 34px 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  line-height: 21px;
 }
 
-.breadcrumbs a {
-  color: #6b7280;
+.product-detail-page[dir="rtl"] .breadcrumbs-nav {
+  justify-content: flex-start;
+}
+
+.bc-link {
+  color: #64748B;
   text-decoration: none;
+  font-weight: 400;
   transition: color 0.2s;
 }
 
-.breadcrumbs a:hover {
-  color: #111827;
+.bc-link:hover {
+  color: #000000;
 }
 
-.breadcrumbs .separator {
-  color: #9ca3af;
-  font-size: 13px;
+.bc-sep {
+  display: flex;
+  align-items: center;
+  color: #64748B;
+  flex-shrink: 0;
 }
 
-.breadcrumbs .current {
-  color: #111827;
-  font-weight: 600;
+.product-detail-page[dir="ltr"] .bc-sep svg {
+  transform: rotate(180deg);
 }
 
+.bc-current {
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Loader */
 .detail-loader {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 480px;
 }
 
 .spinner {
   width: 44px;
   height: 44px;
-  border: 3px solid #f3f4f6;
+  border: 3px solid #E2E8F0;
   border-top-color: #000000;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -1384,763 +1944,1405 @@ onUnmounted(() => {
   to { transform: rotate(360deg); }
 }
 
-/* Product Main Layout: 2 Columns */
-.product-main-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 68px;
-  align-items: start;
-  margin-bottom: 56px;
+/* 2. Product Main Section */
+.product-main-section {
+  padding: 16px 0 48px 0;
+  width: 100%;
 }
 
-/* Gallery Section (Right in RTL) */
-.images-section {
+.product-grid-layout {
+  display: grid;
+  grid-template-columns: 632px 632px;
+  justify-content: space-between;
+  gap: 48px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 1360px) {
+  .product-grid-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 992px) {
+  .product-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* Gallery Column */
+.gallery-column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
+  max-width: 632px;
 }
 
-.main-image-wrapper {
+.main-image-container {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 440px;
-  background: #f8fafc;
-  border-radius: 12px;
+  height: 480px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
+  position: relative;
+  transition: border-color 0.2s;
 }
 
-.main-display-image {
+.main-image-container:hover {
+  border-color: #CBD5E1;
+}
+
+.main-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.3s ease;
+  display: block;
 }
 
-.main-display-image:hover {
+.main-image-container:hover .main-image {
   transform: scale(1.02);
 }
 
-.thumbnails-row {
+.thumbnail-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 16px;
   width: 100%;
+  height: 90px;
 }
 
-.thumb-item {
-  height: 82px;
-  background: #f8fafc;
+.thumb-box {
+  box-sizing: border-box;
+  width: 100%;
+  height: 90px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.thumb-item.active {
-  border-color: #000000;
+.thumb-box:hover {
+  border-color: #94A3B8;
 }
 
-.thumb-item img {
+.thumb-box.thumb-active {
+  border: 2px solid #000000;
+}
+
+.thumb-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-/* Info Section (Left in RTL) */
-.info-section {
+/* Info Column */
+.info-column {
   display: flex;
   flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 632px;
 }
 
-.product-top-meta {
+.brand-and-title {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.image-actions-bar {
+  display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  width: 100%;
+  height: 21px;
 }
 
-.category-origin {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #111827;
+.category-origin-group {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
 }
 
-.meta-pipe {
-  color: #d1d5db;
+.category-name {
+  font-size: 14px;
   font-weight: 400;
+  line-height: 21px;
+  color: #64748B;
 }
 
-.share-btn {
-  background: none;
-  border: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #4b5563;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
-  padding: 0;
-}
-
-.share-btn:hover {
-  color: #111827;
-}
-
-.product-title {
-  font-size: 30px;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 14px 0;
-  line-height: 1.28;
-}
-
-.rating-model-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13.5px;
-  color: #6b7280;
-  margin-bottom: 22px;
-}
-
-.stars-score {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.stars-gold {
-  color: #f59e0b;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 13.5px;
-}
-
-.stars-gold .half-star-flipped {
+.v-line {
+  box-sizing: border-box;
+  width: 1px;
+  height: 12px;
+  background: #000000;
   display: inline-block;
 }
 
-[dir="rtl"] .stars-gold .half-star-flipped,
+.origin-badge {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #000000;
+}
+
+.share-action-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  transition: opacity 0.2s;
+}
+
+.share-action-btn:hover {
+  opacity: 0.7;
+}
+
+.share-icon-svg {
+  width: 16px;
+  height: 16px;
+  stroke: #000000;
+}
+
+.main-title {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 48px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .main-title {
+  text-align: right;
+}
+
+.model-rating-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 21px;
+}
+
+.model-code {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.rating-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.rating-count {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.rating-val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #000000;
+}
+
+.stars-cluster {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.filled-star {
+  color: #F59E1F;
+  font-size: 14px;
+}
+
+.half-star-flipped {
+  display: inline-block;
+}
+
 .product-detail-page[dir="rtl"] .half-star-flipped {
   transform: scaleX(-1);
 }
 
-.score-num {
-  font-weight: 700;
-  color: #111827;
+.empty-star {
+  color: #94A3B8;
+  font-size: 14px;
 }
 
-.count-num {
-  color: #6b7280;
+.section-divider {
+  width: 100%;
+  height: 0px;
+  border-bottom: 1px solid #E2E8F0;
 }
 
-.model-num {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-/* Price Box */
-.price-box {
-  margin-bottom: 12px;
-}
-
-.price-value-row {
+/* Price & Status */
+.price-status-bar {
   display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.product-detail-page[dir="rtl"] .price-group {
+  align-items: flex-start;
+  text-align: right;
+}
+
+.product-detail-page[dir="ltr"] .price-group {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.price-unit {
+  display: flex;
+  flex-direction: row;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
 }
 
-.main-price {
-  font-size: 32px;
-  font-weight: 900;
-  color: #111827;
-  line-height: 1;
+.riyal-symbol {
+  display: inline-flex;
+  align-items: baseline;
 }
 
-.currency-symbol {
-  font-size: 24px;
-  font-weight: 800;
-  color: #111827;
-}
-
-.vat-notice {
-  font-size: 12.5px;
-  color: #6b7280;
-  margin-top: 4px;
+.riyal-svg {
+  width: 21px;
+  height: 24px;
   display: block;
 }
 
-/* Stock Status */
-.stock-status {
+.currency-code {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #000000;
+}
+
+.price-amount {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 48px;
+  color: #000000;
+}
+
+.vat-tag {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #64748B;
+}
+
+.stock-pill {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
-  font-size: 13.5px;
-  font-weight: 600;
-  margin-bottom: 22px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
 }
 
-.stock-status.in-stock {
-  color: #10b981;
+.stock-pill.is-in-stock {
+  color: #10B981;
 }
 
-.stock-status.out-of-stock {
-  color: #ef4444;
+.stock-pill.is-out-stock {
+  color: #EF4444;
 }
 
 .stock-dot {
-  font-size: 18px;
-  line-height: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: currentColor;
 }
 
-/* Key Features */
-.key-features-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 24px 0;
+/* Bullet Specs */
+.bullet-specs-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.key-features-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13.5px;
-  color: #374151;
-}
-
-.feat-icon {
-  font-size: 12px;
-  color: #64748b;
-  line-height: 1;
-}
-
-/* Color Selection */
-.color-selection-section {
-  margin-bottom: 24px;
-}
-
-.color-label {
-  font-size: 13.5px;
-  margin-bottom: 10px;
-}
-
-.label-title {
-  font-weight: 700;
-  color: #111827;
-  margin-left: 6px;
-}
-
-.selected-color-name {
-  color: #374151;
-  font-weight: 500;
-}
-
-.color-swatches-row {
-  display: flex;
-  align-items: center;
   gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.color-swatch-circle {
-  width: 30px;
-  height: 30px;
+.bullet-spec-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.product-detail-page[dir="rtl"] .bullet-spec-item {
+  justify-content: flex-start;
+}
+
+.check-circle-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bullet-spec-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .bullet-spec-text {
+  text-align: right;
+}
+
+/* Color Picker */
+.color-picker-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.product-detail-page[dir="rtl"] .color-picker-block {
+  align-items: flex-start;
+}
+
+.color-picker-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+}
+
+.color-swatches-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-swatch-ring {
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid #d1d5db;
+  padding: 2px;
+  border: 2px solid transparent;
+  background: transparent;
   cursor: pointer;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
 }
 
-.color-swatch-circle.active {
-  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #000000;
-  border-color: transparent;
+.color-swatch-ring:hover {
+  transform: scale(1.08);
 }
 
-/* Action Row (Quantity + Add to Cart) */
-.action-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 6px;
+.color-swatch-ring.active {
+  border-color: #000000;
 }
 
-.qty-selector {
+.swatch-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+.swatch-circle.is-light {
+  border: 1px solid #cbd5e1;
+}
+
+/* Attribute Picker */
+.attribute-picker-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.attribute-picker-title {
   display: flex;
   align-items: center;
-  border: 1px solid #e5e7eb;
+  gap: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+}
+
+.attribute-options-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attribute-btn {
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
-  height: 48px;
-  width: 120px;
+  background: #FFFFFF;
+  color: #000000;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.attribute-btn:hover {
+  border-color: #000000;
+}
+
+.attribute-btn.active {
+  border-color: #000000;
+  background: #000000;
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+/* Purchase Actions */
+.purchase-actions-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.btn-add-to-cart {
+  flex: 1;
+  height: 56px;
+  background: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 32px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #FFFFFF;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-to-cart:hover:not(:disabled) {
+  background: #1F2937;
+  transform: translateY(-1px);
+}
+
+.btn-add-to-cart:disabled {
+  background: #94A3B8;
+  cursor: not-allowed;
+}
+
+.bag-svg {
+  width: 20px;
+  height: 20px;
+  stroke: #FFFFFF;
+}
+
+.qty-control-box {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
-  background: #ffffff;
+  padding: 12px 16px;
+  gap: 16px;
+  width: 104px;
+  height: 56px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #FFFFFF;
 }
 
 .qty-btn {
   background: none;
   border: none;
-  font-size: 18px;
-  color: #4b5563;
+  padding: 0;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 400;
   cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+.qty-btn:hover {
+  opacity: 0.6;
+}
+
+.qty-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+  user-select: none;
+}
+
+/* 3. Tabs Section */
+.tabs-section {
+  box-sizing: border-box;
+  width: 100%;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+  padding: 48px 0;
+  margin-top: 24px;
+}
+
+.tabs-header-nav {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 32px;
+  padding: 0;
+}
+
+.product-detail-page[dir="rtl"] .tabs-header-nav {
+  justify-content: flex-start;
+}
+
+.tab-nav-btn {
+  background: none;
+  border: none;
+  padding: 0 0 10px 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-nav-btn .tab-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.tab-nav-btn:hover .tab-label {
+  color: #000000;
+}
+
+.tab-nav-btn.active .tab-label {
+  font-weight: 700;
+  color: #000000;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #000000;
+}
+
+/* Tab 1: Overview */
+.overview-tab-content {
+  width: 100%;
+}
+
+.overview-text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.ov-title {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .ov-title {
+  text-align: right;
+}
+
+.ov-desc {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+}
+
+.product-detail-page[dir="rtl"] .ov-desc {
+  text-align: right;
+}
+
+.features-icons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .features-icons-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-detail-page[dir="rtl"] .feature-item {
+  justify-content: flex-start;
+}
+
+.feat-ico {
+  width: 18px;
+  height: 18px;
+  color: #000000;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feat-txt {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.product-detail-page[dir="rtl"] .feat-txt {
+  text-align: right;
+}
+
+/* Tab 2: Specs */
+.specs-tab-content {
+  width: 100%;
+}
+
+.specs-card {
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 24px 32px;
+  width: 100%;
+}
+
+.specs-title {
+  margin: 0 0 16px 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 27px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .specs-title {
+  text-align: right;
+}
+
+.specs-table-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.spec-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 48px;
+  padding: 12px 0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.spec-table-row:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .spec-table-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.spec-cell-pair {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.sc-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.sc-value {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+}
+
+.spec-color-val {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spec-color-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spec-color-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Tab 3 & 4: Guide (Installation, Shipping) */
+.pane-headline {
+  margin: 0 0 24px 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .pane-headline {
+  text-align: right;
+}
+
+.dynamic-alert-banner {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+}
+
+.product-detail-page[dir="rtl"] .dynamic-alert-banner {
+  border-right: 4px solid #000000;
+}
+
+.product-detail-page[dir="ltr"] .dynamic-alert-banner {
+  border-left: 4px solid #000000;
+}
+
+.banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.banner-title-row i {
+  color: #000000;
+  font-size: 16px;
+}
+
+.banner-title-row h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.banner-content-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #64748B;
+  white-space: pre-line;
+}
+
+.guide-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.guide-block:last-child {
+  margin-bottom: 0;
+}
+
+.guide-block-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-detail-page[dir="rtl"] .guide-block-header {
+  justify-content: flex-start;
+}
+
+.block-ico {
+  color: #000000;
+  flex-shrink: 0;
+}
+
+.block-title {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 27px;
+  color: #000000;
+}
+
+.guide-items-list, .guide-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-items-list li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-detail-page[dir="rtl"] .guide-items-list li {
+  justify-content: flex-start;
+}
+
+.item-bullet-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.item-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.product-detail-page[dir="rtl"] .item-text {
+  text-align: right;
+}
+
+.guide-steps-list li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-detail-page[dir="rtl"] .guide-steps-list li {
+  justify-content: flex-start;
+}
+
+.step-badge {
+  width: 24px;
+  height: 24px;
+  background: #E2E8F0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000000;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.product-detail-page[dir="rtl"] .step-text {
+  text-align: right;
+}
+
+/* Tab 5: Reviews */
+.reviews-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.reviews-header-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.product-detail-page[dir="rtl"] .reviews-header-block {
+  align-items: flex-start;
+}
+
+.reviews-headline {
+  margin: 0 0 12px 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000000;
+}
+
+.product-detail-page[dir="rtl"] .reviews-headline {
+  text-align: right;
+}
+
+.rating-summary-strip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.product-detail-page[dir="rtl"] .rating-summary-strip {
+  justify-content: flex-start;
+}
+
+.summary-stars-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-star-ico {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.score-ratio-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 28px;
+  color: #000000;
+}
+
+.reviews-count-tag {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.rating-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.product-detail-page[dir="rtl"] .rating-breakdown-list {
+  align-self: flex-start;
+}
+
+.breakdown-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.star-title {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.product-detail-page[dir="rtl"] .star-title {
+  text-align: right;
+}
+
+.bar-container {
+  flex: 1;
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill-amber {
+  height: 100%;
+  background: #F59E1F;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.pct-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+  width: 36px;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.product-detail-page[dir="rtl"] .pct-val {
+  text-align: left;
+}
+
+.reviews-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.review-card-figma {
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.rc-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.rc-author-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.rc-author-icon {
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.qty-number {
+.rc-author-icon svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.rc-author-name {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
   font-weight: 700;
-  font-size: 15px;
-  color: #111827;
-}
-
-.add-to-cart-button {
-  flex: 1;
-  height: 48px;
-  background: #000000;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.add-to-cart-button:hover:not(:disabled) {
-  background: #1f2937;
-}
-
-.add-to-cart-button:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Tabs Section */
-.tabs-section {
-  margin-top: 50px;
-  margin-bottom: 60px;
-}
-
-.tabs-header {
-  display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  gap: 36px;
-  margin-bottom: 36px;
-}
-
-.tab-btn {
-  background: none;
-  border: none;
-  font-size: 15.5px;
-  font-weight: 600;
-  color: #6b7280;
-  padding: 12px 4px;
-  cursor: pointer;
-  position: relative;
-  transition: color 0.2s;
-}
-
-.tab-btn:hover {
-  color: #111827;
-}
-
-.tab-btn.active {
+  font-size: 16px;
+  line-height: 24px;
   color: #000000;
-  font-weight: 800;
-  border-bottom: 2.5px solid #000000;
-  margin-bottom: -1px;
 }
 
-/* Tab 1: Overview */
-.overview-pane .pane-main-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 14px 0;
-}
-
-.overview-pane .pane-main-desc {
-  font-size: 14.5px;
-  line-height: 1.8;
-  color: #4b5563;
-  margin: 0 0 28px 0;
-  max-width: 960px;
-}
-
-.overview-features-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 30px;
-}
-
-.ov-feat-item {
+.rc-stars-group {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #374151;
+  gap: 4px;
 }
 
-.ov-feat-item i {
-  color: #64748b;
-  font-size: 14px;
-}
-
-/* Tab 2: Specs */
-.specs-pane {
-  background: rgba(255, 255, 255, 1) !important;
-}
-
-.specs-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 28px 36px 24px 36px;
-  background: rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-.specs-card-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 20px 0;
-  text-align: right;
-  background: transparent !important;
-}
-
-.specs-grid-rows {
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 1) !important;
-}
-
-.spec-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 80px;
-  padding: 16px 0;
-  border-bottom: 1px solid #edf2f7;
-  background: rgba(255, 255, 255, 1) !important;
-}
-
-.spec-row:last-child {
-  border-bottom: none;
-  padding-bottom: 4px;
-}
-
-.spec-col {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  background: rgba(255, 255, 255, 1) !important;
-}
-
-.spec-label {
-  font-size: 14.5px;
-  color: #475569;
-  font-weight: 500;
-  background: transparent !important;
-}
-
-.spec-val {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #0f172a;
-  background: transparent !important;
-}
-
-/* Tab 3 & 4: Guide Sections (Installation, Shipping) */
-.pane-heading {
-  font-size: 22px;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 28px 0;
-}
-
-.guide-dynamic-banner {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-right: 4px solid #111827;
-  border-radius: 10px;
-  padding: 18px 22px;
-  margin-bottom: 30px;
-}
-
-[dir="ltr"] .guide-dynamic-banner {
-  border-right: 1px solid #e2e8f0;
-  border-left: 4px solid #111827;
-}
-
-.dynamic-banner-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #111827;
-  margin-bottom: 8px;
-}
-
-.dynamic-banner-header i {
-  color: #000000;
-  font-size: 16px;
-}
-
-.dynamic-banner-header h4 {
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.dynamic-banner-body {
-  font-size: 14px;
-  line-height: 1.7;
-  color: #4b5563;
-}
-
-.guide-section {
-  margin-bottom: 30px;
-}
-
-.guide-sec-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.guide-sec-header i {
-  font-size: 16px;
-  color: #374151;
-}
-
-.guide-sec-header h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-
-.guide-checklist, .guide-steps-list, .guide-notes-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.guide-checklist li, .guide-steps-list li, .guide-notes-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #4b5563;
-}
-
-.check-icon {
-  color: #10b981;
-  font-weight: 700;
-}
-
-.warn-icon {
-  color: #f59e0b;
-}
-
-.step-num-txt {
-  font-weight: 700;
-  color: #6b7280;
+.rc-star-ico {
   width: 16px;
+  height: 16px;
+  display: block;
+  flex-shrink: 0;
 }
 
-/* Tab 5: Reviews */
-.reviews-score-summary {
-  display: flex;
-  align-items: center;
-  gap: 50px;
-  margin-bottom: 36px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.score-left-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
-
-.big-score {
-  font-size: 38px;
-  font-weight: 900;
-  color: #111827;
-  line-height: 1;
-}
-
-.total-reviews-count {
-  font-size: 13.5px;
-  color: #6b7280;
-}
-
-.bars-right-col {
-  flex: 1;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.rating-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.bar-label {
-  width: 60px;
-}
-
-.bar-track {
-  flex: 1;
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  background: #f59e0b;
-  border-radius: 4px;
-}
-
-.bar-pct {
-  font-size: 12.5px;
-  width: 32px;
-  text-align: left;
-}
-
-.reviews-cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.review-card-item {
-  border: 1px solid #f3f4f6;
-  border-radius: 10px;
-  padding: 18px 22px;
-  background: #fafafa;
-}
-
-.rc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.rc-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 14.5px;
-  color: #111827;
-}
-
-.rc-date {
-  font-size: 12.5px;
-  color: #9ca3af;
-}
-
-.rc-stars {
-  color: #f59e0b;
-  font-size: 12px;
-  margin-bottom: 8px;
-  display: flex;
-  gap: 2px;
-}
-
-.rc-comment {
+.rc-date-line {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
   font-size: 14px;
-  line-height: 1.6;
-  color: #4b5563;
-  margin: 0;
+  line-height: 21px;
+  color: #94A3B8;
 }
 
-.add-review-action {
+.product-detail-page[dir="rtl"] .rc-date-line {
+  text-align: right;
+}
+
+.rc-body-comment {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: #1E293B;
+}
+
+.product-detail-page[dir="rtl"] .rc-body-comment {
+  text-align: right;
+}
+
+.add-review-cta-wrap {
   display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.product-detail-page[dir="rtl"] .add-review-cta-wrap {
   justify-content: flex-start;
 }
 
-.add-review-btn {
+.btn-add-review-cta {
+  height: 44px;
   background: #000000;
-  color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
+  padding: 10px 20px;
   gap: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   cursor: pointer;
-  transition: background 0.2s;
+  color: #FFFFFF;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 22px;
+  transition: all 0.2s;
 }
 
-.add-review-btn:hover {
-  background: #1f2937;
+.btn-add-review-cta:hover {
+  background: #1E293B;
+  transform: translateY(-1px);
 }
 
-/* Related Products Section */
-.related-section {
-  margin-top: 60px;
-  margin-bottom: 60px;
+/* 4. Related Products Section */
+.related-products-section {
+  padding: 64px 0;
+  width: 100%;
 }
 
-.related-header {
-  text-align: center;
-  margin-bottom: 36px;
+.related-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 32px;
+  width: 100%;
 }
 
-.related-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 6px 0;
-}
-
-.related-subtitle {
-  font-size: 14.5px;
-  color: #6b7280;
+.related-heading {
   margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 42px;
+  color: #000000;
 }
 
-.products-grid {
+.product-detail-page[dir="rtl"] .related-heading {
+  text-align: right;
+}
+
+.related-subheading {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.product-detail-page[dir="rtl"] .related-subheading {
+  text-align: right;
+}
+
+.related-products-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .related-products-grid {
+    grid-template-columns: 1fr;
+  }
+  .tabs-header-nav {
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 6px;
+  }
 }
 
 /* Lightbox Modal */
@@ -2301,6 +3503,22 @@ onUnmounted(() => {
   font-size: 13px;
 }
 
+.login-prompt {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 16px;
+}
+
+.login-link-btn {
+  background: none;
+  border: none;
+  color: #000000;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
 .review-form {
   display: flex;
   flex-direction: column;
@@ -2327,6 +3545,7 @@ onUnmounted(() => {
   padding: 10px;
   font-family: inherit;
   resize: vertical;
+  box-sizing: border-box;
 }
 
 .submit-review-btn {
@@ -2337,6 +3556,11 @@ onUnmounted(() => {
   padding: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-review-btn:hover {
+  background: #1f2937;
 }
 
 .review-msg.success {
@@ -2348,37 +3572,5 @@ onUnmounted(() => {
 .review-msg.error {
   color: #ef4444;
   font-size: 13px;
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .product-main-layout {
-    grid-template-columns: 1fr;
-    gap: 36px;
-  }
-  .specs-grid-rows .spec-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-  .overview-features-grid {
-    grid-template-columns: 1fr;
-  }
-  .tabs-header {
-    overflow-x: auto;
-    gap: 20px;
-  }
-  .reviews-score-summary {
-    flex-direction: column;
-    gap: 20px;
-  }
 }
 </style>

@@ -1,33 +1,10 @@
 <template>
   <div class="website-layout" :class="currentLang === 'ar' ? 'lang-ar' : 'lang-en'" :dir="currentLang === 'ar' ? 'rtl' : 'ltr'">
     <header class="fixed-header">
-      <!-- Top Bar -->
+      <!-- Top Bar / Announcement Bar -->
       <div class="top-bar">
-        <div class="container top-bar-container">
-          <div class="top-bar-content">
-            <!-- Welcome Message -->
-            <div class="top-bar-item welcome-message">
-              <span class="delivery-promo">
-                <svg class="icon-3d" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="1" y="3" width="15" height="13" rx="2" ry="2"/>
-                  <path d="M16 8h4l3 3v5h-7V8z"/>
-                  <circle cx="5.5" cy="18.5" r="2.5"/>
-                  <circle cx="18.5" cy="18.5" r="2.5"/>
-                </svg>
-                {{ $t('topbar.free_shipping') || 'شحن مجاني للطلبات فوق 50 دينار - توصيل سريع لجميع المناطق' }}
-              </span>
-            </div>
-
-            <!-- Dynamic Coupon or Offer if exists -->
-            <template v-if="latestCoupon && latestCoupon.code">
-              <div class="top-bar-divider"></div>
-              <div class="top-bar-item coupon-info">
-                <span class="sparkle">✨</span>
-                <span class="use-code-text">{{ $t('use_code') }}</span>
-                <span class="coupon-code">{{ latestCoupon.code }}</span>
-              </div>
-            </template>
-          </div>
+        <div class="top-bar-container">
+          <span class="announcement-text">{{ currentLang === 'ar' ? 'شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات' : ($t('topbar.free_shipping') || 'Free shipping on orders over 500 SAR | Comprehensive warranty on all products') }}</span>
         </div>
       </div>
 
@@ -37,74 +14,97 @@
           <!-- Logo (Right in RTL) -->
           <router-link to="/" class="logo" aria-label="Mastergas Home">
             <div class="logo-icon">
-              <img :src="siteLogo || '/logo.png'" :alt="siteName || 'Mastergas'" class="site-logo-img">
+              <img :src="siteLogo || '/brand/mastergas-logo.png'" :alt="siteName || 'Mastergas'" class="site-logo-img">
             </div>
           </router-link>
 
           <!-- Main Links (Center in Desktop) -->
           <div class="nav-links desktop-only">
-            <router-link to="/" active-class="active" exact-active-class="active">{{ $t('nav.home') }}</router-link>
-            <router-link to="/products" active-class="active" exact-active-class="active">{{ $t('nav.products') }}</router-link>
-            <router-link to="/offers" active-class="active" exact-active-class="active">{{ $t('nav.offers') }}</router-link>
-            <router-link to="/about" active-class="active" exact-active-class="active">{{ $t('nav.about') }}</router-link>
-            <router-link to="/contact" active-class="active" exact-active-class="active">{{ $t('nav.contact') }}</router-link>
+            <router-link to="/" active-class="active" exact-active-class="active">
+              <span>{{ $t('nav.home') }}</span>
+              <span class="active-underline"></span>
+            </router-link>
+            <router-link to="/products" active-class="active" exact-active-class="active">
+              <span>{{ $t('nav.products') }}</span>
+              <span class="active-underline"></span>
+            </router-link>
+            <router-link to="/offers" active-class="active" exact-active-class="active">
+              <span>{{ $t('nav.offers') }}</span>
+              <span class="active-underline"></span>
+            </router-link>
+            <router-link to="/about" active-class="active" exact-active-class="active">
+              <span>{{ $t('nav.about') }}</span>
+              <span class="active-underline"></span>
+            </router-link>
+            <router-link to="/contact" active-class="active" exact-active-class="active">
+              <span>{{ $t('nav.contact') }}</span>
+              <span class="active-underline"></span>
+            </router-link>
           </div>
 
-          <!-- Desktop specific Icons (Left in RTL) -->
-          <div class="nav-icons desktop-only">
-            <button class="lang-pill-btn" @click="toggleLanguage">
-              {{ currentLang === 'ar' ? 'English' : 'العربية' }}
+          <!-- Desktop specific Icons & Controls (Left in RTL) -->
+          <div class="header-left desktop-only">
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle-btn" @click="toggleLanguage" :title="currentLang === 'ar' ? 'English' : 'العربية'">
+              <span>{{ currentLang === 'ar' ? 'English' : 'العربية' }}</span>
             </button>
-            <span class="nav-v-divider"></span>
 
-            <button class="icon-btn search-btn" @click="showSearchModal = true" title="البحث">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-            </button>
-            <router-link to="/wishlist" class="icon-btn wishlist-btn" :class="{ 'has-items': wishlistCount > 0 }" title="المفضلة">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-              <span class="badge" v-if="wishlistCount > 0">{{ wishlistCount }}</span>
-            </router-link>
-            
-            <router-link to="/cart" class="icon-btn cart-btn" :class="{ 'has-items': cartCount > 0 }" title="سلة المشتريات">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
-              <span class="badge cart-badge-black" v-if="cartCount > 0">{{ cartCount }}</span>
-            </router-link>
-            
-            <div class="user-dropdown-container" @mouseenter="isLoggedIn && (showUserDropdown = true)" @mouseleave="showUserDropdown = false">
-              <button class="icon-btn user-btn" :title="isLoggedIn ? $t('profile.title') : $t('nav.login')" @click="handleUserClick">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            <!-- Line Divider -->
+            <span class="nav-divider-line"></span>
+
+            <!-- Nav Icons (Cart, User, Search) -->
+            <div class="header-nav-icons">
+              <!-- Cart -->
+              <router-link to="/cart" class="header-icon-link cart-link" :title="$t('cart.title') || 'سلة المشتريات'">
+                <div class="cart-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1.60387 1.83326C1.60387 1.45357 1.91167 1.14576 2.29137 1.14576L3.15161 1.14576C4.30834 1.14576 5.31663 1.93301 5.59718 3.0552L5.60035 3.06789L6.06285 5.27077L17.8269 5.27077C18.2887 5.2707 18.7138 5.27064 19.0533 5.32454C19.4335 5.38491 19.8298 5.53039 20.1102 5.91625C20.3802 6.28767 20.4146 6.70764 20.3882 7.09216C20.3632 7.4544 20.2736 7.8993 20.1716 8.40606L20.163 8.44894C19.7912 10.2953 19.4254 12.0364 18.5652 13.2919C18.1195 13.9425 17.5396 14.4696 16.7682 14.8276C16.0046 15.1819 15.0891 15.3541 13.991 15.3541L7.75722 15.3541C7.00538 15.3568 6.34388 15.9315 6.21132 16.7291L16.0414 16.7291C17.1805 16.7291 18.1039 17.6525 18.1039 18.7916C18.1039 19.9307 17.1805 20.8541 16.0414 20.8541C14.9023 20.8541 13.9789 19.9307 13.9789 18.7916C13.9789 18.5505 14.0202 18.3191 14.0962 18.1041L11.5698 18.1041C11.6458 18.3191 11.6872 18.5505 11.6872 18.7916C11.6872 19.9307 10.7638 20.8541 9.6247 20.8541C8.48561 20.8541 7.5622 19.9307 7.5622 18.7916C7.5622 18.5505 7.60356 18.3191 7.67956 18.1041L5.87685 18.1041C5.26268 18.1041 4.8122 17.5937 4.8122 17.0237C4.8122 15.8062 5.51311 14.7321 6.54297 14.2495L4.84881 6.1802C4.83123 6.12863 4.81961 6.07431 4.81477 6.01804L4.26037 3.37749C4.12898 2.87337 3.67354 2.52076 3.15161 2.52076L2.29137 2.52076C1.91167 2.52076 1.60387 2.21296 1.60387 1.83326ZM16.0414 18.1041C15.6617 18.1041 15.3539 18.4119 15.3539 18.7916C15.3539 19.1713 15.6617 19.4791 16.0414 19.4791C16.4211 19.4791 16.7289 19.1713 16.7289 18.7916C16.7289 18.4119 16.4211 18.1041 16.0414 18.1041ZM8.9372 18.7916C8.9372 18.4119 9.24501 18.1041 9.6247 18.1041C10.0044 18.1041 10.3122 18.4119 10.3122 18.7916C10.3122 19.1713 10.0044 19.4791 9.6247 19.4791C9.24501 19.4791 8.9372 19.1713 8.9372 18.7916ZM8.14338 13.9791L8.1397 13.9791L7.89118 13.9791L6.35153 6.64577L17.7776 6.64577C18.3056 6.64577 18.619 6.64782 18.8377 6.68253C18.9373 6.69835 18.9808 6.71626 18.9955 6.72376L18.9986 6.72537C19.0004 6.72787 19.0057 6.73681 19.0111 6.7641C19.0188 6.80346 19.0249 6.8743 19.0164 6.99777C18.9984 7.25944 18.9283 7.615 18.815 8.17757C18.4279 10.1003 18.1016 11.5359 17.4309 12.5148C17.1111 12.9814 16.7159 13.336 16.1894 13.5803C15.655 13.8283 14.9497 13.9791 13.991 13.9791L8.14338 13.9791Z" fill="currentColor"/>
+                  </svg>
+                  <span class="cart-badge-black" v-if="cartCount > 0">{{ cartCount }}</span>
+                </div>
+              </router-link>
+
+              <!-- Profile / Login -->
+              <div class="user-dropdown-container" @mouseenter="isLoggedIn && (showUserDropdown = true)" @mouseleave="showUserDropdown = false">
+                <button class="header-icon-btn user-btn" :title="isLoggedIn ? $t('profile.title') : $t('nav.login')" @click="handleUserClick">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="7" r="4"/>
+                    <ellipse cx="12" cy="17.5" rx="6.5" ry="3.5"/>
+                  </svg>
+                </button>
+                <transition name="fade">
+                  <div v-if="isLoggedIn && showUserDropdown" class="user-dropdown-menu" @click.stop>
+                    <div class="user-dropdown-header">
+                      <p class="user-name">{{ authState.user?.name || authState.user?.full_name || $t('auth.customer') }}</p>
+                      <p class="user-phone" dir="ltr" v-if="authState.user?.email || authState.user?.phone || currentUser?.phone">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        {{ authState.user?.email || authState.user?.phone || currentUser?.phone || '' }}
+                      </p>
+                    </div>
+                    <div class="user-dropdown-body">
+                      <router-link to="/profile" class="user-dropdown-item" @click="showUserDropdown = false">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        {{ $t('profile.title') }}
+                      </router-link>
+                      <router-link to="/wishlist" class="user-dropdown-item" @click="showUserDropdown = false">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        {{ $t('profile.wishlist') }}
+                      </router-link>
+                      <button class="user-dropdown-item logout" @click="handleLogout(); showUserDropdown = false">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        {{ $t('profile.logout') }}
+                      </button>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+
+              <!-- Search -->
+              <button class="header-icon-btn search-btn" @click="showSearchModal = true" :title="$t('nav.search') || 'بحث'">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M10.084 1.14575C5.14794 1.14575 1.14648 5.14721 1.14648 10.0833C1.14648 15.0193 5.14794 19.0208 10.084 19.0208C12.3045 19.0208 14.3359 18.2109 15.899 16.8705L19.6812 20.6527C19.9497 20.9212 20.385 20.9212 20.6535 20.6527C20.9219 20.3842 20.9219 19.9489 20.6535 19.6804L16.8713 15.8983C18.2117 14.3352 19.0215 12.3038 19.0215 10.0833C19.0215 5.14721 15.02 1.14575 10.084 1.14575ZM2.52148 10.0833C2.52148 5.9066 5.90733 2.52075 10.084 2.52075C14.2606 2.52075 17.6465 5.9066 17.6465 10.0833C17.6465 14.2599 14.2606 17.6458 10.084 17.6458C5.90733 17.6458 2.52148 14.2599 2.52148 10.0833Z" fill="currentColor"/>
                 </svg>
               </button>
-              <transition name="fade">
-                <div v-if="isLoggedIn && showUserDropdown" class="user-dropdown-menu" @click.stop>
-                  <div class="user-dropdown-header">
-                    <p class="user-name">{{ authState.user?.name || authState.user?.full_name || $t('auth.customer') }}</p>
-                    <p class="user-phone" dir="ltr" v-if="authState.user?.email || authState.user?.phone || currentUser?.phone">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                      {{ authState.user?.email || authState.user?.phone || currentUser?.phone || '' }}
-                    </p>
-                  </div>
-                  <div class="user-dropdown-body">
-                    <router-link to="/profile" class="user-dropdown-item" @click="showUserDropdown = false">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                      {{ $t('profile.title') }}
-                    </router-link>
-                    <router-link to="/wishlist" class="user-dropdown-item" @click="showUserDropdown = false">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                      {{ $t('profile.wishlist') }}
-                    </router-link>
-                    <button class="user-dropdown-item logout" @click="handleLogout(); showUserDropdown = false">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                      {{ $t('profile.logout') }}
-                    </button>
-                  </div>
-                </div>
-              </transition>
             </div>
           </div>
 
@@ -308,7 +308,7 @@
           <!-- Col 4: Brand Info & Payment (Far Left in RTL) -->
           <div class="footer-col brand-info footer-col-brand">
             <router-link to="/" class="footer-logo">
-              <img src="/images/footer_logo_transparent.png" alt="MASTERgas" class="footer-brand-logo-img" />
+              <img :src="footerLogo" alt="MASTERgas" class="footer-brand-logo-img" />
             </router-link>
             <p class="footer-desc">
               {{ currentLang === 'ar' 
@@ -396,8 +396,8 @@ const categories = ref([]);
 const latestCoupon = ref(null);
 const freeDeliveryThreshold = ref(null);
 const siteName = ref('');
-const siteLogo = ref('/logo.png');
-const footerLogo = ref('/images/footer_logo_transparent.png');
+const siteLogo = ref('/brand/mastergas-logo.png');
+const footerLogo = ref('/brand/mastergas-logo-white.png');
 const siteDescription = ref('');
 const sitePhone = ref('');
 const siteEmail = ref('');
@@ -572,27 +572,28 @@ const fetchData = async () => {
       const faviconVal = getVal('favicon');
       const logoVal = getVal('logo');
       const footerLogoVal = getVal('footer_logo');
+      const resolveAssetUrl = (value) => {
+        if (!value) return '';
+        if (value.startsWith('/') || value.startsWith('http')) return value;
+        return `${api.defaults.baseURL.replace('/api', '')}/storage/${value}`;
+      };
       
       if (logoVal && !isIrisAsset(logoVal)) {
-        siteLogo.value = logoVal.startsWith('http') 
-          ? logoVal 
-          : `${api.defaults.baseURL.replace('/api', '')}/storage/${logoVal}`;
+        siteLogo.value = resolveAssetUrl(logoVal);
       } else {
-        siteLogo.value = '/logo.png';
+        siteLogo.value = '/brand/mastergas-logo.png';
       }
 
       if (footerLogoVal && !isIrisAsset(footerLogoVal)) {
-        footerLogo.value = footerLogoVal.startsWith('http') 
-          ? footerLogoVal 
-          : `${api.defaults.baseURL.replace('/api', '')}/storage/${footerLogoVal}`;
+        footerLogo.value = resolveAssetUrl(footerLogoVal);
       } else {
-        footerLogo.value = '/images/footer_logo_transparent.png';
+        footerLogo.value = '/brand/mastergas-logo-white.png';
       }
 
       // Update Favicon (Mastergas favicon, ignore legacy Iris)
       const finalFavicon = (faviconVal && !isIrisAsset(faviconVal))
-        ? (faviconVal.startsWith('http') ? faviconVal : `${api.defaults.baseURL.replace('/api', '')}/storage/${faviconVal}`)
-        : '/logo.png';
+        ? resolveAssetUrl(faviconVal)
+        : '/brand/mastergas-icon.png';
 
       const faviconLink = document.querySelector("link[rel~='icon']");
       if (faviconLink) {
@@ -869,64 +870,52 @@ onUnmounted(() => {
 }
 
 /* Top Bar */
+/* announcement-bar */
 .top-bar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 64px;
+  width: 100%;
+  height: 40px;
   background: #000000;
-  color: #fff;
-  padding: 8px 10px !important;
-  font-size: 11px !important;
-  font-weight: 400 !important;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  text-align: center;
+  border-radius: 0px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
 }
 
 .top-bar-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 100% !important;
+  width: 100%;
+  max-width: 1440px;
 }
 
-.top-bar-content {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 15px !important;
-  width: auto !important;
-}
-
-.delivery-icon ,.sparkle{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.top-bar-item {
-  display: flex;
-  align-items: center;
-  gap: 6px !important;
-  font-size: 0.88rem;
+.announcement-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  color: #FFFFFF;
+  text-align: center;
   white-space: nowrap;
 }
 
-.top-bar-divider {
-  width: 1px;
-  height: 12px;
-  background: rgba(255,255,255,0.2);
-  margin: 0 5px;
-}
-
-.coupon-code {
-  color: #fdb913;
-  letter-spacing: 1px;
-  font-weight: 700;
-}
-
-.text-bold {
-  font-weight: 700;
-}
-
-.sparkle {
-  font-size: 16px;
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0px 16px;
+    height: 40px;
+  }
+  .announcement-text {
+    font-size: 11px;
+    white-space: normal;
+  }
 }
 
 .container {
@@ -950,97 +939,243 @@ onUnmounted(() => {
 
 /* Navbar */
 .navbar {
-  background: #fff;
-  border-bottom: 1px solid #f3f4f6;
-  padding: 8px 0;
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+  height: 80px;
+  display: flex;
+  align-items: center;
   position: relative;
   z-index: 1000;
+  transition: all 0.3s ease;
 }
 
 .nav-container {
+  box-sizing: border-box;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-left: 5% !important;
-  padding-right: 5% !important;
+  width: 100%;
+  max-width: 1440px;
+  height: 80px;
+  margin: 0 auto;
+  padding: 0 64px !important;
 }
 
 /* Logo */
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
+  width: 140px;
+  height: 35px;
 }
 
 .logo-icon {
-  height: 32px;
-  width: auto;
-  min-width: unset;
-  background: transparent;
+  height: 35px;
+  width: 140px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  justify-content: flex-end;
 }
 
-.navbar-scrolled .logo-icon {
-  height: 28px;
-  min-width: unset;
+.lang-en .logo-icon {
+  justify-content: flex-start;
 }
 
 .site-logo-img {
-  height: 26px;
+  height: 35px;
   width: auto;
-  max-width: 135px;
+  max-width: 140px;
   object-fit: contain;
 }
 
+/* Center Navigation Links */
+.nav-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+  height: 32px;
+}
+
+.nav-links a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  gap: 6px;
+  height: 32px;
+  text-decoration: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #666666;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: #000000;
+  font-weight: 600;
+}
+
+.nav-links a .active-underline {
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  border-radius: 0px;
+  transition: background-color 0.2s ease;
+}
+
+.nav-links a.active .active-underline,
+.nav-links a:hover .active-underline {
+  background: #000000;
+}
+
+/* Left Header Cluster */
+.header-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 24px;
+  height: 26px;
+  direction: ltr; /* Keeps [English] | [Cart] [User] [Search] */
+}
+
+/* Language Toggle Button */
+.lang-toggle-btn {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 12px;
+  width: 64px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #000000;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.lang-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Line Divider */
+.nav-divider-line {
+  box-sizing: border-box;
+  width: 1px;
+  height: 20px;
+  background: #000000;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Nav Icons Group */
+.header-nav-icons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 16px;
+  height: 22px;
+}
+
+.header-icon-link,
+.header-icon-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #000000;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.header-icon-link:hover,
+.header-icon-btn:hover {
+  opacity: 0.7;
+}
+
+/* Cart Wrapper & Badge */
+.cart-wrapper {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+}
+
+.cart-badge-black {
+  position: absolute;
+  top: -8px;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  background: #000000;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .nav-container {
+    padding: 0 24px !important;
+  }
+  .nav-links {
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+  }
+  .nav-container {
+    height: 60px;
+    padding: 0 16px !important;
+  }
   .logo-icon {
     height: 28px;
     width: auto;
-    min-width: unset;
   }
   .site-logo-img {
     height: 24px;
     max-width: 120px;
   }
-  .nav-container {
-    padding: 0 15px !important;
-  }
-}
-
-.nav-links {
-  display: flex;
-  gap: 25px;
-  align-items: center;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 400;
-  font-size: 15px;
-  transition: all 0.2s;
-  position: relative;
-  padding: 5px 0;
-}
-
-.nav-links a:hover, .nav-links a.active {
-  color: #000000;
-}
-
-.nav-links a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  right: 0;
-  width: 100%;
-  height: 2.5px;
-  background: #000000;
-  border-radius: 2px;
 }
 
 /* Icons */

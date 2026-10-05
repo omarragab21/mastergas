@@ -1,0 +1,261 @@
+{
+  "info": {
+    "_postman_id": "mastergas-product-attributes-qa-2026",
+    "name": "Mastergas - Product Attributes API QA",
+    "description": "CRUD and deletion-verification collection for product attributes and attribute values. Fill admin_password before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://backend-mastergas.be-kite.com/api" },
+    { "key": "admin_email", "value": "admin@tijara.com" },
+    { "key": "admin_password", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "attribute_id", "value": "" },
+    { "key": "value_id", "value": "" },
+    { "key": "value_label", "value": "" },
+    { "key": "updated_value_label", "value": "" },
+    { "key": "product_id", "value": "25" },
+    { "key": "color_attribute_id", "value": "24" }
+  ],
+  "item": [
+    {
+      "name": "1 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/v1/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.expect(json.token, 'token').to.be.a('string').and.not.empty;",
+              "pm.collectionVariables.set('token', json.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - List current attributes",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/product-attributes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Attributes list returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "const attributes = json.data?.data || json.data || [];",
+              "pm.expect(attributes).to.be.an('array');",
+              "console.log('Current attributes:', attributes.map(a => ({ id: a.id, name: a.name, values: (a.values || []).length })));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Create temporary attribute",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": {\n    \"ar\": \"Postman QA Attribute\",\n    \"en\": \"Postman QA Attribute\"\n  },\n  \"label\": {\n    \"ar\": \"اختر خاصية الاختبار\",\n    \"en\": \"Select QA Attribute\"\n  },\n  \"type\": \"select\",\n  \"values_list\": [],\n  \"is_active\": true,\n  \"sort_order\": 99\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/dashboard/product-attributes/store"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Attribute created', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+              "const json = pm.response.json();",
+              "const attribute = json.data || json;",
+              "pm.expect(attribute.id, 'attribute_id').to.exist;",
+              "pm.collectionVariables.set('attribute_id', String(attribute.id));",
+              "pm.collectionVariables.set('value_label', 'Postman QA Value ' + Date.now());",
+              "pm.collectionVariables.set('updated_value_label', 'Postman QA Updated Value ' + Date.now());"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Add value to temporary attribute",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"label\": \"{{value_label}}\",\n  \"color\": null,\n  \"is_active\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Value created', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+              "const json = pm.response.json();",
+              "const data = json.data || json;",
+              "const values = Array.isArray(data.values) ? data.values : (Array.isArray(data) ? data : []);",
+              "const value = values.find(v => v.label === pm.collectionVariables.get('value_label')) || values[values.length - 1];",
+              "pm.expect(value?.id, 'value_id').to.exist;",
+              "pm.collectionVariables.set('value_id', String(value.id));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Update value",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"label\": \"{{updated_value_label}}\",\n  \"color\": null,\n  \"is_active\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values/{{value_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Value update returns success', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 - Delete value and verify persistence",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values/{{value_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Delete endpoint responds', function () { pm.expect(pm.response.code).to.be.within(200, 299); });",
+              "const url = pm.collectionVariables.get('base_url') + '/dashboard/product-attributes';",
+              "pm.sendRequest({ url, method: 'GET', header: { Accept: 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('token') } }, function (error, response) {",
+              "  pm.test('Deleted value is absent from a fresh GET', function () {",
+              "    pm.expect(error).to.equal(null);",
+              "    const json = response.json();",
+              "    const attributes = json.data?.data || json.data || [];",
+              "    const attribute = attributes.find(a => String(a.id) === String(pm.collectionVariables.get('attribute_id')));",
+              "    const stillExists = (attribute?.values || []).some(v => String(v.id) === String(pm.collectionVariables.get('value_id')));",
+              "    pm.expect(stillExists, 'value still exists after DELETE').to.equal(false);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 - Contract check: unknown value must not return success",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values/qa-nonexistent-value"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Unknown value is rejected with 4xx', function () { pm.expect(pm.response.code).to.be.within(400, 499); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 - Delete temporary attribute and verify persistence",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/delete"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Attribute delete responds with success', function () { pm.expect(pm.response.code).to.be.within(200, 299); });",
+              "const url = pm.collectionVariables.get('base_url') + '/dashboard/product-attributes';",
+              "pm.sendRequest({ url, method: 'GET', header: { Accept: 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('token') } }, function (error, response) {",
+              "  pm.test('Deleted attribute is absent from a fresh GET', function () {",
+              "    pm.expect(error).to.equal(null);",
+              "    const json = response.json();",
+              "    const attributes = json.data?.data || json.data || [];",
+              "    const stillExists = attributes.some(a => String(a.id) === String(pm.collectionVariables.get('attribute_id')));",
+              "    pm.expect(stillExists, 'attribute still exists after DELETE').to.equal(false);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

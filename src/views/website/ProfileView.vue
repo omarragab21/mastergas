@@ -1189,7 +1189,7 @@ const printInvoice = async (order) => {
       ? (logoVal.value.startsWith('http') 
         ? logoVal.value 
         : `${api.defaults.baseURL.replace('/api', '')}/storage/${logoVal.value}`)
-      : '/logo.png'
+      : '/brand/mastergas-logo.png'
 
     const nameVal = settings.find(s => s.key === 'site_name')
     const siteName = (nameVal && nameVal.value && !isIrisAsset(nameVal.value)) 

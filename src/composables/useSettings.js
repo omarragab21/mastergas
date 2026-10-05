@@ -5,9 +5,9 @@ import { API_TTL } from '../services/apiClient';
 
 export const defaultSettings = {
   site_name: 'ماسترجاز | Mastergas',
-  logo: '/logo.png',
-  footer_logo: '/images/footer_logo_transparent.png',
-  favicon: '/logo.png',
+  logo: '/brand/mastergas-logo.png',
+  footer_logo: '/brand/mastergas-logo-white.png',
+  favicon: '/brand/mastergas-icon.png',
   currency: 'SAR',
   currency_ar: 'ر.س',
   currency_en: 'SAR',

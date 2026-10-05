@@ -81,9 +81,9 @@ const fetchSettings = async () => {
                 if (s.value === '[]' || (Array.isArray(s.value) && s.value.length === 0)) {
                     settings.value[s.key] = null;
                 } else if (isIrisAsset(s.value)) {
-                    if (s.key === 'logo') settings.value[s.key] = '/logo.png';
-                    else if (s.key === 'footer_logo') settings.value[s.key] = '/images/footer_logo_transparent.png';
-                    else if (s.key === 'favicon') settings.value[s.key] = '/logo.png';
+                    if (s.key === 'logo') settings.value[s.key] = '/brand/mastergas-logo.png';
+                    else if (s.key === 'footer_logo') settings.value[s.key] = '/brand/mastergas-logo-white.png';
+                    else if (s.key === 'favicon') settings.value[s.key] = '/brand/mastergas-icon.png';
                     else if (s.key === 'site_name') settings.value[s.key] = 'ماسترجاز | Mastergas';
                     else settings.value[s.key] = null;
                 } else {

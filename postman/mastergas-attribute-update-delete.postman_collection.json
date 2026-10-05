@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "Mastergas - Attribute Update Delete Requests",
+    "description": "Requests for updating/deleting attribute values and updating product 25 attributes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://backend-mastergas.be-kite.com/api" },
+    { "key": "admin_email", "value": "admin@tijara.com" },
+    { "key": "admin_password", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "attribute_id", "value": "24" },
+    { "key": "value_id", "value": "" },
+    { "key": "product_id", "value": "25" }
+  ],
+  "item": [
+    {
+      "name": "1 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/v1/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('token', json.token || json.data?.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Update attribute value",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"label\": \"QA لون محدث\",\n  \"color\": \"#2563EB\",\n  \"is_active\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values/{{value_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Update value returns success', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Delete attribute value",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/product-attributes/{{attribute_id}}/values/{{value_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Delete value returns success', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Update product 25 attributes JSON",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"attributes\": {\n    \"الألوان\": [\"أسود ملكي\", \"فضي\"],\n    \"السعة\": [\"65 لتر\"],\n    \"العرض\": [\"89.5 سم\"],\n    \"العمق\": [\"56 سم\"],\n    \"الارتفاع\": [\"59.5 سم\"],\n    \"الجهد الكهربائي\": [\"220-240 فولت\"],\n    \"وظائف الطهي\": [\"4 وظائف\"],\n    \"نظام الإشعال\": [\"إلكتروني ذاتي\"]\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{base_url}}/dashboard/products/{{product_id}}/attributes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Product attributes update returns success', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Verify product 25 attributes",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/dashboard/products/{{product_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Product attributes can be read after update', function () { pm.response.to.have.status(200); });",
+              "const product = pm.response.json().data || pm.response.json();",
+              "pm.expect(product.attributes?.['الألوان'] || product.attributes?.color || product.attributes?.['اللون']).to.exist;"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

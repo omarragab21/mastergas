@@ -7,12 +7,13 @@
 import { reactive, computed } from 'vue';
 import api from '../config/axios';
 import { cartState } from './cart';
+import { clearCustomerToken, getCustomerToken, setCustomerToken } from '../utils/customerSession.js';
 
 const TOKEN_KEY = 'c_token';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 export const authState = reactive({
-  token: localStorage.getItem(TOKEN_KEY) || null,
+  token: getCustomerToken(),
   user: null,
   loading: false,
 });
@@ -46,11 +47,11 @@ export const authActions = {
   /**
    * Login with email & password
    */
-  async login(credentials) {
+  async login(credentials, options = {}) {
     authState.loading = true;
     try {
       const res = await api.post('/frontend/login', credentials);
-      this._setSession(res.data.token, res.data.customer);
+      this._setSession(res.data.token, res.data.customer, options.remember ?? true);
       return res.data;
     } finally {
       authState.loading = false;
@@ -85,10 +86,10 @@ export const authActions = {
   },
 
   // ─── Private Helpers ────────────────────────────────────────────────────────
-  _setSession(token, user) {
+  _setSession(token, user, remember = true) {
     authState.token = token;
     authState.user = user;
-    localStorage.setItem(TOKEN_KEY, token);
+    setCustomerToken(token, remember);
     // Preserve any guest cart/wishlist by moving it to the new token key
     cartState.migrateToToken(token);
     cartState.syncWithToken();
@@ -100,6 +101,6 @@ export const authActions = {
     cartState.clear();
     authState.token = null;
     authState.user = null;
-    localStorage.removeItem(TOKEN_KEY);
+    clearCustomerToken();
   },
 };

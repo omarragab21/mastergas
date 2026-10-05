@@ -6,7 +6,26 @@
         <h2 class="page-title">خصائص المنتجات</h2>
         <p class="page-subtitle">إدارة القيم المتاحة ضمن خصائص المنتجات المعرفة مسبقاً</p>
       </div>
-      <!-- No Add Attribute button based on requirements -->
+      <button class="header-add-btn" type="button" @click="openAttributeModal">+ إضافة خاصية</button>
+    </div>
+
+    <!-- Add Attribute Modal -->
+    <div class="modal-overlay" v-if="showAttributeModal" @click.self="closeAttributeModal">
+      <div class="modal-content">
+        <button class="modal-close" @click="closeAttributeModal">×</button>
+        <h3 class="modal-title">إضافة خاصية منتج</h3>
+        <p class="modal-subtitle">أضف اللون أو المقاس أو أي خاصية نصية جديدة</p>
+        <form class="value-form" @submit.prevent="submitAttribute">
+          <div class="form-group"><label class="form-label">الاسم بالعربي *</label><input v-model="attributeForm.name_ar" class="form-control" required placeholder="اللون" /></div>
+          <div class="form-group"><label class="form-label">الاسم بالإنجليزية *</label><input v-model="attributeForm.name_en" class="form-control" required placeholder="Color" /></div>
+          <div class="form-group"><label class="form-label">نوع الخاصية</label><select v-model="attributeForm.type" class="form-control"><option value="color">لون</option><option value="select">اختيارات</option><option value="text">نص</option></select></div>
+          <div class="form-group"><label class="form-label">القيم (افصل بينها بفاصلة)</label><input v-model="attributeForm.values_list" class="form-control" placeholder="أسود|#111827, أبيض|#ffffff" /></div>
+          <div class="form-actions">
+            <button class="btn-cancel" type="button" @click="closeAttributeModal">إلغاء</button>
+            <button class="btn-submit" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'جاري الحفظ...' : 'حفظ الخاصية' }}</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Table -->
@@ -65,6 +84,11 @@
                   <button class="action-btn add-btn" @click="openAddValueModal(attr)" title="إضافة قيمة جديدة">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn delete-btn" @click="deleteAttributeItem(attr)" title="حذف الخاصية" aria-label="حذف الخاصية">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                   </button>
                 </div>
@@ -127,6 +151,7 @@
           </div>
 
           <div class="form-actions">
+            <button type="button" class="btn-cancel" @click="closeValueModal">إلغاء</button>
             <button type="submit" class="btn-submit" :disabled="isSubmitting">
               {{ isSubmitting ? 'جاري الحفظ...' : (isEditingValue ? 'تحديث القيمة' : 'إضافة القيمة') }}
             </button>
@@ -190,7 +215,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import api from '../config/axios';
+import productAttributeService from '../services/productAttributeService';
 
 const attributes = ref([]);
 const loading = ref(false);
@@ -209,6 +234,8 @@ const valueForm = ref({
 });
 
 const showManageModal = ref(false);
+const showAttributeModal = ref(false);
+const attributeForm = ref({ name_ar: '', name_en: '', label_ar: '', label_en: '', type: 'select', values_list: '', is_active: true, sort_order: 1 });
 
 // Alerts
 const showAlert = ref(false);
@@ -224,8 +251,7 @@ const triggerAlert = (msg, type = 'success') => {
 const fetchAttributes = async () => {
   loading.value = true;
   try {
-    const res = await api.get('/dashboard/product-attributes');
-    attributes.value = res.data.data;
+    attributes.value = await productAttributeService.list();
     
     // update selectedAttribute if its open
     if (selectedAttribute.value) {
@@ -264,6 +290,31 @@ const closeValueModal = () => {
   selectedAttribute.value = null;
 };
 
+const openAttributeModal = () => {
+  attributeForm.value = { name_ar: '', name_en: '', label_ar: '', label_en: '', type: 'select', values_list: '', is_active: true, sort_order: attributes.value.length + 1 };
+  showAttributeModal.value = true;
+};
+
+const closeAttributeModal = () => { showAttributeModal.value = false; };
+
+const submitAttribute = async () => {
+  isSubmitting.value = true;
+  try {
+    await productAttributeService.create({
+      ...attributeForm.value,
+      label_ar: attributeForm.value.label_ar || `اختر ${attributeForm.value.name_ar}`,
+      label_en: attributeForm.value.label_en || `Select ${attributeForm.value.name_en}`,
+    });
+    closeAttributeModal();
+    await fetchAttributes();
+    triggerAlert('تم إضافة الخاصية بنجاح');
+  } catch (error) {
+    triggerAlert(error.response?.data?.message || 'تعذر إضافة الخاصية', 'error');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
 const submitValue = async () => {
   if (!selectedAttribute.value) return;
   isSubmitting.value = true;
@@ -272,15 +323,15 @@ const submitValue = async () => {
     if (!payload.color) payload.color = null;
 
     if (isEditingValue.value) {
-      await api.put(`/dashboard/product-attributes/${selectedAttribute.value.id}/values/${currentEditValueId.value}`, payload);
+      await productAttributeService.updateValue(selectedAttribute.value.id, currentEditValueId.value, payload);
       triggerAlert('تم تحديث القيمة بنجاح');
     } else {
-      await api.post(`/dashboard/product-attributes/${selectedAttribute.value.id}/values`, payload);
+      await productAttributeService.createValue(selectedAttribute.value.id, payload);
       triggerAlert('تم إضافة القيمة بنجاح');
     }
     closeValueModal();
-    // if manage modal is open, let it stay open and just refresh list
-    fetchAttributes();
+    // Keep the manage modal/list in sync with the server before showing success.
+    await fetchAttributes();
   } catch (error) {
     const msg = error.response?.data?.message || 'حدث خطأ أثناء الحفظ';
     triggerAlert(msg, 'error');
@@ -302,6 +353,8 @@ const closeManageModal = () => {
 
 const editValueItem = (val) => {
   // Can open the form over the manage modal
+  // Close the manage layer first so it cannot intercept the edit form controls.
+  showManageModal.value = false;
   isEditingValue.value = true;
   currentEditValueId.value = val.id;
   valueForm.value = {
@@ -312,14 +365,41 @@ const editValueItem = (val) => {
   showValueModal.value = true;
 };
 
+const deleteAttributeItem = async (attr) => {
+  if (!confirm(`هل أنت متأكد من حذف الخاصية "${attr.name}"؟`)) return;
+
+  try {
+    await productAttributeService.delete(attr.id);
+    await fetchAttributes();
+    const stillExists = attributes.value.some((item) => Number(item.id) === Number(attr.id));
+    if (stillExists) {
+      triggerAlert('تعذر حذف الخاصية. تم تسجيل تذكرة لمراجعة خطأ Backend.', 'error');
+      return;
+    }
+    triggerAlert('تم حذف الخاصية بنجاح');
+  } catch (error) {
+    await fetchAttributes();
+    triggerAlert(error.response?.data?.message || 'تعذر حذف الخاصية. تم تسجيل تذكرة لمراجعة خطأ Backend.', 'error');
+  }
+};
+
 const deleteValueItem = async (val) => {
   if (confirm(`هل أنت متأكد من إزالة القيمة "${val.label}"؟`)) {
     try {
-      await api.delete(`/dashboard/product-attributes/${selectedAttribute.value.id}/values/${val.id}`);
+      await productAttributeService.deleteValue(selectedAttribute.value.id, val.id);
+      const attributeId = selectedAttribute.value.id;
+      selectedAttribute.value.values = selectedAttribute.value.values.filter((item) => String(item.id) !== String(val.id));
+      await fetchAttributes();
+      const refreshed = attributes.value.find((attribute) => Number(attribute.id) === Number(attributeId));
+      const stillExists = refreshed?.values?.some((item) => String(item.id) === String(val.id));
+      if (stillExists) {
+        triggerAlert('تعذر حذف قيمة الخاصية. تم تسجيل تذكرة لمراجعة خطأ Backend.', 'error');
+        return;
+      }
       triggerAlert('تم إزالة القيمة بنجاح');
-      fetchAttributes();
     } catch (error) {
       const msg = error.response?.data?.message || 'تعذر إزالة القيمة';
+      await fetchAttributes();
       triggerAlert(msg, 'error');
     }
   }
@@ -353,6 +433,30 @@ const deleteValueItem = async (val) => {
   font-size: 0.85rem;
   color: #6b7280;
 }
+.header-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: max-content;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+}
+.header-add-btn:hover {
+  background: #262626;
+  border-color: #262626;
+}
 
 /* Table */
 .table-container {
@@ -373,7 +477,7 @@ const deleteValueItem = async (val) => {
   vertical-align: middle;
 }
 .data-table th {
-  background: #fdfafb;
+  background: #f9fafb;
   font-size: 0.78rem;
   font-weight: 700;
   color: #6b7280;
@@ -450,9 +554,9 @@ const deleteValueItem = async (val) => {
   box-shadow: 0 0 0 1px rgba(0,0,0,0.05) inset;
 }
 .more-chip {
-  background: #fdf2f8;
-  color: #db2777;
-  border-color: #fbcfe8;
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #e5e7eb;
 }
 .no-values-text {
   font-size: 0.75rem;
@@ -472,10 +576,12 @@ const deleteValueItem = async (val) => {
   cursor: pointer; color: #9ca3af; transition: all 0.2s;
 }
 .action-btn:hover { background: #f3f4f6; color: #111827; }
-.add-btn { color: #873260; }
-.add-btn:hover { background: #fdf2f8; color: #873260; }
+.add-btn { color: #000000; }
+.add-btn:hover { background: #f3f4f6; color: #000000; }
 .view-btn { color: #f59e0b; }
 .view-btn:hover { background: #fef3c7; color: #d97706; }
+.delete-btn { color: #dc2626; }
+.delete-btn:hover { background: #fef2f2; color: #b91c1c; }
 
 /* Modals */
 .modal-overlay {
@@ -504,7 +610,7 @@ const deleteValueItem = async (val) => {
   width: 100%; padding: 0.65rem 0.8rem; border: 1px solid #e5e7eb; border-radius: 8px;
   font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 0.85rem; color: #1f2937; outline: none; transition: border-color 0.2s; text-align: right;
 }
-.form-control:focus { border-color: #873260; }
+.form-control:focus { border-color: #000000; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06); }
 
 .select-wrapper { position: relative; display: flex; align-items: center; }
 .select-wrapper .form-control { appearance: none; padding-left: 2rem; cursor: pointer; }
@@ -524,13 +630,38 @@ const deleteValueItem = async (val) => {
 }
 .help-text { display: block; margin-top: 0.3rem; font-size: 0.7rem; color: #9ca3af; }
 
-.form-actions { margin-top: 1.5rem; display: flex; justify-content: center; }
-.btn-submit {
-  background: #873260; color: #fff; border: none; padding: 0.7rem 2rem; border-radius: 8px;
-  font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; width: 100%;
+.form-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
-.btn-submit:hover:not(:disabled) { background: #6E1A41; }
-.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  min-width: 90px;
+}
+.btn-submit:hover:not(:disabled) {
+  background: #262626;
+  border-color: #262626;
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* Manage Modal List */
 .manage-list {
@@ -555,12 +686,31 @@ const deleteValueItem = async (val) => {
 .edit-val-btn:hover { background: #eff6ff; color: #2563eb; }
 .delete-val-btn:hover { background: #fef2f2; color: #dc2626; }
 
-.manage-footer { display: flex; justify-content: center; }
-.btn-cancel {
-  background: #f3f4f6; color: #374151; border: none; padding: 0.6rem 2rem; border-radius: 8px;
-  font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; width: 100%;
+.manage-footer {
+  display: flex;
+  justify-content: flex-end;
 }
-.btn-cancel:hover { background: #e5e7eb; }
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  min-width: 70px;
+}
+.btn-cancel:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
 
 /* Alert */
 .alert-toast {

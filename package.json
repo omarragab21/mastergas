@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "sync:local-data": "node scripts/sync-local-data.mjs",
     "clean": "rm -rf dist node_modules/.vite",
     "generate:feed": "node --dns-result-order=ipv4first scripts/generateFeed.js",
     "build": "node --dns-result-order=ipv4first scripts/generateFeed.js && vite build",

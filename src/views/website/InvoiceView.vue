@@ -198,7 +198,7 @@ export default {
     const { currency } = useSettings()
     const order = ref(null)
     const loading = ref(true)
-    const siteLogo = ref('/logo.png')
+    const siteLogo = ref('/brand/mastergas-logo.png')
     const siteName = ref('ماسترجاز | Mastergas')
 
     const fetchSiteInfo = async () => {
@@ -218,7 +218,7 @@ export default {
             ? logoVal.value 
             : `${api.defaults.baseURL.replace('/api', '')}/storage/${logoVal.value}`
         } else {
-          siteLogo.value = '/logo.png'
+          siteLogo.value = '/brand/mastergas-logo.png'
         }
 
         const nameVal = settings.find(s => s.key === 'site_name')

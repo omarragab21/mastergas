@@ -544,6 +544,7 @@ import {
 } from '../../utils/checkoutSafety';
 import { trackPurchase } from '../../utils/metaPixel';
 import { logPayment } from '../../utils/terminalLogger.js';
+import { getCustomerToken } from '../../utils/customerSession.js';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -761,7 +762,7 @@ const progressSteps = computed(() => [
 ]);
 
 const fetchUserData = async () => {
-  const token = localStorage.getItem('c_token');
+  const token = getCustomerToken();
   if (!token) return;
 
   try {

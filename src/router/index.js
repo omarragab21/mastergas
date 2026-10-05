@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue';
 import AppLayout from '../components/AppLayout.vue';
 import WebsiteLayout from '../components/WebsiteLayout.vue';
 import HomeView from '../views/website/HomeView.vue';
+import { getCustomerToken } from '../utils/customerSession.js';
 
 const routes = [
   // Website Routes
@@ -174,7 +175,7 @@ if (typeof window !== 'undefined') {
 // Auth Guard
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  const customerToken = localStorage.getItem('c_token');
+  const customerToken = getCustomerToken();
   const isAdminPath = to.path.startsWith('/admin');
 
   if (to.meta.requiresCustomerAuth && !customerToken) {

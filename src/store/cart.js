@@ -3,6 +3,7 @@ import api from '../config/axios';
 import { productService } from '../services/productService';
 import { getCheckoutOwner } from '../utils/checkoutSafety';
 import { trackAddToCart, trackEvent } from '../utils/metaPixel';
+import { getCustomerToken } from '../utils/customerSession.js';
 
 // Per-token localStorage keys (shared-preferences style)
 // Using the customer token guarantees the same cart is loaded even if authState.user
@@ -10,12 +11,12 @@ import { trackAddToCart, trackEvent } from '../utils/metaPixel';
 const TOKEN_KEY = 'c_token';
 
 const getCartKey = () => {
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = getCustomerToken();
   return token ? `cart_${token}` : 'cart_guest';
 };
 
 const getWishlistKey = () => {
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = getCustomerToken();
   return token ? `wishlist_${token}` : 'wishlist_guest';
 };
 
@@ -72,7 +73,7 @@ export const cartState = reactive({
 
   // Simple methods
   addToCart(product, quantity = 1, selectedAttributes = null) {
-    const token = localStorage.getItem('c_token');
+    const token = getCustomerToken();
     if (!token) {
       if (window.openAuthModal) window.openAuthModal();
       return;
@@ -151,7 +152,7 @@ export const cartState = reactive({
   async refreshCartItems() {
     if (!this.items.length) return;
 
-    const ownerToken = localStorage.getItem(TOKEN_KEY) || 'guest';
+    const ownerToken = getCustomerToken() || 'guest';
     const snapshotItems = this.items.map(item => ({ ...item }));
 
     try {
@@ -166,7 +167,7 @@ export const cartState = reactive({
       );
 
       // A request started for one account must never hydrate another account's cart.
-      const currentToken = localStorage.getItem(TOKEN_KEY) || 'guest';
+      const currentToken = getCustomerToken() || 'guest';
       if (currentToken !== ownerToken) return;
 
       this.items = snapshotItems.map((item, index) => {
@@ -180,7 +181,7 @@ export const cartState = reactive({
   },
 
   async toggleWishlist(product) {
-    const token = localStorage.getItem('c_token');
+    const token = getCustomerToken();
     if (!token) {
       // User is not logged in, trigger auth modal
       if (window.openAuthModal) {

@@ -131,7 +131,7 @@
     <div class="login-right">
       <!-- اللوجو والشارة -->
       <div class="brand-logo">
-        <img src="/images/logo_white.png" alt="ماستر غاز" class="brand-logo-img" />
+        <img src="/brand/mastergas-logo-white.png" alt="ماستر غاز" class="brand-logo-img" />
         <span class="brand-badge">
           <svg class="admin-badge-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -196,7 +196,7 @@ onMounted(() => {
     link.rel = 'icon';
     document.head.appendChild(link);
   }
-  link.href = '/images/logo_white.png';
+  link.href = '/brand/mastergas-icon.png';
   document.title = 'ماستر غاز | تسجيل الدخول للوحة التحكم';
 });
 

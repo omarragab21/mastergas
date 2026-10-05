@@ -1,4 +1,5 @@
 import { logPayment } from './terminalLogger.js';
+import { getCustomerToken } from './customerSession.js';
 
 const PAYTABS_SUCCESS_STATUSES = new Set([
   'A',
@@ -52,7 +53,7 @@ const stableTokenFingerprint = (token = '') => {
 
 export const getCheckoutOwner = (storage) => {
   const targetStorage = getStorage(storage);
-  const token = targetStorage?.getItem('c_token') || '';
+  const token = storage ? targetStorage?.getItem('c_token') || '' : getCustomerToken() || '';
   return token ? `customer_${stableTokenFingerprint(token)}` : 'guest';
 };
 

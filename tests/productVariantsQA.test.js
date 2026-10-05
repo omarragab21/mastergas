@@ -1,6 +1,7 @@
 import test, { after, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
+import { dedupeColorOptions } from '../src/utils/productAttributes.js';
 
 class MemoryStorage {
   constructor() {
@@ -94,6 +95,20 @@ test('Product Variants QA: Color options parsing and hex formatting', () => {
   const nameFallback = resolveColor('ستانلس ستيل');
   assert.equal(nameFallback.name, 'ستانلس ستيل');
   assert.equal(nameFallback.hex, '#a8b2bc');
+});
+
+test('Product Variants QA: Color aliases and pipe strings are deduplicated before rendering', () => {
+  const colors = dedupeColorOptions([
+    { label: 'أسود', color: '#111827' },
+    { label: '  أسود  ', color: '#000000' },
+    'أسود|#111827',
+    { name: 'فضي', hex: '#9ca3af' },
+    'فضي|#9ca3af'
+  ]);
+
+  assert.equal(colors.length, 2);
+  assert.equal(colors[0].label, 'أسود');
+  assert.equal(colors[1].name, 'فضي');
 });
 
 test('Product Variants QA: Adding distinct variants of same product generates distinct cart keys', () => {

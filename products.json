@@ -1,5 +1,815 @@
 {
   "status": "success",
-  "total": 0,
-  "data": []
+  "total": 6,
+  "data": [
+    {
+      "id": "25",
+      "name": "Mastergas 90cm Italian Built-in Gas Oven Full Safety Rotisserie",
+      "name_i18n": {
+        "ar": "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة",
+        "en": "Mastergas 90cm Italian Built-in Gas Oven Full Safety Rotisserie"
+      },
+      "description": "Luxury 90cm 85L Italian built-in gas oven featuring fingerprint-proof stainless steel, dual reflective glass door, instant flame failure safety, and motorized rotisserie turnspit.",
+      "description_i18n": {
+        "ar": "فرن غاز مدمج إيطالي فاخر مقاس 90 سم سعة 85 لتر، مصنع من الستانلس ستيل المقاوم للبصمات مع زجاج عاكس مزدوج، أمان إيطالي كامل فوري، إشعال إلكتروني وشواية دائرية دوارة متطورة.",
+        "en": "Luxury 90cm 85L Italian built-in gas oven featuring fingerprint-proof stainless steel, dual reflective glass door, instant flame failure safety, and motorized rotisserie turnspit."
+      },
+      "category_id": 57,
+      "subcategory_id": null,
+      "category": "Gas Stoves & Built-in Hobs",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 3899,
+      "discount": "1364.65",
+      "stock": 25,
+      "quantity": 25,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/25-cover.jpg",
+        "/local-assets/products/25-2.jpg",
+        "/local-assets/products/25-3.jpg"
+      ],
+      "image": "/local-assets/products/25-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "85 لتر",
+          "65 لتر",
+          "10 لتر / دقيقة",
+          "5 شعلات غاز",
+          "4 شعلات غاز"
+        ],
+        "العرض": [
+          "89.5 سم",
+          "135 سم"
+        ],
+        "العمق": [
+          "56 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي|#111827",
+          "فضي|#9ca3af",
+          "أسود ملكي / فضي|#111827",
+          "أبيض|#ffffff",
+          "ستانلس ستيل|#111827"
+        ],
+        "الارتفاع": [
+          "59.5 سم",
+          "12 سم",
+          "4.5 سم",
+          "70-105 سم",
+          "55 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز طبيعي / مسال"
+        ],
+        "صمام الأمان": [
+          "أمان كامل فوري"
+        ],
+        "وظائف الطهي": [
+          "6 وظائف",
+          "7 وظائف",
+          "4 وظائف"
+        ],
+        "نظام الإشعال": [
+          "أوتوماتيكي عند فتح صنبور المياه",
+          "إلكتروني مدمج بالمفتاح",
+          "إلكتروني ذاتي"
+        ],
+        "المؤقت الرقمي": [
+          "شاشة رقمية LED"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "color_options": [
+        "أسود ملكي|#111827",
+        "فضي|#9ca3af",
+        "أسود ملكي / فضي|#111827",
+        "أبيض|#ffffff",
+        "ستانلس ستيل|#111827"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "85 لتر",
+          "65 لتر",
+          "10 لتر / دقيقة",
+          "5 شعلات غاز",
+          "4 شعلات غاز"
+        ],
+        "العرض": [
+          "89.5 سم",
+          "135 سم"
+        ],
+        "العمق": [
+          "56 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي|#111827",
+          "فضي|#9ca3af",
+          "أسود ملكي / فضي|#111827",
+          "أبيض|#ffffff",
+          "ستانلس ستيل|#111827"
+        ],
+        "الارتفاع": [
+          "59.5 سم",
+          "12 سم",
+          "4.5 سم",
+          "70-105 سم",
+          "55 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز طبيعي / مسال"
+        ],
+        "صمام الأمان": [
+          "أمان كامل فوري"
+        ],
+        "وظائف الطهي": [
+          "6 وظائف",
+          "7 وظائف",
+          "4 وظائف"
+        ],
+        "نظام الإشعال": [
+          "أوتوماتيكي عند فتح صنبور المياه",
+          "إلكتروني مدمج بالمفتاح",
+          "إلكتروني ذاتي"
+        ],
+        "المؤقت الرقمي": [
+          "شاشة رقمية LED"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "features": "Spacious 85L cavity capacity for large family meals\nMotorized rotisserie for even professional browning\nInstantaneous Italian flame safety shutdown system\n3D Turbo convection fan for rapid heat distribution\nSmart digital LED timer display\nTriple-glazed cool-touch glass door",
+      "features_i18n": {
+        "ar": "سعة داخلية عملاقة 85 لتر تكفي للعزائم الكبيرة\nشواية دائرية دوارة لتحمير متساوي واحترافي\nنظام أمان إيطالي كامل يقطع الغاز فور انطفاء اللهب\nمروحة توزيع حراري تيربو ثلاثية الأبعاد\nشاشة ديجيتال LED مع مؤقت ذكي لضبط وقت الطهي\nباب زجاجي ثلاثي الطبقات بارد الملمس من الخارج",
+        "en": "Spacious 85L cavity capacity for large family meals\nMotorized rotisserie for even professional browning\nInstantaneous Italian flame safety shutdown system\n3D Turbo convection fan for rapid heat distribution\nSmart digital LED timer display\nTriple-glazed cool-touch glass door"
+      },
+      "tips": "Preheat the oven for 10 minutes prior to baking for optimal and uniform results.",
+      "tips_i18n": {
+        "ar": "ينصح بتسخين الفرن مسبقاً لمدة 10 دقائق قبل إدخال الصواني لضمان نضج متجانس.",
+        "en": "Preheat the oven for 10 minutes prior to baking for optimal and uniform results."
+      },
+      "additionalInfo": "",
+      "shipping_info": "Free express delivery, certified Mastergas installation, and 3-year full warranty.",
+      "shipping_info_i18n": {
+        "ar": "شحن مجاني سريع مع خدمة التركيب المعتمدة من ماسترجاز وضمان 3 سنوات.",
+        "en": "Free express delivery, certified Mastergas installation, and 3-year full warranty."
+      },
+      "sku": "MG-OVEN90-LUX",
+      "created_at": "2026-10-01 12:13:33",
+      "updated_at": "2026-10-01 13:58:21"
+    },
+    {
+      "id": "26",
+      "name": "Mastergas 90cm 5-Burner Tempered Glass Built-in Gas Hob with Wok",
+      "name_i18n": {
+        "ar": "مسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك",
+        "en": "Mastergas 90cm 5-Burner Tempered Glass Built-in Gas Hob with Wok"
+      },
+      "description": "Premium 90cm 5-burner tempered black glass built-in gas hob equipped with a powerful triple-flame wok burner, heavy cast-iron supports, and automatic safety valves.",
+      "description_i18n": {
+        "ar": "مسطح غاز بلت إن فاخر 90 سم مصنوع من الزجاج الحراري المقسّى الأسود المقاوم للصدمات، 5 شعلات غاز متطورة مع شعلة ووك ثلاثية وحوامل حديد زهر ثقيلة وأمان كامل.",
+        "en": "Premium 90cm 5-burner tempered black glass built-in gas hob equipped with a powerful triple-flame wok burner, heavy cast-iron supports, and automatic safety valves."
+      },
+      "category_id": 57,
+      "subcategory_id": null,
+      "category": "Gas Stoves & Built-in Hobs",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 2349,
+      "discount": "822.15",
+      "stock": 30,
+      "quantity": 30,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/26-cover.jpg",
+        "/local-assets/products/26-2.jpg",
+        "/local-assets/products/26-3.jpg"
+      ],
+      "image": "/local-assets/products/26-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "5 شعلات غاز"
+        ],
+        "العرض": [
+          "86 سم"
+        ],
+        "العمق": [
+          "51 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي",
+          "ستانلس ستيل"
+        ],
+        "الارتفاع": [
+          "5 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "حماية ثلاثية متكاملة"
+        ],
+        "نظام الإشعال": [
+          "إلكتروني أوتوماتيكي فوري"
+        ],
+        "اللون والمظهر": [
+          "زجاج حراري مقسّى أسود"
+        ],
+        "المؤقت الرقمي": [
+          "لا"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "color_options": [
+        "أسود ملكي",
+        "ستانلس ستيل"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "5 شعلات غاز"
+        ],
+        "العرض": [
+          "86 سم"
+        ],
+        "العمق": [
+          "51 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي",
+          "ستانلس ستيل"
+        ],
+        "الارتفاع": [
+          "5 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "حماية ثلاثية متكاملة"
+        ],
+        "نظام الإشعال": [
+          "إلكتروني أوتوماتيكي فوري"
+        ],
+        "اللون والمظهر": [
+          "زجاج حراري مقسّى أسود"
+        ],
+        "المؤقت الرقمي": [
+          "لا"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "features": "Heavy-duty 8mm tempered scratch-resistant thermal glass\nTriple-flame 4.2kW high-output wok burner\nHeavy-duty cast iron pan supports for absolute stability\nIntegrated triple safety protection with instant cutoff\nAutomatic one-touch knob ignition",
+      "features_i18n": {
+        "ar": "زجاج حراري أسود مقسّى مقاوم للحرارة والخدش 8 مم\nشعلة ووك ثلاثية التاج بقدرة 4.2kW للطهي فائق السرعة\nشبك ثقيل من حديد الزهر يوفر أقصى ثبات للأواني\nنظام حماية ثلاثية متكاملة لقطع الغاز الفوري\nإشعال إلكتروني أوتوماتيكي فوري مدمج بالمقابض",
+        "en": "Heavy-duty 8mm tempered scratch-resistant thermal glass\nTriple-flame 4.2kW high-output wok burner\nHeavy-duty cast iron pan supports for absolute stability\nIntegrated triple safety protection with instant cutoff\nAutomatic one-touch knob ignition"
+      },
+      "tips": "Use a soft microfiber cloth to clean the glass surface once cooled to maintain its pristine shine.",
+      "tips_i18n": {
+        "ar": "استخدم قطعة قماش ميكروفايبر ناعمة لتنظيف السطح الزجاجي بعد أن يبرد للحفاظ على لمعانه.",
+        "en": "Use a soft microfiber cloth to clean the glass surface once cooled to maintain its pristine shine."
+      },
+      "additionalInfo": "",
+      "shipping_info": "Insured shipping across the Kingdom with a comprehensive 2-year warranty.",
+      "shipping_info_i18n": {
+        "ar": "شحن آمن لكافة مناطق المملكة مع ضمان شامل لمدة سنتين.",
+        "en": "Insured shipping across the Kingdom with a comprehensive 2-year warranty."
+      },
+      "sku": "MG-HOB90-5B-GLASS",
+      "created_at": "2026-10-01 12:13:36",
+      "updated_at": "2026-10-01 12:13:36"
+    },
+    {
+      "id": "27",
+      "name": "Mastergas 90cm Italian Pyramid Cooker Hood 1200 m³/h Suction",
+      "name_i18n": {
+        "ar": "شفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة",
+        "en": "Mastergas 90cm Italian Pyramid Cooker Hood 1200 m³/h Suction"
+      },
+      "description": "Mastergas 90cm Italian pyramid chimney hood with heavy 1200 m³/h suction capacity, washable 5-layer aluminum filters, dual LED lighting, and digital temperature indicator.",
+      "description_i18n": {
+        "ar": "شفاط مطبخ هرمي جداري 90 سم بتصميم إيطالي عصري ومحرك توربيني قوي بقوة سحب 1200 م³/ساعة، فلاتر ألمنيوم 5 طبقات قابلة للغسيل وإضاءة LED نقية ومؤشر حرارة رقمي.",
+        "en": "Mastergas 90cm Italian pyramid chimney hood with heavy 1200 m³/h suction capacity, washable 5-layer aluminum filters, dual LED lighting, and digital temperature indicator."
+      },
+      "category_id": 57,
+      "subcategory_id": null,
+      "category": "Gas Stoves & Built-in Hobs",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 1799,
+      "discount": "629.65",
+      "stock": 20,
+      "quantity": 20,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/27-cover.jpg",
+        "/local-assets/products/27-2.jpg",
+        "/local-assets/products/27-3.jpg"
+      ],
+      "image": "/local-assets/products/27-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "قوة شفط 1200 م³/ساعة"
+        ],
+        "العرض": [
+          "90 سم"
+        ],
+        "العمق": [
+          "50 سم"
+        ],
+        "الألوان": [
+          "فضي",
+          "ستانلس ستيل"
+        ],
+        "الارتفاع": [
+          "115 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "كهرباء 230 واط"
+        ],
+        "صمام الأمان": [
+          "أمان كامل"
+        ],
+        "اللون والمظهر": [
+          "ستانلس ستيل وأسود"
+        ],
+        "المؤقت الرقمي": [
+          "مؤشر حرارة رقمي"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "color_options": [
+        "فضي",
+        "ستانلس ستيل"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "قوة شفط 1200 م³/ساعة"
+        ],
+        "العرض": [
+          "90 سم"
+        ],
+        "العمق": [
+          "50 سم"
+        ],
+        "الألوان": [
+          "فضي",
+          "ستانلس ستيل"
+        ],
+        "الارتفاع": [
+          "115 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "كهرباء 230 واط"
+        ],
+        "صمام الأمان": [
+          "أمان كامل"
+        ],
+        "اللون والمظهر": [
+          "ستانلس ستيل وأسود"
+        ],
+        "المؤقت الرقمي": [
+          "مؤشر حرارة رقمي"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "features": "Ultra-powerful turbo blower extracting 1200 m³/h\n3 speed settings plus intensive boost mode\n5-layer washable aluminum grease filters\nDual energy-efficient bright white LED spots\nDigital touch interface with temperature readout",
+      "features_i18n": {
+        "ar": "محرك توربيني فائق القوة لسحب 1200 متر مكعب/ساعة\n3 سرعات تشغيل مع خاصية التربو المكثف\nفلاتر ألمنيوم خماسية الطبقات لحجز الدهون بنسبة 99%\nإضاءة LED بيضاء ساطعة موفرة للطاقة\nشاشة تحكم ديجيتال مع مؤشر حرارة رقمي",
+        "en": "Ultra-powerful turbo blower extracting 1200 m³/h\n3 speed settings plus intensive boost mode\n5-layer washable aluminum grease filters\nDual energy-efficient bright white LED spots\nDigital touch interface with temperature readout"
+      },
+      "tips": "Wash aluminum filters monthly in the dishwasher for maximum extraction efficiency.",
+      "tips_i18n": {
+        "ar": "اغسل الفلاتر في غسالة الأطباق مرة كل شهر للحفاظ على كفاءة الشفط القصوى.",
+        "en": "Wash aluminum filters monthly in the dishwasher for maximum extraction efficiency."
+      },
+      "additionalInfo": "",
+      "shipping_info": "Express delivery with chimney ducting kit included and 2-year warranty.",
+      "shipping_info_i18n": {
+        "ar": "توصيل سريع مع كافة ملحقات التركيب والمدخنة وضمان سنتان.",
+        "en": "Express delivery with chimney ducting kit included and 2-year warranty."
+      },
+      "sku": "MG-HOOD90-PYRAMID",
+      "created_at": "2026-10-01 12:13:39",
+      "updated_at": "2026-10-01 12:13:39"
+    },
+    {
+      "id": "28",
+      "name": "Mastergas 60cm 4-Burner Built-in Stainless Steel Gas Hob",
+      "name_i18n": {
+        "ar": "مسطح غاز ستانلس ستيل بلت إن ماسترجاز 4 شعلات 60 سم",
+        "en": "Mastergas 60cm 4-Burner Built-in Stainless Steel Gas Hob"
+      },
+      "description": "Compact 60cm 4-burner built-in gas hob engineered from premium 304 stainless steel, featuring cast-iron grids, one-hand knob ignition, and certified safety valves.",
+      "description_i18n": {
+        "ar": "مسطح غاز مدمج 60 سم من الستانلس ستيل المقاوم للصدأ 304، يحتوي على 4 شعلات غاز إيطالية متوازنة، حوامل حديد زهر صلبة، إشعال إلكتروني مدمج بالمفتاح وصمامات أمان كاملة معتمدة.",
+        "en": "Compact 60cm 4-burner built-in gas hob engineered from premium 304 stainless steel, featuring cast-iron grids, one-hand knob ignition, and certified safety valves."
+      },
+      "category_id": 57,
+      "subcategory_id": null,
+      "category": "Gas Stoves & Built-in Hobs",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 1499,
+      "discount": "524.65",
+      "stock": 35,
+      "quantity": 35,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/28-cover.jpg",
+        "/local-assets/products/28-2.jpg",
+        "/local-assets/products/28-3.jpg"
+      ],
+      "image": "/local-assets/products/28-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "4 شعلات غاز"
+        ],
+        "العرض": [
+          "58 سم"
+        ],
+        "العمق": [
+          "50 سم"
+        ],
+        "الألوان": [
+          "ستانلس ستيل|#111827",
+          "أسود ملكي|#111827"
+        ],
+        "الارتفاع": [
+          "4.5 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز طبيعي / مسال"
+        ],
+        "صمام الأمان": [
+          "صمامات أمان معتمدة"
+        ],
+        "نظام الإشعال": [
+          "إلكتروني مدمج بالمفتاح"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "color_options": [
+        "ستانلس ستيل|#111827",
+        "أسود ملكي|#111827"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "4 شعلات غاز"
+        ],
+        "العرض": [
+          "58 سم"
+        ],
+        "العمق": [
+          "50 سم"
+        ],
+        "الألوان": [
+          "ستانلس ستيل|#111827",
+          "أسود ملكي|#111827"
+        ],
+        "الارتفاع": [
+          "4.5 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز طبيعي / مسال"
+        ],
+        "صمام الأمان": [
+          "صمامات أمان معتمدة"
+        ],
+        "نظام الإشعال": [
+          "إلكتروني مدمج بالمفتاح"
+        ],
+        "الجهد الكهربائي": [
+          "220-240 فولت"
+        ]
+      },
+      "features": "Thick 304 stainless steel body resistant to high heat and corrosion\n4 Italian burners accommodating diverse cookware sizes\nCertified flame safety valves preventing gas leaks automatically\nIntegrated one-hand rotary electronic ignition\nSleek 60cm space-efficient modern footprint",
+      "features_i18n": {
+        "ar": "سطح ستانلس ستيل 304 سميك ومقاوم للحرارة والتآكل\n4 شعلات غاز إيطالية تناسب مختلف أحجام أواني الطهي\nصمامات أمان معتمدة تمنع تسرب الغاز تلقائياً\nإشعال إلكتروني مدمج بالمفتاح لسهولة الاستخدام بيد واحدة\nتصميم مدمج عصري يناسب المطابخ الحديثة 60 سم",
+        "en": "Thick 304 stainless steel body resistant to high heat and corrosion\n4 Italian burners accommodating diverse cookware sizes\nCertified flame safety valves preventing gas leaks automatically\nIntegrated one-hand rotary electronic ignition\nSleek 60cm space-efficient modern footprint"
+      },
+      "tips": "Wipe down after each use with non-abrasive stainless cleaner to retain pristine sheen.",
+      "tips_i18n": {
+        "ar": "نظف السطح بعد كل استخدام بمنظف ستانلس ستيل غير كاشط للحفاظ على لمعان المعدن.",
+        "en": "Wipe down after each use with non-abrasive stainless cleaner to retain pristine sheen."
+      },
+      "additionalInfo": "",
+      "shipping_info": "2-day express courier dispatch with instant exchange guarantee and 2 years warranty.",
+      "shipping_info_i18n": {
+        "ar": "شحن سريع خلال يومين مع ضمان استبدال فوري وضمان سنتين.",
+        "en": "2-day express courier dispatch with instant exchange guarantee and 2 years warranty."
+      },
+      "sku": "MG-HOB60-4B-SS",
+      "created_at": "2026-10-01 12:13:41",
+      "updated_at": "2026-10-01 14:03:07"
+    },
+    {
+      "id": "29",
+      "name": "Mastergas Premium 4-Burner Outdoor Gas BBQ Grill with Thermometer",
+      "name_i18n": {
+        "ar": "شواية باربيكيو غاز فاخرة 4 شعلات للحدائق والمزارع مع مقياس حرارة",
+        "en": "Mastergas Premium 4-Burner Outdoor Gas BBQ Grill with Thermometer"
+      },
+      "description": "Luxury 4-burner outdoor gas BBQ grill crafted for patios and gardens with heavy-duty cooking grates, lid-mounted temperature gauge, smooth mobility casters, and prep shelves.",
+      "description_i18n": {
+        "ar": "شواية غاز خارجية فاخرة للحدائق والاستراحات مزودة بـ 4 شعلات رئيسية وشبكات طهي واسعة من الستانلس ستيل المقاوم للصدأ، مقياس حرارة مدمج بالغطاء، عجلات قوية لنقل سلس، وأرفف جانبية للتحضير.",
+        "en": "Luxury 4-burner outdoor gas BBQ grill crafted for patios and gardens with heavy-duty cooking grates, lid-mounted temperature gauge, smooth mobility casters, and prep shelves."
+      },
+      "category_id": 59,
+      "subcategory_id": null,
+      "category": "Outdoor Gas Grills & BBQs",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 4499,
+      "discount": "1574.65",
+      "stock": 15,
+      "quantity": 15,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/29-cover.jpg",
+        "/local-assets/products/29-2.jpg",
+        "/local-assets/products/29-3.jpg"
+      ],
+      "image": "/local-assets/products/29-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "مساحة شواء 70 × 45 سم"
+        ],
+        "العرض": [
+          "135 سم"
+        ],
+        "العمق": [
+          "58 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي|#111827",
+          "فضي|#9ca3af"
+        ],
+        "الارتفاع": [
+          "115 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "صمامات نحاسية آمنة"
+        ],
+        "نظام الإشعال": [
+          "إشعال بيزو ذاتي"
+        ],
+        "المؤقت الرقمي": [
+          "مقياس حرارة مدمج بالغطاء"
+        ],
+        "الجهد الكهربائي": [
+          "لا يتطلب كهرباء"
+        ]
+      },
+      "color_options": [
+        "أسود ملكي|#111827",
+        "فضي|#9ca3af"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "مساحة شواء 70 × 45 سم"
+        ],
+        "العرض": [
+          "135 سم"
+        ],
+        "العمق": [
+          "58 سم"
+        ],
+        "الألوان": [
+          "أسود ملكي|#111827",
+          "فضي|#9ca3af"
+        ],
+        "الارتفاع": [
+          "115 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "صمامات نحاسية آمنة"
+        ],
+        "نظام الإشعال": [
+          "إشعال بيزو ذاتي"
+        ],
+        "المؤقت الرقمي": [
+          "مقياس حرارة مدمج بالغطاء"
+        ],
+        "الجهد الكهربائي": [
+          "لا يتطلب كهرباء"
+        ]
+      },
+      "features": "4 heavy stainless steel tubular burners delivering intense even heat\nExpansive 70 x 45 cm cooking zone for large outdoor barbecues\nPrecision lid-mounted dial thermometer for temperature control\nHeavy-duty brass valves and instant piezo spark ignition\nAll-weather thermo-powder coated matte exterior",
+      "features_i18n": {
+        "ar": "4 شعلات غاز أنبوبية من الستانلس ستيل بقوة حرارية فائقة\nمساحة شواء رحبة 70 × 45 سم تكفي لتحضير وجبات كبيرة\nمقياس حرارة دقيق مدمج بالغطاء لمراقبة مستوى النضج\nصمامات نحاسية آمنة مع نظام إشعال بيزو ذاتي\nهيكل خارجي أسود مطلي حرارياً ومقاوم للظروف الجوية",
+        "en": "4 heavy stainless steel tubular burners delivering intense even heat\nExpansive 70 x 45 cm cooking zone for large outdoor barbecues\nPrecision lid-mounted dial thermometer for temperature control\nHeavy-duty brass valves and instant piezo spark ignition\nAll-weather thermo-powder coated matte exterior"
+      },
+      "tips": "Brush the grilling grates clean and cover with a weatherproof tarp after cooling.",
+      "tips_i18n": {
+        "ar": "احرص على تنظيف شبك الشواء بالفرشاة المخصصة وتغطية الشواية بالغطاء الواقي بعد الاستخدام.",
+        "en": "Brush the grilling grates clean and cover with a weatherproof tarp after cooling."
+      },
+      "additionalInfo": "",
+      "shipping_info": "White-glove heavy freight shipping with on-site assembly and 2-year warranty.",
+      "shipping_info_i18n": {
+        "ar": "شحن خاص للطلبات الثقيلة مع خدمة التركيب الميداني وضمان سنتين.",
+        "en": "White-glove heavy freight shipping with on-site assembly and 2-year warranty."
+      },
+      "sku": "MG-BBQ-4B-GRILL",
+      "created_at": "2026-10-01 12:13:43",
+      "updated_at": "2026-10-01 14:03:18"
+    },
+    {
+      "id": "30",
+      "name": "Mastergas 12L Digital Instant Gas Water Heater Full ODS Safety",
+      "name_i18n": {
+        "ar": "سخان مياه غاز فوري رقمي ماسترجاز 12 لتر أمان كامل ODS",
+        "en": "Mastergas 12L Digital Instant Gas Water Heater Full ODS Safety"
+      },
+      "description": "Smart 12L/min instant tankless gas water heater delivering uninterrupted hot water, digital LED temperature display, and multi-stage ODS safety shutting off upon oxygen depletion.",
+      "description_i18n": {
+        "ar": "سخان مياه غاز فوري ذكي ديجيتال سعة 10-12 لتر/دقيقة، تدفق مياه ساخنة فوري ومستمر بدون انقطاع، شاشة رقمية LED لضبط درجة الحرارة، نظام أمان ODS متطور يقطع الغاز تلقائياً عند نقص الأكسجين أو الميلان.",
+        "en": "Smart 12L/min instant tankless gas water heater delivering uninterrupted hot water, digital LED temperature display, and multi-stage ODS safety shutting off upon oxygen depletion."
+      },
+      "category_id": 58,
+      "subcategory_id": null,
+      "category": "Gas Water Heaters & Geysers",
+      "category_parent_id": null,
+      "subcategory": null,
+      "brand": null,
+      "price": 1349,
+      "discount": "472.15",
+      "stock": 40,
+      "quantity": 40,
+      "sales": 0,
+      "status": "active",
+      "is_featured": false,
+      "images": [
+        "/local-assets/products/30-cover.jpg",
+        "/local-assets/products/30-2.jpg",
+        "/local-assets/products/30-3.jpg"
+      ],
+      "image": "/local-assets/products/30-cover.jpg",
+      "attributes": {
+        "السعة": [
+          "10 لتر / دقيقة"
+        ],
+        "العرض": [
+          "35 سم"
+        ],
+        "العمق": [
+          "18 سم"
+        ],
+        "الألوان": [
+          "أبيض|#ffffff",
+          "فضي|#9ca3af"
+        ],
+        "الارتفاع": [
+          "72 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "نظام ODS مع قفل عند الميلان"
+        ],
+        "نظام الإشعال": [
+          "أوتوماتيكي عند فتح صنبور المياه"
+        ],
+        "المؤقت الرقمي": [
+          "شاشة رقمية LED"
+        ],
+        "الجهد الكهربائي": [
+          "شاشة إلكترونية تعمل بالبطاريات"
+        ]
+      },
+      "color_options": [
+        "أبيض|#ffffff",
+        "فضي|#9ca3af"
+      ],
+      "size_options": [],
+      "raw_attributes": {
+        "السعة": [
+          "10 لتر / دقيقة"
+        ],
+        "العرض": [
+          "35 سم"
+        ],
+        "العمق": [
+          "18 سم"
+        ],
+        "الألوان": [
+          "أبيض|#ffffff",
+          "فضي|#9ca3af"
+        ],
+        "الارتفاع": [
+          "72 سم"
+        ],
+        "بلد المنشأ": [
+          "إيطاليا"
+        ],
+        "نوع الطاقة": [
+          "غاز مسال"
+        ],
+        "صمام الأمان": [
+          "نظام ODS مع قفل عند الميلان"
+        ],
+        "نظام الإشعال": [
+          "أوتوماتيكي عند فتح صنبور المياه"
+        ],
+        "المؤقت الرقمي": [
+          "شاشة رقمية LED"
+        ],
+        "الجهد الكهربائي": [
+          "شاشة إلكترونية تعمل بالبطاريات"
+        ]
+      },
+      "features": "Continuous instant hot water delivery of 10-12 Liters per minute\nBright digital LED interface displaying exact output temperature\nAdvanced ODS oxygen depletion safety with auto-tilt shutoff\nInstant automatic ignition triggered immediately upon water tap turn\nReliable high-efficiency performance under low water pressure",
+      "features_i18n": {
+        "ar": "تدفق مستمر للمياه الساخنة الفورية حتى 10-12 لتر في الدقيقة\nشاشة رقمية LED تعرض درجة حرارة المياه بدقة عالية\nنظام أمان ODS الذكي مع قفل أوتوماتيكي عند نقص الأكسجين أو الميلان\nإشعال أوتوماتيكي ذكي يعمل تلقائياً فور فتح صنبور المياه\nيعمل بكفاءة عالية حتى مع ضغط المياه المنخفض",
+        "en": "Continuous instant hot water delivery of 10-12 Liters per minute\nBright digital LED interface displaying exact output temperature\nAdvanced ODS oxygen depletion safety with auto-tilt shutoff\nInstant automatic ignition triggered immediately upon water tap turn\nReliable high-efficiency performance under low water pressure"
+      },
+      "tips": "Ensure the flue vent pipe is properly vented outside with clear airflow around the unit.",
+      "tips_i18n": {
+        "ar": "تأكد من تركيب مدخنة تصريف العادم بشكل سليم وعدم سد فتحات التهوية المحيطة بالسخان.",
+        "en": "Ensure the flue vent pipe is properly vented outside with clear airflow around the unit."
+      },
+      "additionalInfo": "",
+      "shipping_info": "24-hour express courier delivery across all cities with 3-year full warranty.",
+      "shipping_info_i18n": {
+        "ar": "توصيل سريع خلال 24 ساعة في كافة المدن مع ضمان شامل 3 سنوات.",
+        "en": "24-hour express courier delivery across all cities with 3-year full warranty."
+      },
+      "sku": "MG-WATER-HEATER-12L",
+      "created_at": "2026-10-01 12:13:44",
+      "updated_at": "2026-10-01 14:03:34"
+    }
+  ]
 }

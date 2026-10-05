@@ -121,8 +121,8 @@
               </td>
               <td class="col-price">
                 <div class="price-cell">
-                  <span class="current-price">{{ formatPrice(prod.price * (1 - (prod.discount/100 || 0))) }} د.أ</span>
-                  <span v-if="prod.discount" class="old-price">{{ formatPrice(prod.price) }} د.أ</span>
+                  <span class="current-price">{{ formatPrice(prod.price * (1 - (getDiscountPercent(prod) / 100))) }} د.أ</span>
+                  <span v-if="getDiscountPercent(prod) > 0" class="old-price">{{ formatPrice(prod.price) }} د.أ</span>
                 </div>
               </td>
               <td class="col-stock">
@@ -349,9 +349,9 @@
             </div>
           </div>
 
-          <div v-show="currentTab === 'attributes'" class="tab-pane">
+          <div v-show="currentTab === 'attributes'" class="tab-pane attributes-tab-pane">
             <!-- 1. Colors Management Section -->
-            <div class="variant-section-card">
+            <div v-if="false" class="variant-section-card">
               <div class="variant-section-header">
                 <div class="variant-icon-wrapper color-icon-bg">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
@@ -364,11 +364,11 @@
 
               <!-- Popular Quick Color Presets -->
               <div class="presets-block">
-                <span class="presets-label">ألوان شائعة سريعة (اضغط للإضافة):</span>
-                <div class="color-presets-row">
+                <span class="presets-label">ألوان خصائص المنتجات من API (اضغط للإضافة):</span>
+                <div class="color-presets-row" v-if="apiColorPresets.length > 0">
                   <button 
                     type="button" 
-                    v-for="p in colorPresets" 
+                    v-for="p in apiColorPresets" 
                     :key="p.label" 
                     class="color-preset-pill" 
                     :class="{ active: isColorSelected(p) }" 
@@ -379,6 +379,7 @@
                     <span v-if="isColorSelected(p)" class="preset-check">✓</span>
                   </button>
                 </div>
+                <div v-else class="empty-variants-hint">لا توجد ألوان محملة من API خصائص المنتجات.</div>
               </div>
 
               <!-- Custom Color Adder -->
@@ -424,7 +425,7 @@
             </div>
 
             <!-- 2. Sizes & Dimensions Management Section -->
-            <div class="variant-section-card">
+            <div v-if="false" class="variant-section-card">
               <div class="variant-section-header">
                 <div class="variant-icon-wrapper size-icon-bg">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
@@ -487,27 +488,32 @@
               </div>
             </div>
 
-            <!-- 3. Additional Global Attributes Section -->
-            <div class="variant-section-card" v-if="otherAttributesList.length > 0">
-              <div class="variant-section-header">
-                <div class="variant-icon-wrapper other-icon-bg">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </div>
-                <div>
-                  <h4 class="variant-section-title">خصائص ومواصفات إضافية (Additional Specs)</h4>
-                  <p class="variant-section-desc">تحديد خصائص إضافية كبلد المنشأ، الضمان، المادة، أو نوع الإشعال</p>
-                </div>
-              </div>
+            <div v-if="attributesLoading" class="attributes-state-card">
+              جاري تحميل خصائص المنتجات من API...
+            </div>
+            <div v-else-if="attributesLoadError" class="attributes-state-card error">
+              تعذر تحميل خصائص المنتجات. اضغط لإعادة المحاولة.
+              <button type="button" class="attributes-retry-btn" @click.prevent="fetchDependencies">إعادة المحاولة</button>
+            </div>
 
+            <!-- Product attributes -->
+            <div class="variant-section-card api-attributes-section" v-else-if="apiAttributesList.length > 0">
               <div class="other-attrs-list">
-                <div v-for="attr in otherAttributesList" :key="attr.id" class="other-attr-row">
-                  <label class="other-attr-label">{{ attr.label }} ({{ attr.name }})</label>
-                  <div class="attr-values-list" v-if="attr.values && attr.values.length > 0">
-                    <label v-for="val in attr.values" :key="val.id" class="attr-val-checkbox">
-                      <input type="checkbox" :value="val.label" v-model="form.selectedAttributes[attr.name]" />
-                      <span class="checkmark"></span>
-                      <span class="val-text">{{ val.label }}</span>
-                    </label>
+                  <div v-for="attr in apiAttributesList" :key="attr.id" class="other-attr-row">
+                    <label class="other-attr-label">{{ attr.label }} ({{ attr.name }})</label>
+                    <div class="attr-values-list" v-if="attr.values && attr.values.length > 0">
+                      <button
+                        v-for="val in attr.values"
+                        :key="val.id"
+                        class="attr-val-checkbox"
+                        type="button"
+                        :aria-pressed="isApiAttributeSelected(attr.name, val.label)"
+                        @click="toggleApiAttribute(attr.name, val.label)"
+                      >
+                        <span class="checkmark" :class="{ active: isApiAttributeSelected(attr.name, val.label) }"></span>
+                        <span v-if="val.color" class="api-attribute-color-dot" :style="{ background: val.color }"></span>
+                        <span class="val-text">{{ val.label }}</span>
+                      </button>
                   </div>
                   <div v-else class="attr-no-vals">
                     <span class="text-muted-xs">لا توجد قيم مسجلة لهذه الخاصية.</span>
@@ -517,7 +523,7 @@
             </div>
 
             <!-- 4. Full Technical Specifications (Key-Value) Section -->
-            <div class="variant-section-card" style="background: rgba(255, 255, 255, 1);">
+            <div v-if="false" class="variant-section-card" style="background: rgba(255, 255, 255, 1);">
               <div class="variant-section-header">
                 <div class="variant-icon-wrapper other-icon-bg">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
@@ -718,11 +724,14 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import api from '../config/axios';
+import { dedupeColorOptions, isColorAttribute, normalizeProductAttributes } from '../utils/productAttributes';
 
 // States
 const products = ref([]);
 const categories = ref([]);
 const attributesList = ref([]);
+const attributesLoading = ref(false);
+const attributesLoadError = ref(false);
 const loading = ref(false);
 
 const searchQuery = ref('');
@@ -789,16 +798,16 @@ const isLightColor = (hex) => {
   return false;
 };
 
-const colorPresets = [
-  { label: 'أسود', color: '#111827' },
-  { label: 'فضي استانلس', color: '#9ca3af' },
-  { label: 'أبيض', color: '#ffffff' },
-  { label: 'رمادي داكن', color: '#4b5563' },
-  { label: 'ذهبي شامبانيا', color: '#d97706' },
-  { label: 'أحمر', color: '#dc2626' },
-  { label: 'أزرق كحلي', color: '#1e3a8a' },
-  { label: 'بيج', color: '#d4b996' }
-];
+// Standard color choices are sourced from the product-attributes API.
+const apiColorPresets = computed(() => {
+  const colorAttribute = attributesList.value.find(attribute => isColorAttribute(attribute));
+  return dedupeColorOptions((colorAttribute?.values || [])
+    .map(value => ({
+      label: value.label,
+      color: value.color || getPresetColorHex(value.label) || '#111827',
+    }))
+    .filter(value => value.label));
+});
 
 const sizePresets = [
   '60 سم',
@@ -817,15 +826,32 @@ const customColorName = ref('');
 const customColorHex = ref('#111827');
 const customSizeInput = ref('');
 
-const otherAttributesList = computed(() => {
-  return attributesList.value.filter(a => {
-    const n = (a.name || '').toLowerCase();
-    const l = (a.label || '').toLowerCase();
-    return !n.includes('color') && !l.includes('لون') && !n.includes('size') && !l.includes('مقاس') && !l.includes('حجم');
-  });
-});
+// All rendered standard attributes displayed in the product form come from the API.
+// The legacy custom sections are intentionally removed from the attributes tab.
+const apiAttributesList = computed(() => attributesList.value);
+
+const isApiAttributeSelected = (attributeName, valueLabel) => (
+  Array.isArray(form.value.selectedAttributes[attributeName]) &&
+  form.value.selectedAttributes[attributeName].includes(valueLabel)
+);
+
+const toggleApiAttribute = (attributeName, valueLabel) => {
+  const selected = Array.isArray(form.value.selectedAttributes[attributeName])
+    ? form.value.selectedAttributes[attributeName]
+    : [];
+  const checked = selected.includes(valueLabel);
+  const next = checked
+    ? selected.filter(value => value !== valueLabel)
+    : Array.from(new Set([...selected, valueLabel]));
+
+  form.value.selectedAttributes = {
+    ...form.value.selectedAttributes,
+    [attributeName]: next,
+  };
+};
 
 const toggleColorPreset = (preset) => {
+  form.value.colors = dedupeColorOptions(form.value.colors);
   const idx = form.value.colors.findIndex(c => c.label === preset.label || (c.color && c.color.toLowerCase() === preset.color.toLowerCase()));
   if (idx > -1) {
     form.value.colors.splice(idx, 1);
@@ -848,6 +874,7 @@ const addCustomColor = () => {
   const exists = form.value.colors.some(c => c.label.toLowerCase() === name.toLowerCase());
   if (!exists) {
     form.value.colors.push({ label: name, color: hex });
+    form.value.colors = dedupeColorOptions(form.value.colors);
     customColorName.value = '';
     customColorHex.value = '#111827';
   } else {
@@ -888,7 +915,7 @@ const removeSize = (idx) => {
 };
 
 const hasColorType = (attr) => {
-  return attr?.name?.toLowerCase().includes('color') || attr?.label?.includes('لون');
+  return isColorAttribute(attr);
 };
 
 const addCustomAttributeValue = (attrName, defaultVal = '') => {
@@ -1061,6 +1088,20 @@ const triggerAlert = (msg, type = 'success') => {
 // Utils
 const formatPrice = (p) => Number(p).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// The dashboard API returns discount as an amount, while the product form
+// edits it as a percentage. Normalize both shapes before rendering/submitting.
+const normalizeDiscountPercent = (discount, price) => {
+  const rawDiscount = Number(discount);
+  const rawPrice = Number(price);
+  if (!Number.isFinite(rawDiscount) || rawDiscount <= 0) return 0;
+  if (rawDiscount > 100 && rawPrice > 0 && rawDiscount <= rawPrice) {
+    return Number(((rawDiscount / rawPrice) * 100).toFixed(2));
+  }
+  return Math.min(rawDiscount, 100);
+};
+
+const getDiscountPercent = (product) => normalizeDiscountPercent(product?.discount, product?.price);
+
 // Pagination
 const goToPage = (page) => {
   if (page < 1 || page > totalPages.value) return;
@@ -1153,6 +1194,8 @@ const fetchStats = async () => {
 };
 
 const fetchDependencies = async () => {
+  attributesLoading.value = true;
+  attributesLoadError.value = false;
   try {
     const [cats, attrs] = await Promise.all([
       api.get('/dashboard/categories'),
@@ -1164,9 +1207,17 @@ const fetchDependencies = async () => {
       c.subchildren = allC.filter(sc => sc.parent_id === c.id);
     });
 
-    attributesList.value = attrs.data.data.filter(a => a.is_active);
+    const rawAttributes = attrs?.data?.data ?? attrs?.data ?? [];
+    const normalizedAttributes = normalizeProductAttributes(rawAttributes).filter(a => a.is_active);
+    if (!normalizedAttributes.length) {
+      throw new Error('Product attributes API returned an empty list.');
+    }
+    attributesList.value = normalizedAttributes;
   } catch (err) {
+    attributesLoadError.value = true;
     console.error('Failed to fetch dependencies', err);
+  } finally {
+    attributesLoading.value = false;
   }
 };
 
@@ -1187,6 +1238,7 @@ const updateSubcats = () => {
 
 // Modals Setup
 const openAddModal = () => {
+  if (!attributesList.value.length && !attributesLoading.value) fetchDependencies();
   isEdit.value = false;
   editingId.value = null;
   currentTab.value = 'info';
@@ -1225,6 +1277,7 @@ const openAddModal = () => {
 };
 
 const openEditModal = (prod) => {
+  if (!attributesList.value.length && !attributesLoading.value) fetchDependencies();
   isEdit.value = true;
   editingId.value = prod.id;
   currentTab.value = 'info';
@@ -1325,7 +1378,7 @@ const openEditModal = (prod) => {
     description_ar: (prod.description_i18n && typeof prod.description_i18n === 'object' ? (prod.description_i18n.ar ?? prod.description) : prod.description) || '',
     description_en: (prod.description_i18n && typeof prod.description_i18n === 'object' ? (prod.description_i18n.en ?? '') : ''),
     price: prod.price,
-    discount: prod.discount || '',
+    discount: normalizeDiscountPercent(prod.discount, prod.price),
     quantity: prod.stock,
     is_active: prod.status === 'active',
     category_id: catId,
@@ -1338,7 +1391,7 @@ const openEditModal = (prod) => {
     shipping_info_en: (prod.shipping_info_i18n && typeof prod.shipping_info_i18n === 'object' ? (prod.shipping_info_i18n.en ?? '') : ''),
     existing_images: [...(prod.images || [])],
     new_images: [],
-    colors: extractedColors,
+    colors: dedupeColorOptions(extractedColors),
     sizes: extractedSizes,
     specs: extractedSpecs,
     selectedAttributes: selAttr
@@ -1483,12 +1536,28 @@ const submitForm = async () => {
 
   // Merge attributes
   const finalAttributes = {};
+  const normalizedColors = dedupeColorOptions(form.value.colors || []);
+  const colorAttribute = attributesList.value.find(attribute => isColorAttribute(attribute));
+  const canonicalColorKey = colorAttribute?.name || 'color';
+  const selectedColorValues = Object.entries(form.value.selectedAttributes || {})
+    .filter(([key]) => isColorAttribute({ name: key, label: key }))
+    .flatMap(([, values]) => Array.isArray(values) ? values : []);
+  const selectedColors = selectedColorValues.map(value => {
+    const raw = value && typeof value === 'object'
+      ? (value.label || value.name || value.value || '')
+      : String(value || '');
+    const [label, inlineColor] = raw.split('|', 2);
+    const matched = colorAttribute?.values?.find(item => item.label === label.trim());
+    return {
+      label: label.trim(),
+      color: inlineColor?.trim() || matched?.color || getPresetColorHex(label.trim()) || '#111827',
+    };
+  });
+  const payloadColors = dedupeColorOptions(normalizedColors.length > 0 ? normalizedColors : selectedColors);
 
   // 1. Color Options
-  if (form.value.colors && form.value.colors.length > 0) {
-    const colorValues = form.value.colors.map(c => `${c.label}|${c.color}`);
-    finalAttributes['color'] = colorValues;
-    finalAttributes['اللون'] = colorValues;
+  if (payloadColors.length > 0) {
+    finalAttributes[canonicalColorKey] = payloadColors.map(c => `${c.label}|${c.color}`);
   }
 
   // 2. Size Options
@@ -1499,7 +1568,7 @@ const submitForm = async () => {
 
   // 3. Other attributes
   Object.keys(form.value.selectedAttributes).forEach(key => {
-    if (['color', 'اللون', 'size', 'المقاس', 'الحجم'].includes(key)) return;
+    if (isColorAttribute({ name: key, label: key }) || ['size', 'المقاس', 'الحجم'].includes(key)) return;
     const combined = [
       ...(form.value.selectedAttributes[key] || []),
       ...(customAttributes.value[key] || [])
@@ -1508,16 +1577,8 @@ const submitForm = async () => {
       finalAttributes[key] = Array.from(new Set(combined));
     }
   });
-
-  // 4. Custom Technical Specifications
-  (form.value.specs || []).forEach(sp => {
-    if (sp.key && sp.value) {
-      finalAttributes[sp.key.trim()] = [sp.value.trim()];
-    }
-  });
-
   fd.append('attributes', JSON.stringify(finalAttributes));
-  fd.append('color_options', JSON.stringify(form.value.colors || []));
+  fd.append('color_options', JSON.stringify(payloadColors));
   fd.append('size_options', JSON.stringify(form.value.sizes || []));
 
   // Images
@@ -1574,9 +1635,9 @@ const confirmDelete = async (prod) => {
 .page-title { font-size: 1.4rem; font-weight: 800; color: #111827; margin-bottom: 0.2rem; }
 .page-subtitle { font-size: 0.85rem; color: #6b7280; }
 .add-btn {
-  display: flex; align-items: center; gap: 0.5rem; background: #873260; color: #fff; border: none; padding: 0.65rem 1.1rem; border-radius: 8px; font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 6px; background: #000000; color: #fff; border: 1px solid #000000; padding: 6px 14px; border-radius: 6px; font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; width: fit-content;
 }
-.add-btn:hover { background: #6E1A41; }
+.add-btn:hover { background: #262626; border-color: #262626; }
 
 /* Stats Cards */
 .stats-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
@@ -1671,6 +1732,9 @@ const confirmDelete = async (prod) => {
 .tab-btn.active { color: #873260; }
 .tab-btn.active::after { content:''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #873260; }
 .tab-pane { animation: fadeIn 0.3s; }
+.attributes-tab-pane { display: flex; flex-direction: column; }
+.attributes-tab-pane > .variant-section-card { order: 1; }
+.attributes-tab-pane > .api-attributes-section { order: 0; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Form Fields */
@@ -1759,9 +1823,9 @@ const confirmDelete = async (prod) => {
 .custom-color-hex { width: 80px; border: none; font-family: monospace; font-size: 0.8rem; font-weight: 700; padding: 0; }
 .custom-color-hex:focus { border: none; box-shadow: none; }
 .btn-add-variant {
-  background: #873260; color: #fff; border: none; padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: #000000; color: #fff; border: 1px solid #000000; padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
 }
-.btn-add-variant:hover { background: #6E1A41; }
+.btn-add-variant:hover { background: #262626; border-color: #262626; }
 
 .selected-items-block { border-top: 1px dashed #e5e7eb; padding-top: 0.8rem; margin-top: 0.5rem; }
 .selected-colors-grid { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -1779,20 +1843,20 @@ const confirmDelete = async (prod) => {
 .size-preset-pill {
   display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.85rem; border: 1.5px solid #e5e7eb; border-radius: 8px; background: #fff; font-size: 0.8rem; font-weight: 700; color: #374151; cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
 }
-.size-preset-pill:active { border-color: #873260; background: #fdf2f8; color: #873260; box-shadow: 0 0 0 1px #873260; }
+.size-preset-pill:active { border-color: #000000; background: #f3f4f6; color: #000000; box-shadow: 0 0 0 1px #000000; }
 
 /* Technical Specs Admin Styles */
 .specs-presets-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
 .spec-preset-pill {
   display: inline-flex; align-items: center; padding: 0.35rem 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; background: #fff; font-size: 0.8rem; font-weight: 700; color: #374151; cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
 }
-.spec-preset-pill:hover { border-color: #873260; color: #873260; background: #fdfafb; }
+.spec-preset-pill:hover { border-color: #000000; color: #000000; background: #f9fafb; }
 
 .add-spec-row { display: flex; gap: 0.6rem; align-items: center; margin-bottom: 1rem; }
 .btn-add-spec {
-  background: #873260; color: #fff; border: none; padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: #000000; color: #fff; border: 1px solid #000000; padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; font-family: 'IBM Plex Sans Arabic', sans-serif;
 }
-.btn-add-spec:hover { background: #6E1A41; }
+.btn-add-spec:hover { background: #262626; border-color: #262626; }
 
 .specs-table-wrapper { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-top: 0.5rem; margin-bottom: 1rem; }
 .specs-admin-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: right; }
@@ -1809,24 +1873,29 @@ const confirmDelete = async (prod) => {
 .empty-variants-hint {
   font-size: 0.78rem; color: #9ca3af; font-style: italic; background: #f9fafb; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px dashed #e5e7eb;
 }
+.attributes-state-card {
+  display: flex; align-items: center; justify-content: center; gap: 0.75rem; min-height: 120px; padding: 1rem; border: 1px dashed #d1d5db; border-radius: 10px; background: #f9fafb; color: #6b7280; font-size: 0.85rem; font-weight: 700;
+}
+.attributes-state-card.error { flex-direction: column; color: #b91c1c; background: #fff7f7; border-color: #fecaca; }
+.attributes-retry-btn { background: #000; color: #fff; border: 0; border-radius: 6px; padding: 0.45rem 0.9rem; cursor: pointer; font-family: inherit; font-weight: 700; }
 
 .other-attrs-list { display: flex; flex-direction: column; gap: 0.8rem; }
 .other-attr-row { background: #f9fafb; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #f3f4f6; }
 .other-attr-label { font-size: 0.8rem; font-weight: 800; color: #374151; display: block; margin-bottom: 0.4rem; }
 .text-muted-xs { font-size: 0.75rem; color: #9ca3af; }
 .attr-values-list { display: flex; flex-wrap: wrap; gap: 0.8rem; }
-.attr-val-checkbox { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; position: relative; }
-.attr-val-checkbox input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+.attr-val-checkbox { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; position: relative; border: 0; padding: 0; background: transparent; font-family: inherit; }
 .checkmark { width: 16px; height: 16px; border: 1px solid #d1d5db; border-radius: 4px; display: inline-block; position: relative; background: #fff; transition: all 0.2s; }
-.attr-val-checkbox input:checked ~ .checkmark { background: #873260; border-color: #873260; }
-.attr-val-checkbox input:checked ~ .checkmark::after { content: ''; position: absolute; display: block; left: 4px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.checkmark.active { background: #000000; border-color: #000000; }
+.api-attribute-color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(17, 24, 39, 0.15); flex: 0 0 auto; }
+.checkmark.active::after { content: ''; position: absolute; display: block; left: 4px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .val-text { font-size: 0.85rem; font-weight: 600; color: #374151; }
 .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,0.1); }
 
 
 .form-actions { margin-top: 2rem; display: flex; justify-content: center; }
-.btn-submit { background: #873260; color: #fff; border: none; padding: 0.7rem 3rem; border-radius: 8px; font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
-.btn-submit:hover:not(:disabled) { background: #6E1A41; }
+.btn-submit { background: #000000; color: #fff; border: 1px solid #000000; padding: 0.65rem 2.5rem; border-radius: 8px; font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; width: fit-content; }
+.btn-submit:hover:not(:disabled) { background: #262626; border-color: #262626; }
 .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* View Details Modal */
