@@ -54,7 +54,7 @@
           <div v-else class="wishlist-list">
             <div v-for="item in cartState.wishlist" :key="item.id" class="wishlist-item">
               <div class="item-visual" @click="goToProduct(item)" style="cursor: pointer;">
-                <img :src="getImageUrl(item.image)" :alt="localized(item, 'name')">
+                <img :src="getImageUrl(item.image || item.images?.[0], item.id)" :alt="localized(item, 'name')" @error="$event.target.src = '/images/home/product_ceramic_hob_60.png'">
                 <div class="discount-label" v-if="item.discount > 0">
                   -{{ Math.round((item.discount / item.price) * 100) }}%
                 </div>
@@ -109,12 +109,17 @@ const { currency, fetchSettings } = useSettings();
 const { localized } = useLocalized();
 const isLoggedIn = computed(() => !!authState.token);
 
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (typeof path === 'object') return path.image_path; // Handle object if passed
-  if (path.startsWith('http')) return path;
+const getImageUrl = (path, id) => {
+  const rawPath = typeof path === 'object' && path !== null
+    ? (path.image_url || path.url || path.image || path.path || path.image_path || '')
+    : path;
+  if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
+    return rawPath;
+  }
+  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-  return `${baseUrl.replace('/api', '')}/storage/${path}`;
+  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
 const goToProduct = (product) => {

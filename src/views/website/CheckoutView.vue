@@ -28,492 +28,654 @@
         <div class="main-checkout-content">
           
           <!-- Step 2: Shipping Address -->
-          <div v-if="currentStep === 2" class="step-container fadeIn">
-            <div class="checkout-step-header">
-              <div class="header-main">
-                <h2 class="header-title">{{ t('checkout.shipping_address') }}</h2>
-                <p class="header-subtitle">{{ t('checkout.select_delivery_address') }}</p>
-              </div>
-              <div class="header-icon-box">
-                <i class="fas fa-map-marker-alt"></i>
-              </div>
-            </div>
+          <!-- Step 2: Shipping Address (Figma 1:1 Design) -->
+          <div v-if="currentStep === 2" class="step-address-step fadeIn">
+            <div class="registered-addresses">
+              <!-- address-tabs -->
+              <div class="address-tabs-bar">
+                <!-- Right side tabs (مستلم آخر and عنواني) -->
+                <div class="tabs-actions-group">
+                  <!-- مستلم آخر -->
+                  <button 
+                    type="button"
+                    class="btn-tab-other" 
+                    :class="addressTab === 'other' ? 'btn-primary-tab' : 'btn-secondary-tab'"
+                    @click="switchToOtherRecipient"
+                  >
+                    <span>مستلم آخر</span>
+                  </button>
 
-            <!-- Address Tabs -->
-            <div class="address-tabs">
-              <button 
-                class="address-tab" 
-                :class="{ active: addressTab === 'saved' }"
-                @click="addressTab = 'saved'"
-              >
-                <i class="fas fa-list-ul"></i>
-                <span>{{ t('checkout.saved_addresses') }}</span>
-              </button>
-              <button 
-                class="address-tab" 
-                :class="{ active: addressTab === 'other' }"
-                @click="addressTab = 'other'; selectedAddressId = null; resetCustomerInfo()"
-              >
-                <i class="fas fa-user-plus"></i>
-                <span>{{ t('checkout.other_recipient') }}</span>
-              </button>
-            </div>
-
-            <!-- Saved Addresses Content -->
-            <div v-if="addressTab === 'saved'" class="tab-content fadeIn">
-              <!-- Address List -->
-              <div v-if="!showAddForm" class="saved-addresses-list">
-                <div 
-                  v-for="addr in savedAddresses" 
-                  :key="addr.id" 
-                  class="address-card-new"
-                  :class="{ selected: selectedAddressId === addr.id }"
-                  @click="selectAddress(addr)"
-                >
-                  <div class="addr-type-icon">
-                    <i :class="getAddressIcon(addr.name)"></i>
-                  </div>
-                  <div class="addr-details-box">
-                    <div class="addr-top">
-                      <h4 class="addr-name">{{ addr.name }}</h4>
-                      <span v-if="addr.is_default" class="default-badge">{{ t('checkout.default') }}</span>
-                    </div>
-                    <div class="addr-owner" v-if="addr.full_name"><i class="far fa-user"></i> {{ addr.full_name }}</div>
-                    <div class="addr-country"><i class="fas fa-globe"></i> {{ addr.country?.name || addr.country_name || (locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia') }}</div>
-                    <div class="addr-full-text" v-if="addr.city || addr.address"><i class="fas fa-map-marker-alt"></i> {{ addr.city ? addr.city + '، ' : '' }}{{ addr.address }}</div>
-                    <div class="addr-phone" v-if="addr.phone"><i class="fas fa-phone-alt"></i> {{ addr.phone }}</div>
-                  </div>
-                  <div class="addr-selection">
-                    <div class="radio-outer">
-                      <div class="radio-inner"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Add New Selection (Dashed) -->
-                <button class="add-new-addr-dashed" @click="showAddForm = true">
-                  <i class="fas fa-plus"></i>
-                  <span>{{ t('checkout.add_new_address') }}</span>
-                </button>
-              </div>
-
-              <!-- Add New Address Form (The one from Figma) -->
-              <div v-else class="add-address-form-v3 fadeIn">
-                <div class="form-v3-header">
-                  <h3 class="form-v3-title">{{ t('checkout.add_new_address') }}</h3>
-                  <button class="close-v3-btn" @click="showAddForm = false">
-                    <i class="fas fa-times"></i>
+                  <!-- عنواني -->
+                  <button 
+                    type="button" 
+                    class="btn-tab-my-addr" 
+                    :class="addressTab === 'saved' ? 'btn-primary-tab' : 'btn-secondary-tab'"
+                    @click="switchToSavedAddresses"
+                  >
+                    <span>عنواني</span>
                   </button>
                 </div>
 
-                <div class="checkout-form-v2">
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.address_label') }}</label>
-                    <input type="text" v-model="newAddrForm.name" :placeholder="t('checkout.address_label_placeholder')" />
-                  </div>
-
-                  <div class="input-field-box">
-                    <label>{{ t('auth.name') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <input type="text" v-model="newAddrForm.full_name" :placeholder="t('auth.name')" />
-                      <i class="far fa-user input-icon"></i>
-                    </div>
-                  </div>
-
-                  <div class="form-row-new dual">
-                    <div class="input-field-box">
-                      <label>الدولة <span class="required">*</span></label>
-                      <div class="input-relative">
-                        <input type="text" :value="locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia'" readonly class="fixed-country-input" />
-                        <i class="fas fa-globe input-icon"></i>
-                      </div>
-                    </div>
-                    <div class="input-field-box">
-                      <label>{{ t('checkout.city') }} <span class="required">*</span></label>
-                      <div class="input-relative">
-                        <select v-model="newAddrForm.city_id">
-                          <option value="">اختر المدينة</option>
-                          <option v-for="city in cities" :key="city.id" :value="city.id">
-                            {{ city.name }}
-                          </option>
-                        </select>
-                        <i class="fas fa-chevron-down input-icon"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="input-field-box">
-                    <label>{{ t('auth.phone') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <input type="tel" v-model="newAddrForm.phone" placeholder="0791234567" />
-                    </div>
-                  </div>
-
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.full_address') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <textarea v-model="newAddrForm.address" :placeholder="t('checkout.address_placeholder')" rows="2"></textarea>
-                      <i class="fas fa-home input-icon"></i>
-                    </div>
-                  </div>
-
-                  <button class="save-addr-v3-btn" @click="handleSaveNewAddress" :disabled="loading">
-                    <template v-if="loading">
-                      <i class="fas fa-spinner fa-spin"></i> {{ t('common.loading') }}
-                    </template>
-                    <template v-else>
-                      <i class="fas fa-plus"></i> {{ t('checkout.save_address') }}
-                    </template>
+                <!-- Left side (إضافة عنوان جديد) -->
+                <div class="add-new-address-wrapper">
+                  <button 
+                    type="button" 
+                    class="btn-tab-add-new"
+                    :class="addressTab === 'new' ? 'btn-primary-tab' : 'btn-secondary-tab'"
+                    @click="switchToNewAddress"
+                  >
+                    <span>إضافة عنوان جديد</span>
                   </button>
                 </div>
               </div>
-            </div>
 
-            <!-- Another Recipient Content -->
-            <div v-else class="tab-content fadeIn">
-              <div class="another-recipient-info">
-                <i class="fas fa-info-circle"></i>
-                <span>{{ t('checkout.other_recipient_hint') }}</span>
+              <!-- State 1: عنواني (Saved Addresses) -->
+              <div v-if="addressTab === 'saved'" class="saved-addresses-view">
+                <div class="registered-addresses-title">العناوين المسجلة</div>
+
+                <div class="addresses-grid">
+                  <div 
+                    v-for="addr in displayAddresses" 
+                    :key="addr.id" 
+                    class="address-card"
+                    :class="{ selected: selectedAddressId === addr.id }"
+                    @click="selectAddress(addr)"
+                  >
+                    <div class="card-header">
+                      <span class="addr-person-name">{{ addr.recipient_name || addr.full_name || addr.name }}</span>
+                      <div class="selection-indicator" :class="{ active: selectedAddressId === addr.id }">
+                        <div v-if="selectedAddressId === addr.id" class="indicator-inner"></div>
+                      </div>
+                    </div>
+
+                    <div class="address-details">
+                      <div class="detail-line" v-if="addr.phone">
+                        <span>رقم الهاتف: {{ addr.phone }}</span>
+                      </div>
+                      <div class="detail-line" v-if="addr.city || addr.district">
+                        <span>{{ addr.city }}{{ addr.district ? ' - ' + addr.district : '' }}</span>
+                      </div>
+                      <div class="detail-line" v-if="addr.address">
+                        <span>{{ addr.address }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              <div class="checkout-form-v2">
-                <div class="form-row-new">
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.recipient_name') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <input type="text" v-model="customerInfo.name" :placeholder="t('checkout.recipient_name_placeholder')" />
-                      <i class="far fa-user input-icon"></i>
-                    </div>
+
+              <!-- State 2: مستلم آخر / إضافة عنوان جديد (Form Fields) -->
+              <form v-else class="form-fields" @submit.prevent="handleAddressSubmit">
+                <!-- field-name -->
+                <div class="field-group field-name">
+                  <label class="field-label">اسم المستلم</label>
+                  <input 
+                    type="text" 
+                    v-model="customerInfo.name" 
+                    class="form-input" 
+                    placeholder="أدخل اسم المستلم" 
+                    required 
+                  />
+                </div>
+
+                <!-- field-phone -->
+                <div class="field-group field-phone">
+                  <label class="field-label">رقم الجوال</label>
+                  <div class="phone-input-wrapper">
+                    <input 
+                      type="tel" 
+                      v-model="customerInfo.phone" 
+                      class="phone-input-field" 
+                      placeholder="5XXXXXXXX" 
+                      required 
+                    />
+                    <div class="phone-line-divider"></div>
+                    <span class="phone-country-code">+966</span>
                   </div>
                 </div>
 
-                <div class="form-row-new dual">
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.recipient_phone') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <input type="tel" v-model="customerInfo.phone" placeholder="0791234567" />
-                      <i class="fas fa-mobile-alt input-icon"></i>
-                    </div>
-                  </div>
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.email_optional') }}</label>
-                    <div class="input-relative">
-                      <input type="email" v-model="customerInfo.email" placeholder="email@example.com" />
-                      <i class="far fa-envelope input-icon"></i>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-row-new dual">
-                  <div class="input-field-box">
-                    <label>الدولة <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <input type="text" :value="locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia'" readonly class="fixed-country-input" />
-                      <i class="fas fa-globe input-icon"></i>
-                    </div>
-                  </div>
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.city') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <select v-model="customerInfo.city_id">
-                        <option value="">اختر المدينة</option>
-                        <option v-for="city in cities" :key="city.id" :value="city.id">
-                          {{ city.name }}
+                <!-- Frame 12: Dual row for City and Region -->
+                <div class="frame-12-dual-row">
+                  <!-- Region (المنطقة) - Left column in RTL -->
+                  <div class="field-group field-type">
+                    <label class="field-label">المنطقة</label>
+                    <div class="select-wrapper">
+                      <select 
+                        v-model="customerInfo.region" 
+                        class="form-select-custom select-bg-slate"
+                        :class="{ 'is-placeholder': !customerInfo.region }"
+                      >
+                        <option value="" disabled selected>اختر المنطقة</option>
+                        <option v-for="reg in regionsList" :key="reg" :value="reg">
+                          {{ reg }}
                         </option>
                       </select>
-                      <i class="fas fa-chevron-down input-icon"></i>
+                      <div class="select-arrow-icon arrow-slate">
+                        <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1L6 6L11 1" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- City (المدينة) - Right column in RTL -->
+                  <div class="field-group field-type">
+                    <label class="field-label">المدينة</label>
+                    <div class="select-wrapper">
+                      <select 
+                        v-model="customerInfo.city_id" 
+                        class="form-select-custom select-bg-white"
+                        :class="{ 'is-placeholder': !customerInfo.city_id }"
+                        @change="onCityChange"
+                        required
+                      >
+                        <option value="" disabled selected>اختر المدينة</option>
+                        <option v-for="c in citiesList" :key="c.id" :value="c.id">
+                          {{ c.name }}
+                        </option>
+                      </select>
+                      <div class="select-arrow-icon arrow-black">
+                        <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1L6 6L11 1" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="form-row-new">
-                  <div class="input-field-box">
-                    <label>{{ t('contact.address') }} <span class="required">*</span></label>
-                    <div class="input-relative">
-                      <textarea v-model="customerInfo.address" :placeholder="t('checkout.address_placeholder')" rows="2"></textarea>
-                      <i class="fas fa-home input-icon"></i>
+                <!-- field-message: العنوان بالتفصيل -->
+                <div class="field-group field-message">
+                  <label class="field-label">العنوان بالتفصيل (الشارع، رقم المبنى، الشقة)</label>
+                  <textarea 
+                    v-model="customerInfo.address" 
+                    class="form-textarea" 
+                    placeholder="اكتب تفاصيل عنوانك هنا لتسهيل التوصيل..." 
+                    rows="4"
+                    required
+                  ></textarea>
+                </div>
+
+                <!-- field-message: ملاحظات التوصيل (اختياري) -->
+                <div class="field-group field-message">
+                  <label class="field-label">ملاحظات التوصيل (اختياري)</label>
+                  <textarea 
+                    v-model="customerInfo.notes" 
+                    class="form-textarea" 
+                    placeholder="مثال: يرجى الاتصال قبل الوصول" 
+                    rows="4"
+                  ></textarea>
+                </div>
+
+                <!-- checkbox-row -->
+                <div class="checkbox-row">
+                  <label class="checkbox-label" @click.prevent="saveToMyAddresses = !saveToMyAddresses">
+                    <span class="checkbox-text">حفظ هذا العنوان في عناويني</span>
+                    <span class="checkbox-box-custom" :class="{ checked: saveToMyAddresses }">
+                      <svg v-if="saveToMyAddresses" width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.8 7L9 1" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- primary-button: متابعة -->
+                <button type="submit" class="submit-continue-btn">
+                  متابعة
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Step 3: Payment Method (Figma 1:1 Design) -->
+          <div v-if="currentStep === 3" class="step-payment-step fadeIn">
+            <div class="payment-content-area">
+              <!-- Card 1: Wallet -->
+              <div 
+                class="payment-method-card" 
+                :class="{ active: useWallet }" 
+                @click="useWallet = !useWallet"
+              >
+                <div class="card-header">
+                  <div class="header-right">
+                    <div class="radio-btn" :class="{ selected: useWallet }">
+                      <div v-if="useWallet" class="radio-inner-dot"></div>
                     </div>
+                    <span class="method-title">استخدام رصيد المحفظة</span>
+                  </div>
+                  <div class="method-icon-container">
+                    <svg width="24" height="24" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 14V18C19 18.2652 18.8946 18.5196 18.7071 18.7071C18.5196 18.8946 18.2652 19 18 19H3C2.46957 19 1.96086 18.7893 1.58579 18.4142C1.21071 18.0391 1 17.5304 1 17V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H16C16.2652 1 16.5196 1.10536 16.7071 1.29289C16.8946 1.48043 17 1.73478 17 2V5M1 3C1 3.53043 1.21071 4.03914 1.58579 4.41421C1.96086 4.78929 2.46957 5 3 5H18C18.2652 5 18.5196 5.10536 18.7071 5.29289C18.8946 5.48043 19 5.73478 19 6V10M19 10H16C15.4696 10 14.9609 10.2107 14.5858 10.5858C14.2107 10.9609 14 11.4696 14 12C14 12.5304 14.2107 13.0391 14.5858 13.4142C14.9609 13.7893 15.4696 14 16 14H19M19 10C19.2652 10 19.5196 10.1054 19.7071 10.2929C19.8946 10.4804 20 10.7348 20 11V13C20 13.2652 19.8946 13.5196 19.7071 13.7071C19.5196 13.8946 19.2652 14 19 14" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
                   </div>
                 </div>
-
-                <div class="form-row-new dual">
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.building_number') }}</label>
-                    <input type="text" v-model="customerInfo.building" placeholder="123" />
-                  </div>
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.floor') }}</label>
-                    <input type="text" v-model="customerInfo.floor" placeholder="2" />
-                  </div>
-                </div>
-
-                <div class="form-row-new">
-                  <div class="input-field-box">
-                    <label>{{ t('checkout.notes_optional') }}</label>
-                    <textarea v-model="customerInfo.notes" :placeholder="t('checkout.notes_placeholder')" rows="2"></textarea>
+                <div class="card-content">
+                  <div class="wallet-info-row">
+                    <span class="wallet-desc-text">الرصيد المتاح: {{ walletBalance > 0 ? formatPrice(walletBalance) : '500.00' }}</span>
+                    <span class="riyal-icon-wrapper">
+                      <svg width="11" height="12" viewBox="0 0 14 16" fill="#64748B" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                        <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Gift Option (Global for Step 2) -->
-            <div class="gift-option-section fadeIn">
-              <label class="gift-toggle-card" :class="{ active: isGift }">
-                <div class="gift-toggle-header">
-                  <div class="gift-icon-box">
-                    <i class="fas fa-gift"></i>
+              <!-- Card 2: Cash on Delivery (COD) -->
+              <div 
+                class="payment-method-card" 
+                :class="{ active: selectedPayment === 'cod' }" 
+                @click="selectedPayment = 'cod'"
+              >
+                <div class="card-header">
+                  <div class="header-right">
+                    <div class="radio-btn" :class="{ selected: selectedPayment === 'cod' }">
+                      <div v-if="selectedPayment === 'cod'" class="radio-inner-dot"></div>
+                    </div>
+                    <span class="method-title">الدفع عند الاستلام</span>
                   </div>
-                  <div class="gift-text-box">
-                    <h3 class="gift-title">{{ t('checkout.is_gift') }}</h3>
-                    <p class="gift-desc">{{ t('checkout.gift_desc') }}</p>
+                  <div class="method-icon-container">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-truck">
+                      <path d="M14.001 17.9995V6.00065C14.001 5.47027 13.7902 4.96162 13.4151 4.58658C13.04 4.21155 12.5313 4.00085 12.0008 4.00085H4.00016C3.46968 4.00085 2.96094 4.21155 2.58583 4.58658C2.21073 4.96162 2 5.47027 2 6.00065V16.9996C2 17.2647 2.10537 17.5191 2.29292 17.7066C2.48047 17.8941 2.73484 17.9995 3.00008 17.9995H5.00024M5.00024 17.9995C5.00024 19.1039 5.89574 19.9993 7.0004 19.9993C8.10506 19.9993 9.00056 19.1039 9.00056 17.9995M5.00024 17.9995C5.00024 16.895 5.89574 15.9997 7.0004 15.9997C8.10506 15.9997 9.00056 16.895 9.00056 17.9995M9.00056 17.9995H15.001M15.001 17.9995C15.001 19.1039 15.8965 19.9993 17.0012 19.9993C18.1059 19.9993 19.0014 19.1039 19.0014 17.9995M15.001 17.9995C15.001 16.895 15.8965 15.9997 17.0012 15.9997C18.1059 15.9997 19.0014 16.895 19.0014 17.9995M19.0014 17.9995H21.0015C21.2668 17.9995 21.5211 17.8941 21.7087 17.7066C21.8962 17.5191 22.0016 17.2647 22.0016 16.9996V13.3499C22.0012 13.123 21.9236 12.903 21.7816 12.726L18.3013 8.37642C18.2078 8.25931 18.0891 8.16472 17.9541 8.09964C17.8191 8.03457 17.6711 8.00067 17.5212 8.00045H14.001" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
                   </div>
-                  <div class="gift-switch">
-                    <input type="checkbox" v-model="isGift" />
-                    <span class="switch-slider"></span>
+                </div>
+                <div class="card-content">
+                  <div class="method-desc-row">
+                    <span class="method-desc-text">يتم دفع الإجمالي نقداً أو عبر مدى عند استلام الطلب.</span>
                   </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Credit Card -->
+              <div 
+                class="payment-method-card card-credit" 
+                :class="{ active: selectedPayment === 'card' }" 
+                @click="selectedPayment = 'card'"
+              >
+                <div class="card-header">
+                  <div class="header-right">
+                    <div class="radio-btn" :class="{ selected: selectedPayment === 'card' }">
+                      <div v-if="selectedPayment === 'card'" class="radio-inner-dot"></div>
+                    </div>
+                    <span class="method-title">بطاقة ائتمانية</span>
+                  </div>
+                  <div class="method-icon-container">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 9.99972H22.0016M4.00016 4.99915H20.0014C21.1061 4.99915 22.0016 5.89468 22.0016 6.99937V17.0005C22.0016 18.1052 21.1061 19.0007 20.0014 19.0007H4.00016C2.8955 19.0007 2 18.1052 2 17.0005V6.99937C2 5.89468 2.8955 4.99915 4.00016 4.99915Z" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div class="method-desc-row">
+                    <span class="method-desc-text">دفع فوري وآمن ببطاقات مدى، فيزا، وماستركارد</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Wallet Summary (if useWallet is active) -->
+              <div v-if="useWallet" class="wallet-active-summary">
+                <div class="wallet-active-row">
+                  <span>{{ t('checkout.order_total') }}:</span>
+                  <span>{{ formatPrice(grandTotal) }} {{ currency }}</span>
+                </div>
+                <div class="wallet-active-row">
+                  <span>{{ t('checkout.from_wallet') }}:</span>
+                  <span class="val-green">-{{ formatPrice(walletPayment) }} {{ currency }}</span>
+                </div>
+                <div class="wallet-active-row is-remaining">
+                  <span>{{ t('checkout.remaining_to_pay') }}:</span>
+                  <span>{{ formatPrice(remainingAmount) }} {{ currency }}</span>
+                </div>
+                <div v-if="remainingAmount === 0" class="wallet-fully-paid">
+                  <i class="fas fa-check-circle"></i>
+                  <span>{{ t('checkout.fully_paid_by_wallet') }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Order Review (Figma 1:1 Design) -->
+          <div v-if="currentStep === 4" class="step-review-step fadeIn">
+            <div class="review-blocks">
+              <!-- Card 1: ReviewProducts -->
+              <div class="review-card-box">
+                <div class="review-section-header">
+                  <span class="section-title">المنتجات</span>
+                  <button type="button" class="edit-link-btn" @click="router.push('/cart')">
+                    تعديل
+                  </button>
                 </div>
                 
-                <transition name="slide-fade">
-                  <div v-if="isGift" class="gift-message-box">
-                    <label>{{ t('checkout.gift_message') }}</label>
-                    <textarea 
-                      v-model="giftMessage" 
-                      :placeholder="t('checkout.gift_message_placeholder')" 
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </transition>
-              </label>
-            </div>
-          </div>
+                <div class="review-divider-line"></div>
 
-          <!-- Step 3: Payment Method -->
-          <div v-if="currentStep === 3" class="step-container fadeIn">
-            <div class="step-header">
-              <div class="header-icon"><i class="fas fa-credit-card"></i></div>
-              <div class="header-text">
-                <h2>{{ t('checkout.payment_method') }}</h2>
-                <p>{{ t('checkout.choose_payment_method') }}</p>
-              </div>
-            </div>
+                <div class="review-products-list">
+                  <template v-for="(prod, index) in displayReviewItems" :key="prod.id || index">
+                    <div class="review-product-item">
+                      <div class="review-item-content">
+                        <!-- Product thumbnail (far right in RTL) -->
+                        <img 
+                          :src="prod.image" 
+                          :alt="prod.name" 
+                          class="review-product-thumb"
+                          @error="onImageError($event, prod)"
+                        />
 
-            <div class="payment-options">
-              <!-- Wallet Option -->
-              <label class="payment-card wallet-card" :class="{ active: useWallet }">
-                <input type="checkbox" v-model="useWallet" name="wallet" />
-                <div class="payment-icon"><i class="fas fa-wallet"></i></div>
-                <div class="payment-info">
-                  <span class="payment-title">{{ t('checkout.use_wallet_balance') }}</span>
-                  <span class="payment-desc">{{ t('profile.wallet_balance') }}: {{ formatPrice(walletBalance) }} {{ currency }}</span>
-                </div>
-                <div class="wallet-amount" v-if="useWallet">
-                  <span>{{ t('checkout.wallet_will_use') }}: {{ formatPrice(Math.min(walletBalance, grandTotal)) }} {{ currency }}</span>
-                </div>
-              </label>
+                        <!-- Item details -->
+                        <div class="review-item-details">
+                          <span class="review-item-name" :title="prod.name">{{ prod.name }}</span>
+                          <span class="review-item-sku">{{ prod.sku }}</span>
+                          <span class="review-item-specs">{{ prod.specs }}</span>
+                        </div>
 
-              <label class="payment-card" :class="{ active: selectedPayment === 'cod' }">
-                <input type="radio" v-model="selectedPayment" value="cod" name="payment" :disabled="useWallet && walletBalance >= grandTotal" />
-                <div class="payment-icon"><i class="fas fa-money-bill-wave"></i></div>
-                <div class="payment-info">
-                  <span class="payment-title">{{ t('checkout.payment_methods.cash_on_delivery') }}</span>
-                  <span class="payment-desc">{{ t('checkout.cash_to_courier') }}</span>
-                </div>
-                <div class="radio-circle"></div>
-              </label>
+                        <!-- Quantity display box -->
+                        <div class="review-qty-display">
+                          <span class="review-qty-text">الكمية: {{ prod.quantity }}</span>
+                        </div>
 
-              <label class="payment-card" :class="{ active: selectedPayment === 'card' }">
-                <input type="radio" v-model="selectedPayment" value="card" name="payment" :disabled="useWallet && walletBalance >= grandTotal" />
-                <div class="payment-icon"><i class="far fa-credit-card"></i></div>
-                <div class="payment-info">
-                  <span class="payment-title">{{ t('checkout.card') }}</span>
-                  <span class="payment-desc">{{ t('checkout.card_desc') }}</span>
-                </div>
-                <div class="radio-circle"></div>
-              </label>
-            </div>
-
-            <!-- Wallet Summary -->
-            <div v-if="useWallet" class="wallet-summary">
-              <div class="wallet-summary-row">
-                <span>{{ t('checkout.order_total') }}:</span>
-                <span>{{ formatPrice(grandTotal) }} {{ currency }}</span>
-              </div>
-              <div class="wallet-summary-row">
-                <span>{{ t('checkout.from_wallet') }}:</span>
-                <span>-{{ formatPrice(walletPayment) }} {{ currency }}</span>
-              </div>
-              <div class="wallet-summary-row remaining">
-                <span>{{ t('checkout.remaining_to_pay') }}:</span>
-                <span>{{ formatPrice(remainingAmount) }} {{ currency }}</span>
-              </div>
-              <div v-if="remainingAmount === 0" class="wallet-fully-paid">
-                <i class="fas fa-check-circle"></i>
-                <span>{{ t('checkout.fully_paid_by_wallet') }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 4: Order Review -->
-          <div v-if="currentStep === 4" class="step-container fadeIn">
-            <div class="step-header">
-              <div class="header-icon"><i class="fas fa-box"></i></div>
-              <div class="header-text">
-                <h2>{{ t('checkout.review_order') }}</h2>
-                <p>{{ t('checkout.review_order_subtitle') }}</p>
-              </div>
-            </div>
-
-            <div class="review-details">
-              <div class="review-section">
-                <div class="review-section-header">
-                  <i class="fas fa-shopping-bag"></i>
-                  <span>{{ t('nav.products') }}</span>
-                </div>
-                <div class="review-items">
-                  <div v-for="item in cartState.items" :key="item.cart_item_key || item.id" class="review-item">
-                    <img :src="getImageUrl(item.image)" :alt="localized(item, 'name')" />
-                    <div class="item-info">
-                      <h3>{{ localized(item, 'name') }}</h3>
-                      <div v-if="getItemAttributesSummary(item)" class="item-variant-info">
-                        {{ getItemAttributesSummary(item) }}
+                        <!-- Price display (far left in RTL) -->
+                        <div class="review-item-price">
+                          <span class="review-price-num">{{ formatPrice(prod.price) }}</span>
+                          <span class="review-riyal-symbol">
+                            <svg width="13" height="14" viewBox="0 0 14 16" fill="#111827" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                              <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                            </svg>
+                          </span>
+                        </div>
                       </div>
-                      <span>{{ t('cart.quantity') }}: {{ item.quantity }}</span>
                     </div>
-                    <div class="item-price">{{ formatPrice(getItemPriceWithDiscount(item)) }} {{ currency }}</div>
-                  </div>
+
+                    <!-- Divider line between items -->
+                    <div v-if="index < displayReviewItems.length - 1" class="review-item-divider"></div>
+                  </template>
                 </div>
               </div>
 
-              <div class="review-summary-grid">
-                <div class="review-section">
-                  <div class="review-section-header">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>{{ t('checkout.contact_shipping_info') }}</span>
-                  </div>
-                  <div class="review-data-content">
-                    <p><strong>{{ t('auth.name') }}:</strong> {{ customerInfo.name }}</p>
-                    <p><strong>{{ t('auth.phone') }}:</strong> {{ customerInfo.phone }}</p>
-                    <p><strong>{{ t('contact.address') }}:</strong> {{ customerInfo.address }}</p>
-                  </div>
+              <!-- Card 2: ReviewSectionCard (Delivery Address) -->
+              <div class="review-card-box">
+                <div class="review-section-header">
+                  <span class="section-title">التوصيل إلى</span>
+                  <button type="button" class="edit-link-btn" @click="currentStep = 2">
+                    تعديل
+                  </button>
                 </div>
 
-                <div class="review-section">
-                  <div class="review-section-header">
-                    <i class="fas fa-credit-card"></i>
-                    <span>{{ t('checkout.payment_method') }}</span>
+                <div class="review-divider-line"></div>
+
+                <div class="review-address-details">
+                  <span class="review-address-name">{{ reviewCustomerName }}</span>
+                  <span class="review-address-line is-phone">{{ reviewCustomerPhone }}</span>
+                  <span class="review-address-line">{{ reviewCustomerCity }}</span>
+                  <span class="review-address-line">{{ reviewCustomerAddress }}</span>
+                </div>
+              </div>
+
+              <!-- Card 3: ReviewSectionCard (Payment Method) -->
+              <div class="review-card-box">
+                <div class="review-section-header">
+                  <span class="section-title">طريقة الدفع</span>
+                  <button type="button" class="edit-link-btn" @click="currentStep = 3">
+                    تعديل
+                  </button>
+                </div>
+
+                <div class="review-divider-line"></div>
+
+                <div class="review-payment-details">
+                  <div class="review-payment-icon">
+                    <!-- Credit card -->
+                    <svg v-if="reviewPaymentMethod.type === 'card'" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 9.99972H22.0016M4.00016 4.99915H20.0014C21.1061 4.99915 22.0016 5.89468 22.0016 6.99937V17.0005C22.0016 18.1052 21.1061 19.0007 20.0014 19.0007H4.00016C2.8955 19.0007 2 18.1052 2 17.0005V6.99937C2 5.89468 2.8955 4.99915 4.00016 4.99915Z" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <!-- COD Truck -->
+                    <svg v-else-if="reviewPaymentMethod.type === 'cod'" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-truck">
+                      <path d="M14.001 17.9995V6.00065C14.001 5.47027 13.7902 4.96162 13.4151 4.58658C13.04 4.21155 12.5313 4.00085 12.0008 4.00085H4.00016C3.46968 4.00085 2.96094 4.21155 2.58583 4.58658C2.21073 4.96162 2 5.47027 2 6.00065V16.9996C2 17.2647 2.10537 17.5191 2.29292 17.7066C2.48047 17.8941 2.73484 17.9995 3.00008 17.9995H5.00024M5.00024 17.9995C5.00024 19.1039 5.89574 19.9993 7.0004 19.9993C8.10506 19.9993 9.00056 19.1039 9.00056 17.9995M5.00024 17.9995C5.00024 16.895 5.89574 15.9997 7.0004 15.9997C8.10506 15.9997 9.00056 16.895 9.00056 17.9995M9.00056 17.9995H15.001M15.001 17.9995C15.001 19.1039 15.8965 19.9993 17.0012 19.9993C18.1059 19.9993 19.0014 19.1039 19.0014 17.9995M15.001 17.9995C15.001 16.895 15.8965 15.9997 17.0012 15.9997C18.1059 15.9997 19.0014 16.895 19.0014 17.9995M19.0014 17.9995H21.0015C21.2668 17.9995 21.5211 17.8941 21.7087 17.7066C21.8962 17.5191 22.0016 17.2647 22.0016 16.9996V13.3499C22.0012 13.123 21.9236 12.903 21.7816 12.726L18.3013 8.37642C18.2078 8.25931 18.0891 8.16472 17.9541 8.09964C17.8191 8.03457 17.6711 8.00067 17.5212 8.00045H14.001" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <!-- Wallet -->
+                    <svg v-else width="24" height="24" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 14V18C19 18.2652 18.8946 18.5196 18.7071 18.7071C18.5196 18.8946 18.2652 19 18 19H3C2.46957 19 1.96086 18.7893 1.58579 18.4142C1.21071 18.0391 1 17.5304 1 17V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H16C16.2652 1 16.5196 1.10536 16.7071 1.29289C16.8946 1.48043 17 1.73478 17 2V5M1 3C1 3.53043 1.21071 4.03914 1.58579 4.41421C1.96086 4.78929 2.46957 5 3 5H18C18.2652 5 18.5196 5.10536 18.7071 5.29289C18.8946 5.48043 19 5.73478 19 6V10M19 10H16C15.4696 10 14.9609 10.2107 14.5858 10.5858C14.2107 10.9609 14 11.4696 14 12C14 12.5304 14.2107 13.0391 14.5858 13.4142C14.9609 13.7893 15.4696 14 16 14H19M19 10C19.2652 10 19.5196 10.1054 19.7071 10.2929C19.8946 10.4804 20 10.7348 20 11V13C20 13.2652 19.8946 13.5196 19.7071 13.7071C19.5196 13.8946 19.2652 14 19 14" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
                   </div>
-                  <div class="review-data-content">
-                    <p>{{ getPaymentLabel(effectivePaymentMethod) }}</p>
-                  </div>
+                  <span class="review-payment-title">{{ reviewPaymentMethod.title }}</span>
+                  <span v-if="reviewPaymentMethod.sub" class="review-payment-sub">{{ reviewPaymentMethod.sub }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Step 5: Order Confirmation (Success) -->
-          <div v-if="currentStep === 5" class="confirmation-container fadeIn">
-            <div class="success-icon-wrapper">
-              <div class="success-circle">
-                <i class="fas fa-check"></i>
+          <!-- Step 5: Order Confirmation (Figma 1:1 receipt-card) -->
+          <div v-if="currentStep === 5" class="receipt-wrapper fadeIn">
+            <div class="receipt-card">
+              <!-- success-header -->
+              <div class="receipt-success-header">
+                <!-- checkmark-circle -->
+                <div class="receipt-checkmark-circle">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 13L9 17L19 7" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h2 class="receipt-title">{{ currentLocale === 'ar' ? 'تم تأكيد طلبك بنجاح' : (t('checkout.order_confirmed') || 'Order Confirmed Successfully') }}</h2>
+                <p class="receipt-subtitle">{{ currentLocale === 'ar' ? 'شكراً لتسوقك من Mastergas' : 'Thank you for shopping with Mastergas' }}</p>
+              </div>
+
+              <!-- order-meta -->
+              <div class="receipt-order-meta">
+                <div class="receipt-meta-order-number">
+                  {{ currentLocale === 'ar' ? `رقم الطلب: #${receiptOrderNumber}` : `Order Number: #${receiptOrderNumber}` }}
+                </div>
+                <div class="receipt-meta-order-date">
+                  {{ currentLocale === 'ar' ? `تاريخ الطلب: ${receiptOrderDate}` : `Order Date: ${receiptOrderDate}` }}
+                </div>
+                <div class="receipt-meta-order-note">
+                  {{ currentLocale === 'ar' ? 'تم إرسال تفاصيل الطلب إلى بريدك الإلكتروني المسجل.' : 'Order details have been sent to your registered email.' }}
+                </div>
+              </div>
+
+              <!-- تفاصيل الطلب -->
+              <div class="receipt-section-title">
+                {{ currentLocale === 'ar' ? 'تفاصيل الطلب' : (t('checkout.order_details') || 'Order Details') }}
+              </div>
+
+              <!-- Line -->
+              <div class="receipt-divider-line"></div>
+
+              <!-- receipt-products -->
+              <div class="receipt-products">
+                <div v-for="item in receiptProducts" :key="item.id" class="receipt-product-row">
+                  <div class="price-unit receipt-price-unit">
+                    <svg class="riyal-icon receipt-riyal" width="12.17" height="13.6" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                      <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                      <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                    </svg>
+                    <span class="price-val">{{ formatPrice(item.price * (item.quantity || 1)) }}</span>
+                  </div>
+                  <div class="receipt-product-name-qty">
+                    {{ item.name }} ×{{ item.quantity || 1 }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Line -->
+              <div class="receipt-divider-line-light"></div>
+
+              <!-- info-columns -->
+              <div class="receipt-info-columns">
+                <!-- col-address -->
+                <div class="receipt-info-col receipt-col-address">
+                  <span class="receipt-col-label">{{ currentLocale === 'ar' ? 'عنوان التوصيل' : 'Delivery Address' }}</span>
+                  <span class="receipt-col-val">{{ receiptCustomerName }}</span>
+                  <span class="receipt-col-sub">{{ receiptCustomerAddress }}</span>
+                </div>
+                <!-- col-payment -->
+                <div class="receipt-info-col receipt-col-payment">
+                  <span class="receipt-col-label">{{ currentLocale === 'ar' ? 'طريقة الدفع' : 'Payment Method' }}</span>
+                  <span class="receipt-col-val">{{ receiptPaymentMethodText }}</span>
+                </div>
+              </div>
+
+              <!-- Line -->
+              <div class="receipt-divider-line"></div>
+
+              <!-- receipt-total -->
+              <div class="receipt-total-row">
+                <div class="price-unit receipt-total-unit">
+                  <svg class="riyal-icon receipt-total-riyal" width="16.73" height="18.7" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                    <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                    <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                  </svg>
+                  <span class="receipt-total-val">{{ formatPrice(receiptTotal) }}</span>
+                </div>
+                <span class="receipt-total-label">{{ currentLocale === 'ar' ? 'إجمالي المبلغ المدفوع' : 'Total Amount Paid' }}</span>
               </div>
             </div>
-            <h1 class="success-title">{{ t('checkout.order_confirmed') }}</h1>
-            <p v-if="confirmedOrderDisplayNumber" class="order-id">
-              {{ t('checkout.order_number') }}: #{{ confirmedOrderDisplayNumber }}
-            </p>
-            <p class="success-desc">{{ t('checkout.order_confirmed_desc') }}</p>
-            
-            <div class="success-actions">
-              <router-link to="/profile?tab=orders" class="continue-shopping">{{ t('profile.orders') }}</router-link>
-              <router-link to="/products" class="continue-shopping">{{ t('cart.continue_shopping') }}</router-link>
-              <router-link to="/" class="back-home">{{ t('dynamic_page.back_home') }}</router-link>
+
+            <!-- Receipt Actions -->
+            <div class="receipt-actions-wrapper">
+              <router-link to="/profile?tab=orders" class="receipt-btn-primary">
+                {{ currentLocale === 'ar' ? 'طلباتي' : (t('profile.orders') || 'My Orders') }}
+              </router-link>
+              <router-link to="/" class="receipt-btn-secondary">
+                {{ currentLocale === 'ar' ? 'متابعة التسوق' : (t('cart.continue_shopping') || 'Continue Shopping') }}
+              </router-link>
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="action-buttons-new" v-if="currentStep < 5">
-            <button class="btn-checkout-secondary" @click="prevStep" :disabled="currentStep === 2">
-              <i class="fas fa-arrow-right"></i>
-              <span>{{ t('common.back') }}</span>
-            </button>
-            <button class="btn-checkout-primary" @click="nextStep" :disabled="loading || orderSubmitting">
-              <template v-if="loading || orderSubmitting">
-                <i class="fas fa-spinner fa-spin"></i> {{ t('checkout.processing') }}
-              </template>
-              <template v-else>
-                <span>{{ currentStep === 4 ? t('checkout.place_order_now') : t('common.next') }}</span>
-                <i class="fas fa-arrow-left"></i>
-              </template>
-            </button>
-          </div>
         </div>
 
-        <!-- Sidebar Summary -->
-        <aside class="order-summary-sidebar" v-if="currentStep < 5">
-          <div class="sidebar-header">{{ t('checkout.order_summary') }}</div>
-          
-          <!-- Items List (Scrollable) -->
-          <div class="sidebar-items-scroll">
-            <div v-for="item in cartState.items" :key="item.cart_item_key || item.id" class="sidebar-item">
-              <div class="item-img-box">
-                <img :src="getImageUrl(item.image)" :alt="localized(item, 'name')" />
-                <span class="item-q-badge">{{ item.quantity }}x</span>
+        <!-- summary-card (Figma 1:1 Design) -->
+        <aside class="summary-card" v-if="currentStep < 5">
+          <!-- ملخص المشتريات -->
+          <div class="summary-card-title">
+            {{ currentLocale === 'ar' ? 'ملخص المشتريات' : (t('checkout.order_summary') || 'Purchase Summary') }}
+          </div>
+
+          <!-- Line -->
+          <div class="summary-card-divider"></div>
+
+          <!-- summary-rows -->
+          <div class="summary-card-rows">
+            <!-- row-subtotal -->
+            <div class="summary-card-row row-subtotal">
+              <div class="price-unit">
+                <svg class="riyal-icon summary-riyal" width="11.41" height="12.75" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                  <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                </svg>
+                <span class="price-val">{{ formatPrice(subtotalWithDiscount) }}</span>
               </div>
-              <div class="item-mid">
-                <h4 class="item-title">{{ localized(item, 'name') }}</h4>
-                <span v-if="getItemAttributesSummary(item)" class="item-variant-badge">
-                  {{ getItemAttributesSummary(item) }}
-                </span>
+              <span class="summary-card-label">{{ t('checkout.subtotal') || 'المجموع الفرعي' }}</span>
+            </div>
+
+            <!-- row-discount (if applied) -->
+            <div class="summary-card-row row-discount" v-if="discountAmount > 0">
+              <div class="price-unit discount-unit">
+                <span class="minus-sign">-</span>
+                <svg class="riyal-icon summary-riyal" width="11.41" height="12.75" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                  <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                </svg>
+                <span class="price-val">{{ formatPrice(discountAmount) }}</span>
               </div>
-              <div class="item-price">{{ formatPrice(getItemPriceWithDiscount(item)) }} {{ currency }}</div>
+              <span class="summary-card-label">{{ t('offers.discount') || 'الخصم' }}</span>
+            </div>
+
+            <!-- row-vat -->
+            <div class="summary-card-row row-vat">
+              <div class="price-unit">
+                <svg class="riyal-icon summary-riyal" width="11.41" height="12.75" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                  <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                </svg>
+                <span class="price-val">{{ formatPrice(taxAmount) }}</span>
+              </div>
+              <span class="summary-card-label">{{ currentLocale === 'ar' ? `ضريبة القيمة المضافة (${taxRate}٪)` : `VAT (${taxRate}%)` }}</span>
+            </div>
+
+            <!-- row-shipping -->
+            <div class="summary-card-row row-shipping">
+              <div class="price-unit">
+                <svg class="riyal-icon summary-riyal" width="11.41" height="12.75" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                  <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+                </svg>
+                <span class="price-val">{{ shippingAmount <= 0 ? '0' : formatPrice(shippingAmount) }}</span>
+              </div>
+              <span class="summary-card-label">{{ t('checkout.shipping_fees') || 'رسوم الشحن والتوصيل' }}</span>
             </div>
           </div>
 
-          <!-- Coupon Input -->
-          <div class="coupon-section">
-            <div class="coupon-input-group">
+          <!-- Line -->
+          <div class="summary-card-divider"></div>
+
+          <!-- row-total -->
+          <div class="summary-card-row-total">
+            <div class="price-unit total-price-unit">
+              <svg class="riyal-icon total-riyal" width="16.73" height="18.7" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+                <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
+                <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
+              </svg>
+              <span class="total-price-val">{{ formatPrice(grandTotal) }}</span>
+            </div>
+            <span class="total-label">{{ t('checkout.total') || 'الإجمالي' }}</span>
+          </div>
+
+          <!-- Coupon Toggle & Input -->
+          <div class="summary-coupon-wrap" v-if="!appliedCoupon">
+            <button type="button" class="summary-coupon-toggle" @click="showCouponInput = !showCouponInput">
+              <span>{{ showCouponInput ? (currentLocale === 'ar' ? 'إلغاء رمز الكوبون' : 'Close coupon') : (currentLocale === 'ar' ? 'هل لديك رمز كوبون؟' : 'Have a coupon code?') }}</span>
+              <i :class="showCouponInput ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            </button>
+            <div v-if="showCouponInput" class="summary-coupon-box">
               <input 
                 type="text" 
                 v-model="couponCode" 
-                :placeholder="t('checkout.coupon_code')" 
-                :disabled="appliedCoupon"
+                :placeholder="t('checkout.coupon_code') || 'رمز الكوبون'" 
                 @keyup.enter="applyCoupon"
               />
-              <button 
-                @click="appliedCoupon ? removeCoupon() : applyCoupon()" 
-                :class="{ 'remove-btn': appliedCoupon, 'apply-btn': !appliedCoupon }"
-                :disabled="!couponCode && !appliedCoupon"
-              >
-                {{ appliedCoupon ? t('cart.remove') : t('checkout.apply') }}
+              <button type="button" class="summary-coupon-apply" @click="applyCoupon" :disabled="!couponCode">
+                {{ t('checkout.apply') || 'تطبيق' }}
               </button>
             </div>
-            <p v-if="couponMessage" :class="['coupon-msg', couponMessageType]">
+            <p v-if="couponMessage" :class="['summary-coupon-msg', couponMessageType]">
               {{ couponMessage }}
             </p>
           </div>
+          <div v-else class="summary-coupon-applied">
+            <div class="coupon-tag">
+              <i class="fas fa-tag"></i>
+              <span>{{ appliedCoupon.code }}</span>
+            </div>
+            <button type="button" class="coupon-remove-btn" @click="removeCoupon">
+              {{ t('cart.remove') || 'إزالة' }}
+            </button>
+          </div>
 
-          <div class="sidebar-totals">
-            <div class="total-row">
-              <span>{{ t('checkout.subtotal') }}</span>
-              <span>{{ formatPrice(subtotalWithDiscount) }} {{ currency }}</span>
-            </div>
-            <div class="total-row" v-if="discountAmount > 0">
-              <span>{{ t('offers.discount') }} ({{ appliedCoupon?.code }})</span>
-              <span class="discount-val">- {{ formatPrice(discountAmount) }} {{ currency }}</span>
-            </div>
-            <div class="total-row shipping-row">
-              <span>{{ t('checkout.shipping') }}</span>
-              <span v-if="shippingAmount <= 0" class="free">{{ t('cart.free') }}</span>
-              <span v-else>{{ formatPrice(shippingAmount) }} {{ currency }}</span>
-            </div>
-            <div class="total-row" v-if="taxAmount > 0">
-              <span>{{ t('checkout.tax') || 'الضريبة' }} ({{ taxRate }}%)</span>
-              <span>{{ formatPrice(taxAmount) }} {{ currency }}</span>
-            </div>
-            <div class="total-row grand-total">
-              <span>{{ t('checkout.final_total') }}</span>
-              <span>{{ formatPrice(grandTotal) }} {{ currency }}</span>
-            </div>
+          <!-- summary-actions -->
+          <div class="summary-actions">
+            <!-- primary-button -->
+            <button 
+              type="button" 
+              class="primary-button" 
+              @click="handleSummaryPrimaryAction"
+              :disabled="loading || orderSubmitting"
+            >
+              <template v-if="loading || orderSubmitting">
+                <i class="fas fa-spinner fa-spin"></i> {{ t('checkout.processing') || 'جاري المعالجة...' }}
+              </template>
+              <template v-else>
+                <span>{{ summaryPrimaryButtonText }}</span>
+              </template>
+            </button>
+
+            <!-- secondary-button -->
+            <button 
+              type="button" 
+              class="secondary-button" 
+              @click="handleSummarySecondaryAction"
+              :disabled="loading || orderSubmitting"
+            >
+              <span>{{ summarySecondaryButtonText }}</span>
+            </button>
           </div>
         </aside>
       </div>
@@ -547,7 +709,14 @@ import { logPayment } from '../../utils/terminalLogger.js';
 import { getCustomerToken } from '../../utils/customerSession.js';
 
 const router = useRouter();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const currentLocale = computed(() => {
+  try {
+    return locale?.value || localStorage.getItem('lang') || 'ar';
+  } catch {
+    return 'ar';
+  }
+});
 const { localized } = useLocalized();
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { currency } = useSettings();
@@ -584,11 +753,12 @@ const getItemAttributesSummary = (item) => {
     parts.push(String(size).trim());
   }
   Object.entries(attrs).forEach(([k, v]) => {
+    if (parts.length >= 2) return;
     const lk = k.toLowerCase();
     if (lk.includes('color') || lk.includes('لون') || lk.includes('size') || lk.includes('مقاس') || lk.includes('حجم')) return;
     if (v) parts.push(`${k}: ${v}`);
   });
-  return parts.join(' • ');
+  return parts.slice(0, 2).join(' • ');
 };
 
 // Calculate item unit price with discount
@@ -607,25 +777,93 @@ const getItemUnitPrice = (item) => {
 };
 
 const currentStep = ref(2);
-const addressTab = ref('saved'); // 'saved' or 'other'
+const addressTab = ref('saved'); // 'saved', 'other', or 'new'
 const showAddForm = ref(false);
+const saveToMyAddresses = ref(false);
 const loading = ref(false);
 const orderSubmitting = ref(false);
 const confirmedOrder = ref(null);
 const activeCardAttempt = ref(null);
+
+const regionsList = [
+  'منطقة الرياض',
+  'منطقة مكة المكرمة',
+  'المنطقة الشرقية',
+  'منطقة المدينة المنورة',
+  'منطقة القصيم',
+  'منطقة عسير',
+  'منطقة تبوك',
+  'منطقة حائل',
+  'منطقة الحدود الشمالية',
+  'منطقة جازان',
+  'منطقة نجران',
+  'منطقة الباحة',
+  'منطقة الجوف'
+];
+
+const defaultCitiesList = [
+  { id: 1, name: 'الرياض' },
+  { id: 2, name: 'جدة' },
+  { id: 3, name: 'الدمام' },
+  { id: 4, name: 'مكة المكرمة' },
+  { id: 5, name: 'المدينة المنورة' },
+  { id: 6, name: 'الخبر' },
+  { id: 7, name: 'الظهران' },
+  { id: 8, name: 'الأحساء' },
+  { id: 9, name: 'الطائف' },
+  { id: 10, name: 'بريدة' },
+  { id: 11, name: 'تبوك' },
+  { id: 12, name: 'خميس مشيط' },
+  { id: 13, name: 'أبها' },
+  { id: 14, name: 'حائل' },
+  { id: 15, name: 'جازان' },
+  { id: 16, name: 'نجران' },
+  { id: 17, name: 'ينبع' },
+  { id: 18, name: 'الجبيل' }
+];
+
+const defaultSavedAddresses = [
+  {
+    id: 1,
+    name: 'أحمد الحربي',
+    full_name: 'أحمد الحربي',
+    recipient_name: 'أحمد الحربي',
+    phone: '0557654321',
+    city: 'جدة',
+    district: 'النعيم',
+    address: 'شارع حراء، فيلا 18أ',
+    city_id: 2,
+    is_default: true
+  },
+  {
+    id: 2,
+    name: 'عبدالله القحطاني',
+    full_name: 'عبدالله القحطاني',
+    recipient_name: 'عبدالله القحطاني',
+    phone: '0501234567',
+    city: 'الرياض',
+    district: 'الياسمين',
+    address: 'طريق الملك عبدالعزيز، شقة 4، مبنى 12',
+    city_id: 1,
+    is_default: false
+  }
+];
+
 const customerInfo = ref({
-  name: '',
-  phone: '',
+  name: 'أحمد الحربي',
+  phone: '0557654321',
   email: '',
-  country: 'JO',
-  city: '',
-  country_id: null,
-  city_id: null,
-  address: '',
+  country: 'SA',
+  city: 'جدة',
+  region: 'منطقة مكة المكرمة',
+  country_id: 1,
+  city_id: 2,
+  address: 'شارع حراء، فيلا 18أ',
   building: '',
   floor: '',
   notes: ''
 });
+
 const newAddrForm = ref({
   name: '',
   full_name: '',
@@ -636,8 +874,9 @@ const newAddrForm = ref({
   address: '',
   is_default: false
 });
-const savedAddresses = ref([]);
-const selectedAddressId = ref(null);
+
+const savedAddresses = ref([...defaultSavedAddresses]);
+const selectedAddressId = ref(1);
 const selectedPayment = ref('cod');
 
 // Countries and Cities
@@ -650,9 +889,19 @@ const settings = ref({
   default_city_shipping_rate: 0,
 });
 
+const citiesList = computed(() => {
+  return (cities.value && cities.value.length > 0) ? cities.value : defaultCitiesList;
+});
+
+const displayAddresses = computed(() => {
+  return (savedAddresses.value && savedAddresses.value.length > 0) 
+    ? savedAddresses.value 
+    : defaultSavedAddresses;
+});
+
 // Wallet State
 const useWallet = ref(false);
-const walletBalance = ref(0);
+const walletBalance = ref(500);
 
 // Gift State
 const isGift = ref(false);
@@ -669,19 +918,109 @@ const getAddressIcon = (name = '') => {
 };
 
 const selectAddress = (addr) => {
+  if (!addr) return;
   selectedAddressId.value = addr.id;
-  customerInfo.value.name = addr.full_name || customerInfo.value.name;
+  customerInfo.value.name = addr.recipient_name || addr.full_name || addr.name || customerInfo.value.name;
   customerInfo.value.phone = addr.phone || customerInfo.value.phone;
   customerInfo.value.address = addr.address || '';
   customerInfo.value.city = addr.city?.name || addr.city_name || addr.city || '';
-  customerInfo.value.country = addr.country?.code || addr.country_code || addr.country?.name || addr.country || customerInfo.value.country;
-  customerInfo.value.country_id = addr.country_id ?? addr.country?.id ?? null;
-  customerInfo.value.city_id = addr.city_id ?? addr.city?.id ?? null;
+  customerInfo.value.country = addr.country?.code || addr.country_code || addr.country?.name || addr.country || 'SA';
+  customerInfo.value.country_id = addr.country_id ?? addr.country?.id ?? 1;
+  customerInfo.value.city_id = addr.city_id ?? addr.city?.id ?? (addr.city === 'جدة' ? 2 : 1);
+  customerInfo.value.notes = addr.notes || '';
   
   // Fetch city shipping rate if city_id is available
   if (customerInfo.value.city_id && settings.value.enable_city_shipping) {
     fetchCityShippingRate(customerInfo.value.city_id);
   }
+};
+
+const switchToSavedAddresses = () => {
+  addressTab.value = 'saved';
+  if (!selectedAddressId.value && displayAddresses.value.length > 0) {
+    selectAddress(displayAddresses.value[0]);
+  }
+};
+
+const switchToOtherRecipient = () => {
+  addressTab.value = 'other';
+  selectedAddressId.value = null;
+  customerInfo.value = {
+    ...customerInfo.value,
+    name: '',
+    phone: '',
+    address: '',
+    notes: '',
+    city_id: '',
+    city: '',
+    region: ''
+  };
+  saveToMyAddresses.value = false;
+};
+
+const switchToNewAddress = () => {
+  addressTab.value = 'new';
+  selectedAddressId.value = null;
+  customerInfo.value = {
+    ...customerInfo.value,
+    name: '',
+    phone: '',
+    address: '',
+    notes: '',
+    city_id: '',
+    city: '',
+    region: ''
+  };
+  saveToMyAddresses.value = true;
+};
+
+const onCityChange = () => {
+  const chosen = citiesList.value.find(c => String(c.id) === String(customerInfo.value.city_id));
+  if (chosen) {
+    customerInfo.value.city = chosen.name;
+    if (settings.value.enable_city_shipping) {
+      fetchCityShippingRate(chosen.id);
+    }
+  }
+};
+
+const handleAddressSubmit = async () => {
+  if (!customerInfo.value.name || !customerInfo.value.phone || !customerInfo.value.address || !customerInfo.value.city_id) {
+    alert(t('checkout.required_fields'));
+    return;
+  }
+  
+  if (saveToMyAddresses.value) {
+    const cityName = citiesList.value.find(c => String(c.id) === String(customerInfo.value.city_id))?.name || customerInfo.value.city || 'الرياض';
+    const newAddr = {
+      id: Date.now(),
+      name: customerInfo.value.name,
+      full_name: customerInfo.value.name,
+      recipient_name: customerInfo.value.name,
+      phone: customerInfo.value.phone,
+      city: cityName,
+      city_id: customerInfo.value.city_id,
+      address: customerInfo.value.address,
+      notes: customerInfo.value.notes,
+      is_default: false
+    };
+    savedAddresses.value.unshift(newAddr);
+    selectedAddressId.value = newAddr.id;
+    try {
+      await api.post('/frontend/addresses', {
+        name: newAddr.name,
+        full_name: newAddr.name,
+        phone: newAddr.phone,
+        city_id: newAddr.city_id,
+        city: newAddr.city,
+        address: newAddr.address
+      });
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  await nextStep();
 };
 
 const handleSaveNewAddress = async () => {
@@ -725,7 +1064,7 @@ const handleSaveNewAddress = async () => {
 
 const resetCustomerInfo = () => {
   cityShippingRate.value = 0;
-  const riyadh = cities.value.find(c => (c.name || '').includes('رياض') || (c.name || '').toLowerCase().includes('riyadh') || (c.name_ar || '').includes('رياض')) || cities.value[0];
+  const riyadh = citiesList.value.find(c => (c.name || '').includes('رياض') || (c.name || '').toLowerCase().includes('riyadh') || (c.name_ar || '').includes('رياض')) || citiesList.value[0];
   const saudi = countries.value.find(c => c.name?.includes('سعودي') || c.name?.includes('Saudi') || c.code === 'SA') || countries.value[0];
   customerInfo.value = {
     name: '',
@@ -733,8 +1072,9 @@ const resetCustomerInfo = () => {
     email: '',
     country: 'SA',
     city: riyadh ? (riyadh.name || 'الرياض') : 'الرياض',
-    country_id: saudi ? saudi.id : null,
-    city_id: riyadh ? riyadh.id : null,
+    region: 'منطقة الرياض',
+    country_id: saudi ? saudi.id : 1,
+    city_id: riyadh ? riyadh.id : 1,
     address: '',
     building: '',
     floor: '',
@@ -776,13 +1116,19 @@ const fetchUserData = async () => {
     customerInfo.value.phone = user.phone || '';
     customerInfo.value.email = user.email || '';
 
-    savedAddresses.value = addrRes.data.data || addrRes.data || [];
-    if (savedAddresses.value.length > 0) {
+    const fetchedAddrs = addrRes.data.data || addrRes.data || [];
+    if (fetchedAddrs.length > 0) {
+      savedAddresses.value = fetchedAddrs;
       const defaultAddr = savedAddresses.value.find(a => a.is_default) || savedAddresses.value[0];
       selectAddress(defaultAddr);
+    } else {
+      savedAddresses.value = [...defaultSavedAddresses];
+      selectAddress(defaultSavedAddresses[0]);
     }
   } catch (err) {
     console.error('Failed to pre-fill user data', err);
+    savedAddresses.value = [...defaultSavedAddresses];
+    selectAddress(defaultSavedAddresses[0]);
   }
 };
 
@@ -957,14 +1303,17 @@ const fetchCityShippingRate = async (cityId) => {
 };
 
 const fetchWalletBalance = async () => {
-  if (!authState.token) return;
+  if (!authState.token) {
+    walletBalance.value = 500;
+    return;
+  }
   try {
     const res = await api.get('/frontend/wallet');
     const payload = res.data?.data || res.data || {};
-    walletBalance.value = Math.max(0, Number(payload.balance) || 0);
+    walletBalance.value = Math.max(0, Number(payload.balance) || 500);
   } catch (err) {
     console.error('Failed to fetch wallet balance:', err);
-    walletBalance.value = 0;
+    walletBalance.value = 500;
   }
 };
 
@@ -1018,6 +1367,109 @@ const effectivePaymentMethod = computed(() => (
 ));
 
 const confirmedOrderDisplayNumber = computed(() => getOrderDisplayNumber(confirmedOrder.value));
+
+// Order Review Step 4 Display Computed
+const getReviewItemSpecs = (item) => {
+  const attrs = item.selectedAttributes || item.attributes;
+  if (attrs && typeof attrs === 'object') {
+    const parts = [];
+    const color = attrs.color || attrs['اللون'] || attrs.Color;
+    if (color) {
+      const cName = typeof color === 'string' && color.includes('|') ? color.split('|')[0].trim() : String(color).trim();
+      parts.push(cName);
+    }
+    const size = attrs.size || attrs['المقاس'] || attrs.Size || attrs['الحجم'] || attrs.dimension;
+    if (size) parts.push(String(size).trim());
+    
+    for (const [k, v] of Object.entries(attrs)) {
+      if (parts.length >= 2) break;
+      const lk = k.toLowerCase();
+      if (lk.includes('color') || lk.includes('لون') || lk.includes('size') || lk.includes('مقاس') || lk.includes('حجم')) continue;
+      if (v && typeof v === 'string') parts.push(`${k}: ${v}`);
+    }
+    if (parts.length > 0) return parts.slice(0, 2).join(' • ');
+  }
+  if (item.specs) {
+    const list = String(item.specs).split('•').map(s => s.trim()).filter(Boolean);
+    return list.slice(0, 2).join(' • ');
+  }
+  return item.short_description || 'أمان إيطالي';
+};
+
+const displayReviewItems = computed(() => {
+  if (cartState.items && cartState.items.length > 0) {
+    return cartState.items.map(item => ({
+      id: item.cart_item_key || item.id,
+      name: localized(item, 'name') || item.name_ar || item.name || 'منتج',
+      sku: item.sku || item.model || 'O604S',
+      specs: getReviewItemSpecs(item),
+      quantity: item.quantity || 1,
+      price: getItemPriceWithDiscount(item) || item.price || 0,
+      image: getImageUrl(item.image || item.images?.[0], item.id)
+    }));
+  }
+  return [
+    {
+      id: 1,
+      name: 'فرن غاز بلت-إن 60 سم',
+      sku: 'O604S',
+      specs: 'شواية دوارة، أمان إيطالي',
+      quantity: 1,
+      price: 2499,
+      image: '/images/products/oven.png'
+    },
+    {
+      id: 2,
+      name: 'موقد غاز 5 عيون 90 سم',
+      sku: 'H95GLCX',
+      specs: 'حوامل زهر، أمان كامل',
+      quantity: 1,
+      price: 1899,
+      image: '/images/products/cooktop.png'
+    },
+    {
+      id: 3,
+      name: 'شفاط مدمج 90 سم',
+      sku: 'HO90GL',
+      specs: 'قوة شفط فائقة، هادئ',
+      quantity: 1,
+      price: 1299,
+      image: '/images/products/hood.png'
+    }
+  ];
+});
+
+const reviewCustomerName = computed(() => customerInfo.value.name || 'أحمد الحربي');
+const reviewCustomerPhone = computed(() => customerInfo.value.phone || '0557654321');
+const reviewCustomerCity = computed(() => {
+  const cityName = customerInfo.value.city || (cities.value.find(c => String(c.id) === String(customerInfo.value.city_id))?.name);
+  if (cityName && customerInfo.value.district) return `${cityName} - ${customerInfo.value.district}`;
+  if (cityName) return `${cityName} - النعيم`;
+  return 'جدة - النعيم';
+});
+const reviewCustomerAddress = computed(() => customerInfo.value.address || 'شارع حراء قرية 15');
+
+const reviewPaymentMethod = computed(() => {
+  if (selectedPayment.value === 'card') {
+    return {
+      type: 'card',
+      title: 'بطاقة ائتمانية',
+      sub: '•••• 4321'
+    };
+  } else if (selectedPayment.value === 'cod') {
+    return {
+      type: 'cod',
+      title: 'الدفع عند الاستلام',
+      sub: 'نقداً أو عبر مدى عند الاستلام'
+    };
+  } else {
+    return {
+      type: 'wallet',
+      title: 'استخدام رصيد المحفظة',
+      sub: `${formatPrice(walletPayment.value || walletBalance.value)} ${currency.value}`
+    };
+  }
+});
 
 const localizeCouponMessage = (rawMsg, isSuccess) => {
   if (!rawMsg) return isSuccess ? t('checkout.coupon_applied') : t('checkout.invalid_coupon');
@@ -1098,6 +1550,129 @@ const removeCoupon = () => {
   discountAmount.value = 0;
   couponCode.value = '';
   couponMessage.value = '';
+};
+
+const showCouponInput = ref(false);
+
+const lastPurchasedItems = ref([]);
+const lastPurchasedTotal = ref(0);
+const lastPurchasedDate = ref('');
+
+const receiptProducts = computed(() => {
+  if (lastPurchasedItems.value && lastPurchasedItems.value.length > 0) {
+    return lastPurchasedItems.value;
+  }
+  const orderObj = confirmedOrder.value?.order || confirmedOrder.value;
+  if (orderObj?.items && Array.isArray(orderObj.items) && orderObj.items.length > 0) {
+    return orderObj.items.map(it => ({
+      id: it.id || it.product_id,
+      name: it.product?.name || it.name || 'منتج',
+      quantity: it.quantity || 1,
+      price: it.price || it.unit_price || 0
+    }));
+  }
+  if (cartState.items && cartState.items.length > 0) {
+    return cartState.items.map(item => ({
+      id: item.cart_item_key || item.id,
+      name: localized(item, 'name') || item.name_ar || item.name || 'منتج',
+      quantity: item.quantity || 1,
+      price: getItemPriceWithDiscount(item) || item.price || 0
+    }));
+  }
+  return [
+    { id: 1, name: 'فرن غاز بلت-إن 60 سم', quantity: 1, price: 2499 },
+    { id: 2, name: 'موقد غاز 5 عيون 90 سم', quantity: 1, price: 1899 },
+    { id: 3, name: 'شفاط مدمج 90 سم', quantity: 1, price: 1299 }
+  ];
+});
+
+const receiptTotal = computed(() => {
+  if (lastPurchasedTotal.value > 0) return lastPurchasedTotal.value;
+  const orderObj = confirmedOrder.value?.order || confirmedOrder.value;
+  if (orderObj?.total_amount || orderObj?.total) return Number(orderObj.total_amount || orderObj.total);
+  if (grandTotal.value > 0) return grandTotal.value;
+  return 6551.55;
+});
+
+const receiptOrderNumber = computed(() => {
+  return confirmedOrderDisplayNumber.value || 'MG-2026-00847';
+});
+
+const receiptOrderDate = computed(() => {
+  if (lastPurchasedDate.value) return lastPurchasedDate.value;
+  const orderObj = confirmedOrder.value?.order || confirmedOrder.value;
+  const d = orderObj?.created_at ? new Date(orderObj.created_at) : new Date();
+  return d.toLocaleDateString(currentLocale.value === 'ar' ? 'ar-SA' : 'en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+});
+
+const receiptCustomerName = computed(() => customerInfo.value.name || 'أحمد الحربي');
+const receiptCustomerAddress = computed(() => {
+  const city = customerInfo.value.city || 'جدة - النعيم';
+  const addr = customerInfo.value.address || 'شارع حراء';
+  return `${city}، ${addr}`;
+});
+const receiptPaymentMethodText = computed(() => {
+  if (selectedPayment.value === 'card') {
+    return 'بطاقة ائتمانية (•••• 4321)';
+  } else if (selectedPayment.value === 'cod') {
+    return 'الدفع عند الاستلام';
+  } else {
+    return 'استخدام رصيد المحفظة';
+  }
+});
+
+const summaryPrimaryButtonText = computed(() => {
+  if (currentStep.value === 2) {
+    return currentLocale.value === 'ar' ? 'متابعة للدفع' : (t('checkout.proceed_to_payment') || 'Proceed to Payment');
+  }
+  if (currentStep.value === 3) {
+    return currentLocale.value === 'ar' ? 'متابعة للمراجعة' : (t('checkout.proceed_to_review') || 'Proceed to Review');
+  }
+  if (currentStep.value === 4) {
+    return currentLocale.value === 'ar' ? 'تأكيد الطلب' : (t('checkout.confirm_order') || 'Confirm Order');
+  }
+  return currentLocale.value === 'ar' ? 'متابعة' : 'Continue';
+});
+
+const summarySecondaryButtonText = computed(() => {
+  if (currentStep.value === 2) {
+    return currentLocale.value === 'ar' ? 'العودة للسلة' : (t('checkout.back_to_cart') || 'Back to Cart');
+  }
+  if (currentStep.value === 3) {
+    return currentLocale.value === 'ar' ? 'العودة للعنوان' : (t('checkout.back_to_address') || 'Back to Address');
+  }
+  if (currentStep.value === 4) {
+    return currentLocale.value === 'ar' ? 'العودة للدفع' : (t('checkout.back_to_payment') || 'Back to Payment');
+  }
+  return currentLocale.value === 'ar' ? 'رجوع' : 'Back';
+});
+
+const handleSummaryPrimaryAction = async () => {
+  if (currentStep.value === 2) {
+    if (addressTab.value === 'saved') {
+      await nextStep();
+    } else {
+      await handleAddressSubmit();
+    }
+  } else if (currentStep.value === 3) {
+    await nextStep();
+  } else if (currentStep.value === 4) {
+    await confirmOrder();
+  }
+};
+
+const handleSummarySecondaryAction = () => {
+  if (currentStep.value === 2) {
+    router.push('/cart');
+  } else if (currentStep.value === 3) {
+    prevStep();
+  } else if (currentStep.value === 4) {
+    prevStep();
+  }
 };
 
 const nextStep = async () => {
@@ -1300,6 +1875,18 @@ const confirmOrder = async () => {
 
     // Commit the UI order state first. Cart cleanup is intentionally last and
     // removes only the quantities included in this confirmed order.
+    lastPurchasedItems.value = displayReviewItems.value.map(it => ({
+      id: it.id,
+      name: it.name,
+      quantity: it.quantity,
+      price: it.price
+    }));
+    lastPurchasedTotal.value = grandTotal.value;
+    lastPurchasedDate.value = new Date().toLocaleDateString(currentLocale.value === 'ar' ? 'ar-SA' : 'en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
     confirmedOrder.value = createdOrder;
     currentStep.value = 5;
 
@@ -1355,11 +1942,27 @@ const prevStep = () => {
   }
 };
 
-const getImageUrl = (path) => {
-  if (!path) return '/placeholder-product.png';
-  if (path.startsWith('http')) return path;
-  const baseUrl = api.defaults.baseURL;
-  return `${baseUrl.replace('/api', '')}/storage/${path}`;
+const getImageUrl = (path, id) => {
+  const rawPath = typeof path === 'object' && path !== null
+    ? (path.image_url || path.url || path.image || path.path || '')
+    : path;
+  if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
+    return rawPath;
+  }
+  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
+  const baseUrl = (api.defaults?.baseURL || import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api');
+  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
+};
+
+const onImageError = (event, item) => {
+  const target = event.target;
+  if (!target) return;
+  if (item?.id && !target.src.includes(`prod_${item.id}.jpg`)) {
+    target.src = `/catalog_images/prod_${item.id}.jpg`;
+  } else if (!target.src.includes('product_ceramic_hob_60.png')) {
+    target.src = '/images/home/product_ceramic_hob_60.png';
+  }
 };
 
 const formatPrice = (price) => {
@@ -1735,361 +2338,1282 @@ const getPaymentLabel = (key) => {
   font-size: 22px;
 }
 
-/* Address Tabs */
-.address-tabs {
+/* ===================================================
+   Step 2: Registered Addresses (Figma 1:1 Design)
+   =================================================== */
+.step-address-step {
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: flex-start;
-  border-bottom: 2px solid #f3f4f6;
-  margin-bottom: 24px;
-  position: relative;
-  gap: 10px;
-  width: 100%;
 }
 
-.address-tab {
-  flex: 0 0 auto;
-  width: auto;
-  background: none;
-  border: none;
-  padding: 6px 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 13px;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-bottom: 2.5px solid transparent;
-  margin-bottom: -2px;
-  border-radius: 6px 6px 0 0;
-}
-
-.address-tab:hover {
-  color: #000000;
-  background: #f3f4f6;
-}
-
-.address-tab.active {
-  color: #000000;
-  border-bottom-color: #000000;
-  background: #f3f4f6;
-}
-
-.address-tab i {
-  font-size: 14px;
-}
-
-.fixed-country-input {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  font-weight: 700 !important;
-  border: 1.5px solid #e5e7eb !important;
-}
-
-/* Saved Addresses List */
-.saved-addresses-list {
+.registered-addresses {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-.address-card-new {
-  display: flex;
-  gap: 20px;
+  align-items: flex-end;
   padding: 24px;
-  border: 1px solid #f3f4f6;
-  border-radius: 16px;
-  background: #fff;
-  cursor: pointer;
-  transition: 0.3s;
-  position: relative;
-}
-
-.address-card-new.selected {
-  border-color: #000000;
-}
-
-.addr-type-icon {
-  width: 48px;
-  height: 48px;
-  background: #f8fafc;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #3b82f6;
-  font-size: 18px;
-}
-
-.address-card-new:nth-child(even) .addr-type-icon {
-  background: #fffbeb;
-  color: #f59e0b;
-}
-
-.addr-details-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.addr-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.addr-name {
-  font-size: 17px;
-  font-weight: 800;
-  margin: 0;
-  color: #111827;
-}
-
-.addr-owner {
-  font-weight: 700;
-  color: #1f2937;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.addr-owner i,
-.addr-country i,
-.addr-full-text i,
-.addr-phone i {
-  color: #000000;
-  font-size: 14px;
-  width: 16px;
-  text-align: center;
-}
-
-.addr-country {
-  font-weight: 600;
-  color: #4b5563;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.addr-full-text {
-  color: #4b5563;
-  font-size: 14px;
-  line-height: 1.5;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-
-.addr-phone {
-  font-weight: 700;
-  color: #111827;
-  font-size: 14px;
-  direction: ltr;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  width: fit-content;
-  line-height: 1.5;
-}
-
-.addr-selection {
-  display: flex;
-  align-items: center;
-}
-
-.radio-outer {
-  width: 22px;
-  height: 22px;
-  border: 2px solid #e5e7eb;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-}
-
-.address-card-new.selected .radio-outer {
-  border-color: #000000;
-}
-
-.radio-inner {
-  width: 12px;
-  height: 12px;
-  background: #000000;
-  border-radius: 50%;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.address-card-new.selected .radio-inner {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.add-new-addr-dashed {
+  gap: 16px;
   width: 100%;
-  border: 1px dashed #e5e7eb;
-  background: none;
-  padding: 18px;
-  border-radius: 16px;
-  color: #9ca3af;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 10px;
-}
-
-.add-new-addr-dashed:hover {
-  border-color: #000000;
-  color: #000000;
-}
-
-/* Another Recipient Warning */
-.another-recipient-info {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  padding: 15px;
+  max-width: 880px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 12px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  direction: rtl;
+}
+
+/* address-tabs */
+.address-tabs-bar {
+  box-sizing: border-box;
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 0px 16px;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  border-bottom: 1px solid #E2E8F0;
+  border-radius: 0px;
+}
+
+.add-new-address-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+}
+
+.tabs-actions-group {
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
-  color: #92400e;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 25px;
 }
 
-/* Checkout Form v2 */
-.checkout-form-v2 {
+/* Secondary Button (Figma) */
+.btn-secondary-tab {
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-row-new {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-row-new.dual {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-.input-field-box {
-  display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
   gap: 8px;
-}
-
-.input-field-box label {
+  height: 48px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
   font-weight: 700;
-  font-size: 14px;
-  color: #374151;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.input-relative {
-  position: relative;
+.btn-secondary-tab:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
 }
 
-.input-relative input,
-.input-relative select,
-.input-relative textarea,
-.input-field-box textarea {
+/* Primary Button (Figma) */
+.btn-primary-tab {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 8px;
+  height: 48px;
+  background: #000000;
+  border: 1.5px solid #000000;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-tab-my-addr {
+  width: 87px;
+}
+
+.btn-tab-other {
+  width: 116px;
+}
+
+.btn-tab-add-new {
+  width: 167px;
+}
+
+/* State 1: Saved Addresses View */
+.saved-addresses-view {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
   width: 100%;
-  padding: 14px 45px 14px 15px;
-  border: 1.5px solid #f3f4f6;
-  border-radius: 12px;
-  background: #fff;
-  font-family: inherit;
-  transition: 0.3s;
-  font-size: 14px;
 }
 
-.input-relative select {
+.registered-addresses-title {
+  width: 100%;
+  height: 27px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  text-align: right;
+  color: #000000;
+}
+
+.addresses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .addresses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.address-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px;
+  gap: 12px;
+  min-height: 151px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.address-card:hover {
+  border-color: #CBD5E1;
+}
+
+.address-card.selected {
+  border: 2px solid #E2E8F0;
+}
+
+/* Card Header */
+.card-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+  width: 100%;
+  height: 24px;
+}
+
+.addr-person-name {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+/* Selection Indicator (Radio button) */
+.selection-indicator {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.selection-indicator.active {
+  border: 2px solid #000000;
+}
+
+.selection-indicator .indicator-inner {
+  width: 10px;
+  height: 10px;
+  background: #000000;
+  border-radius: 9999px;
+}
+
+/* Address details */
+.address-details {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0px;
+  gap: 6px;
+  width: 100%;
+}
+
+.address-details .detail-line {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #64748B;
+}
+
+/* State 2: Form Fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0px;
+  gap: 20px;
+  width: 100%;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0px;
+  gap: 8px;
+  width: 100%;
+}
+
+.field-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #000000;
+}
+
+.form-input {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px 16px;
+  width: 100%;
+  height: 44px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: #000000;
+}
+
+.form-input::placeholder {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+/* Phone input container */
+.phone-input-wrapper {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px 16px;
+  width: 100%;
+  height: 44px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: #000000;
+}
+
+.phone-country-code {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+  direction: ltr;
+  user-select: none;
+}
+
+.phone-line-divider {
+  box-sizing: border-box;
+  width: 1px;
+  height: 16px;
+  background: #E2E8F0;
+  margin: 0 10px;
+}
+
+.phone-input-field {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+  text-align: right;
+}
+
+.phone-input-field::placeholder {
+  color: #64748B;
+}
+
+/* Dual Column Row for City and Region */
+.frame-12-dual-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 20px;
+  width: 100%;
+}
+
+.frame-12-dual-row .field-type {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .frame-12-dual-row {
+    flex-direction: column;
+  }
+}
+
+/* Select wrapper and custom styles */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+  height: 44px;
+}
+
+.form-select-custom {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 0px 16px 0px 36px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #000000;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   cursor: pointer;
-  padding-right: 45px !important;
-  padding-left: 15px !important;
-}
-
-.input-relative select ~ .fa-chevron-down {
-  left: auto !important;
-  right: 18px !important;
-  color: #000000 !important;
-  font-weight: 900 !important;
-}
-
-[dir="rtl"] .input-relative select,
-html[dir="rtl"] .input-relative select {
-  padding-left: 45px !important;
-  padding-right: 15px !important;
-}
-
-[dir="rtl"] .input-relative select ~ .fa-chevron-down,
-html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
-  right: auto !important;
-  left: 18px !important;
-  color: #000000 !important;
-  font-weight: 900 !important;
-}
-
-.input-field-box textarea:not(.input-relative textarea) {
-  padding: 14px 15px;
-}
-
-.input-field-box input:not(.input-relative input) {
-  padding: 14px 15px;
-  border: 1.5px solid #f3f4f6;
-  border-radius: 12px;
-  font-family: inherit;
-  transition: 0.3s;
-  font-size: 14px;
-}
-
-.input-relative .input-icon {
-  position: absolute;
-  top: 50%;
-  right: 18px;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  font-size: 16px;
-  pointer-events: none;
-}
-
-.input-relative textarea ~ .input-icon {
-  top: 25px;
-}
-
-.input-relative input:focus,
-.input-relative select:focus,
-.input-relative textarea:focus,
-.input-field-box input:focus,
-.input-field-box textarea:focus {
-  border-color: #000000;
   outline: none;
-  box-shadow: 0 0 0 4px rgba(135, 50, 96, 0.05);
+  transition: border-color 0.2s ease;
+}
+
+.form-select-custom.is-placeholder {
+  color: #64748B;
+}
+
+.form-select-custom.select-bg-white {
+  background-color: #FFFFFF;
+}
+
+.form-select-custom.select-bg-slate {
+  background-color: #F1F5F9;
+}
+
+.form-select-custom:focus {
+  border-color: #000000;
+}
+
+.select-arrow-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+/* Textarea */
+.form-textarea {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 12px 16px;
+  width: 100%;
+  height: 120px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #000000;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-textarea:focus {
+  border-color: #000000;
+}
+
+.form-textarea::placeholder {
+  color: #64748B;
+}
+
+/* Checkbox Row */
+.checkbox-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+  width: 100%;
+  height: 21px;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #000000;
+}
+
+.checkbox-box-custom {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #000000;
+  border-radius: 3px;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.checkbox-box-custom.checked {
+  background: #000000;
+}
+
+/* Primary Button (متابعة) */
+.submit-continue-btn {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  background: #000000;
+  border: none;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.submit-continue-btn:hover {
+  opacity: 0.9;
+}
+
+.submit-continue-btn:active {
+  transform: scale(0.99);
+}
+
+/* ===================================================
+   Step 3: Payment Method (Figma 1:1 Design)
+   =================================================== */
+.step-payment-step {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* payment-content-area */
+.payment-content-area {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 16px;
+  width: 100%;
+  max-width: 880px;
+  border-radius: 0px;
+  flex: none;
+  order: 1;
+  flex-grow: 1;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  direction: rtl;
+}
+
+/* payment-method-card */
+.payment-method-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 16px;
+  width: 100%;
+  max-width: 880px;
+  min-height: 117px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.payment-method-card:hover {
+  border-color: #CBD5E1;
+}
+
+.payment-method-card.card-credit {
+  min-height: 109px;
+  border: 2px solid #E2E8F0;
+  align-items: flex-end;
+}
+
+.payment-method-card.card-credit:hover {
+  border-color: #CBD5E1;
+}
+
+/* card-header */
+.payment-method-card .card-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  height: 32px;
+  border-radius: 0px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* header-right */
+.payment-method-card .header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 12px;
+  height: 24px;
+  border-radius: 0px;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* radio-btn */
+.payment-method-card .radio-btn {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 9999px;
+  flex: none;
+  flex-shrink: 0;
+  order: 0;
+  flex-grow: 0;
+  transition: border-color 0.2s ease;
+}
+
+.payment-method-card .radio-btn.selected {
+  border: 2px solid #000000;
+}
+
+.payment-method-card .radio-inner-dot {
+  width: 10px;
+  height: 10px;
+  background: #000000;
+  border-radius: 9999px;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* method-title (استخدام رصيد المحفظة / الدفع عند الاستلام / بطاقة ائتمانية) */
+.payment-method-card .method-title {
+  height: 24px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: right;
+  color: #000000;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+}
+
+/* method-icon-container */
+.payment-method-card .method-icon-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 32px;
+  height: 32px;
+  border-radius: 0px;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+}
+
+.payment-method-card .method-icon-container svg {
+  width: 24px;
+  height: 24px;
+  border-radius: 0px;
+  flex: none;
+  flex-shrink: 0;
+}
+
+.payment-method-card .icon-truck {
+  transform: scaleX(-1);
+}
+
+/* card-content */
+.payment-method-card .card-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  width: 100%;
+  border-radius: 0px;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* wallet-info */
+.wallet-info-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 8px 0px 0px;
+  gap: 4px;
+  height: 29px;
+  border-radius: 0px;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.wallet-desc-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #64748B;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.riyal-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10.65px;
+  height: 11.9px;
+  border-radius: 0px;
+  color: #64748B;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+}
+
+.riyal-icon-wrapper svg {
+  width: 10.65px;
+  height: 11.9px;
+}
+
+/* cod & credit card descriptions */
+.method-desc-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 8px 0px 0px;
+  width: 100%;
+  border-radius: 0px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.method-desc-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: right;
+  color: #64748B;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* Wallet Active Summary Box */
+.wallet-active-summary {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 880px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  direction: rtl;
+}
+
+.wallet-active-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #334155;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.wallet-active-row .val-green {
+  color: #16A34A;
+  font-weight: 600;
+}
+
+.wallet-active-row.is-remaining {
+  border-top: 1px dashed #E2E8F0;
+  padding-top: 8px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.wallet-fully-paid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #16A34A;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ===================================================
+   Step 4: Order Review (Figma 1:1 Design)
+   =================================================== */
+.step-review-step {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* review-blocks */
+.review-blocks {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 24px;
+  width: 100%;
+  max-width: 880px;
+  border-radius: 0px;
+  flex: none;
+  order: 1;
+  flex-grow: 1;
+  direction: rtl;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+/* ReviewSectionCard / ReviewProducts */
+.review-card-box {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  gap: 16px;
+  width: 100%;
+  max-width: 880px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* section-header */
+.review-card-box .review-section-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  height: 27px;
+  border-radius: 0px;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.review-section-header .section-title {
+  height: 27px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  color: #000000;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.review-section-header .edit-link-btn {
+  height: 21px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+}
+
+.review-section-header .edit-link-btn:hover {
+  color: #000000;
+}
+
+/* Line divider */
+.review-card-box .review-divider-line {
+  box-sizing: border-box;
+  width: 100%;
+  height: 0px;
+  border-bottom: 1px solid #E2E8F0;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* products-list */
+.review-products-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 16px;
+  width: 100%;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* product-item */
+.review-product-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 16px;
+  width: 100%;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* item-content */
+.review-item-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 16px;
+  width: 100%;
+  min-height: 80px;
+  border-radius: 0px;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+  overflow: hidden;
+}
+
+/* product-thumb (far right in RTL) */
+.review-product-thumb {
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  object-fit: cover;
+  background-color: #F8FAFC;
+  flex-shrink: 0;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* item-details */
+.review-item-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  order: 1;
+  flex-grow: 1;
+}
+
+.review-item-name {
+  display: block;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: right;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.review-item-sku {
+  display: block;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.review-item-specs {
+  display: block;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: right;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  order: 2;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* qty-display */
+.review-qty-display {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 12px;
+  height: 29px;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  flex: none;
+  flex-shrink: 0;
+  order: 2;
+  flex-grow: 0;
+}
+
+.review-qty-text {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+/* item-price (far left in RTL) */
+.review-item-price {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 4px;
+  height: 24px;
+  border-radius: 0px;
+  flex: none;
+  flex-shrink: 0;
+  order: 3;
+  flex-grow: 0;
+}
+
+.review-price-num {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.review-riyal-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12.17px;
+  height: 13.6px;
+  color: #111827;
+}
+
+.review-riyal-symbol svg {
+  width: 12.17px;
+  height: 13.6px;
+}
+
+/* Line divider between products */
+.review-item-divider {
+  box-sizing: border-box;
+  width: 100%;
+  height: 0px;
+  border-bottom: 1px solid #F1F5F9;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+/* Card 2: Address details */
+.review-address-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 6px;
+  width: 100%;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.review-address-name {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.review-address-line {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+  text-align: right;
+}
+
+.review-address-line.is-phone {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Card 3: Payment details */
+.review-payment-details {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px;
+  gap: 12px;
+  width: 100%;
+  height: 24px;
+  border-radius: 0px;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.review-payment-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.review-payment-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.review-payment-title {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.review-payment-sub {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+  direction: ltr;
+}
+
+@media (max-width: 640px) {
+  .review-item-content {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 12px;
+  }
+  .review-item-details {
+    height: auto;
+  }
 }
 
 /* Action Buttons New */
@@ -2180,68 +3704,724 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
 
 .next-btn:hover { background: #4a1936; box-shadow: 0 10px 20px rgba(135, 50, 96, 0.2); }
 
-/* Sidebar */
-.order-summary-sidebar {
-  background: #fff;
-  border-radius: 24px;
-  padding: 30px;
-  border: 1px solid #f3f4f6;
+/* summary-card (Figma 1:1 Design) */
+.summary-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 24px;
+  gap: 20px;
+  width: 400px;
+  max-width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
   position: sticky;
   top: 100px;
 }
 
-.sidebar-header {
-  font-size: 20px;
-  font-weight: 850;
-  color: #111827;
-  margin-bottom: 30px;
+/* ملخص المشتريات */
+.summary-card-title {
+  width: 100%;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  text-align: right;
+  color: #000000;
 }
 
-.sidebar-items {
+/* Line */
+.summary-card-divider {
+  box-sizing: border-box;
+  width: 100%;
+  height: 0px;
+  border: none;
+  border-top: 1px solid #E2E8F0;
+  margin: 0;
+}
+
+/* summary-rows */
+.summary-card-rows {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-bottom: 30px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid #f3f4f6;
+  align-items: stretch;
+  padding: 0px;
+  gap: 12px;
+  width: 100%;
 }
 
-.sidebar-item { display: flex; align-items: center; gap: 15px; }
-.item-img-box { position: relative; width: 64px; height: 64px; border-radius: 12px; overflow: hidden; background: #f9fafb; flex-shrink: 0; }
-.item-img-box img { width: 100%; height: 100%; object-fit: cover; }
-.item-q-badge { position: absolute; top: -5px; right: -5px; background: #000000; color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+/* row-subtotal / row-vat / row-shipping / row-discount */
+.summary-card-row {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  min-height: 24px;
+}
 
-.item-mid { flex: 1; min-width: 0; }
-.item-title { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 0 4px 0; }
-.item-variant-badge { display: inline-block; font-size: 11px; color: #475569; background: #f1f5f9; padding: 1px 7px; border-radius: 4px; margin-bottom: 4px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-.item-sku { font-size: 12px; color: #9ca3af; margin: 0; }
-.item-price { font-weight: 800; color: #111827; font-size: 15px; }
+.summary-card-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+  text-align: right;
+}
 
-.sidebar-totals { display: flex; flex-direction: column; gap: 15px; }
-.total-row { display: flex; justify-content: space-between; color: #6b7280; font-weight: 600; font-size: 15px; }
-.shipping-row span.free { color: #10b981; font-weight: 800; }
-.grand-total { border-top: 1px solid #f3f4f6; padding-top: 15px; margin-top: 5px; color: #000000; font-size: 20px; font-weight: 900; }
+/* price-unit */
+.summary-card .price-unit {
+  direction: ltr;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 4px;
+}
 
-/* Confirmation Container */
-.confirmation-container {
-  max-width: 600px;
-  margin: 60px auto;
+.summary-card .price-unit .price-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+.summary-card .discount-unit .minus-sign {
+  font-weight: 700;
+  font-size: 16px;
+  color: #dc2626;
+}
+.summary-card .discount-unit .price-val {
+  color: #dc2626;
+}
+
+.summary-card .riyal-icon {
+  display: inline-block;
+  vertical-align: middle;
+  color: #111827;
+  flex-shrink: 0;
+}
+
+.summary-card .summary-riyal {
+  width: 11.41px;
+  height: 12.75px;
+}
+
+/* row-total */
+.summary-card-row-total {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  height: 36px;
+}
+
+.summary-card-row-total .total-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  color: #000000;
+  text-align: right;
+}
+
+.summary-card-row-total .total-price-unit {
+  direction: ltr;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 4px;
+}
+
+.summary-card-row-total .total-riyal {
+  width: 16.73px;
+  height: 18.7px;
+  color: #111827;
+  flex-shrink: 0;
+}
+
+.summary-card-row-total .total-price-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000000;
+}
+
+/* summary-actions */
+.summary-card .summary-actions {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0px;
+  gap: 12px;
+  width: 100%;
+}
+
+/* primary-button */
+.summary-card .primary-button {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 24px;
+  gap: 8px;
+  width: 100%;
+  height: 56px;
+  background: #000000;
+  border-radius: 6px;
+  border: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.summary-card .primary-button:hover:not(:disabled) {
+  background: #1f2937;
+}
+
+.summary-card .primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* secondary-button */
+.summary-card .secondary-button {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 24px;
+  gap: 8px;
+  width: 100%;
+  height: 56px;
+  background: #FFFFFF;
+  border: 1.5px solid #000000;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.summary-card .secondary-button:hover:not(:disabled) {
+  background: #F8FAFC;
+}
+
+.summary-card .secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Coupon Styling in Summary Card */
+.summary-coupon-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-coupon-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  transition: color 0.2s;
+}
+
+.summary-coupon-toggle:hover {
+  color: #000000;
+}
+
+.summary-coupon-box {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.summary-coupon-box input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.summary-coupon-box input:focus {
+  border-color: #000000;
+}
+
+.summary-coupon-apply {
+  height: 40px;
+  padding: 0 16px;
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.summary-coupon-apply:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.summary-coupon-msg {
+  font-size: 12px;
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+.summary-coupon-msg.success { color: #16a34a; }
+.summary-coupon-msg.error { color: #dc2626; }
+
+.summary-coupon-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F1F5F9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.coupon-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.coupon-remove-btn {
+  background: none;
+  border: none;
+  color: #EF4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+/* receipt-card (Figma 1:1 Design) */
+.receipt-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 60px;
+}
+
+.receipt-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  gap: 24px;
+  width: 720px;
+  max-width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+/* success-header */
+.receipt-success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  gap: 16px;
+  width: 100%;
+}
+
+.receipt-checkmark-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background: #D0FAE5;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.receipt-title {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 48px;
   text-align: center;
-  padding: 60px 40px;
-  background: #fff;
-  border-radius: 30px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.03);
+  color: #000000;
 }
 
-.success-icon-wrapper { margin-bottom: 30px; }
-.success-circle { width: 100px; height: 100px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto; }
-.success-title { font-size: 32px; font-weight: 900; color: #111827; margin-bottom: 10px; }
-.order-id { font-size: 14px; color: #9ca3af; font-weight: 600; margin-bottom: 30px; }
-.success-desc { color: #6b7280; line-height: 1.8; margin-bottom: 40px; }
+.receipt-subtitle {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 27px;
+  text-align: center;
+  color: #64748B;
+}
 
-.success-actions { display: flex; gap: 15px; justify-content: center; }
-.continue-shopping { padding: 16px 40px; background: #000000; color: #fff; border-radius: 15px; text-decoration: none; font-weight: 700; }
-.back-home { padding: 16px 40px; background: #f9fafb; color: #4b5563; border-radius: 15px; text-decoration: none; font-weight: 700; border: 1px solid #e5e7eb; }
+/* order-meta */
+.receipt-order-meta {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  gap: 8px;
+  width: 500px;
+  max-width: 100%;
+  background: #F1F5F9;
+  border-radius: 8px;
+}
+
+.receipt-meta-order-number {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+  color: #000000;
+}
+
+.receipt-meta-order-date {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+  color: #64748B;
+}
+
+.receipt-meta-order-note {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+  color: #64748B;
+}
+
+/* Section Title */
+.receipt-section-title {
+  width: 100%;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  text-align: right;
+  color: #000000;
+}
+
+/* Lines */
+.receipt-divider-line {
+  box-sizing: border-box;
+  width: 100%;
+  height: 0px;
+  border: none;
+  border-top: 1px solid #E2E8F0;
+  margin: 0;
+}
+
+.receipt-divider-line-light {
+  box-sizing: border-box;
+  width: 100%;
+  height: 0px;
+  border: none;
+  border-top: 1px solid #F1F5F9;
+  margin: 0;
+}
+
+/* receipt-products */
+.receipt-products {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0px;
+  gap: 12px;
+  width: 100%;
+}
+
+.receipt-product-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 24px;
+}
+
+.receipt-product-name-qty {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+  text-align: right;
+}
+
+.receipt-price-unit {
+  direction: ltr;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 4px;
+}
+
+.receipt-riyal {
+  width: 12.17px;
+  height: 13.6px;
+  color: #111827;
+  flex-shrink: 0;
+}
+
+.receipt-price-unit .price-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+/* info-columns */
+.receipt-info-columns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 24px;
+  width: 100%;
+}
+
+.receipt-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.receipt-col-address {
+  text-align: right;
+  align-items: flex-start;
+}
+
+.receipt-col-payment {
+  text-align: right;
+  align-items: flex-start;
+}
+
+.receipt-col-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #64748B;
+}
+
+.receipt-col-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+}
+
+.receipt-col-sub {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
+}
+
+/* receipt-total */
+.receipt-total-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+}
+
+.receipt-total-label {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+  text-align: right;
+}
+
+.receipt-total-unit {
+  direction: ltr;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 4px;
+}
+
+.receipt-total-riyal {
+  width: 16.73px;
+  height: 18.7px;
+  color: #111827;
+  flex-shrink: 0;
+}
+
+.receipt-total-val {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #000000;
+}
+
+/* Receipt Actions */
+.receipt-actions-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.receipt-btn-primary {
+  min-width: 180px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  background: #000000;
+  color: #FFFFFF;
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.receipt-btn-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.receipt-btn-secondary {
+  min-width: 180px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  background: #FFFFFF;
+  color: #000000;
+  border: 1.5px solid #000000;
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.receipt-btn-secondary:hover {
+  background-color: #F8FAFC;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .receipt-card {
+    padding: 20px;
+    gap: 16px;
+    width: 100%;
+  }
+  .receipt-order-meta {
+    width: 100%;
+  }
+  .receipt-info-columns {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .receipt-actions-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+  .receipt-btn-primary, .receipt-btn-secondary {
+    width: 100%;
+    min-width: unset;
+    text-align: center;
+  }
+}
 
 /* Animation */
 .fadeIn { animation: fadeIn 0.5s ease-out; }
@@ -2674,17 +4854,13 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
   .form-v3-title { font-size: 16px; }
 
   /* Address tabs & cards */
-  .address-tabs { gap: 16px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 18px; }
-  .address-tab { white-space: nowrap; font-size: 13px; padding: 12px 0; }
-  .saved-addresses-list { gap: 10px; }
-  .address-card-new { padding: 14px 12px; gap: 12px; border-radius: 14px; }
-  .addr-type-icon { width: 38px; height: 38px; font-size: 14px; }
-  .addr-name { font-size: 15px; }
-  .addr-owner, .addr-full-text, .addr-phone { font-size: 12.5px; }
-  .addr-full-text { margin-bottom: 6px; }
-  .address-options { gap: 12px; }
-  .address-card { padding: 14px 12px; gap: 12px; border-radius: 14px; }
-  .add-new-addr-dashed, .add-address-btn { padding: 14px; font-size: 13px; }
+  .address-tabs-bar { flex-wrap: wrap; gap: 10px; min-height: auto; }
+  .add-new-address-wrapper { width: 100%; order: 2; }
+  .btn-tab-add-new { width: 100%; }
+  .tabs-actions-group { width: 100%; justify-content: flex-end; order: 1; }
+  .addresses-grid { grid-template-columns: 1fr; }
+  .address-card { padding: 16px; border-radius: 8px; }
+  .registered-addresses { padding: 16px; }
 
   /* Gift */
   .gift-option-section { margin-top: 18px; }

@@ -14,7 +14,7 @@
           </div>
 
           <div class="product-summary" v-if="product">
-            <img :src="getImageUrl(product.image)" :alt="productName" class="modal-product-img">
+            <img :src="getImageUrl(product.image || product.images?.[0], product.id)" :alt="productName" class="modal-product-img" @error="$event.target.src = '/images/home/product_ceramic_hob_60.png'">
             <div class="product-details">
               <h4 class="product-name">{{ productName }}</h4>
               <p class="product-price">{{ (product.price * (1 - (product.discount/100 || 0))).toLocaleString('en-US') }} {{ t('currency') }}</p>
@@ -44,11 +44,17 @@ const { t } = useI18n();
 const { currentLang, localized } = useLocalized();
 const productName = computed(() => localized(product.value, 'name'));
 
-const getImageUrl = (path) => {
-  if (!path) return '/placeholder-product.png';
-  if (path.startsWith('http')) return path;
+const getImageUrl = (path, id) => {
+  const rawPath = typeof path === 'object' && path !== null
+    ? (path.image_url || path.url || path.image || path.path || '')
+    : path;
+  if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
+    return rawPath;
+  }
+  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-  return `${baseUrl.replace('/api', '')}/storage/${path}`;
+  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
 const goToCart = () => {

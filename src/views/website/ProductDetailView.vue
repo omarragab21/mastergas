@@ -4,28 +4,28 @@
     <!-- 1. Breadcrumbs Section -->
     <div class="breadcrumb-section" v-if="product">
       <div class="container breadcrumb-container">
-        <nav class="breadcrumbs-nav" aria-label="breadcrumb">
-          <router-link to="/" class="bc-link">{{ t('nav.home') }}</router-link>
-          <span class="bc-sep">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <nav class="breadcrumb-flow" aria-label="breadcrumb">
+          <router-link to="/" class="crumb-link">{{ t('nav.home') }}</router-link>
+          <span class="crumb-separator" aria-hidden="true">
+            <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.59736 0.676858C3.51667 0.737802 3.2758 0.919755 3.13694 1.02812C2.85884 1.24516 2.48929 1.54171 2.12085 1.86161C1.75054 2.18313 1.38989 2.52089 1.12477 2.82095C0.991829 2.9714 0.890812 3.10357 0.825063 3.21264C0.763226 3.31521 0.750367 3.3758 0.750367 3.3758C0.750367 3.3758 0.763227 3.43462 0.825061 3.53719C0.890809 3.64625 0.991825 3.77842 1.12477 3.92888C1.38989 4.22893 1.75054 4.56669 2.12085 4.88821C2.4893 5.20811 2.85885 5.50467 3.13696 5.7217C3.27582 5.83007 3.51635 6.01177 3.59704 6.07271C3.7638 6.19553 3.79977 6.43053 3.67695 6.59729C3.55413 6.76405 3.31938 6.79968 3.15262 6.67686L3.15135 6.6759C3.06672 6.61198 2.81722 6.42353 2.67554 6.31296C2.39115 6.09103 2.0107 5.78581 1.62914 5.45453C1.24946 5.12487 0.860106 4.76204 0.562729 4.42548C0.41442 4.25763 0.281061 4.08748 0.182748 3.9244C0.0906402 3.77161 0 3.57816 0 3.37491C0 3.17165 0.0906433 2.97821 0.182751 2.82542C0.281064 2.66234 0.414422 2.49219 0.56273 2.32434C0.860105 1.98779 1.24945 1.62495 1.62914 1.29529C2.01068 0.964013 2.39113 0.658798 2.67552 0.436859C2.8173 0.326216 3.06681 0.137753 3.15127 0.0739647L3.15236 0.0731398C3.31912 -0.0496775 3.55411 -0.0142297 3.67692 0.152531C3.79974 0.319286 3.7641 0.554038 3.59736 0.676858Z" fill="#000000"/>
             </svg>
           </span>
-          <router-link to="/products" class="bc-link">{{ t('nav.products') }}</router-link>
-          <span class="bc-sep">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <router-link to="/products" class="crumb-link">{{ t('nav.products') }}</router-link>
+          <span class="crumb-separator" aria-hidden="true">
+            <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.59736 0.676858C3.51667 0.737802 3.2758 0.919755 3.13694 1.02812C2.85884 1.24516 2.48929 1.54171 2.12085 1.86161C1.75054 2.18313 1.38989 2.52089 1.12477 2.82095C0.991829 2.9714 0.890812 3.10357 0.825063 3.21264C0.763226 3.31521 0.750367 3.3758 0.750367 3.3758C0.750367 3.3758 0.763227 3.43462 0.825061 3.53719C0.890809 3.64625 0.991825 3.77842 1.12477 3.92888C1.38989 4.22893 1.75054 4.56669 2.12085 4.88821C2.4893 5.20811 2.85885 5.50467 3.13696 5.7217C3.27582 5.83007 3.51635 6.01177 3.59704 6.07271C3.7638 6.19553 3.79977 6.43053 3.67695 6.59729C3.55413 6.76405 3.31938 6.79968 3.15262 6.67686L3.15135 6.6759C3.06672 6.61198 2.81722 6.42353 2.67554 6.31296C2.39115 6.09103 2.0107 5.78581 1.62914 5.45453C1.24946 5.12487 0.860106 4.76204 0.562729 4.42548C0.41442 4.25763 0.281061 4.08748 0.182748 3.9244C0.0906402 3.77161 0 3.57816 0 3.37491C0 3.17165 0.0906433 2.97821 0.182751 2.82542C0.281064 2.66234 0.414422 2.49219 0.56273 2.32434C0.860105 1.98779 1.24945 1.62495 1.62914 1.29529C2.01068 0.964013 2.39113 0.658798 2.67552 0.436859C2.8173 0.326216 3.06681 0.137753 3.15127 0.0739647L3.15236 0.0731398C3.31912 -0.0496775 3.55411 -0.0142297 3.67692 0.152531C3.79974 0.319286 3.7641 0.554038 3.59736 0.676858Z" fill="#000000"/>
             </svg>
           </span>
-          <router-link :to="product.category_parent_id ? `/products?subcategory_id=${product.category_id}` : `/products?category_id=${product.category_id}`" class="bc-link">
+          <router-link :to="product.category_parent_id ? `/products?subcategory_id=${product.category_id}` : `/products?category_id=${product.category_id}`" class="crumb-link">
             {{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}
           </router-link>
-          <span class="bc-sep">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M7.5 9L4.5 6L7.5 3" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <span class="crumb-separator" aria-hidden="true">
+            <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.59736 0.676858C3.51667 0.737802 3.2758 0.919755 3.13694 1.02812C2.85884 1.24516 2.48929 1.54171 2.12085 1.86161C1.75054 2.18313 1.38989 2.52089 1.12477 2.82095C0.991829 2.9714 0.890812 3.10357 0.825063 3.21264C0.763226 3.31521 0.750367 3.3758 0.750367 3.3758C0.750367 3.3758 0.763227 3.43462 0.825061 3.53719C0.890809 3.64625 0.991825 3.77842 1.12477 3.92888C1.38989 4.22893 1.75054 4.56669 2.12085 4.88821C2.4893 5.20811 2.85885 5.50467 3.13696 5.7217C3.27582 5.83007 3.51635 6.01177 3.59704 6.07271C3.7638 6.19553 3.79977 6.43053 3.67695 6.59729C3.55413 6.76405 3.31938 6.79968 3.15262 6.67686L3.15135 6.6759C3.06672 6.61198 2.81722 6.42353 2.67554 6.31296C2.39115 6.09103 2.0107 5.78581 1.62914 5.45453C1.24946 5.12487 0.860106 4.76204 0.562729 4.42548C0.41442 4.25763 0.281061 4.08748 0.182748 3.9244C0.0906402 3.77161 0 3.57816 0 3.37491C0 3.17165 0.0906433 2.97821 0.182751 2.82542C0.281064 2.66234 0.414422 2.49219 0.56273 2.32434C0.860105 1.98779 1.24945 1.62495 1.62914 1.29529C2.01068 0.964013 2.39113 0.658798 2.67552 0.436859C2.8173 0.326216 3.06681 0.137753 3.15127 0.0739647L3.15236 0.0731398C3.31912 -0.0496775 3.55411 -0.0142297 3.67692 0.152531C3.79974 0.319286 3.7641 0.554038 3.59736 0.676858Z" fill="#000000"/>
             </svg>
           </span>
-          <span class="bc-current">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60cm') }}</span>
+          <span class="crumb-current">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60cm') }}</span>
         </nav>
       </div>
     </div>
@@ -1882,45 +1882,55 @@ onUnmounted(() => {
   width: 100%;
 }
 
-.breadcrumbs-nav {
+.breadcrumb-flow {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  height: 21px;
+}
+
+.crumb-link {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
+  font-weight: 400;
   font-size: 14px;
   line-height: 21px;
-}
-
-.product-detail-page[dir="rtl"] .breadcrumbs-nav {
-  justify-content: flex-start;
-}
-
-.bc-link {
   color: #64748B;
   text-decoration: none;
-  font-weight: 400;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
 }
 
-.bc-link:hover {
+.crumb-link:hover {
   color: #000000;
 }
 
-.bc-sep {
-  display: flex;
+.crumb-separator {
+  display: inline-flex;
   align-items: center;
-  color: #64748B;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
 }
 
-.product-detail-page[dir="ltr"] .bc-sep svg {
+.crumb-arrow-svg {
+  width: 4px;
+  height: 7px;
+  display: block;
+}
+
+.product-detail-page[dir="ltr"] .crumb-arrow-svg {
   transform: rotate(180deg);
 }
 
-.bc-current {
-  color: #000000;
+.crumb-current {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-style: normal;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #000000;
 }
 
 /* Loader */

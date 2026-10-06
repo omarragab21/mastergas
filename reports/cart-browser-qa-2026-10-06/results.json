@@ -1,0 +1,755 @@
+{
+  "startedAt": "2026-10-06T12:32:41.599Z",
+  "baseUrl": "http://127.0.0.1:5173",
+  "results": [
+    {
+      "number": 1,
+      "slug": "baseline-single-item",
+      "title": "الحالة الأساسية: منتج واحد داخل الكارت على سطح المكتب",
+      "status": "PASS",
+      "durationMs": 1873,
+      "screenshotPath": "screenshots/01-baseline-single-item.png",
+      "evidence": {
+        "expectation": "صف واحد وكمية 1 وملخص ظاهر",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 2,
+      "slug": "multi-item-summary",
+      "title": "ثلاثة منتجات مختلفة وحساب صفوف الملخص",
+      "status": "PASS",
+      "durationMs": 1269,
+      "screenshotPath": "screenshots/02-multi-item-summary.png",
+      "evidence": {
+        "expectation": "3 صفوف منتجات مع ملخص الإجمالي والشحن والضريبة",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 3,
+          "quantities": [
+            "1",
+            "1",
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة",
+            "مسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك",
+            "شفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,897\nالمجموع الفرعي\n1,184.55\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n9,081.55\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n3\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\n2,299\n+\n1\n−\nمسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك\n\nMG-HOB90-5B-GLASS\n\nحوامل زهر، أمان كامل\n\n1,749\n+\n1\n−\nشفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة\n\nMG-HOOD90-PYRAMID\n\nقوة شفط فائقة، هادئ\n\nملخص الطلب\nتطبيق\n7,897\nالمجموع الفرعي\n1,184.55\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n9,081.55\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 3,
+      "slug": "add-from-products-ui",
+      "title": "إضافة منتج من صفحة المنتجات عبر زر الواجهة",
+      "status": "PASS",
+      "durationMs": 1652,
+      "screenshotPath": "screenshots/03-add-from-products-ui.png",
+      "evidence": {
+        "expectation": "زر أضف للسلة من المنتجات أنشأ صفًا في الكارت",
+        "sourceUrl": "http://127.0.0.1:5173/products",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nتمت الإضافة للسلة\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\n-49,308.704 ﷼\n\nعرض السلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 4,
+      "slug": "duplicate-add-increments",
+      "title": "إضافة نفس المنتج مرتين من الواجهة ودمج الكمية",
+      "status": "PASS",
+      "durationMs": 1914,
+      "screenshotPath": "screenshots/04-duplicate-add-increments.png",
+      "evidence": {
+        "expectation": "نفس المنتج يبقى في صف واحد والكمية تصبح 2",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "2"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n7,698\n+\n2\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nتمت الإضافة للسلة\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\n-49,308.704 ﷼\n\nعرض السلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 5,
+      "slug": "increase-quantity",
+      "title": "زيادة الكمية بزر + وتحديث ملخص الكارت",
+      "status": "PASS",
+      "durationMs": 1157,
+      "screenshotPath": "screenshots/05-increase-quantity.png",
+      "evidence": {
+        "expectation": "الكمية تزيد من 1 إلى 2 بعد ضغطة واحدة",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "2"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n7,698\n+\n2\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 6,
+      "slug": "decrease-quantity-boundary",
+      "title": "حد إنقاص الكمية: زر − مع كمية 1 يظل معطلاً",
+      "status": "PASS",
+      "durationMs": 1353,
+      "screenshotPath": "screenshots/06-decrease-quantity-boundary.png",
+      "evidence": {
+        "expectation": "لا يمكن النزول تحت كمية 1",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 7,
+      "slug": "quantity-upper-bound",
+      "title": "الحد الأعلى للكمية عبر 1000 ضغطة UI",
+      "status": "PASS",
+      "durationMs": 34490,
+      "screenshotPath": "screenshots/07-quantity-upper-bound.png",
+      "evidence": {
+        "expectation": "الكمية تتوقف عند 999 ولا تتجاوزها",
+        "clicks": 1000,
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "999"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n3,845,151\nالمجموع الفرعي\n576,772.65\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,421,923.65\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,845,151\n+\n999\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n3,845,151\nالمجموع الفرعي\n576,772.65\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,421,923.65\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 8,
+      "slug": "remove-one-of-many",
+      "title": "حذف منتج واحد مع بقاء باقي المنتجات",
+      "status": "PASS",
+      "durationMs": 1242,
+      "screenshotPath": "screenshots/08-remove-one-of-many.png",
+      "evidence": {
+        "expectation": "حذف صف واحد لا يمس باقي الصفوف",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 2,
+          "quantities": [
+            "1",
+            "1"
+          ],
+          "itemTitles": [
+            "مسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك",
+            "شفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n4,048\nالمجموع الفرعي\n607.20\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,655.20\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n2\n2,299\n+\n1\n−\nمسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك\n\nMG-HOB90-5B-GLASS\n\nحوامل زهر، أمان كامل\n\n1,749\n+\n1\n−\nشفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة\n\nMG-HOOD90-PYRAMID\n\nقوة شفط فائقة، هادئ\n\nملخص الطلب\nتطبيق\n4,048\nالمجموع الفرعي\n607.20\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,655.20\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 9,
+      "slug": "remove-last-empty-state",
+      "title": "حذف آخر منتج وظهور الحالة الفارغة",
+      "status": "PASS",
+      "durationMs": 1140,
+      "screenshotPath": "screenshots/09-remove-last-empty-state.png",
+      "evidence": {
+        "expectation": "رسالة السلة الفارغة وزر التسوق يظهران",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 0,
+          "quantities": [],
+          "itemTitles": [],
+          "summary": "",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\nسلة التسوق فارغة\n\nابدأ التسوق الآن وأضف بعض المنتجات الرائعة!\n\nاستكشف التشكيلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 10,
+      "slug": "reload-persistence",
+      "title": "استمرارية الكمية بعد إعادة تحميل الصفحة",
+      "status": "PASS",
+      "durationMs": 1259,
+      "screenshotPath": "screenshots/10-reload-persistence.png",
+      "evidence": {
+        "expectation": "الكمية 2 تبقى بعد reload",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "2"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n7,698\n+\n2\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 11,
+      "slug": "invalid-coupon",
+      "title": "كوبون غير صالح وإظهار رسالة خطأ بدون خصم",
+      "status": "PASS",
+      "durationMs": 1186,
+      "screenshotPath": "screenshots/11-invalid-coupon.png",
+      "evidence": {
+        "expectation": "رسالة خطأ وعدم إضافة صف خصم",
+        "message": "Coupon is not valid",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n\nCoupon is not valid\n\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n\nCoupon is not valid\n\n3,849\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 12,
+      "slug": "valid-coupon",
+      "title": "كوبون صالح وإظهار صف الخصم وتحديث الإجمالي",
+      "status": "PASS",
+      "durationMs": 1375,
+      "screenshotPath": "screenshots/12-valid-coupon.png",
+      "evidence": {
+        "expectation": "الكوبون IRIS2026 يضيف صف الخصم ويعرض رسالة نجاح",
+        "message": "تم تطبيق الكوبون بنجاح",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n\nتم تطبيق الكوبون بنجاح\n\n3,849\nالمجموع الفرعي\n-\n10\nالخصم\n575.85\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,414.85\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n\nتم تطبيق الكوبون بنجاح\n\n3,849\nالمجموع الفرعي\n-\n10\nالخصم\n575.85\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,414.85\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 13,
+      "slug": "coupon-enter-key",
+      "title": "تطبيق الكوبون باستخدام زر Enter",
+      "status": "PASS",
+      "durationMs": 1191,
+      "screenshotPath": "screenshots/13-coupon-enter-key.png",
+      "evidence": {
+        "expectation": "زر Enter داخل حقل الكوبون يطبق الكوبون",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n\nتم تطبيق الكوبون بنجاح\n\n3,849\nالمجموع الفرعي\n-\n10\nالخصم\n575.85\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,414.85\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n\nتم تطبيق الكوبون بنجاح\n\n3,849\nالمجموع الفرعي\n-\n10\nالخصم\n575.85\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,414.85\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 14,
+      "slug": "variant-isolation",
+      "title": "حذف Variant واحد مع الحفاظ على Variant آخر لنفس المنتج",
+      "status": "FAIL",
+      "durationMs": 2010,
+      "screenshotPath": "screenshots/14-variant-isolation.png",
+      "evidence": {
+        "expectation": "حذف Variant بالـ cart_item_key لا يحذف المنتج الآخر",
+        "failure": "Expected one variant left, got 0",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 0,
+          "quantities": [],
+          "itemTitles": [],
+          "summary": "",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\nسلة التسوق فارغة\n\nابدأ التسوق الآن وأضف بعض المنتجات الرائعة!\n\nاستكشف التشكيلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[Vue warn]: Duplicate keys found during update: \"25\" Make sure keys are unique. \n  at <CartView onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <WebsiteLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>"
+        ],
+        "pageErrors": []
+      },
+      "error": "Expected one variant left, got 0"
+    },
+    {
+      "number": 15,
+      "slug": "checkout-navigation",
+      "title": "الانتقال من الكارت إلى checkout",
+      "status": "PASS",
+      "durationMs": 1575,
+      "screenshotPath": "screenshots/15-checkout-navigation.png",
+      "evidence": {
+        "expectation": "زر متابعة الطلب ينقل إلى /checkout",
+        "checkoutUrl": "http://127.0.0.1:5173/checkout",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/checkout",
+          "rows": 0,
+          "quantities": [],
+          "itemTitles": [],
+          "summary": "ملخص المشتريات\n3,849.00\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nهل لديك رمز كوبون؟\nمتابعة للدفع\nالعودة للسلة",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\nالسلة\n2\nالعنوان\n3\nالدفع\n4\nالمراجعة\n5\nالتأكيد\nإضافة عنوان جديد\nمستلم آخر\nعنواني\nالعناوين المسجلة\nأحمد الحربي\nرقم الهاتف: 0557654321\nجدة - النعيم\nشارع حراء، فيلا 18أ\nعبدالله القحطاني\nرقم الهاتف: 0501234567\nالرياض - الياسمين\nطريق الملك عبدالعزيز، شقة 4، مبنى 12\nملخص المشتريات\n3,849.00\nالمجموع الفرعي\n577.35\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n4,426.35\nالإجمالي\nهل لديك رمز كوبون؟\nمتابعة للدفع\nالعودة للسلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": ""
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 16,
+      "slug": "continue-shopping-navigation",
+      "title": "الانتقال من الكارت إلى المنتجات",
+      "status": "PASS",
+      "durationMs": 1742,
+      "screenshotPath": "screenshots/16-continue-shopping-navigation.png",
+      "evidence": {
+        "expectation": "زر متابعة التسوق ينقل إلى /products",
+        "productsUrl": "http://127.0.0.1:5173/products",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/products",
+          "rows": 0,
+          "quantities": [],
+          "itemTitles": [],
+          "summary": "",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\nالرئيسية\n›\nالمنتجات\nجميع منتجات\n(6 منتج)\nعرض 6 من أصل 6 منتج متوفر\nترتيب حسب:\nالأكثر ملائمة\nالسعر: من الأقل للأعلى\nالسعر: من الأعلى للأقل\nالأحدث\nتصفية النتائج\nكافة التصنيفات\n(6)\nأسطوانات الغاز ومستلزماتها\n(0)\nمنظمات ومحابس الغاز\n(0)\nصوبات ومدافئ الغاز\n(0)\nمعدات غاز التخييم والرحلات\n(0)\nخراطيم وتوصيلات الغاز الآمنة\n(0)\nكواشف وأنظمة إنذار تسريب الغاز\n(0)\nطباخات وأفران الغاز المسطحة\n(4)\nسخانات المياه بالغاز\n(1)\nشوايات ومواقد الحدائق\n(1)\nملحقات وقطع غيار الغاز\n(0)\nخيارات إضافية\nمتوفر في المخزون\nعروض وتخفيضات\nصناعة إيطالية\n-1%\n3\nإيطالي الصنع\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\nتحكم باللمس، حماية حرارية\nMG-OVEN90-LUX\n3,899\n3,849\nأضف للسلة\n-2%\n3\nإيطالي الصنع\nمسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك\nتحكم باللمس، حماية حرارية\nMG-HOB90-5B-GLASS\n2,349\n2,299\nأضف للسلة\n-3%\n3\nإيطالي الصنع\nشفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة\nتحكم باللمس، حماية حرارية\nMG-HOOD90-PYRAMID\n1,799\n1,749\nأضف للسلة\n-3%\n3\nإيطالي الصنع\nمسطح غاز ستانلس ستيل بلت إن ماسترجاز 4 شعلات 60 سم\nتحكم باللمس، حماية حرارية\nMG-HOB60-4B-SS\n1,499\n1,449\nأضف للسلة\n-1%\n3\nإيطالي الصنع\nشواية باربيكيو غاز فاخرة 4 شعلات للحدائق والمزارع مع مقياس حرارة\nتحكم باللمس، حماية حرارية\nMG-BBQ-4B-GRILL\n4,499\n4,449\nأضف للسلة\n-4%\n3\nإيطالي الصنع\nسخان مياه غاز فوري رقمي ماسترجاز 12 لتر أمان كامل ODS\nتحكم باللمس، حماية حرارية\nMG-WATER-HEATER-12L\n1,349\n1,299\nأضف للسلة\nعرض 1-6 من 6 منتج\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": ""
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 17,
+      "slug": "product-detail-navigation",
+      "title": "فتح صفحة المنتج من صورة أو اسم المنتج",
+      "status": "PASS",
+      "durationMs": 2508,
+      "screenshotPath": "screenshots/17-product-detail-navigation.png",
+      "evidence": {
+        "expectation": "النقر على تفاصيل المنتج ينقل إلى صفحة المنتج",
+        "productUrl": "http://127.0.0.1:5173/product/25",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/product/25",
+          "rows": 0,
+          "quantities": [],
+          "itemTitles": [],
+          "summary": "",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\nالرئيسية\nالمنتجات\nالعروض\nمن نحن\nالدعم الفني\nEnglish\n1\nالرئيسية\nالمنتجات\nGas Stoves & Built-in Hobs\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\nGas Stoves & Built-in Hobs\nمشاركة\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\nالموديل: MG-OVEN90-LUX\n(24 تقييم)\n4.0\n3,849\nشامل ضريبة القيمة المضافة\nسعة داخلية عملاقة 85 لتر تكفي للعزائم الكبيرة\nشواية دائرية دوارة لتحمير متساوي واحترافي\nنظام أمان إيطالي كامل يقطع الغاز فور انطفاء اللهب\nشاشة ديجيتال LED مع مؤقت ذكي لضبط وقت الطهي\nباب زجاجي ثلاثي الطبقات بارد الملمس من الخارج\nأضف إلى السلة\n+\n1\n−\nنظرة عامة\nالمواصفات الفنية\nالتركيب\nالشحن والإرجاع\nالتقييمات\nتحكم كامل وتوزيع حراري متساوٍ\n\nفرن غاز مدمج إيطالي فاخر مقاس 90 سم سعة 85 لتر، مصنع من الستانلس ستيل المقاوم للبصمات مع زجاج عاكس مزدوج، أمان إيطالي كامل فوري، إشعال إلكتروني وشواية دائرية دوارة متطورة.\n\nسعة داخلية عملاقة 85 لتر تكفي للعزائم الكبيرة\nشواية دائرية دوارة لتحمير متساوي واحترافي\nنظام أمان إيطالي كامل يقطع الغاز فور انطفاء اللهب\nمروحة توزيع حراري تيربو ثلاثية الأبعاد\nشاشة ديجيتال LED مع مؤقت ذكي لضبط وقت الطهي\nباب زجاجي ثلاثي الطبقات بارد الملمس من الخارج\nمنتجات ذات صلة\n\nأجهزة مطابقة تكمل تصميم مطبخك الفاخر\n\n-2%\n3\nإيطالي الصنع\nمسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك\nتحكم باللمس، حماية حرارية\nMG-HOB90-5B-GLASS\n2,349\n2,299\nأضف للسلة\n-3%\n3\nإيطالي الصنع\nشفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة\nتحكم باللمس، حماية حرارية\nMG-HOOD90-PYRAMID\n1,799\n1,749\nأضف للسلة\n-3%\n3\nإيطالي الصنع\nمسطح غاز ستانلس ستيل بلت إن ماسترجاز 4 شعلات 60 سم\nتحكم باللمس، حماية حرارية\nMG-HOB60-4B-SS\n1,499\n1,449\nأضف للسلة\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": ""
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 18,
+      "slug": "english-ltr-layout",
+      "title": "تبديل اللغة إلى English والتحقق من LTR",
+      "status": "PASS",
+      "durationMs": 1927,
+      "screenshotPath": "screenshots/18-english-ltr-layout.png",
+      "evidence": {
+        "expectation": "زر اللغة يحول الصفحة من RTL إلى LTR",
+        "htmlDir": "ltr",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 2,
+          "quantities": [
+            "1",
+            "1"
+          ],
+          "itemTitles": [
+            "Mastergas 90cm Italian Built-in Gas Oven Full Safety Rotisserie",
+            "Mastergas 90cm 5-Burner Tempered Glass Built-in Gas Hob with Wok"
+          ],
+          "summary": "Order Summary\nApply\n6,148\nSubtotal\n922.20\nVAT (15%)\n0\nShipping & Delivery\n7,070.20\nTotal\nProceed to Checkout\nContinue Shopping",
+          "body": "Free shipping on orders over 500 SAR\nHome\nProducts\nOffers\nAbout Us\nSupport\nالعربية\n2\n3,849\n+\n1\n−\nMastergas 90cm Italian Built-in Gas Oven Full Safety Rotisserie\n\nMG-OVEN90-LUX\n\nRotary grill, Italian safety\n\n2,299\n+\n1\n−\nMastergas 90cm 5-Burner Tempered Glass Built-in Gas Hob with Wok\n\nMG-HOB90-5B-GLASS\n\nCast iron grates, full safety\n\nOrder Summary\nApply\n6,148\nSubtotal\n922.20\nVAT (15%)\n0\nShipping & Delivery\n7,070.20\nTotal\nProceed to Checkout\nContinue Shopping\nStore\nAll Appliances\nCookers & Oven\nBuilt-in Hobs\nBuilt-in Hoods\nSpecial Offers\nMy Account\nSign In\nMy Orders\nDelivery Addresses\nSupport\nTechnical Support\nPrivacy & Terms\nTerms & Conditions\n\nThe premier provider of luxury Italian home appliances in Saudi Arabia. Engineered quality, integrated safety, and long-lasting performance.\n\nPayment Methods\n\nmada\nVISA\nMastercard\nPay\n\nAll rights reserved .Mastergas 2026 ©\n\nDesigned & Developed by\nbekite",
+          "direction": "cart-page is-ltr"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 19,
+      "slug": "mobile-layout",
+      "title": "عرض الكارت على Mobile بدون قص أو خروج أفقي",
+      "status": "PASS",
+      "durationMs": 1044,
+      "screenshotPath": "screenshots/19-mobile-layout.png",
+      "evidence": {
+        "expectation": "الكارت والملخص يظهران في viewport 390x844 بدون overflow",
+        "overflow": false,
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 3,
+          "quantities": [
+            "1",
+            "1",
+            "1"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة",
+            "مسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك",
+            "شفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,897\nالمجموع الفرعي\n1,184.55\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n9,081.55\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\n3\n3,849\n+\n1\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\n2,299\n+\n1\n−\nمسطح غاز زجاجي بلت إن ماسترجاز 5 شعلات 90 سم مع شعلة ووك\n\nMG-HOB90-5B-GLASS\n\nحوامل زهر، أمان كامل\n\n1,749\n+\n1\n−\nشفاط مطبخ هرمي إيطالي ماسترجاز 90 سم بقوة شفط 1200 م³/ساعة\n\nMG-HOOD90-PYRAMID\n\nقوة شفط فائقة، هادئ\n\nملخص الطلب\nتطبيق\n7,897\nالمجموع الفرعي\n1,184.55\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n9,081.55\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    },
+    {
+      "number": 20,
+      "slug": "mobile-quantity-and-remove",
+      "title": "تفاعل الكمية والحذف على Mobile",
+      "status": "PASS",
+      "durationMs": 1136,
+      "screenshotPath": "screenshots/20-mobile-quantity-and-remove.png",
+      "evidence": {
+        "expectation": "زيادة الكمية والحذف يعملان على Mobile",
+        "viewport": "390x844",
+        "finalState": {
+          "url": "http://127.0.0.1:5173/cart",
+          "rows": 1,
+          "quantities": [
+            "2"
+          ],
+          "itemTitles": [
+            "فرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة"
+          ],
+          "summary": "ملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق",
+          "body": "شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات\n1\n7,698\n+\n2\n−\nفرن غاز مدمج إيطالي ماسترجاز 90 سم أمان كامل شواية دوارة\n\nMG-OVEN90-LUX\n\nشواية دوارة، أمان إيطالي\n\nملخص الطلب\nتطبيق\n7,698\nالمجموع الفرعي\n1,154.70\nضريبة القيمة المضافة (15٪)\n0\nرسوم الشحن والتوصيل\n8,852.70\nالإجمالي\nمتابعة الطلب\nمتابعة التسوق\nالمتجر\nجميع الأجهزة\nالمواقد والفرن\nالمواقد المسطحة\nالشفاطات المدمجة\nالعروض الخاصة\nحسابي\nتسجيل الدخول\nطلباتي\nعناوين التوصيل\nالدعم\nالدعم الفني\nسياسة الخصوصية والاستخدام\nالشروط والأحكام\n\nالرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.\n\nطرق الدفع\n\nmada\nVISA\nMastercard\nPay\n\nجميع الحقوق محفوظة .Mastergas 2026 ©\n\nتم التصميم والتطوير بواسطة\nbekite",
+          "direction": "cart-page"
+        },
+        "consoleErrors": [],
+        "consoleWarnings": [
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages.",
+          "[intlify] Not found 'nav.search' key in 'ar' locale messages.",
+          "[intlify] Fall back to translate 'nav.search' key with 'en' locale.",
+          "[intlify] Not found 'nav.search' key in 'en' locale messages."
+        ],
+        "pageErrors": []
+      },
+      "error": ""
+    }
+  ]
+}

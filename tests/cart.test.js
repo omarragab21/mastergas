@@ -135,6 +135,7 @@ test('full clear remains available for logout', () => {
 });
 
 test('corrupted local storage does not crash cart synchronization', () => {
+  storage.setItem('cart_cleared_by_user', '1');
   storage.setItem('cart_test-token', '{not-json');
   assert.doesNotThrow(() => cartState.syncWithToken());
   assert.deepEqual(cartState.items, []);
@@ -152,4 +153,37 @@ test('stored cart quantities are normalized to safe positive integers', () => {
     { id: 1, quantity: 1 },
     { id: 2, quantity: 999 },
   ]);
+});
+
+test('refreshCartItems preserves variant identity so one variant can be removed safely', async () => {
+  const variants = [
+    {
+      id: 25,
+      price: 100,
+      quantity: 1,
+      selectedAttributes: { color: 'أسود' },
+      cart_item_key: '25_color:أسود',
+    },
+    {
+      id: 25,
+      price: 100,
+      quantity: 1,
+      selectedAttributes: { color: 'فضي' },
+      cart_item_key: '25_color:فضي',
+    },
+  ];
+  storage.setItem('cart_test-token', JSON.stringify(variants));
+  cartState.syncWithToken();
+
+  await cartState.refreshCartItems();
+
+  assert.deepEqual(
+    cartState.items.map(item => item.cart_item_key),
+    ['25_color:أسود', '25_color:فضي']
+  );
+
+  cartState.removeFromCart('25_color:أسود');
+
+  assert.equal(cartState.items.length, 1);
+  assert.equal(cartState.items[0].cart_item_key, '25_color:فضي');
 });

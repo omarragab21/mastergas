@@ -1382,11 +1382,14 @@ const submitRating = async () => {
 }
 
 const getImageUrl = (i) => {
-  if (!i) return 'https://via.placeholder.com/80'
-  const p = typeof i === 'object' ? i.image_path : i
+  if (!i) return '/images/home/product_ceramic_hob_60.png';
+  const p = typeof i === 'object' ? (i.image_path || i.image || i.url || '') : i;
+  if (!p) return '/images/home/product_ceramic_hob_60.png';
+  if (typeof p === 'string' && (p.startsWith('http') || p.startsWith('/'))) return p;
+  if (typeof p === 'string' && p.includes('catalog_images')) return `/${p.replace(/^\//, '')}`;
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-  return p.startsWith('http') ? p : `${baseUrl.replace('/api', '')}/storage/${p}`
-}
+  return `${baseUrl.replace('/api', '')}/storage/${p}`;
+};
 </script>
 
 <style scoped>

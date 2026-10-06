@@ -41,9 +41,24 @@ const usersFor = (kind) => {
   const isAdmin = kind === 'admin';
   const key = isAdmin ? ADMINS_KEY : CUSTOMERS_KEY;
   const seed = isAdmin ? localSnapshot.admins : localSnapshot.customers;
-  return [...seed, ...readJson(key, [])].filter((user, index, users) => (
-    users.findIndex((candidate) => candidate.email?.toLowerCase() === user.email?.toLowerCase()) === index
-  ));
+  const stored = readJson(key, []);
+  const list = [...stored];
+  for (const item of seed) {
+    const index = list.findIndex((c) => c.email?.toLowerCase() === item.email?.toLowerCase());
+    if (index === -1) {
+      list.push(item);
+    } else {
+      list[index] = { ...item, ...list[index] };
+      if (list[index].name === 'Local Customer' && item.name !== 'Local Customer') {
+        list[index].name = item.name;
+        list[index].phone = item.phone;
+        list[index].country = item.country;
+        list[index].city = item.city;
+        list[index].address = item.address;
+      }
+    }
+  }
+  return list;
 };
 
 const sessions = () => readJson(SESSIONS_KEY, {});
@@ -129,7 +144,21 @@ const currentAdmin = () => requireSession('admin').user;
 
 const userAddresses = (userId) => {
   const all = readJson(ADDRESSES_KEY, {});
+  if (!all[userId] || !Array.isArray(all[userId]) || all[userId].length === 0) {
+    const seed = (localSnapshot.addresses || []).filter((item) => String(item.customer_id) === String(userId));
+    if (seed.length > 0) {
+      all[userId] = seed;
+      writeJson(ADDRESSES_KEY, all);
+      return { all, list: seed };
+    }
+  }
   return { all, list: all[userId] || [] };
+};
+
+const userWithAddresses = (user) => {
+  if (!user) return user;
+  const { list } = userAddresses(user.id);
+  return { ...user, addresses: list };
 };
 
 const saveAddressList = (userId, list) => {
@@ -156,7 +185,7 @@ const handleRequest = (config) => {
     if (!user) throw localError(401, 'Invalid email or password', config);
     const token = `local-customer-${user.id}-${Date.now()}`;
     saveSession(token, 'customer', user.id);
-    return { status: 'success', token, customer: stripCredentials(user) };
+    return { status: 'success', token, customer: stripCredentials(userWithAddresses(user)) };
   }
   if (path === '/frontend/register' && method === 'post') {
     const users = usersFor('customer');
@@ -168,7 +197,7 @@ const handleRequest = (config) => {
     return { status: 'success', token, customer: stripCredentials(user) };
   }
   if (path === '/frontend/logout' && method === 'post') return { status: 'success' };
-  if (path === '/frontend/user' && method === 'get') return { data: stripCredentials(currentCustomer()) };
+  if (path === '/frontend/user' && method === 'get') return { data: stripCredentials(userWithAddresses(currentCustomer())) };
   if (path === '/frontend/profile' && method === 'put') {
     const user = currentCustomer();
     const updated = { ...user, ...body, id: user.id, password: user.password };
@@ -264,7 +293,7 @@ const handleRequest = (config) => {
     }
     if (resource === 'orders' && method === 'get') {
       const user = currentCustomer();
-      if (parts[2]) {
+      if (parts[2] && parts[2] !== 'me') {
         const order = userOrders(user.id).find((item) => String(item.id) === String(parts[2]));
         if (!order) throw localError(404, 'Order not found', config);
         return { data: order };

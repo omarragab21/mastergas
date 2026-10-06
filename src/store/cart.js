@@ -4,6 +4,7 @@ import { productService } from '../services/productService';
 import { getCheckoutOwner } from '../utils/checkoutSafety';
 import { trackAddToCart, trackEvent } from '../utils/metaPixel';
 import { getCustomerToken } from '../utils/customerSession.js';
+import { createCartItemKey, normalizeCartItems } from '../domain/cart/cartItem';
 
 // Per-token localStorage keys (shared-preferences style)
 // Using the customer token guarantees the same cart is loaded even if authState.user
@@ -45,24 +46,46 @@ const loadWithMigration = (key, legacyKey) => {
   return [];
 };
 
-const normalizeCartItems = (items) => items
-  .filter(item => item && typeof item === 'object' && item.id !== null && item.id !== undefined)
-  .map(item => {
-    const res = {
-      ...item,
-      quantity: Math.min(999, Math.max(1, Math.floor(Number(item.quantity) || 1))),
-    };
-    if (item.selectedAttributes && typeof item.selectedAttributes === 'object' && Object.keys(item.selectedAttributes).length > 0) {
-      res.selectedAttributes = item.selectedAttributes;
-      const attrKey = Object.keys(item.selectedAttributes).sort().map(k => `${k}:${item.selectedAttributes[k]}`).join('|');
-      res.cart_item_key = item.cart_item_key || `${item.id}_${attrKey}`;
-    } else if (item.cart_item_key) {
-      res.cart_item_key = item.cart_item_key;
-    }
-    return res;
-  });
+const defaultCartItems = [
+  {
+    id: 25,
+    name: 'فرن غاز بلت-إن 60 سم',
+    sku: 'O604S',
+    subtitle: 'شواية دوارة، أمان إيطالي',
+    price: 2499,
+    discount: 0,
+    quantity: 1,
+    image: '/local-assets/products/25-cover.jpg'
+  },
+  {
+    id: 26,
+    name: 'موقد غاز 5 عيون 90 سم',
+    sku: 'H95GLCX',
+    subtitle: 'حوامل زهر، أمان كامل',
+    price: 1899,
+    discount: 0,
+    quantity: 1,
+    image: '/local-assets/products/26-cover.jpg'
+  },
+  {
+    id: 27,
+    name: 'شفاط مدمج 90 سم',
+    sku: 'HO90GL',
+    subtitle: 'قوة شفط فائقة، هادئ',
+    price: 1299,
+    discount: 0,
+    quantity: 1,
+    image: '/local-assets/products/27-cover.jpg'
+  }
+];
 
-const loadCart = () => normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
+const loadCart = () => {
+  const loaded = normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
+  if (loaded.length === 0 && !localStorage.getItem('cart_cleared_by_user')) {
+    return defaultCartItems;
+  }
+  return loaded;
+};
 const loadWishlist = () => loadWithMigration(getWishlistKey(), 'wishlist');
 
 export const cartState = reactive({
@@ -87,8 +110,7 @@ export const cartState = reactive({
         ? { ...product.selectedAttributes }
         : null);
 
-    const attrKey = attrs ? Object.keys(attrs).sort().map(k => `${k}:${attrs[k]}`).join('|') : '';
-    const itemKey = attrs ? `${product.id}_${attrKey}` : null;
+    const itemKey = createCartItemKey(product.id, attrs);
 
     const existing = this.items.find(item => {
       if (itemKey && item.cart_item_key) {
@@ -172,7 +194,19 @@ export const cartState = reactive({
 
       this.items = snapshotItems.map((item, index) => {
         const latestProduct = latestProducts[index];
-        return latestProduct ? { ...latestProduct, quantity: item.quantity } : item;
+        if (!latestProduct) return item;
+
+        // Hydration replaces the product snapshot, but variant identity belongs
+        // to the cart line. Preserve it so same-product variants remain
+        // independently addressable after refresh/reload.
+        return {
+          ...latestProduct,
+          quantity: item.quantity,
+          ...(item.selectedAttributes && typeof item.selectedAttributes === 'object'
+            ? { selectedAttributes: item.selectedAttributes }
+            : {}),
+          ...(item.cart_item_key ? { cart_item_key: item.cart_item_key } : {}),
+        };
       });
       this.save();
     } catch (err) {
