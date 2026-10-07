@@ -1583,7 +1583,7 @@ onUnmounted(() => {
 /* WhatsApp */
 .whatsapp-float {
   position: fixed;
-  bottom: 100px; /* Raised a bit */
+  bottom: 25px;
   right: 25px;
   background: #25d366;
   color: #fff;
@@ -1613,7 +1613,14 @@ onUnmounted(() => {
 
 html[dir="rtl"] .whatsapp-float {
   right: auto;
-  left: 30px;
+  left: 25px;
+}
+
+@media (max-width: 768px) {
+  html[dir="rtl"] .whatsapp-float {
+    right: auto;
+    left: 15px;
+  }
 }
 
 .whatsapp-float:hover {
