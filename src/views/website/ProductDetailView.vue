@@ -92,6 +92,17 @@
                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                   </svg>
                 </button>
+                <button
+                  class="favorite-detail-btn"
+                  :class="{ active: isFavorite }"
+                  type="button"
+                  @click.stop="toggleFavorite"
+                  :title="isFavorite ? (locale === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (locale === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
+                  :aria-label="isFavorite ? (locale === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (locale === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
+                >
+                  <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'" aria-hidden="true"></i>
+                  <span>{{ isFavorite ? (locale === 'ar' ? 'في المفضلة' : 'Saved') : (locale === 'ar' ? 'أضف للمفضلة' : 'Save') }}</span>
+                </button>
               </div>
 
               <!-- Product Title -->
@@ -1692,6 +1703,14 @@ const currentPrice = computed(() => {
   return price * (1 - discount / 100);
 });
 
+const isFavorite = computed(() => cartState.isInWishlist(product.value?.id));
+
+const toggleFavorite = () => {
+  if (product.value) {
+    cartState.toggleWishlist(product.value);
+  }
+};
+
 const handleAddToCart = () => {
   const payload = {
     ...product.value,
@@ -2138,6 +2157,36 @@ onUnmounted(() => {
 
 .share-action-btn:hover {
   opacity: 0.7;
+}
+
+.favorite-detail-btn {
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 7px 12px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  color: #64748B;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.favorite-detail-btn:hover,
+.favorite-detail-btn.active {
+  color: #E53333;
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+
+.favorite-detail-btn i {
+  font-size: 16px;
 }
 
 .share-icon-svg {

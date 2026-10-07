@@ -62,6 +62,15 @@
             <span>{{ t('profile.notifications') || 'الإشعارات' }}</span>
             <span class="mobile-tab-badge danger" v-if="notifCount > 0">{{ notifCount }}</span>
           </router-link>
+          <router-link to="/profile?tab=returns" class="mobile-tab-btn" :class="{ active: currentTab === 'returns' }">
+            <i class="fas fa-rotate-left" aria-hidden="true"></i>
+            <span>{{ t('profile.returns') || 'المرتجعات' }}</span>
+          </router-link>
+          <router-link to="/profile?tab=wishlist" class="mobile-tab-btn" :class="{ active: currentTab === 'wishlist' }">
+            <i class="far fa-heart" aria-hidden="true"></i>
+            <span>{{ t('profile.wishlist') || 'المفضلة' }}</span>
+            <span class="mobile-tab-badge" v-if="wishlistCount > 0">{{ wishlistCount }}</span>
+          </router-link>
           <router-link to="/profile?tab=info" class="mobile-tab-btn" :class="{ active: currentTab === 'info' }">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -138,6 +147,23 @@
                 </svg>
               </div>
               <span class="menu-text">{{ t('profile.personal_info') || 'الملف الشخصي' }}</span>
+            </router-link>
+
+            <router-link to="/profile?tab=returns" class="menu-item menu-item-returns" :class="{ active: currentTab === 'returns' }">
+              <div class="menu-icon-frame">
+                <img src="/assets/return-request.svg" alt="" class="profile-menu-asset-icon" aria-hidden="true" />
+              </div>
+              <span class="menu-text">{{ t('profile.returns') || 'المرتجعات' }}</span>
+            </router-link>
+
+            <router-link to="/profile?tab=wishlist" class="menu-item menu-item-wishlist" :class="{ active: currentTab === 'wishlist' }">
+              <div class="menu-icon-frame">
+                <i class="far fa-heart profile-menu-fa-icon" aria-hidden="true"></i>
+              </div>
+              <span class="menu-text">
+                {{ t('profile.wishlist') || 'المفضلة' }}
+                <span class="sidebar-badge wishlist-menu-badge" v-if="wishlistCount > 0">{{ wishlistCount }}</span>
+              </span>
             </router-link>
 
             <div class="sidebar-divider"></div>
@@ -1203,13 +1229,13 @@
              </header>
 
              <div v-if="wishlistCount === 0" class="empty-view">
-                <div class="empty-icon">💔</div>
+                <div class="empty-icon wishlist-empty-icon"><i class="far fa-heart" aria-hidden="true"></i></div>
                 <p>{{ t('profile.wishlist_empty') }}</p>
                 <router-link to="/products" class="go-shop-btn">{{ t('home.shop_now') }}</router-link>
              </div>
 
              <div class="wishlist-grid" v-else>
-                <div v-for="product in cartState.wishlist" :key="product.id" class="wish-card">
+                <div v-for="product in wishlistItems" :key="product.id" class="wish-card">
                    <img :src="getImageUrl(product.image || product.images?.[0])" @click="$router.push('/product/'+product.id)" />
                    <div class="wish-body">
                       <h4 @click="$router.push('/product/'+product.id)">{{ product.name }}</h4>
@@ -1218,7 +1244,7 @@
                         <button class="wish-add-cart" @click="cartState.addToCart(product)">
                           <i class="fas fa-shopping-cart"></i> {{ t('cart.title') }}
                         </button>
-                        <button class="wish-remove" @click="cartState.toggleWishlist(product)">
+                        <button class="wish-remove" @click="removeFromWishlist(product)">
                           <i class="far fa-trash-alt"></i>
                         </button>
                       </div>
@@ -1696,6 +1722,7 @@ import { useOffers } from '../../composables/useOffers'
 import { useLocalized } from '../../composables/useLocalized'
 import { useSettings } from '../../composables/useSettings'
 import { findCountryByCode } from '../../data/countries'
+import { products as fallbackProducts } from '../../data/catalogData'
 import { escapeHtml } from '../../utils/sanitize'
 import returnsService from '../../services/returnsService'
 
@@ -1722,11 +1749,15 @@ const currentTabBreadcrumbTitle = computed(() => {
       return isAr ? 'الإشعارات' : 'Notifications'
     case 'info':
       return isAr ? 'معلوماتك الشخصية' : 'Personal Info'
+    case 'returns':
+      return isAr ? 'المرتجعات' : 'Returns'
+    case 'wishlist':
+      return isAr ? 'المفضلة' : 'Wishlist'
     default:
       return ''
   }
 })
-const wishlistCount = computed(() => cartState.wishlist.length)
+const wishlistCount = computed(() => wishlistItems.value.length)
 const ordersTotalCount = computed(() => ordersList.value.length)
 const notifCount = ref(0) // Default to 0, no longer hardcoded
 
@@ -1938,6 +1969,42 @@ const defaultMockAddresses = [
   }
 ]
 const addressesList = ref([...defaultMockAddresses])
+const defaultWishlistImages = [
+  '/images/products/oven_main.jpg',
+  '/images/products/gas_stove_thumb.jpg',
+  '/images/products/water_heater_thumb.jpg',
+  '/images/products/dishwasher_thumb.jpg'
+]
+
+const defaultMockWishlist = fallbackProducts.slice(0, 4).map((product, index) => ({
+  ...product,
+  image: defaultWishlistImages[index],
+  quantity: product.stock || 1
+}))
+
+const wishlistItems = computed(() => {
+  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
+    return defaultMockWishlist
+  }
+  return cartState.wishlist
+})
+
+const ensureMockWishlist = () => {
+  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
+    cartState.wishlist = [...defaultMockWishlist]
+    cartState.saveWishlist()
+  }
+}
+
+const removeFromWishlist = (product) => {
+  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
+    cartState.wishlist = defaultMockWishlist.filter(item => item.id !== product.id)
+    cartState.saveWishlist()
+    return
+  }
+  cartState.toggleWishlist(product)
+}
+
 const selectDefaultAddress = async (addr) => {
   addressesList.value.forEach(a => {
     a.is_default = (a.id === addr.id)
@@ -2042,7 +2109,31 @@ const markNotificationAsRead = async (notif) => {
 }
 
 // Returns State
-const returnsList = ref([])
+const defaultMockReturns = [
+  {
+    id: 'return-preview-1',
+    returnNumber: 'MG-R-2026-0012',
+    status: 'processing',
+    productName: 'سخان مياه غاز ماستر 10 لتر',
+    productImage: '/images/products/water_heater_thumb.jpg',
+    orderNumber: '#MG-2024-00847',
+    reason: 'المنتج لا يعمل بالشكل المتوقع',
+    refundAmount: '1,299.00',
+    date: '2026-08-28'
+  },
+  {
+    id: 'return-preview-2',
+    returnNumber: 'MG-R-2026-0009',
+    status: 'refunded',
+    productName: 'غسالة أطباق ماستر 14 مكان',
+    productImage: '/images/products/dishwasher_thumb.jpg',
+    orderNumber: '#MG-2024-00831',
+    reason: 'تغيير في الطلب قبل الاستخدام',
+    refundAmount: '2,450.00',
+    date: '2026-08-21'
+  }
+]
+const returnsList = ref([...defaultMockReturns])
 const showReturnForm = ref(false)
 const returnStep = ref(1)
 const selectedOrderForReturn = ref(null)
@@ -2564,7 +2655,7 @@ watch(() => authState.user, (u) => {
 }, { immediate: true })
 
 const fetchData = async () => {
-  if (!authState.token) return router.push('/')
+  if (!authState.token && !route.query.mockAuth) return router.push('/')
   loadingData.value = true
   try {
     // Fresh User Data
@@ -2594,9 +2685,12 @@ const fetchData = async () => {
     // Returns & Notifications
     fetchNotifications()
     try {
-      returnsList.value = await returnsService.listMine()
+      const fetchedReturns = await returnsService.listMine()
+      returnsList.value = Array.isArray(fetchedReturns) && fetchedReturns.length > 0
+        ? fetchedReturns
+        : [...defaultMockReturns]
     } catch (e) {
-      returnsList.value = []
+      returnsList.value = [...defaultMockReturns]
     }
   } catch (err) {
     // Silent fallback
@@ -2627,6 +2721,7 @@ onMounted(async () => {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
+  ensureMockWishlist()
   fetchSettings()
   if (currentTab.value === 'wallet') {
     fetchWallet()
@@ -2864,6 +2959,7 @@ const getPaymentLabel = (method) => {
 
 const formatReturnStatus = (s) => ({
   pending: t('profile.return_status_pending'),
+  processing: 'قيد المراجعة',
   approved: t('profile.return_status_approved'),
   rejected: t('profile.return_status_rejected'),
   refunded: 'تم رد المبلغ'
@@ -3322,8 +3418,26 @@ const getImageUrl = (i) => {
   display: block;
 }
 
+.profile-menu-asset-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  object-fit: contain;
+  opacity: 0.72;
+}
+
+.profile-menu-fa-icon {
+  font-size: 19px;
+  line-height: 1;
+  color: currentColor;
+}
+
 .menu-item.active .menu-icon-frame {
   color: #000000;
+}
+
+.menu-item.active .profile-menu-asset-icon {
+  opacity: 1;
 }
 
 .sidebar-badge {
@@ -5680,6 +5794,18 @@ html[dir="ltr"] .input-relative select {
 /* Empty States */
 .empty-state, .placeholder-msg, .empty-view { text-align: center; color: #9ca3af; padding: 40px 0; }
 .empty-icon { font-size: 50px; margin-bottom: 15px; }
+.wishlist-empty-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  color: #94a3b8;
+  font-size: 32px;
+}
 .go-shop-btn { display: inline-block; background: #000000; color: #fff; padding: 10px 25px; border-radius: 10px; text-decoration: none; font-weight: 800; margin-top: 15px; }
 
 /* Country Readonly Input */

@@ -44,6 +44,17 @@
         <span class="badge-sale" v-if="discountPercentage > 0">-{{ Math.round(discountPercentage) }}%</span>
       </div>
 
+      <button
+        type="button"
+        class="product-favorite-btn"
+        :class="{ active: isFavorite }"
+        :aria-label="isFavorite ? (currentLang === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (currentLang === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
+        :title="isFavorite ? (currentLang === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (currentLang === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
+        @click.stop="toggleFavorite"
+      >
+        <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'" aria-hidden="true"></i>
+      </button>
+
       <!-- Multiple images indicator badge -->
       <div v-if="hasMultipleImages" class="card-images-count">
         <i class="fas fa-camera"></i>
@@ -109,6 +120,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useOffers } from '../composables/useOffers';
 import { useLocalized } from '../composables/useLocalized';
+import { cartState } from '../store/cart';
 import riyalIcon from '../../assets/riyal.svg';
 
 const props = defineProps({
@@ -128,6 +140,11 @@ const { t } = useI18n();
 const { currentLang, localized } = useLocalized();
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer } = useOffers();
 const secondaryVisible = ref(false);
+const isFavorite = computed(() => cartState.isInWishlist(props.product?.id));
+
+const toggleFavorite = () => {
+  cartState.toggleWishlist(props.product);
+};
 
 const productName = computed(() => {
   if (!props.product) return '';
@@ -418,6 +435,43 @@ const formatPrice = (price) => {
 .product-card[dir="ltr"] .product-badges {
   right: auto;
   left: 12px;
+}
+
+.product-favorite-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 4;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.product-card[dir="ltr"] .product-favorite-btn {
+  right: 12px;
+  left: auto;
+}
+
+.product-favorite-btn:hover,
+.product-favorite-btn.active {
+  color: #e53333;
+  background: #fff1f2;
+  transform: translateY(-1px) scale(1.04);
+}
+
+.product-favorite-btn:focus-visible {
+  outline: 3px solid rgba(229, 51, 51, 0.25);
+  outline-offset: 2px;
 }
 
 .badge-new {
