@@ -64,6 +64,23 @@ beforeEach(() => {
   cartState.syncWithToken();
 });
 
+test('guest cart stays empty and stale guest cart data is discarded', () => {
+  storage.removeItem('c_token');
+  storage.setItem('cart_guest', JSON.stringify([
+    { id: 25, name: 'Legacy demo item', price: 100, quantity: 1 },
+  ]));
+
+  cartState.syncWithToken();
+
+  assert.equal(cartState.items.length, 0);
+  assert.equal(cartState.count, 0);
+
+  storage.setItem('c_token', 'test-token');
+  cartState.migrateToToken('test-token');
+  assert.equal(storage.getItem('cart_guest'), null);
+  assert.deepEqual(JSON.parse(storage.getItem('cart_test-token')).map(item => item.id), [1, 2]);
+});
+
 test('clearCart preserves wishlist state and storage', () => {
   cartState.clearCart();
 

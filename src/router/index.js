@@ -30,26 +30,31 @@ const routes = [
         path: 'cart',
         name: 'Cart',
         component: () => import('../views/website/CartView.vue'),
+        meta: { requiresCustomerAuth: true },
       },
       {
         path: 'wishlist',
         name: 'Wishlist',
         component: () => import('../views/website/WishlistView.vue'),
+        meta: { requiresCustomerAuth: true },
       },
       {
         path: 'checkout',
         name: 'Checkout',
         component: () => import('../views/website/CheckoutView.vue'),
+        meta: { requiresCustomerAuth: true },
       },
       {
         path: 'payment/success',
         name: 'PaymentSuccess',
         component: () => import('../views/website/PaymentSuccessView.vue'),
+        meta: { requiresCustomerAuth: true },
       },
       {
         path: 'payment/failure',
         name: 'PaymentFailure',
         component: () => import('../views/website/PaymentFailureView.vue'),
+        meta: { requiresCustomerAuth: true },
       },
       {
         path: 'about',
@@ -77,6 +82,46 @@ const routes = [
         name: 'Invoice',
         component: () => import('../views/website/InvoiceView.vue'),
         meta: { requiresCustomerAuth: true },
+      },
+      {
+        path: 'privacy-policy',
+        name: 'PrivacyPolicy',
+        component: () => import('../views/website/PrivacyPolicyView.vue'),
+      },
+      {
+        path: 'privacy',
+        name: 'Privacy',
+        component: () => import('../views/website/PrivacyPolicyView.vue'),
+      },
+      {
+        path: 'page/privacy',
+        name: 'PagePrivacy',
+        component: () => import('../views/website/PrivacyPolicyView.vue'),
+      },
+      {
+        path: 'page/privacy-policy',
+        name: 'PagePrivacyPolicy',
+        component: () => import('../views/website/PrivacyPolicyView.vue'),
+      },
+      {
+        path: 'terms',
+        name: 'Terms',
+        component: () => import('../views/website/TermsView.vue'),
+      },
+      {
+        path: 'terms-and-conditions',
+        name: 'TermsAndConditions',
+        component: () => import('../views/website/TermsView.vue'),
+      },
+      {
+        path: 'page/terms',
+        name: 'PageTerms',
+        component: () => import('../views/website/TermsView.vue'),
+      },
+      {
+        path: 'page/terms-and-conditions',
+        name: 'PageTermsAndConditions',
+        component: () => import('../views/website/TermsView.vue'),
       },
       {
         path: 'page/:id',
@@ -177,9 +222,12 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const customerToken = getCustomerToken();
   const isAdminPath = to.path.startsWith('/admin');
+  const requiresCustomerAuth = to.matched.some(record => record.meta.requiresCustomerAuth);
 
-  if (to.meta.requiresCustomerAuth && !customerToken) {
-    next({ path: '/', query: { openAuth: 'true' } });
+  if (requiresCustomerAuth && !customerToken) {
+    // Keep the original destination so the auth modal can take the customer
+    // back there after a successful login or registration.
+    next({ path: '/', query: { openAuth: 'true', redirect: to.fullPath } });
   } else if (isAdminPath && to.meta.requiresAuth && !token && to.name !== 'Login') {
     next('/admin/login');
   } else if (to.name === 'Login' && token) {

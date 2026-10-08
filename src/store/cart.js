@@ -46,45 +46,11 @@ const loadWithMigration = (key, legacyKey) => {
   return [];
 };
 
-const defaultCartItems = [
-  {
-    id: 25,
-    name: 'فرن غاز بلت-إن 60 سم',
-    sku: 'O604S',
-    subtitle: 'شواية دوارة، أمان إيطالي',
-    price: 2499,
-    discount: 0,
-    quantity: 1,
-    image: '/local-assets/products/25-cover.jpg'
-  },
-  {
-    id: 26,
-    name: 'موقد غاز 5 عيون 90 سم',
-    sku: 'H95GLCX',
-    subtitle: 'حوامل زهر، أمان كامل',
-    price: 1899,
-    discount: 0,
-    quantity: 1,
-    image: '/local-assets/products/26-cover.jpg'
-  },
-  {
-    id: 27,
-    name: 'شفاط مدمج 90 سم',
-    sku: 'HO90GL',
-    subtitle: 'قوة شفط فائقة، هادئ',
-    price: 1299,
-    discount: 0,
-    quantity: 1,
-    image: '/local-assets/products/27-cover.jpg'
-  }
-];
-
 const loadCart = () => {
-  const loaded = normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
-  if (loaded.length === 0 && !localStorage.getItem('cart_cleared_by_user')) {
-    return defaultCartItems;
-  }
-  return loaded;
+  // Cart data belongs to an authenticated customer. A guest must always start
+  // with an empty cart instead of receiving demo/fallback products.
+  if (!getCustomerToken()) return [];
+  return normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
 };
 const loadWishlist = () => loadWithMigration(getWishlistKey(), 'wishlist');
 
@@ -140,6 +106,10 @@ export const cartState = reactive({
       }
       this.items.push(newItem);
     }
+    if (this._modalTimer) {
+      clearTimeout(this._modalTimer);
+      this._modalTimer = null;
+    }
     this.lastAddedProduct = product;
     this.showModal = true;
     this.save();
@@ -147,9 +117,18 @@ export const cartState = reactive({
     // Meta Pixel AddToCart Event
     trackAddToCart(product, safeQuantity);
 
-    setTimeout(() => {
+    this._modalTimer = setTimeout(() => {
       this.showModal = false;
-    }, 3500);
+      this._modalTimer = null;
+    }, 4500);
+  },
+
+  closeModal() {
+    this.showModal = false;
+    if (this._modalTimer) {
+      clearTimeout(this._modalTimer);
+      this._modalTimer = null;
+    }
   },
 
   removeFromCart(identifier) {
@@ -317,17 +296,12 @@ export const cartState = reactive({
     this.wishlist = loadWishlist();
   },
 
-  // When a guest logs in, copy any items saved under the guest key to the
-  // new token-based key so the cart is not lost.
+  // Guest carts are no longer supported. Remove stale guest cart data so old
+  // demo/legacy items cannot reappear after a later login.
   migrateToToken(token) {
     if (!token) return;
-    const guestCart = parseStoredList(localStorage.getItem('cart_guest'), 'cart_guest');
     const guestWishlist = parseStoredList(localStorage.getItem('wishlist_guest'), 'wishlist_guest');
-    const tokenCartKey = `cart_${token}`;
     const tokenWishlistKey = `wishlist_${token}`;
-    if (guestCart.length && !localStorage.getItem(tokenCartKey)) {
-      localStorage.setItem(tokenCartKey, JSON.stringify(guestCart));
-    }
     if (guestWishlist.length && !localStorage.getItem(tokenWishlistKey)) {
       localStorage.setItem(tokenWishlistKey, JSON.stringify(guestWishlist));
     }

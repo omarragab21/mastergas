@@ -55,7 +55,7 @@
             <!-- Nav Icons (Cart, User, Search) -->
             <div class="header-nav-icons">
               <!-- Cart -->
-              <router-link to="/cart" class="header-icon-link cart-link" :title="$t('cart.title') || 'سلة المشتريات'">
+              <router-link v-if="isLoggedIn" to="/cart" class="header-icon-link cart-link" :title="$t('cart.title') || 'سلة المشتريات'">
                 <div class="cart-wrapper">
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M1.60387 1.83326C1.60387 1.45357 1.91167 1.14576 2.29137 1.14576L3.15161 1.14576C4.30834 1.14576 5.31663 1.93301 5.59718 3.0552L5.60035 3.06789L6.06285 5.27077L17.8269 5.27077C18.2887 5.2707 18.7138 5.27064 19.0533 5.32454C19.4335 5.38491 19.8298 5.53039 20.1102 5.91625C20.3802 6.28767 20.4146 6.70764 20.3882 7.09216C20.3632 7.4544 20.2736 7.8993 20.1716 8.40606L20.163 8.44894C19.7912 10.2953 19.4254 12.0364 18.5652 13.2919C18.1195 13.9425 17.5396 14.4696 16.7682 14.8276C16.0046 15.1819 15.0891 15.3541 13.991 15.3541L7.75722 15.3541C7.00538 15.3568 6.34388 15.9315 6.21132 16.7291L16.0414 16.7291C17.1805 16.7291 18.1039 17.6525 18.1039 18.7916C18.1039 19.9307 17.1805 20.8541 16.0414 20.8541C14.9023 20.8541 13.9789 19.9307 13.9789 18.7916C13.9789 18.5505 14.0202 18.3191 14.0962 18.1041L11.5698 18.1041C11.6458 18.3191 11.6872 18.5505 11.6872 18.7916C11.6872 19.9307 10.7638 20.8541 9.6247 20.8541C8.48561 20.8541 7.5622 19.9307 7.5622 18.7916C7.5622 18.5505 7.60356 18.3191 7.67956 18.1041L5.87685 18.1041C5.26268 18.1041 4.8122 17.5937 4.8122 17.0237C4.8122 15.8062 5.51311 14.7321 6.54297 14.2495L4.84881 6.1802C4.83123 6.12863 4.81961 6.07431 4.81477 6.01804L4.26037 3.37749C4.12898 2.87337 3.67354 2.52076 3.15161 2.52076L2.29137 2.52076C1.91167 2.52076 1.60387 2.21296 1.60387 1.83326ZM16.0414 18.1041C15.6617 18.1041 15.3539 18.4119 15.3539 18.7916C15.3539 19.1713 15.6617 19.4791 16.0414 19.4791C16.4211 19.4791 16.7289 19.1713 16.7289 18.7916C16.7289 18.4119 16.4211 18.1041 16.0414 18.1041ZM8.9372 18.7916C8.9372 18.4119 9.24501 18.1041 9.6247 18.1041C10.0044 18.1041 10.3122 18.4119 10.3122 18.7916C10.3122 19.1713 10.0044 19.4791 9.6247 19.4791C9.24501 19.4791 8.9372 19.1713 8.9372 18.7916ZM8.14338 13.9791L8.1397 13.9791L7.89118 13.9791L6.35153 6.64577L17.7776 6.64577C18.3056 6.64577 18.619 6.64782 18.8377 6.68253C18.9373 6.69835 18.9808 6.71626 18.9955 6.72376L18.9986 6.72537C19.0004 6.72787 19.0057 6.73681 19.0111 6.7641C19.0188 6.80346 19.0249 6.8743 19.0164 6.99777C18.9984 7.25944 18.9283 7.615 18.815 8.17757C18.4279 10.1003 18.1016 11.5359 17.4309 12.5148C17.1111 12.9814 16.7159 13.336 16.1894 13.5803C15.655 13.8283 14.9497 13.9791 13.991 13.9791L8.14338 13.9791Z" fill="currentColor"/>
@@ -117,7 +117,7 @@
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
             </button>
-            <router-link to="/cart" class="icon-btn cart-btn" @click="isMobileMenuOpen = false">
+            <router-link v-if="isLoggedIn" to="/cart" class="icon-btn cart-btn" @click="isMobileMenuOpen = false">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-6 h-6"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
               <span class="badge" v-if="cartCount > 0">{{ cartCount }}</span>
             </router-link>
@@ -208,7 +208,12 @@
 
     <!-- Global Components -->
     <add-to-cart-modal />
-    <auth-modal ref="authModal" :logo="siteLogo" :site-name="siteName" />
+    <auth-modal
+      ref="authModal"
+      :logo="siteLogo"
+      :site-name="siteName"
+      @close="handleAuthModalClose"
+    />
 
     <!-- Search Modal -->
     <div class="search-modal-overlay" v-if="showSearchModal" @click.self="showSearchModal = false">
@@ -367,13 +372,16 @@
       </div>
     </footer>
 
+    <!-- Add To Cart Toast Notification -->
+    <AddToCartModal />
+
     <!-- Cookie Consent Banner & Modal -->
     <CookieConsent ref="cookieConsent" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import api, { isCancelledRequest } from '../config/axios';
@@ -467,6 +475,26 @@ const openAuthModal = () => {
   if (authModal.value && typeof authModal.value.openModal === 'function') {
     authModal.value.openModal();
   }
+};
+
+const openAuthModalFromQuery = () => {
+  if (route.query.openAuth === 'true' && !isLoggedIn.value) {
+    nextTick(openAuthModal);
+  }
+};
+
+// The router intentionally sends unauthenticated customers to the storefront
+// with this query flag. Open the modal here so the redirect never looks like a
+// silent or broken navigation.
+watch(() => route.query.openAuth, openAuthModalFromQuery, { immediate: true });
+
+const handleAuthModalClose = () => {
+  if (route.query.openAuth !== 'true') return;
+
+  const query = { ...route.query };
+  delete query.openAuth;
+  delete query.redirect;
+  router.replace({ path: route.path, query });
 };
 
 // Make openAuthModal globally accessible for wishlist and cart operations
@@ -723,7 +751,9 @@ watch(searchQuery, (newValue) => {
 onMounted(() => {
   fetchData();
   fetchCategories();
+  cartState.syncWithToken();
   authActions.init();
+  openAuthModalFromQuery();
   window.addEventListener('scroll', handleScroll);
   document.addEventListener('click', closeDropdownOnOutsideClick);
 });

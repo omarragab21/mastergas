@@ -237,13 +237,17 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { authActions, authState } from '../store/auth'
 import api from '../config/axios'
 import { countries, findCountryByCode, validatePhoneByCountry } from '../data/countries'
 
 const { t, locale } = useI18n()
+const route = useRoute()
 const isRtl = computed(() => locale.value === 'ar')
 const currentDir = computed(() => isRtl.value ? 'rtl' : 'ltr')
+
+const emit = defineEmits(['close'])
 
 defineProps({
   logo: String,
@@ -396,11 +400,36 @@ const closeModal = () => {
   currentTab.value = 'login'
   resetSuccess.value = false
   document.body.style.overflow = ''
+  emit('close')
+}
+
+const getPostAuthRedirect = () => {
+  const redirect = route.query.redirect
+  if (typeof redirect !== 'string' || !redirect.startsWith('/') || redirect.startsWith('//')) {
+    return ''
+  }
+  return redirect
+}
+
+const finishAuthentication = () => {
+  const redirect = getPostAuthRedirect()
+  closeModal()
+
+  if (redirect) {
+    window.location.assign(redirect)
+    return
+  }
+
+  cleanAuthQuery()
+  window.location.reload()
 }
 
 const cleanAuthQuery = () => {
   if (typeof window === 'undefined') return
-  const cleanUrl = `${window.location.pathname}${window.location.hash}`
+  const cleanUrlObject = new URL(window.location.href)
+  cleanUrlObject.searchParams.delete('openAuth')
+  cleanUrlObject.searchParams.delete('redirect')
+  const cleanUrl = cleanUrlObject.pathname + cleanUrlObject.search + cleanUrlObject.hash
   window.history.replaceState({}, document.title, cleanUrl || '/')
 }
 
@@ -449,9 +478,7 @@ const handleLogin = async () => {
     const res = await authActions.login(loginForm, { remember: rememberMe.value })
     globalSuccess.value = res.message || t('auth.login_success')
     setTimeout(() => {
-      closeModal()
-      cleanAuthQuery()
-      window.location.reload()
+      finishAuthentication()
     }, 1000)
   } catch (error) {
     logUnexpectedAuthError(error)
@@ -469,9 +496,7 @@ const handleRegister = async () => {
     const res = await authActions.register(registerForm)
     globalSuccess.value = res.message || t('auth.login_success')
     setTimeout(() => {
-      closeModal()
-      cleanAuthQuery()
-      window.location.reload()
+      finishAuthentication()
     }, 1000)
   } catch (error) {
     logUnexpectedAuthError(error)

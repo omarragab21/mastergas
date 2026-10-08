@@ -72,7 +72,7 @@ const messages = {
       continue_order: 'متابعة الطلب',
       apply_coupon: 'تطبيق',
       coupon_placeholder: 'رمز الكوبون أو القسيمة',
-      added_to_cart: 'تمت الإضافة للسلة',
+      added_to_cart: 'تمت الإضافة إلى السلة',
       view_cart: 'عرض السلة',
       remove: 'إزالة',
       delete_item: 'حذف المنتج',
