@@ -13,12 +13,14 @@ const isLocalhost = isBrowser &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 const forceRemote = import.meta.env.VITE_USE_PROXY === 'false';
+const forceProxy = import.meta.env.VITE_USE_PROXY === 'true';
+const isVercelHost = isBrowser && /\.vercel\.app$/.test(window.location?.hostname || '');
 const frappeMode = import.meta.env.VITE_FRAPPE_MODE === 'true';
 
-// When running in a browser locally, route through Vite dev server proxy '/api'
-// to eliminate browser Cross-Origin Request Blocked (CORS) errors.
-// In SSR/Node test environments or production builds, use VITE_API_BASE_URL or fallback.
-const baseURL = (!forceRemote && isBrowser && (import.meta.env.DEV || isLocalhost))
+// When running in a browser locally (Vite dev proxy) or on Vercel (vercel.json rewrite),
+// route through same-origin '/api' to eliminate browser Cross-Origin Request Blocked (CORS) errors.
+// In SSR/Node test environments or other production builds, use VITE_API_BASE_URL or fallback.
+const baseURL = (!forceRemote && isBrowser && (import.meta.env.DEV || isLocalhost || isVercelHost || forceProxy))
   ? '/api'
   : (envUrl || serverUrl);
 
