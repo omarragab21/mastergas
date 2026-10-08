@@ -2,9 +2,14 @@ import axios from 'axios';
 import { localApiAdapter } from './localApi';
 import { getCustomerToken } from '../utils/customerSession.js';
 
-const serverUrl = 'https://backend-mastergas.be-kite.com/api';
-const envUrl = import.meta.env.VITE_API_BASE_URL;
-const dataMode = String(import.meta.env.VITE_DATA_MODE || (import.meta.env.DEV ? 'local' : 'api')).toLowerCase();
+// TEMP: backend disabled — backend URL commented out until the CORS issue is solved.
+// const serverUrl = 'https://backend-mastergas.be-kite.com/api';
+const serverUrl = '/api';
+// const envUrl = import.meta.env.VITE_API_BASE_URL;
+const envUrl = undefined;
+// TEMP: always use the bundled local data (src/data/localData.json), including on Vercel.
+// const dataMode = String(import.meta.env.VITE_DATA_MODE || (import.meta.env.DEV ? 'local' : 'api')).toLowerCase();
+const dataMode = 'local';
 export const isLocalDataMode = dataMode === 'local';
 
 const isBrowser = typeof window !== 'undefined';
