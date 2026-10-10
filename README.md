@@ -74,6 +74,18 @@
 
 ```
 mastergas/
+├── website/                    # مشروع Vue مستقل للويب سايت
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── index.html
+│   └── vite.config.js
+├── admin/                      # مشروع Vue مستقل للوحة التحكم
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── index.html
+│   └── vite.config.js
 ├── public/                     # الملفات الثابتة المباشرة
 │   ├── .htaccess               # إعدادات Apache و SPA Rewrite لـ cPanel
 │   ├── favicon.png             # أيقونة الموقع
@@ -163,11 +175,19 @@ npm run sync:local-data
 # 1. تثبيت الحزم والتبعيات
 npm install
 
-# 2. تشغيل سيرفر التطوير المحلي
+# 2. تشغيل الويب سايت من مشروعه
+cd website
 npm run dev
 
-# افتح المتصفح على: http://localhost:5173
+# 3. تشغيل لوحة التحكم من Terminal آخر
+cd admin
+npm run dev
+
+# الويب سايت: http://localhost:5173
+# لوحة التحكم: http://localhost:5174
 ```
+
+كل مجلد من `website` و`admin` مشروع Vue مستقل وله `src/main.js` و`src/App.vue` و`src/router` و`package.json` خاص به. يمكن أيضًا تشغيلهما من جذر المستودع عبر `npm run dev:website` و`npm run dev:admin`.
 
 ---
 
@@ -175,7 +195,9 @@ npm run dev
 
 | الأمر | الوصف |
 | :--- | :--- |
-| `npm run dev` | تشغيل سيرفر التطوير المحلي مع Hot Module Replacement |
+| `npm run dev` | تشغيل الويب سايت من خلال المشروع الفرعي |
+| `npm run dev:website` | تشغيل مشروع `website` على المنفذ 5173 |
+| `npm run dev:admin` | تشغيل مشروع `admin` على المنفذ 5174 |
 | `npm run build` | توليد كتالوج المنتجات وبناء ملفات الإنتاج في مجلد `dist` |
 | `npm run build:clean` | تنظيف مخلفات البناء السابقة وبناء نسخة إنتاج نظيفة تماماً |
 | `npm run build:cpanel` | بناء المشروع وتجهيز أرشيف مضغوط جاهز للرفع مباشرة على cPanel |
