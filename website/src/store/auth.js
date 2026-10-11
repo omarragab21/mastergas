@@ -9,7 +9,18 @@ import api from '../config/axios';
 import { cartState } from './cart';
 import { clearCustomerToken, getCustomerToken, setCustomerToken } from '../utils/customerSession.js';
 
-const TOKEN_KEY = 'c_token';
+const CUSTOMER_USER_KEY = 'c_user';
+
+const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem(CUSTOMER_USER_KEY) || sessionStorage.getItem(CUSTOMER_USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getResponseUser = (payload) => payload?.user || payload?.customer || payload?.admin || payload?.data || null;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 export const authState = reactive({
@@ -29,19 +40,11 @@ export const authActions = {
    */
   async init() {
     if (!authState.token) return;
-    try {
-      const res = await api.get('/frontend/user');
-      const rawData = res.data;
-      // Aggressive extraction: check all possible wrappers used by Laravel Resources
-      const finalUser = rawData.data || rawData.customer || rawData.user || rawData;
-      authState.user = finalUser;
-      cartState.syncWithToken();
-    } catch (err) {
-      // Token invalid or expired → clear it silently
-      if (err.response?.status === 401) {
-        this._clearSession();
-      }
-    }
+    // The Tijara auth contract returns the user with the login response and does
+    // not expose a profile endpoint in the auth collection. Restore only the
+    // session user; authentication itself always happens through the API.
+    authState.user = getStoredUser();
+    cartState.syncWithToken();
   },
 
   /**
@@ -50,8 +53,8 @@ export const authActions = {
   async login(credentials, options = {}) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/login', credentials);
-      this._setSession(res.data.token, res.data.customer, options.remember ?? true);
+      const res = await api.post('/v1/login', credentials);
+      this._setSession(res.data.token, getResponseUser(res.data), options.remember ?? true);
       return res.data;
     } finally {
       authState.loading = false;
@@ -64,8 +67,8 @@ export const authActions = {
   async register(data) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/register', data);
-      this._setSession(res.data.token, res.data.customer);
+      const res = await api.post('/v1/register', data);
+      this._setSession(res.data.token, getResponseUser(res.data));
       return res.data;
     } finally {
       authState.loading = false;
@@ -77,7 +80,7 @@ export const authActions = {
    */
   async logout() {
     try {
-      await api.post('/frontend/logout');
+      await api.post('/v1/logout');
     } catch (_) {
       // Even if the server call fails, clear locally
     }
@@ -90,6 +93,8 @@ export const authActions = {
     authState.token = token;
     authState.user = user;
     setCustomerToken(token, remember);
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem(CUSTOMER_USER_KEY, JSON.stringify(user || {}));
     // Preserve any guest cart/wishlist by moving it to the new token key
     cartState.migrateToToken(token);
     cartState.syncWithToken();
@@ -102,5 +107,7 @@ export const authActions = {
     authState.token = null;
     authState.user = null;
     clearCustomerToken();
+    localStorage.removeItem(CUSTOMER_USER_KEY);
+    sessionStorage.removeItem(CUSTOMER_USER_KEY);
   },
 };

@@ -2,37 +2,36 @@ import axios from 'axios';
 import { localApiAdapter } from './localApi';
 import { getCustomerToken } from '../utils/customerSession.js';
 
-// TEMP: backend disabled — backend URL commented out until the CORS issue is solved.
-// const serverUrl = 'https://backend-mastergas.be-kite.com/api';
-const serverUrl = '/api';
-// const envUrl = import.meta.env.VITE_API_BASE_URL;
-const envUrl = undefined;
-// TEMP: always use the bundled local data (src/data/localData.json), including on Vercel.
-// const dataMode = String(import.meta.env.VITE_DATA_MODE || (import.meta.env.DEV ? 'local' : 'api')).toLowerCase();
-const dataMode = 'local';
-export const isLocalDataMode = dataMode === 'local';
+const serverUrl = 'https://backend-tijara.be-kite.com/api';
+const envUrl = import.meta.env.VITE_API_BASE_URL;
 
 const isBrowser = typeof window !== 'undefined';
-const isLocalhost = isBrowser && 
-  window.location?.hostname &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-const forceRemote = import.meta.env.VITE_USE_PROXY === 'false';
-const forceProxy = import.meta.env.VITE_USE_PROXY === 'true';
-const isVercelHost = isBrowser && /\.vercel\.app$/.test(window.location?.hostname || '');
+const isDev = import.meta.env.DEV;
 const frappeMode = import.meta.env.VITE_FRAPPE_MODE === 'true';
 
-// When running in a browser locally (Vite dev proxy) or on Vercel (vercel.json rewrite),
-// route through same-origin '/api' to eliminate browser Cross-Origin Request Blocked (CORS) errors.
-// In SSR/Node test environments or other production builds, use VITE_API_BASE_URL or fallback.
-const baseURL = (!forceRemote && isBrowser && (import.meta.env.DEV || isLocalhost || isVercelHost || forceProxy))
-  ? '/api'
-  : (envUrl || serverUrl);
+// Catalog/content requests intentionally use the local snapshot while auth stays remote.
+const baseURL = envUrl || (isDev && isBrowser ? '/api' : serverUrl);
+
+const REMOTE_AUTH_PATHS = new Set([
+  '/v1/login',
+  '/v1/register',
+  '/v1/logout',
+  '/v1/user',
+  '/v1/admin/login',
+  '/frontend/login',
+  '/frontend/register',
+  '/frontend/logout',
+  '/frontend/user',
+  '/frontend/profile',
+  '/frontend/change-password',
+  '/frontend/forgot-password',
+]);
+
+const normalizePath = (url = '') => String(url).split('?')[0].replace(/^\/api/, '') || '/';
 
 const api = axios.create({
   baseURL,
   timeout: 6000,
-  adapter: isLocalDataMode ? localApiAdapter : undefined,
   headers: {
     'Accept': 'application/json',
   },
@@ -126,11 +125,14 @@ api.interceptors.request.use(config => {
   performanceMark(`mastergas:api:start:${requestId}`);
 
   const requestUrl = config.url || '';
-  const cleanPath = requestUrl.split('?')[0].replace(/^\/api/, '');
+  const cleanPath = normalizePath(requestUrl);
   const token = getCustomerToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (!REMOTE_AUTH_PATHS.has(cleanPath)) {
+    config.adapter = localApiAdapter;
   }
   if (frappeMode && cleanPath.startsWith('/frontend') && config.method?.toLowerCase() === 'get') {
     const parts = cleanPath.split('/').filter(Boolean);
@@ -177,11 +179,6 @@ const finalizeMetric = (config, overrides = {}) => {
     error_type: overrides.errorType,
   });
 };
-
-let appRouter = null;
-export function setRouter(r) {
-  appRouter = r;
-}
 
 api.interceptors.response.use(
   response => {

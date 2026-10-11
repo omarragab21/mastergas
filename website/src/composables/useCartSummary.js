@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, toValue } from 'vue';
 
 export function useCartSummary({ items, getItemPrice, getSetting, discountAmount, translate }) {
   const readNumericSetting = (key, fallback) => {
@@ -13,7 +13,7 @@ export function useCartSummary({ items, getItemPrice, getSetting, discountAmount
   const freeDeliveryThreshold = computed(() => readNumericSetting('free_delivery_threshold', 0));
 
   const subtotalWithDiscount = computed(() => (
-    items.reduce((sum, item) => sum + getItemPrice(item), 0)
+    toValue(items).reduce((sum, item) => sum + getItemPrice(item), 0)
   ));
 
   const shippingAmount = computed(() => {

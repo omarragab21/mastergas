@@ -14,13 +14,13 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'npm run dev:website -- --host 127.0.0.1',
+      command: 'npm --prefix website run dev -- --host 127.0.0.1',
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: true,
       timeout: 120_000,
     },
     {
-      command: 'npm run dev:admin -- --host 127.0.0.1',
+      command: 'npm --prefix admin run dev -- --host 127.0.0.1',
       url: 'http://127.0.0.1:5174',
       reuseExistingServer: true,
       timeout: 120_000,

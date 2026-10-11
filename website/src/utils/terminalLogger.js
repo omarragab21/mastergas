@@ -1,17 +1,20 @@
 export const logPayment = (tag, message, data = null) => {
+  if (!import.meta.env.DEV) return;
+
   const formattedTag = `[PayTabs ${tag}]`;
 
-  // Always log to browser console
   if (data !== null) {
     console.log(formattedTag, message, data);
   } else {
     console.log(formattedTag, message);
   }
 
-  // Forward to Vite dev server terminal endpoint if running in browser
-  if (typeof window !== 'undefined' && typeof fetch === 'function') {
+  const endpoint = import.meta.env.VITE_TERMINAL_LOG_ENDPOINT
+    || (typeof window !== 'undefined' ? window.__MASTERGAS_TERMINAL_LOG_ENDPOINT__ : '');
+
+  if (endpoint && typeof fetch === 'function') {
     try {
-      fetch('/__terminal_log', {
+      fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

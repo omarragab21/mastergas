@@ -1,7 +1,6 @@
 import localSnapshot from '../data/localData.json';
 import { getCustomerToken } from '../utils/customerSession.js';
 
-const CUSTOMER_TOKEN_KEY = 'c_token';
 const ADMIN_TOKEN_KEY = 'token';
 const CUSTOMERS_KEY = 'mastergas_local_customers';
 const ADMINS_KEY = 'mastergas_local_admins';

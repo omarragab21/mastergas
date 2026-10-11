@@ -50,8 +50,8 @@ export const authActions = {
   async login(credentials, options = {}) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/login', credentials);
-      this._setSession(res.data.token, res.data.customer, options.remember ?? true);
+      const res = await api.post('/v1/login', credentials);
+      this._setSession(res.data.token, res.data.user || res.data.customer, options.remember ?? true);
       return res.data;
     } finally {
       authState.loading = false;
@@ -64,8 +64,8 @@ export const authActions = {
   async register(data) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/register', data);
-      this._setSession(res.data.token, res.data.customer);
+      const res = await api.post('/v1/register', data);
+      this._setSession(res.data.token, res.data.user || res.data.customer);
       return res.data;
     } finally {
       authState.loading = false;
@@ -77,7 +77,7 @@ export const authActions = {
    */
   async logout() {
     try {
-      await api.post('/frontend/logout');
+      await api.post('/v1/logout');
     } catch (_) {
       // Even if the server call fails, clear locally
     }

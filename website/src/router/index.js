@@ -1,39 +1,37 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import WebsiteLayout from '../components/WebsiteLayout.vue';
-import HomeView from '../views/website/HomeView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { getCustomerToken } from '../utils/customerSession.js';
 import { trackPageView } from '../utils/metaPixel.js';
-import { setRouter } from '../config/axios.js';
 
 const routes = [
   {
     path: '/',
     component: WebsiteLayout,
     children: [
-      { path: '', name: 'Home', component: HomeView },
-      { path: 'products', name: 'StoreProducts', component: () => import('../views/website/ProductsView.vue') },
-      { path: 'offers', name: 'Offers', component: () => import('../views/website/OffersView.vue') },
-      { path: 'cart', name: 'Cart', component: () => import('../views/website/CartView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'wishlist', name: 'Wishlist', component: () => import('../views/website/WishlistView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'checkout', name: 'Checkout', component: () => import('../views/website/CheckoutView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'payment/success', name: 'PaymentSuccess', component: () => import('../views/website/PaymentSuccessView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'payment/failure', name: 'PaymentFailure', component: () => import('../views/website/PaymentFailureView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'about', name: 'About', component: () => import('../views/website/AboutView.vue') },
-      { path: 'contact', name: 'Contact', component: () => import('../views/website/ContactView.vue') },
-      { path: 'product/:id', name: 'ProductDetail', component: () => import('../views/website/ProductDetailView.vue') },
-      { path: 'profile', name: 'Profile', component: () => import('../views/website/ProfileView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'invoice/:id', name: 'Invoice', component: () => import('../views/website/InvoiceView.vue'), meta: { requiresCustomerAuth: true } },
-      { path: 'privacy-policy', name: 'PrivacyPolicy', component: () => import('../views/website/PrivacyPolicyView.vue') },
-      { path: 'privacy', name: 'Privacy', component: () => import('../views/website/PrivacyPolicyView.vue') },
-      { path: 'page/privacy', name: 'PagePrivacy', component: () => import('../views/website/PrivacyPolicyView.vue') },
-      { path: 'page/privacy-policy', name: 'PagePrivacyPolicy', component: () => import('../views/website/PrivacyPolicyView.vue') },
-      { path: 'terms', name: 'Terms', component: () => import('../views/website/TermsView.vue') },
-      { path: 'terms-and-conditions', name: 'TermsAndConditions', component: () => import('../views/website/TermsView.vue') },
-      { path: 'page/terms', name: 'PageTerms', component: () => import('../views/website/TermsView.vue') },
-      { path: 'page/terms-and-conditions', name: 'PageTermsAndConditions', component: () => import('../views/website/TermsView.vue') },
-      { path: 'page/:id', name: 'Page', component: () => import('../views/website/DynamicPageView.vue') },
-      { path: ':slug', name: 'DynamicPage', component: () => import('../views/website/DynamicPageView.vue') },
+      { path: '', name: 'Home', component: () => import('../modules/home/views/HomeView.vue') },
+      { path: 'products', name: 'StoreProducts', component: () => import('../modules/product/views/ProductsView.vue') },
+      { path: 'offers', name: 'Offers', component: () => import('../modules/offers/views/OffersView.vue') },
+      { path: 'cart', name: 'Cart', component: () => import('../modules/cart/views/CartView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'wishlist', name: 'Wishlist', component: () => import('../modules/wishlist/views/WishlistView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'checkout', name: 'Checkout', component: () => import('../modules/checkout/views/CheckoutView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'payment/success', name: 'PaymentSuccess', component: () => import('../modules/payment/views/PaymentSuccessView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'payment/failure', name: 'PaymentFailure', component: () => import('../modules/payment/views/PaymentFailureView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'about', name: 'About', component: () => import('../modules/about/views/AboutView.vue') },
+      { path: 'contact', name: 'Contact', component: () => import('../modules/contact/views/ContactView.vue') },
+      { path: 'product/:id', name: 'ProductDetail', component: () => import('../modules/product/views/ProductDetailView.vue') },
+      { path: 'profile', name: 'Profile', component: () => import('../modules/profile/views/ProfileView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'invoice/:id', name: 'Invoice', component: () => import('../modules/invoice/views/InvoiceView.vue'), meta: { requiresCustomerAuth: true } },
+      { path: 'privacy-policy', name: 'PrivacyPolicy', component: () => import('../modules/privacy/views/PrivacyPolicyView.vue') },
+      { path: 'privacy', name: 'Privacy', component: () => import('../modules/privacy/views/PrivacyPolicyView.vue') },
+      { path: 'page/privacy', name: 'PagePrivacy', component: () => import('../modules/privacy/views/PrivacyPolicyView.vue') },
+      { path: 'page/privacy-policy', name: 'PagePrivacyPolicy', component: () => import('../modules/privacy/views/PrivacyPolicyView.vue') },
+      { path: 'terms', name: 'Terms', component: () => import('../modules/terms/views/TermsView.vue') },
+      { path: 'terms-and-conditions', name: 'TermsAndConditions', component: () => import('../modules/terms/views/TermsView.vue') },
+      { path: 'page/terms', name: 'PageTerms', component: () => import('../modules/terms/views/TermsView.vue') },
+      { path: 'page/terms-and-conditions', name: 'PageTermsAndConditions', component: () => import('../modules/terms/views/TermsView.vue') },
+      { path: 'page/:id', name: 'Page', component: () => import('../modules/dynamic/views/DynamicPageView.vue') },
+      { path: ':slug', name: 'DynamicPage', component: () => import('../modules/dynamic/views/DynamicPageView.vue') },
     ],
   },
   { path: '/admin', name: 'WebsiteAdminBlocked', component: NotFoundView },
@@ -48,9 +46,6 @@ const router = createRouter({
     return savedPosition || { top: 0, behavior: 'smooth' };
   },
 });
-
-setRouter(router);
-if (typeof window !== 'undefined') window.__appRouter = router;
 
 router.beforeEach((to, from, next) => {
   const requiresCustomerAuth = to.matched.some(record => record.meta.requiresCustomerAuth);

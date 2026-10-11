@@ -7,6 +7,7 @@ export const couponService = {
       code: normalizedCode,
       amount,
       subtotal: amount,
+      cart_amount: amount,
     });
     return response.data;
   },

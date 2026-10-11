@@ -5,25 +5,35 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "lint": "eslint .",
+    "typecheck": "vue-tsc --noEmit",
+    "test:unit": "node --test ../tests/websiteCheckoutPricing.test.js",
+    "test": "npm run test:unit && playwright test ../tests/e2e/smoke.spec.js --config=../playwright.config.js",
     "build": "node ../scripts/generateFeed.js && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",
     "axios": "^1.13.6",
-    "cors": "^2.8.6",
     "dompurify": "^3.4.15",
-    "express": "^5.2.1",
+    "pinia": "^4.0.3",
     "vue": "^3.5.25",
     "vue-i18n": "^9.14.5",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.2.1",
     "@vitejs/plugin-vue": "^6.0.2",
     "autoprefixer": "^10.4.27",
+    "eslint": "^9.39.1",
+    "eslint-plugin-vue": "^10.6.0",
+    "globals": "^16.5.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.1",
-    "vite": "^7.3.1"
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vue-tsc": "^3.1.5"
   }
 }

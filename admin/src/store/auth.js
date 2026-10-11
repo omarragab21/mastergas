@@ -30,7 +30,7 @@ export const authActions = {
   async init() {
     if (!authState.token) return;
     try {
-      const res = await api.get('/frontend/user');
+      const res = await api.get('/v1/user');
       const rawData = res.data;
       // Aggressive extraction: check all possible wrappers used by Laravel Resources
       const finalUser = rawData.data || rawData.customer || rawData.user || rawData;
@@ -50,8 +50,8 @@ export const authActions = {
   async login(credentials, options = {}) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/login', credentials);
-      this._setSession(res.data.token, res.data.customer, options.remember ?? true);
+      const res = await api.post('/v1/admin/login', credentials);
+      this._setSession(res.data.token, res.data.user || res.data.admin, options.remember ?? true);
       return res.data;
     } finally {
       authState.loading = false;
@@ -64,8 +64,8 @@ export const authActions = {
   async register(data) {
     authState.loading = true;
     try {
-      const res = await api.post('/frontend/register', data);
-      this._setSession(res.data.token, res.data.customer);
+      const res = await api.post('/v1/register', data);
+      this._setSession(res.data.token, res.data.user || res.data.admin || res.data.customer);
       return res.data;
     } finally {
       authState.loading = false;
@@ -77,7 +77,7 @@ export const authActions = {
    */
   async logout() {
     try {
-      await api.post('/frontend/logout');
+      await api.post('/v1/logout');
     } catch (_) {
       // Even if the server call fails, clear locally
     }

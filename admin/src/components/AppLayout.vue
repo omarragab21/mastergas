@@ -350,7 +350,7 @@ const closeUserMenu = (e) => {
 
 const handleLogout = async () => {
   try {
-    await api.post('/logout');
+    await api.post('/v1/logout');
   } catch (err) {
     console.error(err);
   } finally {
@@ -488,7 +488,9 @@ const menuItems = [
 .app-layout {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--bg-main);
   color: var(--text-main);
   position: relative;
@@ -501,6 +503,8 @@ const menuItems = [
   flex-direction: column;
   min-width: 0;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .mobile-toggle-btn {
@@ -549,9 +553,8 @@ const menuItems = [
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  position: sticky;
-  top: 0;
+  height: 100%;
+  flex-shrink: 0;
   overflow-y: auto;
   overflow-x: hidden;
   transition: width 0.25s ease, min-width 0.25s ease, transform 0.25s ease;
@@ -718,14 +721,6 @@ const menuItems = [
   background: rgba(135, 50, 96, 0.08);
   color: #000000;
   font-weight: 600;
-}
-
-/* ===== MAIN AREA ===== */
-.main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
 }
 
 /* ===== TOPBAR ===== */
@@ -977,8 +972,12 @@ input:checked + .slider:before {
 /* ===== PAGE CONTENT ===== */
 .page-content {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
   padding: 1.5rem;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 1024px) {
@@ -1020,6 +1019,8 @@ input:checked + .slider:before {
     width: 100%;
     min-width: 0;
     flex: 1;
+    height: 100%;
+    overflow: hidden;
   }
   .page-content {
     padding: 1rem 0.75rem;

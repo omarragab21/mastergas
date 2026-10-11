@@ -708,9 +708,9 @@ onUnmounted(() => {
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 5%;
 }
 
 /* 1. Hero Section */
@@ -724,7 +724,7 @@ onUnmounted(() => {
 .hero-section {
   position: relative;
   width: 100%;
-  max-width: 1440px;
+  max-width: 100%;
   height: 600px;
   min-height: 600px;
   margin: 0 auto;
@@ -1178,7 +1178,7 @@ onUnmounted(() => {
   width: 280px;
   height: 420px;
   flex: 0 0 280px;
-  border-radius: 0;
+  border-radius: 8px;
   overflow: hidden;
   text-decoration: none;
   display: flex;
@@ -1446,7 +1446,7 @@ onUnmounted(() => {
     width: 280px;
     height: 420px;
     flex: 0 0 280px;
-    border-radius: 0;
+    border-radius: 8px;
   }
 
   .products-grid-four {
@@ -1477,7 +1477,7 @@ onUnmounted(() => {
     width: 260px;
     height: 390px;
     flex: 0 0 260px;
-    border-radius: 0;
+    border-radius: 8px;
     padding: 20px 16px;
   }
 }
@@ -1487,7 +1487,7 @@ onUnmounted(() => {
     width: 240px;
     height: 360px;
     flex: 0 0 240px;
-    border-radius: 0;
+    border-radius: 8px;
     padding: 16px 14px;
   }
 }

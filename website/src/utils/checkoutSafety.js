@@ -210,7 +210,9 @@ export const getPaymentReturnState = (query = {}, storage) => {
       if (latestPending?.attemptId) {
         attemptId = latestPending.attemptId;
       }
-    } catch (_) {}
+    } catch (_) {
+      // A malformed local payment record should not block the redirect flow.
+    }
   }
 
   const gatewayError = normalizeQueryValue(query.error).toString().trim();

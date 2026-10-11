@@ -65,7 +65,7 @@ export default defineConfig({
     cors: true,
     proxy: {
       '/api': {
-        target: 'https://backend-mastergas.be-kite.com',
+        target: 'https://backend-tijara.be-kite.com',
         changeOrigin: true,
         secure: false,
         timeout: 6000,
@@ -79,12 +79,12 @@ export default defineConfig({
           });
         },
         headers: {
-          'Origin': 'https://backend-mastergas.be-kite.com',
-          'Referer': 'https://backend-mastergas.be-kite.com/',
+          'Origin': 'https://backend-tijara.be-kite.com',
+          'Referer': 'https://backend-tijara.be-kite.com/',
         },
       },
       '/storage': {
-        target: 'https://backend-mastergas.be-kite.com',
+        target: 'https://backend-tijara.be-kite.com',
         changeOrigin: true,
         secure: false,
         timeout: 6000,
@@ -98,8 +98,8 @@ export default defineConfig({
           });
         },
         headers: {
-          'Origin': 'https://backend-mastergas.be-kite.com',
-          'Referer': 'https://backend-mastergas.be-kite.com/',
+          'Origin': 'https://backend-tijara.be-kite.com',
+          'Referer': 'https://backend-tijara.be-kite.com/',
         },
       },
     },

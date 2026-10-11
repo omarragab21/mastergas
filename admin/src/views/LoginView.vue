@@ -226,14 +226,15 @@ const handleLogin = async () => {
   loading.value = true;
 
   try {
-    const response = await api.post('/v1/login', {
+    const response = await api.post('/v1/admin/login', {
       email: form.value.email,
       password: form.value.password,
     });
 
     // حفظ الـ token والمعلومات
     localStorage.setItem('token', response.data.token);
-    localStorage.setItem('admin', JSON.stringify(response.data.admin));
+    const user = response.data.user || response.data.admin || response.data.customer || {};
+    localStorage.setItem('admin', JSON.stringify(user));
 
     if (form.value.remember) {
       localStorage.setItem('remembered_email', form.value.email);

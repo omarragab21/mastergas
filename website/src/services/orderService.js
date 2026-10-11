@@ -15,26 +15,26 @@ export const orderService = {
   /**
    * Submit an order (Cash on Delivery or Wallet)
    */
-  async createOrder(orderPayload, idempotencyKey = null) {
+  async createOrder(orderPayload, idempotencyKey = null, options = {}) {
     const headers = {};
     if (idempotencyKey) {
       headers['Idempotency-Key'] = idempotencyKey;
       headers['X-Checkout-Id'] = idempotencyKey;
     }
-    const response = await api.post('/frontend/orders', orderPayload, { headers });
+    const response = await api.post('/frontend/orders', orderPayload, { ...options, headers });
     return response.data;
   },
 
   /**
    * Initiate PayTabs checkout session
    */
-  async createPaytabsCheckout(payload, idempotencyKey = null) {
+  async createPaytabsCheckout(payload, idempotencyKey = null, options = {}) {
     const headers = {};
     if (idempotencyKey) {
       headers['Idempotency-Key'] = idempotencyKey;
       headers['X-Checkout-Id'] = idempotencyKey;
     }
-    const response = await api.post('/frontend/paytabs/checkout', payload, { headers });
+    const response = await api.post('/frontend/paytabs/checkout', payload, { ...options, headers });
     return response.data;
   },
 

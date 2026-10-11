@@ -14,6 +14,7 @@ const messages = {
       contact: 'الدعم الفني',
       dashboard: 'لوحة التحكم',
       login: 'تسجيل الدخول',
+      search: 'بحث',
     },
     topbar: {
       free_shipping: 'شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات'
@@ -492,6 +493,7 @@ const messages = {
       contact: 'Support',
       dashboard: 'Dashboard',
       login: 'Login',
+      search: 'Search',
     },
     topbar: {
       free_shipping: 'Free shipping on orders over 500 SAR | Comprehensive warranty on all products'

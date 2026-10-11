@@ -1,6 +1,6 @@
 import { reactive, computed } from 'vue';
 import api from '../config/axios';
-import { productService } from '../services/productService';
+import { productService } from '../modules/product/services/productService';
 import { getCheckoutOwner } from '../utils/checkoutSafety';
 import { trackAddToCart, trackEvent } from '../utils/metaPixel';
 import { getCustomerToken } from '../utils/customerSession.js';
@@ -9,7 +9,6 @@ import { createCartItemKey, normalizeCartItems } from '../domain/cart/cartItem';
 // Per-token localStorage keys (shared-preferences style)
 // Using the customer token guarantees the same cart is loaded even if authState.user
 // hasn't been restored yet when this module first runs.
-const TOKEN_KEY = 'c_token';
 
 const getCartKey = () => {
   const token = getCustomerToken();
