@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'vite';
 import {
   categoryName,
+  productCategoryName,
   dataFromResponse,
   listFromResponse,
   toAttribute,
@@ -171,6 +172,15 @@ test('REGRESSION categoryName renders a label, never a raw object (product table
   assert.equal(categoryName(null), null);
   assert.equal(categoryName(undefined), undefined);
   assert.notEqual(typeof categoryName({ name: 'x' }), 'object');
+});
+
+test('REGRESSION productCategoryName resolves category IDs and nested sub-categories', () => {
+  const categories = [
+    { id: 10, name_i18n: { ar: 'رئيسي' }, subchildren: [{ id: 11, name_i18n: { ar: 'فرعي' }, parent_id: 10 }] },
+  ];
+  assert.equal(productCategoryName({ category_id: '11' }, categories), 'فرعي');
+  assert.equal(productCategoryName({ category: { id: 10, translations: { ar: { name: 'رئيسي' } } } }, categories), 'رئيسي');
+  assert.equal(productCategoryName({ category: 'اسم قديم', category_id: 999 }, categories), 'اسم قديم');
 });
 
 test('DOMAIN toAttribute: type mapping, colour detection by type and by name', () => {
