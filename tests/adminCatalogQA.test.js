@@ -532,6 +532,35 @@ test('SERVICE listAllProducts walks every page for category counters', async () 
   api.defaults.adapter = captureAdapter;
 });
 
+test('SERVICE admin collection lists forward the all-status contract on every page', async () => {
+  api.defaults.adapter = async (config) => {
+    calls.push({ url: config.url, params: config.params });
+    return {
+      data: {
+        data: [{ id: config.params.page, name: `Item ${config.params.page}`, is_active: config.params.page === 1 }],
+        meta: { last_page: 2 },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  };
+
+  const allStatuses = { include_inactive: 1, show_all: 1 };
+  await adminCatalogService.listCategories(allStatuses);
+  await adminCatalogService.listDiscountCodes(allStatuses);
+  await adminCatalogService.listAllProducts(allStatuses);
+
+  assert.ok(calls.length >= 6);
+  for (const call of calls) {
+    assert.equal(call.params.include_inactive, 1);
+    assert.equal(call.params.show_all, 1);
+    assert.ok([1, 2].includes(Number(call.params.page)));
+  }
+  api.defaults.adapter = captureAdapter;
+});
+
 test('SERVICE createProduct unwraps {data:{…}} and maps it', async () => {
   nextResponse = { data: { id: 9, name: 'New', number: 1, category: { id: 2, name: 'C' } } };
   const product = await adminCatalogService.createProduct({ name_en: 'New' }, []);
