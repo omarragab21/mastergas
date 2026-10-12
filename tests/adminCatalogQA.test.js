@@ -514,6 +514,21 @@ test('SERVICE listProducts keeps pagination meta and exposes mapped data + items
   assert.equal(result.items[0].name_i18n.en, 'P');
 });
 
+test('SERVICE listAllProducts walks every page for category counters', async () => {
+  api.defaults.adapter = async (config) => {
+    calls.push({ params: config.params });
+    const page = Number(config.params?.page || 1);
+    const data = page === 1
+      ? { data: [{ id: 1, name: 'P1', category_id: 10 }], meta: { last_page: 2 } }
+      : { data: [{ id: 2, name: 'P2', category_id: 11 }], meta: { last_page: 2 } };
+    return { data, status: 200, statusText: 'OK', headers: {}, config };
+  };
+  const products = await adminCatalogService.listAllProducts({ per_page: 1000 });
+  assert.deepEqual(products.map(product => product.id), [1, 2]);
+  assert.deepEqual(calls.map(call => call.params.page), [1, 2]);
+  api.defaults.adapter = captureAdapter;
+});
+
 test('SERVICE createProduct unwraps {data:{…}} and maps it', async () => {
   nextResponse = { data: { id: 9, name: 'New', number: 1, category: { id: 2, name: 'C' } } };
   const product = await adminCatalogService.createProduct({ name_en: 'New' }, []);
