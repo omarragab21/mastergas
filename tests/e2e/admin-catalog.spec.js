@@ -326,21 +326,18 @@ test.describe('Attributes CRUD', () => {
   test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => { await loginOk(page); await open(page, 'attributes'); });
 
-  test('ATT-1 create a colour attribute with two inline values', async ({ page }) => {
+  test('ATT-1 create a colour attribute without inline values', async ({ page }) => {
     await page.locator('.header-add-btn').click();
     await page.locator('input[placeholder="اللون"]').fill(attrAr);
     await page.locator('input[placeholder="Color"]').fill(attrEn);
     await page.locator('select.form-control').first().selectOption('color');
-    await page.locator('input[placeholder^="أسود"]').fill(`${TAG} أحمر|#ff0000, ${TAG} أزرق|#0000ff`);
     const [req] = await Promise.all([page.waitForRequest((r) => r.method() === 'POST' && r.url().endsWith('/api/v1/attributes')), page.locator('.btn-submit').click()]);
     const body = req.postDataJSON();
     expect(body.type).toBe('color_swatch');
-    expect(body.options).toHaveLength(2);
-    expect(body.options[0].value_code).toBe('#ff0000');
+    expect(body.options).toBeUndefined();
     await expect(toast(page)).toContainText('تم إضافة الخاصية بنجاح');
     const row = rowOf(page, attrAr);
-    await expect(row).toContainText(`${TAG} أحمر`);
-    await expect(row).toContainText(`${TAG} أزرق`);
+    await expect(row).toContainText('لا توجد قيم يرجى الإضافة');
   });
 
   test('ATT-2 attribute form requires both names', async ({ page }) => {
@@ -352,13 +349,18 @@ test.describe('Attributes CRUD', () => {
     expect(posted).toBe(false);
   });
 
-  test('ATT-3 add a third value from the row action', async ({ page }) => {
-    await rowOf(page, attrAr).locator('.add-btn').click();
-    await page.locator('input[placeholder^="مثال"]').fill(`${TAG} أخضر`);
-    await page.locator('input.color-text-input').fill('#00ff00');
-    const [res] = await Promise.all([waitWrite(page, 'POST', '/options'), page.locator('.btn-submit').click()]);
-    expect(res.status()).toBe(201);
-    await expect(toast(page)).toContainText('تم إضافة القيمة بنجاح');
+  test('ATT-3 add values separately from the row action', async ({ page }) => {
+    const addValue = async (label, color) => {
+      await rowOf(page, attrAr).locator('.add-btn').click();
+      await page.locator('input[placeholder^="مثال"]').fill(label);
+      await page.locator('input.color-text-input').fill(color);
+      const [res] = await Promise.all([waitWrite(page, 'POST', '/options'), page.locator('.btn-submit').click()]);
+      expect(res.status()).toBe(201);
+      await expect(toast(page)).toContainText('تم إضافة القيمة بنجاح');
+    };
+    await addValue(`${TAG} أحمر`, '#ff0000');
+    await addValue(`${TAG} أزرق`, '#0000ff');
+    await addValue(`${TAG} أخضر`, '#00ff00');
   });
 
   test('ATT-4 manage modal lists all values; edit one value', async ({ page }) => {

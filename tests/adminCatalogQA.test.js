@@ -344,6 +344,7 @@ test('PAYLOAD attribute: colour ⇒ color_swatch, options parsed with optional h
   assert.equal(p.type, 'color_swatch');
   assert.deepEqual(p.options.map((o) => [o.name_en, o.value_code]), [['أسود', '#111827'], ['أبيض', '#fff'], ['Plain', null]]);
   assert.equal(toAttributePayload({}).type, 'select');
+  assert.equal(Object.hasOwn(toAttributePayload({ type: 'text', name_en: 'Size', name_ar: 'المقاس' }), 'options'), false);
   assert.deepEqual(toAttributePayload({ values_list: '' }).options, []);
   assert.deepEqual(toAttributePayload({ values_list: '   ,  , ' }).options, []);
 });
