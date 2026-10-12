@@ -12,8 +12,8 @@ export default defineConfig({
     cors: true,
     fs: { allow: [projectRoot, path.resolve(projectRoot, '..')] },
     proxy: {
-      '/api': { target: 'https://backend-tijara.be-kite.com', changeOrigin: true, secure: false },
-      '/storage': { target: 'https://backend-tijara.be-kite.com', changeOrigin: true, secure: false },
+      '/api': { target: 'https://backend-mastergas.be-kite.com', changeOrigin: true, secure: false },
+      '/storage': { target: 'https://backend-mastergas.be-kite.com', changeOrigin: true, secure: false },
     },
   },
 });

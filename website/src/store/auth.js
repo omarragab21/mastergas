@@ -40,7 +40,7 @@ export const authActions = {
    */
   async init() {
     if (!authState.token) return;
-    // The Tijara auth contract returns the user with the login response and does
+    // The Mastergas auth contract returns the user with the login response and does
     // not expose a profile endpoint in the auth collection. Restore only the
     // session user; authentication itself always happens through the API.
     authState.user = getStoredUser();

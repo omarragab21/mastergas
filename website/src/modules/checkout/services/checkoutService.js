@@ -1,7 +1,6 @@
 import api from '../../../config/axios';
 import { authService } from '../../../services/authService';
 import { couponService } from '../../../services/couponService';
-import { orderService } from '../../../services/orderService';
 import { settingsService } from '../../../services/settingsService';
 
 const checkoutRequestOptions = (idempotencyKey) => ({
@@ -27,12 +26,14 @@ export const checkoutService = {
     return response.data?.data || response.data;
   },
 
+  // Both calls resolve with the full axios response: the checkout safety helpers
+  // (extractCreatedOrder / extractPaymentUrl) read `response.data` and the HTTP status.
   createOrder(orderData, idempotencyKey) {
-    return orderService.createOrder(orderData, idempotencyKey, checkoutRequestOptions(idempotencyKey));
+    return api.post('/frontend/orders', orderData, checkoutRequestOptions(idempotencyKey));
   },
 
   createPaytabsCheckout(payload, idempotencyKey) {
-    return orderService.createPaytabsCheckout(payload, idempotencyKey, checkoutRequestOptions(idempotencyKey));
+    return api.post('/frontend/paytabs/checkout', payload, checkoutRequestOptions(idempotencyKey));
   },
 };
 

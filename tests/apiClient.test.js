@@ -7,7 +7,7 @@ let api;
 let apiClient;
 
 before(async () => {
-  viteServer = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
+  viteServer = await createServer({ root: new URL('../website', import.meta.url).pathname, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
   api = (await viteServer.ssrLoadModule('/src/config/axios.js')).default;
   apiClient = await viteServer.ssrLoadModule('/src/services/apiClient.js');
 });
@@ -107,5 +107,21 @@ test('getCached propagates AbortController cancellation without retrying', async
   } finally {
     api.get = originalGet;
     apiClient.clearApiCache();
+  }
+});
+
+test('Axios Request Interceptor: storefront requests use the customer token, not the admin token', async () => {
+  const store = new Map([['token', 'admin-token'], ['c_token', 'customer-token']]);
+  const previous = globalThis.localStorage;
+  globalThis.localStorage = {
+    getItem: (key) => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => store.set(key, String(value)),
+    removeItem: (key) => store.delete(key),
+  };
+  try {
+    const config = await api.interceptors.request.handlers[0].fulfilled({ url: '/products', headers: {} });
+    assert.equal(config.headers.Authorization, 'Bearer customer-token');
+  } finally {
+    globalThis.localStorage = previous;
   }
 });

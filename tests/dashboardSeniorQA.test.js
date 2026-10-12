@@ -44,7 +44,7 @@ globalThis.window = {
 let viteServer;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../admin', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',

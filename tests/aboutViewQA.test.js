@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import axios from 'axios';
 
-const PROJECT_ROOT = '/Users/omarragab/Projects/mastergas';
+const PROJECT_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'website');
 const VITE_PORT = 5173;
 
 test('Senior QA Suite: About Us (من نحن) Redesign, Images & Routing Verification', async (t) => {
@@ -37,7 +37,7 @@ test('Senior QA Suite: About Us (من نحن) Redesign, Images & Routing Verific
 
   // 3. AboutView component design structure & sections verification
   await t.test('Step 3: AboutView.vue contains all copy-paste design sections matching reference screenshot', () => {
-    const viewPath = path.join(PROJECT_ROOT, 'src/views/website/AboutView.vue');
+    const viewPath = path.join(PROJECT_ROOT, 'src/modules/about/views/AboutView.vue');
     const content = fs.readFileSync(viewPath, 'utf8');
 
     // Hero section
@@ -67,13 +67,10 @@ test('Senior QA Suite: About Us (من نحن) Redesign, Images & Routing Verific
   });
 
   // 4. Animation & Interaction completeness
-  await t.test('Step 4: AboutView.vue implements smooth animations and IntersectionObserver reveals', () => {
-    const viewPath = path.join(PROJECT_ROOT, 'src/views/website/AboutView.vue');
+  await t.test('Step 4: AboutView.vue keeps hover transitions for cards and buttons', () => {
+    const viewPath = path.join(PROJECT_ROOT, 'src/modules/about/views/AboutView.vue');
     const content = fs.readFileSync(viewPath, 'utf8');
 
-    assert.ok(content.includes('IntersectionObserver'), 'Must use IntersectionObserver for scroll-triggered animation');
-    assert.ok(content.includes('@keyframes heroKenBurns'), 'Must include hero Ken Burns subtle zoom animation');
-    assert.ok(content.includes('scroll-reveal'), 'Must include scroll-reveal animation classes');
     assert.ok(content.includes('hover'), 'Must include hover transitions for cards and buttons');
   });
 

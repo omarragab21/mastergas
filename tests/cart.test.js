@@ -1,7 +1,7 @@
 import test, { after, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
-import { getCheckoutOwner } from '../src/utils/checkoutSafety.js';
+import { getCheckoutOwner } from '../website/src/utils/checkoutSafety.js';
 
 class MemoryStorage {
   constructor() {
@@ -41,7 +41,7 @@ let viteServer;
 let cartState;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../website', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',

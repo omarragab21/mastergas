@@ -1,7 +1,7 @@
 import test, { after, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
-import { dedupeColorOptions } from '../src/utils/productAttributes.js';
+import { dedupeColorOptions } from '../website/src/utils/productAttributes.js';
 
 class MemoryStorage {
   constructor() {
@@ -29,7 +29,7 @@ let viteServer;
 let cartState;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../website', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',

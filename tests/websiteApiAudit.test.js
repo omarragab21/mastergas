@@ -37,7 +37,7 @@ let apiModule;
 let api;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../website', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',
@@ -256,7 +256,7 @@ test('Website Client-side Resilience: Graceful error handling without crashes', 
   });
 
   await t.test('useOffers date filter handles edge-case dates and active flags', async () => {
-    const useOffersModule = await viteServer.ssrLoadModule('/src/composables/useOffers.js');
+    const useOffersModule = await viteServer.ssrLoadModule('/src/modules/product/composables/useOffers.js');
     const { isOfferActive, isOfferDateValid } = useOffersModule;
 
     // Active offer within valid date

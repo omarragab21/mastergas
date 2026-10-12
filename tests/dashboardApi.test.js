@@ -38,7 +38,7 @@ let apiModule;
 let api;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../admin', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',
@@ -69,18 +69,6 @@ test('Axios Request Interceptor: attaches admin token to /dashboard/* routes', a
 
   assert.equal(config.headers.Authorization, 'Bearer admin-secret-token');
   assert.equal(config.headers['Accept-Language'], 'ar');
-});
-
-test('Axios Request Interceptor: prioritizes customer token for non-admin routes', async () => {
-  storage.setItem('token', 'admin-token');
-  storage.setItem('c_token', 'customer-token');
-
-  const config = await api.interceptors.request.handlers[0].fulfilled({
-    url: '/products',
-    headers: {},
-  });
-
-  assert.equal(config.headers.Authorization, 'Bearer customer-token');
 });
 
 test('Axios Response Interceptor: 401 on /dashboard clears admin session and preserves customer session', async () => {

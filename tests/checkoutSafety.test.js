@@ -16,7 +16,7 @@ import {
   releasePaymentLock,
   saveCompletedPayment,
   savePendingPayment,
-} from '../src/utils/checkoutSafety.js';
+} from '../website/src/utils/checkoutSafety.js';
 
 class MemoryStorage {
   constructor() {

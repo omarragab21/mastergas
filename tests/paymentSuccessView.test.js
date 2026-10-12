@@ -1,14 +1,17 @@
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRenderer } from 'vue';
-import { createI18n } from 'vue-i18n';
-import { createMemoryHistory, createRouter } from 'vue-router';
 import { createServer } from 'vite';
+
+// Framework packages come from the website project (see website/test-support) so views and tests share one instance.
+let createRenderer;
+let createI18n;
+let createMemoryHistory;
+let createRouter;
 import {
   readPendingPayment,
   saveCompletedPayment,
   savePendingPayment,
-} from '../src/utils/checkoutSafety.js';
+} from '../website/src/utils/checkoutSafety.js';
 
 class MemoryStorage {
   constructor() {
@@ -53,7 +56,7 @@ Object.defineProperty(globalThis, 'navigator', {
   value: { onLine: true },
 });
 
-const renderer = createRenderer({
+const rendererOptions = {
   patchProp() {},
   insert(child, parent) {
     (parent.children ||= []).push(child);
@@ -88,7 +91,8 @@ const renderer = createRenderer({
   insertStaticContent() {
     return [{}, {}];
   },
-});
+};
+let renderer;
 
 const originalCart = [{ id: 7, name: 'Rose', price: 10, quantity: 1 }];
 const originalWishlist = [{ id: 99, name: 'Favorite' }];
@@ -104,14 +108,19 @@ let cartState;
 let PaymentSuccessView;
 
 before(async () => {
-  viteServer = await createServer({
+  viteServer = await createServer({ root: new URL('../website', import.meta.url).pathname,
     server: { middlewareMode: true },
     appType: 'custom',
     logLevel: 'silent',
   });
+  const runtime = await viteServer.ssrLoadModule('/test-support/vueRuntime.js');
+  ({ createRenderer, createI18n, createMemoryHistory, createRouter } = runtime);
+  renderer = createRenderer(rendererOptions);
+  const { createPinia, setActivePinia } = runtime;
+  setActivePinia(createPinia());
   api = (await viteServer.ssrLoadModule('/src/config/axios.js')).default;
   ({ cartState } = await viteServer.ssrLoadModule('/src/store/cart.js'));
-  PaymentSuccessView = (await viteServer.ssrLoadModule('/src/views/website/PaymentSuccessView.vue')).default;
+  PaymentSuccessView = (await viteServer.ssrLoadModule('/src/modules/payment/views/PaymentSuccessView.vue')).default;
 });
 
 after(async () => {

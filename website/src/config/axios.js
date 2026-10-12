@@ -2,12 +2,14 @@ import axios from 'axios';
 import { localApiAdapter } from './localApi';
 import { getCustomerToken } from '../utils/customerSession.js';
 
-const serverUrl = 'https://backend-tijara.be-kite.com/api';
+const serverUrl = 'https://backend-mastergas.be-kite.com/api';
 const envUrl = import.meta.env.VITE_API_BASE_URL;
 
 const isBrowser = typeof window !== 'undefined';
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env?.DEV;
 const frappeMode = import.meta.env.VITE_FRAPPE_MODE === 'true';
+// VITE_DATA_MODE=api sends every request to the backend; anything else keeps the local snapshot for catalog/content.
+const useLiveApi = import.meta.env.VITE_DATA_MODE === 'api';
 
 // Catalog/content requests intentionally use the local snapshot while auth stays remote.
 const baseURL = envUrl || (isDev && isBrowser ? '/api' : serverUrl);
@@ -131,7 +133,7 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  if (!REMOTE_AUTH_PATHS.has(cleanPath)) {
+  if (!useLiveApi && !REMOTE_AUTH_PATHS.has(cleanPath)) {
     config.adapter = localApiAdapter;
   }
   if (frappeMode && cleanPath.startsWith('/frontend') && config.method?.toLowerCase() === 'get') {

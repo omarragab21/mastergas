@@ -1,8 +1,14 @@
+const EMAIL = process.env.MASTERGAS_ADMIN_EMAIL;
+const PASSWORD = process.env.MASTERGAS_ADMIN_PASSWORD;
+if (!EMAIL || !PASSWORD) {
+  throw new Error('Set MASTERGAS_ADMIN_EMAIL and MASTERGAS_ADMIN_PASSWORD before running this script.');
+}
+
 async function run() {
   const loginRes = await fetch('https://backend-mastergas.be-kite.com/api/v1/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ email: 'admin@tijara.com', password: 'password123' })
+    body: JSON.stringify({ email: EMAIL, password: PASSWORD })
   });
   const { token } = await loginRes.json();
   const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };

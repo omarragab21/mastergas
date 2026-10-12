@@ -10,7 +10,7 @@
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.2-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
   [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
   [![cPanel](https://img.shields.io/badge/Hosting-cPanel_Ready-orange?style=for-the-badge&logo=cpanel&logoColor=white)](https://cpanel.net/)
-  [![Tests](https://img.shields.io/badge/Tests-113%20Passed-brightgreen?style=for-the-badge&logo=node.js&logoColor=white)](tests/)
+  [![Tests](https://img.shields.io/badge/Tests-120%20Passed-brightgreen?style=for-the-badge&logo=node.js&logoColor=white)](tests/)
 </div>
 
 ---
@@ -66,7 +66,7 @@
 - **الاتصال بالواجهة الخلفية**: [Axios](https://axios-http.com/)
 - **الرسوم البيانية**: [Chart.js](https://www.chartjs.org/)
 - **الأمان والتعقيم**: [DOMPurify](https://github.com/cure53/DOMPurify)
-- **محرك الاختبارات**: Node.js Test Runner (113 اختبار وحدة وتكامل مالي)
+- **محرك الاختبارات**: Node.js Test Runner (اختبارات وحدة وتكامل مالي)
 
 ---
 
@@ -74,62 +74,32 @@
 
 ```
 mastergas/
-├── website/                    # مشروع Vue مستقل للويب سايت
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   ├── index.html
-│   └── vite.config.js
-├── admin/                      # مشروع Vue مستقل للوحة التحكم
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   ├── index.html
-│   └── vite.config.js
-├── public/                     # الملفات الثابتة المباشرة
-│   ├── .htaccess               # إعدادات Apache و SPA Rewrite لـ cPanel
-│   ├── favicon.png             # أيقونة الموقع
-│   ├── logo.png                # شعار ماستر غاز الرئيسي
-│   ├── logo-dashboard.png      # شعار لوحة التحكم
-│   ├── robots.txt              # قواعد محركات البحث
-│   ├── sitemap.xml             # خريطة الموقع
-│   ├── fonts/                  # الخطوط المحلية (IBM Plex Sans Arabic)
-│   └── feeds/                  # كتالوج المنتجات التسويقي
-├── scripts/
-│   └── generateFeed.js         # سكربت توليد كتالوج المنتجات بصيغة CSV
-├── src/
-│   ├── assets/                 # ملفات التنسيق والأيقونات
-│   ├── components/             # المكونات القابلة لإعادة الاستخدام (متجر ولوحة تحكم)
-│   ├── composables/            # دوال Vue Composable المشتركة
-│   ├── config/                 # إعدادات API والتطبيق
-│   ├── i18n/                   # ملفات الترجمة (العربية والإنجليزية)
-│   ├── router/                 # توجيه الصفحات وحماية المسارات
-│   ├── store/                  # إدارة الحالة العامة (State Management)
-│   ├── utils/                  # أدوات معالجة الدفع والأمان
-│   ├── views/                  # صفحات لوحة التحكم الإدارية
-│   │   └── website/            # صفحات المتجر الموجهة للمستخدم
-│   ├── App.vue                 # المكون الجذري للتطبيق
-│   ├── main.js                 # نقطة انطلاق التطبيق
-│   └── style.css               # ملف استيراد Tailwind وتنسيقات الموقع
-├── tests/                      # حزمة الاختبارات الشاملة (113 اختبار)
-├── .env.example                # نموذج المتغيرات البيئية
-├── .gitignore                  # الملفات المستثناة من تتبع Git
-├── .htaccess                   # نسخة الجذر من إعدادات Apache
-├── index.html                  # ملف HTML الرئيسي وعلامات SEO
-├── package.json                # التبعيات والسكربتات
-├── tailwind.config.js          # إعدادات Tailwind CSS
-├── vercel.json                 # إعدادات النشر والتوجيه على Vercel
-└── vite.config.js              # إعدادات حزم وتجميع Vite
+├── website/                    # مشروع Vue مستقل للمتجر (المنفذ 5173)
+│   ├── src/modules/            # وحدات الميزات: home, product, cart, checkout, payment, profile...
+│   ├── src/config/             # axios + localApi (وضع البيانات المحلي)
+│   ├── src/data/localData.json # snapshot الكتالوج المحلي
+│   ├── test-support/           # يعيد تصدير vue/router/i18n/pinia للاختبارات
+│   ├── public/                 # الأصول الثابتة والخطوط وكتالوج الفيد
+│   └── vercel.json             # rewrites نحو backend-mastergas
+├── admin/                      # مشروع Vue مستقل للوحة التحكم (المنفذ 5174)
+│   ├── src/views/              # شاشات الإدارة
+│   ├── eslint.config.js        # npm run lint
+│   └── vercel.json
+├── tests/                      # اختبارات node:test (تُحمّل كود website/ و admin/) + e2e/ بـ Playwright
+├── scripts/                    # سكربتات seeding ومزامنة البيانات وتوليد الفيد
+├── docs/  reports/  postman/   # التوثيق والتقارير ومجموعات Postman
+└── package.json                # سكربتات الجذر (dev/build/test/lint) تفوّض للمشروعين
 ```
 
 ---
 
 ## ⚙️ إعداد المتغيرات البيئية | Environment Variables
 
-أنشئ ملف `.env` في المجلد الرئيسي بالاعتماد على `.env.example`:
+أنشئ ملف `.env` داخل `website/` وداخل `admin/` بالاعتماد على `.env.example` الخاص بكل مشروع:
 
 ```bash
-cp .env.example .env
+cp website/.env.example website/.env
+cp admin/.env.example admin/.env
 ```
 
 محتوى الملف:
@@ -149,10 +119,10 @@ VITE_PAYTABS_CANCEL_URL=
 
 ### 🧪 تشغيل البيانات المحلية
 
-أثناء `npm run dev` يستخدم المشروع تلقائياً snapshot البيانات الموجود في [`src/data/localData.json`](src/data/localData.json)، وتعمل الصور من `public/local-assets`. لتحديث الـ snapshot من الـ API شغّل:
+أثناء `npm run dev` يستخدم المشروع تلقائياً snapshot البيانات الموجود في [`website/src/data/localData.json`](website/src/data/localData.json)، وتعمل الصور من `website/public/local-assets`. لتحديث الـ snapshot من الـ API شغّل:
 
 ```bash
-npm run sync:local-data
+npm run sync:local-data   # يكتب website/src/data/localData.json و website/public/local-assets
 ```
 
 حسابات التجربة المحلية:
@@ -160,7 +130,7 @@ npm run sync:local-data
 - عميل المتجر: `demo@mastergas.local` / `demo123`
 - لوحة التحكم: `admin@mastergas.local` / `admin123`
 
-لتشغيل الـ backend بدلاً من JSON استخدم `VITE_DATA_MODE=api`.
+لتشغيل الـ backend بدلاً من JSON ضع `VITE_DATA_MODE=api` في `.env` الخاص بـ `website/` أو `admin/` (أي قيمة أخرى تُبقي الـ snapshot المحلي للكتالوج والمحتوى، بينما تذهب طلبات تسجيل الدخول للـ backend دائمًا).
 
 ---
 
@@ -202,7 +172,7 @@ npm run dev
 | `npm run build:clean` | تنظيف مخلفات البناء السابقة وبناء نسخة إنتاج نظيفة تماماً |
 | `npm run build:cpanel` | بناء المشروع وتجهيز أرشيف مضغوط جاهز للرفع مباشرة على cPanel |
 | `npm run preview` | معاينة نسخة الإنتاج محلياً والتأكد من عمل المسارات |
-| `npm test` | تشغيل الاختبارات الآلية (113 اختبار للتحقق من سلامة الطلبات والدفع) |
+| `npm test` | تشغيل الاختبارات الآلية (اختبارات سلامة الطلبات والدفع، تشغّل كود website/ و admin/) |
 
 ---
 

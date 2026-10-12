@@ -1,5 +1,5 @@
 export const logPayment = (tag, message, data = null) => {
-  if (!import.meta.env.DEV) return;
+  if (!import.meta.env?.DEV) return;
 
   const formattedTag = `[PayTabs ${tag}]`;
 

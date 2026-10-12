@@ -1,0 +1,3693 @@
+{
+  "config": {
+    "argv": [
+      "/Users/omarragab/.nvm/versions/node/v22.22.3/bin/node",
+      "/Users/omarragab/Projects/mastergas/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "playwright.admin.config.js"
+    ],
+    "configFile": "/Users/omarragab/Projects/mastergas/playwright.admin.config.js",
+    "rootDir": "/Users/omarragab/Projects/mastergas/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/omarragab/Projects/mastergas/reports/admin-e2e-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/omarragab/Projects/mastergas/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/admin-catalog\\.spec\\.js/"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "reports/admin-e2e-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm --prefix admin run dev -- --host 127.0.0.1 --port 5174",
+      "url": "http://127.0.0.1:5174",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "admin-catalog.spec.js",
+      "file": "admin-catalog.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Auth & guards",
+          "file": "admin-catalog.spec.js",
+          "line": 104,
+          "column": 6,
+          "specs": [
+            {
+              "title": "AUTH-1 anonymous visitor is redirected from /admin/categories to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1191,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:49.273Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-077e93201af7f9c50fde",
+              "file": "admin-catalog.spec.js",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "AUTH-1 anonymous visitor is redirected from /admin/products to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 924,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:50.947Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-ed688408ab1bc32d9ed1",
+              "file": "admin-catalog.spec.js",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "AUTH-1 anonymous visitor is redirected from /admin/attributes to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 853,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:51.894Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-1c1015b40aa835a5ae11",
+              "file": "admin-catalog.spec.js",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "AUTH-1 anonymous visitor is redirected from /admin/discounts to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1200,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:52.776Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-e6344097fe3baecba818",
+              "file": "admin-catalog.spec.js",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "AUTH-2 wrong password shows an error and keeps the user on the login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4042,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:53.998Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-ac6c2091f6163afb4a7d",
+              "file": "admin-catalog.spec.js",
+              "line": 112,
+              "column": 3
+            },
+            {
+              "title": "AUTH-3 empty form cannot be submitted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3958,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:34:58.066Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-9fc0b1cbf12eaa560380",
+              "file": "admin-catalog.spec.js",
+              "line": 119,
+              "column": 3
+            },
+            {
+              "title": "AUTH-4 successful login lands on the dashboard and stores a token",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3373,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:02.046Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-441b43553ce6f0f2834f",
+              "file": "admin-catalog.spec.js",
+              "line": 126,
+              "column": 3
+            },
+            {
+              "title": "AUTH-5 an expired/invalid token on a catalogue page sends the user back to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3511,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:05.456Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-107a92aa5fe3b8b2cca0",
+              "file": "admin-catalog.spec.js",
+              "line": 131,
+              "column": 3
+            },
+            {
+              "title": "AUTH-6 SQL-ish / script email input is rejected cleanly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3362,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:08.995Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-744cc7379c3e85350e81",
+              "file": "admin-catalog.spec.js",
+              "line": 139,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Categories CRUD",
+          "file": "admin-catalog.spec.js",
+          "line": 154,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CAT-1 create a main category (payload + list + toast)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8745,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:12.375Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-7cd725eb0ce250b42a91",
+              "file": "admin-catalog.spec.js",
+              "line": 158,
+              "column": 3
+            },
+            {
+              "title": "CAT-2 the new category exists in the backend with both languages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8262,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:21.139Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-43d90189f7c3917b7b5c",
+              "file": "admin-catalog.spec.js",
+              "line": 174,
+              "column": 3
+            },
+            {
+              "title": "CAT-3 edit the English name and re-open to confirm it persisted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10967,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:29.461Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-237241d5ad09217d19a5",
+              "file": "admin-catalog.spec.js",
+              "line": 182,
+              "column": 3
+            },
+            {
+              "title": "CAT-4 edit keeps the existing image when no new file is chosen",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14964,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:40.496Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-89227d9d80568238efea",
+              "file": "admin-catalog.spec.js",
+              "line": 195,
+              "column": 3
+            },
+            {
+              "title": "CAT-5 create a sub-category under the parent (parent_id sent)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7029,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:35:55.841Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-a6c386b7f4d4383ff03d",
+              "file": "admin-catalog.spec.js",
+              "line": 203,
+              "column": 3
+            },
+            {
+              "title": "CAT-6 view modal shows name, status and products count",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4815,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:02.895Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-f5bbac6a42005c44c292",
+              "file": "admin-catalog.spec.js",
+              "line": 219,
+              "column": 3
+            },
+            {
+              "title": "CAT-7 search narrows the table and an unmatched term shows nothing for our tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5541,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:07.742Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-0d09dffebfa5775a74b0",
+              "file": "admin-catalog.spec.js",
+              "line": 227,
+              "column": 3
+            },
+            {
+              "title": "CAT-8 submitting without the required English name is blocked by the form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7636,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:13.314Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-01140774932fff204fa9",
+              "file": "admin-catalog.spec.js",
+              "line": 234,
+              "column": 3
+            },
+            {
+              "title": "CAT-13 missing English name shows a visible message (no hidden-required \"not focusable\" console error)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7046,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:20.989Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-2312d521f1823ed8cec2",
+              "file": "admin-catalog.spec.js",
+              "line": 245,
+              "column": 3
+            },
+            {
+              "title": "CAT-9 submitting without an image is not silently accepted (image is marked required)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "observation",
+                      "description": "no-image submit → blocked client-side"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11414,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:28.059Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "observation",
+                          "description": "no-image submit → blocked client-side"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-1ce2d3e5deb773f1bf75",
+              "file": "admin-catalog.spec.js",
+              "line": 258,
+              "column": 3
+            },
+            {
+              "title": "CAT-10 hostile HTML in a name is rendered as text and never executes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6765,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:39.498Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-6cf4d085f646b1fae6c5",
+              "file": "admin-catalog.spec.js",
+              "line": 274,
+              "column": 3
+            },
+            {
+              "title": "CAT-11 very long names are accepted or rejected gracefully (no crash, table stays usable)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6308,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:46.287Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-4bd33a009bba93756741",
+              "file": "admin-catalog.spec.js",
+              "line": 289,
+              "column": 3
+            },
+            {
+              "title": "CAT-12 deleting a sub-category then its parent succeeds and both disappear",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 154,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7525,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:36:52.611Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 154,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-2ef260ce483d69aaf72c",
+              "file": "admin-catalog.spec.js",
+              "line": 300,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Attributes CRUD",
+          "file": "admin-catalog.spec.js",
+          "line": 325,
+          "column": 6,
+          "specs": [
+            {
+              "title": "ATT-1 create a colour attribute with two inline values",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3876,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:00.168Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-8ad2f348fb3fa35b8fb6",
+              "file": "admin-catalog.spec.js",
+              "line": 329,
+              "column": 3
+            },
+            {
+              "title": "ATT-2 attribute form requires both names",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3655,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:04.105Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-86e5416e83f4ebc5942d",
+              "file": "admin-catalog.spec.js",
+              "line": 346,
+              "column": 3
+            },
+            {
+              "title": "ATT-3 add a third value from the row action",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2899,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:07.775Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-cdb20d1725037fe47685",
+              "file": "admin-catalog.spec.js",
+              "line": 355,
+              "column": 3
+            },
+            {
+              "title": "ATT-4 manage modal lists all values; edit one value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3022,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:10.692Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-47dc1e746949d517b18a",
+              "file": "admin-catalog.spec.js",
+              "line": 364,
+              "column": 3
+            },
+            {
+              "title": "ATT-5 an empty value name is rejected by the form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3589,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:13.740Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-04a1c05e55ed237895ec",
+              "file": "admin-catalog.spec.js",
+              "line": 376,
+              "column": 3
+            },
+            {
+              "title": "ATT-6 delete one value from the manage modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 325,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4820,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:17.343Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 325,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-74321f79eaf8057b83f3",
+              "file": "admin-catalog.spec.js",
+              "line": 385,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Attribute edit (runs between attribute CRUD and product linkage)",
+          "file": "admin-catalog.spec.js",
+          "line": 395,
+          "column": 6,
+          "specs": [
+            {
+              "title": "ATT-8 edit an attribute: rename + keep every existing value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 395,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5622,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:22.185Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 395,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-97227b52869fe2ced386",
+              "file": "admin-catalog.spec.js",
+              "line": 399,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Products CRUD + attribute linkage",
+          "file": "admin-catalog.spec.js",
+          "line": 418,
+          "column": 6,
+          "specs": [
+            {
+              "title": "PRE create a category for the product",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6472,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:27.842Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-ef2a473f65071cadfd2e",
+              "file": "admin-catalog.spec.js",
+              "line": 420,
+              "column": 3
+            },
+            {
+              "title": "PRD-1 create with two attribute values; images go out as images[] (regression BUG-1)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8880,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:34.336Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-5a58e2fdcadcacb89ba2",
+              "file": "admin-catalog.spec.js",
+              "line": 450,
+              "column": 3
+            },
+            {
+              "title": "PRD-2 the backend stores price, stock, default discount and both languages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8344,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:43.230Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-d0784d9d6c77ad012ae2",
+              "file": "admin-catalog.spec.js",
+              "line": 470,
+              "column": 3
+            },
+            {
+              "title": "PRD-3 category column shows the category NAME, not a JSON blob (regression BUG-3)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7737,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:51.591Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-707440450b30a999dd1f",
+              "file": "admin-catalog.spec.js",
+              "line": 480,
+              "column": 3
+            },
+            {
+              "title": "PRD-4 view modal opens without a JS error and lists the linked attribute values (regression BUG-2)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8567,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:37:59.351Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-e140c012a20c0fcdfc7c",
+              "file": "admin-catalog.spec.js",
+              "line": 487,
+              "column": 3
+            },
+            {
+              "title": "PRD-5 edit: price, discount and attribute values change and persist after reload",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10496,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:07.947Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-69b3b8998cbb6431efcc",
+              "file": "admin-catalog.spec.js",
+              "line": 499,
+              "column": 3
+            },
+            {
+              "title": "PRD-6 editing without touching images does not drop the existing image",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11114,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:18.469Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-b2450fb5e3b46d3327bd",
+              "file": "admin-catalog.spec.js",
+              "line": 524,
+              "column": 3
+            },
+            {
+              "title": "PRD-7 search, status filter and category filter find / exclude the product",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9325,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:29.604Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-a84f0ca9ec892952c3df",
+              "file": "admin-catalog.spec.js",
+              "line": 532,
+              "column": 3
+            },
+            {
+              "title": "PRD-8 required fields: empty submit is blocked, nothing is posted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9232,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:38.939Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-f5a7340e0c146ef6f67c",
+              "file": "admin-catalog.spec.js",
+              "line": 542,
+              "column": 3
+            },
+            {
+              "title": "PRD-15 the 1% minimum discount is explained and out-of-range discounts are rejected with a message",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9229,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:48.181Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-22f11e9cf655b09fb8d8",
+              "file": "admin-catalog.spec.js",
+              "line": 551,
+              "column": 3
+            },
+            {
+              "title": "PRD-9 negative price / negative stock / discount 100 are not stored as-is",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "observation",
+                      "description": "{\"price\":\"-5\",\"stock\":\"1\",\"discount\":\"\"} → blocked-by-browser-validation"
+                    },
+                    {
+                      "type": "observation",
+                      "description": "{\"price\":\"10\",\"stock\":\"-3\",\"discount\":\"\"} → blocked-by-browser-validation"
+                    },
+                    {
+                      "type": "observation",
+                      "description": "{\"price\":\"10\",\"stock\":\"1\",\"discount\":\"150\"} → blocked-by-browser-validation"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 27160,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:38:57.422Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "observation",
+                          "description": "{\"price\":\"-5\",\"stock\":\"1\",\"discount\":\"\"} → blocked-by-browser-validation"
+                        },
+                        {
+                          "type": "observation",
+                          "description": "{\"price\":\"10\",\"stock\":\"-3\",\"discount\":\"\"} → blocked-by-browser-validation"
+                        },
+                        {
+                          "type": "observation",
+                          "description": "{\"price\":\"10\",\"stock\":\"1\",\"discount\":\"150\"} → blocked-by-browser-validation"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-c06c81e1a3d6900a6247",
+              "file": "admin-catalog.spec.js",
+              "line": 562,
+              "column": 3
+            },
+            {
+              "title": "PRD-10 stock 0 is accepted and shown as 0 (boundary)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8849,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:39:24.595Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-cbb57da7143c765a3526",
+              "file": "admin-catalog.spec.js",
+              "line": 584,
+              "column": 3
+            },
+            {
+              "title": "PRD-11 hostile HTML in name is inert in table and view modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10437,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:39:33.462Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-99a3a9e837e4ef1773d3",
+              "file": "admin-catalog.spec.js",
+              "line": 595,
+              "column": 3
+            },
+            {
+              "title": "PRD-13 two products may share the same stock quantity",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "fail",
+                      "description": "Backend validates `number` (stock) as unique: \"The number has already been taken.\"",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 614,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "failed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8065,
+                      "error": {
+                        "message": "Error: {\"message\":\"The number has already been taken. (and 1 more error)\",\"errors\":{\"number\":[\"The number has already been taken.\"],\"name_ar\":[\"The name ar has already been taken.\"]}}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m422\u001b[39m",
+                        "stack": "Error: {\"message\":\"The number has already been taken. (and 1 more error)\",\"errors\":{\"number\":[\"The number has already been taken.\"],\"name_ar\":[\"The name ar has already been taken.\"]}}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m422\u001b[39m\n    at /Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js:620:44",
+                        "location": {
+                          "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                          "column": 44,
+                          "line": 620
+                        },
+                        "snippet": "  618 |     await page.locator('input[placeholder^=\"Product name\"]').fill(`${prodEn} SAMESTOCK`);\n  619 |     const [res] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/v1/products')), page.locator('.btn-submit').click()]);\n> 620 |     expect(res.status(), await res.text()).toBe(201);\n      |                                            ^\n  621 |   });\n  622 |\n  623 |   // KNOWN DEFECT QA-B3: expected to FAIL until the backend validates slug uniqueness instead of crashing."
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "column": 44,
+                            "line": 620
+                          },
+                          "message": "Error: {\"message\":\"The number has already been taken. (and 1 more error)\",\"errors\":{\"number\":[\"The number has already been taken.\"],\"name_ar\":[\"The name ar has already been taken.\"]}}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m422\u001b[39m\n\n  618 |     await page.locator('input[placeholder^=\"Product name\"]').fill(`${prodEn} SAMESTOCK`);\n  619 |     const [res] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/v1/products')), page.locator('.btn-submit').click()]);\n> 620 |     expect(res.status(), await res.text()).toBe(201);\n      |                                            ^\n  621 |   });\n  622 |\n  623 |   // KNOWN DEFECT QA-B3: expected to FAIL until the backend validates slug uniqueness instead of crashing.\n    at /Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js:620:44"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:39:43.909Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "fail",
+                          "description": "Backend validates `number` (stock) as unique: \"The number has already been taken.\"",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 614,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/omarragab/Projects/mastergas/reports/admin-e2e-artifacts/admin-catalog-Products-CRU-ee3bd-are-the-same-stock-quantity/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "column": 44,
+                        "line": 620
+                      }
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-8e45e3e01ae8d9d47759",
+              "file": "admin-catalog.spec.js",
+              "line": 613,
+              "column": 3
+            },
+            {
+              "title": "PRD-14 identical Arabic and English names (e.g. a brand name) can be saved",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "fail",
+                      "description": "Backend answers HTTP 500 \"SQLSTATE[23000] Duplicate entry … slug\" when both languages produce the same slug",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 625,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "failed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8119,
+                      "error": {
+                        "message": "Error: {\"status\":false,\"message\":\"SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'qa-pw-same-mv58iepl' for key 'product_translations.product_translations_slug_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: tijara-new-database, SQL: insert into `product_translations` (`locale`, `product_id`, `name`, `slug`, `product_description`, `key_features`, `tips`, `shipping_info`) values (ar, 37, QA-PW Same MV58IEPL, qa-pw-same-mv58iepl, ?, ?, ?, ?))\",\"exception\":\"UniqueConstraintViolationException\",\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":843,\"trace\":[{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":799,\"function\":\"runQueryCallback\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/MySqlConnection.php\",\"line\":42,\"function\":\"run\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Processors\\/MySqlProcessor.php\",\"line\":35,\"function\":\"insert\",\"class\":\"Illuminate\\\\Database\\\\MySqlConnection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Builder.php\",\"line\":4257,\"function\":\"processInsertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Processors\\\\MySqlProcessor\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Eloquent\\/Builder.php\",\"line\":2271,\"function\":\"insertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Builder\"}]}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m500\u001b[39m",
+                        "stack": "Error: {\"status\":false,\"message\":\"SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'qa-pw-same-mv58iepl' for key 'product_translations.product_translations_slug_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: tijara-new-database, SQL: insert into `product_translations` (`locale`, `product_id`, `name`, `slug`, `product_description`, `key_features`, `tips`, `shipping_info`) values (ar, 37, QA-PW Same MV58IEPL, qa-pw-same-mv58iepl, ?, ?, ?, ?))\",\"exception\":\"UniqueConstraintViolationException\",\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":843,\"trace\":[{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":799,\"function\":\"runQueryCallback\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/MySqlConnection.php\",\"line\":42,\"function\":\"run\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Processors\\/MySqlProcessor.php\",\"line\":35,\"function\":\"insert\",\"class\":\"Illuminate\\\\Database\\\\MySqlConnection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Builder.php\",\"line\":4257,\"function\":\"processInsertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Processors\\\\MySqlProcessor\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Eloquent\\/Builder.php\",\"line\":2271,\"function\":\"insertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Builder\"}]}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m500\u001b[39m\n    at /Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js:634:44",
+                        "location": {
+                          "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                          "column": 44,
+                          "line": 634
+                        },
+                        "snippet": "  632 |     await page.locator('input[placeholder^=\"أدخل اسم المنتج\"]').fill(same);\n  633 |     const [res] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/v1/products')), page.locator('.btn-submit').click()]);\n> 634 |     expect(res.status(), await res.text()).toBe(201);\n      |                                            ^\n  635 |   });\n  636 |\n  637 |   test('PRD-12 delete the products created by this suite', async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "column": 44,
+                            "line": 634
+                          },
+                          "message": "Error: {\"status\":false,\"message\":\"SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'qa-pw-same-mv58iepl' for key 'product_translations.product_translations_slug_unique' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: tijara-new-database, SQL: insert into `product_translations` (`locale`, `product_id`, `name`, `slug`, `product_description`, `key_features`, `tips`, `shipping_info`) values (ar, 37, QA-PW Same MV58IEPL, qa-pw-same-mv58iepl, ?, ?, ?, ?))\",\"exception\":\"UniqueConstraintViolationException\",\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":843,\"trace\":[{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Connection.php\",\"line\":799,\"function\":\"runQueryCallback\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/MySqlConnection.php\",\"line\":42,\"function\":\"run\",\"class\":\"Illuminate\\\\Database\\\\Connection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Processors\\/MySqlProcessor.php\",\"line\":35,\"function\":\"insert\",\"class\":\"Illuminate\\\\Database\\\\MySqlConnection\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Query\\/Builder.php\",\"line\":4257,\"function\":\"processInsertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Processors\\\\MySqlProcessor\"},{\"file\":\"\\/home11\\/bekite\\/backend-tijara.be-kite.com\\/vendor\\/laravel\\/framework\\/src\\/Illuminate\\/Database\\/Eloquent\\/Builder.php\",\"line\":2271,\"function\":\"insertGetId\",\"class\":\"Illuminate\\\\Database\\\\Query\\\\Builder\"}]}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m201\u001b[39m\nReceived: \u001b[31m500\u001b[39m\n\n  632 |     await page.locator('input[placeholder^=\"أدخل اسم المنتج\"]').fill(same);\n  633 |     const [res] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/v1/products')), page.locator('.btn-submit').click()]);\n> 634 |     expect(res.status(), await res.text()).toBe(201);\n      |                                            ^\n  635 |   });\n  636 |\n  637 |   test('PRD-12 delete the products created by this suite', async ({ page }) => {\n    at /Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js:634:44"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:39:51.992Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "fail",
+                          "description": "Backend answers HTTP 500 \"SQLSTATE[23000] Duplicate entry … slug\" when both languages produce the same slug",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 625,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/omarragab/Projects/mastergas/reports/admin-e2e-artifacts/admin-catalog-Products-CRU-7fd64-g-a-brand-name-can-be-saved/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "column": 44,
+                        "line": 634
+                      }
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-bed027846e91a5d7b0ed",
+              "file": "admin-catalog.spec.js",
+              "line": 624,
+              "column": 3
+            },
+            {
+              "title": "PRD-12 delete the products created by this suite",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15342,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:00.137Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-66e459c0fb47990b9871",
+              "file": "admin-catalog.spec.js",
+              "line": 637,
+              "column": 3
+            },
+            {
+              "title": "ATT-7 an attribute can be deleted once its product is gone; row disappears",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9441,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:15.489Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-adbbceeac67aa9a8d147",
+              "file": "admin-catalog.spec.js",
+              "line": 649,
+              "column": 3
+            },
+            {
+              "title": "POST cleanup the product category",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 418,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9630,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:24.940Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 418,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-7bcbf6e9863c6eb7a753",
+              "file": "admin-catalog.spec.js",
+              "line": 657,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Discounts CRUD",
+          "file": "admin-catalog.spec.js",
+          "line": 670,
+          "column": 6,
+          "specs": [
+            {
+              "title": "DSC-1 create a percentage code; payload carries formatted dates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3329,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:34.590Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-866a167909485dc6faee",
+              "file": "admin-catalog.spec.js",
+              "line": 688,
+              "column": 3
+            },
+            {
+              "title": "DSC-2 backend stores it as active with the right code/value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3436,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:37.929Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-6275c43a29ed2afad2fc",
+              "file": "admin-catalog.spec.js",
+              "line": 702,
+              "column": 3
+            },
+            {
+              "title": "DSC-3 create a FIXED-amount code with a minimum order amount",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "observation",
+                      "description": "minimum_amount sent: 50"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3025,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:41.376Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "observation",
+                          "description": "minimum_amount sent: 50"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-ed228eb807b6871ac6ac",
+              "file": "admin-catalog.spec.js",
+              "line": 709,
+              "column": 3
+            },
+            {
+              "title": "DSC-4 edit the value and see it in the table + after reload",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3887,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:44.413Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-13a2805e4a9e8fb3462f",
+              "file": "admin-catalog.spec.js",
+              "line": 720,
+              "column": 3
+            },
+            {
+              "title": "DSC-5 toggling status flips is_active on the backend and back",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5456,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:48.311Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-85acd7b753fc1bb2b8f6",
+              "file": "admin-catalog.spec.js",
+              "line": 730,
+              "column": 3
+            },
+            {
+              "title": "DSC-6 duplicate creates \"<code>-COPY\" and keeps value/type (and the minimum amount — regression QA-F4)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3428,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:53.784Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-8e3f37e4c6884287db62",
+              "file": "admin-catalog.spec.js",
+              "line": 743,
+              "column": 3
+            },
+            {
+              "title": "DSC-7 duplicate code is rejected with a visible error and no second row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4258,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:40:57.224Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-ffd4b1df6e4ca205e74b",
+              "file": "admin-catalog.spec.js",
+              "line": 755,
+              "column": 3
+            },
+            {
+              "title": "DSC-8 end date before start date is not accepted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "observation",
+                      "description": "end<start → blocked"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8663,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:01.493Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "observation",
+                          "description": "end<start → blocked"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-12a4a600b62081e2a775",
+              "file": "admin-catalog.spec.js",
+              "line": 766,
+              "column": 3
+            },
+            {
+              "title": "DSC-9 percentage above 100 and negative values are not accepted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    },
+                    {
+                      "type": "observation",
+                      "description": "value 150% → blocked"
+                    },
+                    {
+                      "type": "observation",
+                      "description": "value -10% → blocked"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17511,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:10.168Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        },
+                        {
+                          "type": "observation",
+                          "description": "value 150% → blocked"
+                        },
+                        {
+                          "type": "observation",
+                          "description": "value -10% → blocked"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-b823f90cd95b44ca65b4",
+              "file": "admin-catalog.spec.js",
+              "line": 776,
+              "column": 3
+            },
+            {
+              "title": "DSC-10 required fields: empty submit posts nothing",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3579,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:27.694Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-04ea7a11be585334c7a3",
+              "file": "admin-catalog.spec.js",
+              "line": 790,
+              "column": 3
+            },
+            {
+              "title": "DSC-13 \"view\" is read-only: fields disabled, no save button, can switch to edit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2440,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:31.287Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-2ce448702f5022476d9f",
+              "file": "admin-catalog.spec.js",
+              "line": 799,
+              "column": 3
+            },
+            {
+              "title": "DSC-14 unsupported usage-limit fields are gone from the form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2413,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:33.741Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-87bae247b00de0a9a09b",
+              "file": "admin-catalog.spec.js",
+              "line": 812,
+              "column": 3
+            },
+            {
+              "title": "DSC-15 client-side validation blocks bad values with a clear Arabic message (no request)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3877,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:36.164Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-8c77fde6c6e8d103b555",
+              "file": "admin-catalog.spec.js",
+              "line": 819,
+              "column": 3
+            },
+            {
+              "title": "DSC-11 search by code + type filter + status filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2419,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:40.053Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-c0cf16f59eac24cc0c49",
+              "file": "admin-catalog.spec.js",
+              "line": 836,
+              "column": 3
+            },
+            {
+              "title": "DSC-12 delete confirmation can be cancelled, then confirmed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                        "line": 670,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5931,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:42.483Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "/Users/omarragab/Projects/mastergas/tests/e2e/admin-catalog.spec.js",
+                            "line": 670,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-e2313cbe2f2f7d28e3d6",
+              "file": "admin-catalog.spec.js",
+              "line": 843,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Cross-cutting quality",
+          "file": "admin-catalog.spec.js",
+          "line": 866,
+          "column": 6,
+          "specs": [
+            {
+              "title": "UX-1 /admin/categories has no page-level horizontal scroll at 390px (phone)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "observation",
+                      "description": "overflow px: 0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3793,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:48.427Z",
+                      "annotations": [
+                        {
+                          "type": "observation",
+                          "description": "overflow px: 0"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-c6897b68c8e46732af36",
+              "file": "admin-catalog.spec.js",
+              "line": 868,
+              "column": 5
+            },
+            {
+              "title": "UX-1 /admin/products has no page-level horizontal scroll at 390px (phone)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "observation",
+                      "description": "overflow px: 0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9602,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:41:52.235Z",
+                      "annotations": [
+                        {
+                          "type": "observation",
+                          "description": "overflow px: 0"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-02098e34efbcca2859ce",
+              "file": "admin-catalog.spec.js",
+              "line": 868,
+              "column": 5
+            },
+            {
+              "title": "UX-1 /admin/attributes has no page-level horizontal scroll at 390px (phone)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "observation",
+                      "description": "overflow px: 0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2057,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:01.854Z",
+                      "annotations": [
+                        {
+                          "type": "observation",
+                          "description": "overflow px: 0"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-03627d99423f43639847",
+              "file": "admin-catalog.spec.js",
+              "line": 868,
+              "column": 5
+            },
+            {
+              "title": "UX-1 /admin/discounts has no page-level horizontal scroll at 390px (phone)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "observation",
+                      "description": "overflow px: 0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2530,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:03.933Z",
+                      "annotations": [
+                        {
+                          "type": "observation",
+                          "description": "overflow px: 0"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-3793ff079267570c1ca2",
+              "file": "admin-catalog.spec.js",
+              "line": 868,
+              "column": 5
+            },
+            {
+              "title": "UX-2 layout is RTL and Arabic is the visible language on every catalogue page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12292,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:06.478Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-5e3000d944c29c07f1c9",
+              "file": "admin-catalog.spec.js",
+              "line": 877,
+              "column": 3
+            },
+            {
+              "title": "UX-3 reloading a catalogue page keeps the session",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7664,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:18.789Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-f0f04eb224cefb8bfdd3",
+              "file": "admin-catalog.spec.js",
+              "line": 886,
+              "column": 3
+            },
+            {
+              "title": "UX-4 browser back/forward between catalogue pages keeps working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9846,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:26.470Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-6818e16623941f538e3f",
+              "file": "admin-catalog.spec.js",
+              "line": 891,
+              "column": 3
+            },
+            {
+              "title": "STAB-1 no uncaught JS exceptions and no UNEXPECTED HTTP 5xx during the entire run",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "known-backend-5xx",
+                      "description": "6 responses from documented defects QA-B1 / QA-B3"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 132,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-12T12:42:36.447Z",
+                      "annotations": [
+                        {
+                          "type": "known-backend-5xx",
+                          "description": "6 responses from documented defects QA-B1 / QA-B3"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3bb5ecbfafd4f95ac27b-7fd87ba0e5c3c2e9eade",
+              "file": "admin-catalog.spec.js",
+              "line": 897,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-12T12:34:46.079Z",
+    "duration": 473784.63700000005,
+    "expected": 70,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createCartItemKey, normalizeCartItems } from '../src/domain/cart/cartItem.js';
+import { createCartItemKey, normalizeCartItems } from '../website/src/domain/cart/cartItem.js';
 
 test('cart item keys are deterministic regardless of attribute order', () => {
   assert.equal(
