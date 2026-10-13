@@ -1794,6 +1794,7 @@ const formatDateArabic = (date) => {
 const formatStatusLabel = (s) => {
   const map = {
     pending: 'قيد المراجعة',
+    paid_confirmed: 'تم تأكيد الدفع',
     processing: 'قيد التجهيز',
     shipped: 'قيد التوصيل',
     delivering: 'قيد التوصيل',

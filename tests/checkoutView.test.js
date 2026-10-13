@@ -93,7 +93,7 @@ const rendererOptions = {
 };
 let renderer;
 
-const originalCart = [{ id: 7, name: 'Rose', price: 10, discount: 0, quantity: 1 }];
+const originalCart = [{ id: 28, name: 'Rose', price: 10, discount: 0, quantity: 1 }];
 const originalWishlist = [{ id: 99, name: 'Favorite' }];
 const snapshot = value => JSON.parse(JSON.stringify(value));
 
@@ -145,7 +145,8 @@ const mountCheckout = async (post) => {
 
   api.get = async (url) => {
     if (url.includes('/frontend/products/')) {
-      return { data: { data: { id: 7, name: 'Rose', price: 10, discount: 0 } } };
+      const id = Number(url.split('/').pop()) || 28;
+      return { data: { data: { id, name: id === 26 ? 'New item' : 'Rose', price: id === 26 ? 5 : 10, discount: 0 } } };
     }
     if (url === '/frontend/user') return { data: { data: authState.user } };
     if (url === '/frontend/addresses') return { data: { data: [] } };
@@ -221,7 +222,7 @@ test('CheckoutView order submission safety scenarios', async (t) => {
 
     // Simulate additions from another tab while the request is in flight.
     cartState.items[0].quantity = 2;
-    cartState.items.push({ id: 8, name: 'New item', price: 5, quantity: 1 });
+    cartState.items.push({ id: 26, name: 'New item', price: 5, quantity: 1 });
     cartState.saveCart();
 
     resolveOrder();
@@ -230,8 +231,8 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     assert.equal(checkout.state.currentStep, 5);
     assert.equal(checkout.state.confirmedOrderDisplayNumber, 'ORD-777');
     assert.deepEqual(snapshot(cartState.items), [
-      { id: 7, name: 'Rose', price: 10, discount: 0, quantity: 1 },
-      { id: 8, name: 'New item', price: 5, quantity: 1 },
+      { id: 28, name: 'Rose', price: 10, discount: 0, quantity: 1 },
+      { id: 26, name: 'New item', price: 5, quantity: 1 },
     ]);
     assert.deepEqual(snapshot(cartState.wishlist), originalWishlist);
     checkout.app.unmount();
@@ -336,7 +337,7 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     }
   });
 
-  await t.test('wallet covering the full amount never opens PayTabs even if card was selected', async () => {
+  await t.test('wallet covering the full amount never opens PayTabs and, with no wallet support on /site/orders, sends nothing', async () => {
     const checkout = await mountCheckout(async () => ({
       data: { success: true, data: { id: 888, order_number: 'ORD-888' } },
     }));
@@ -345,11 +346,10 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     checkout.state.walletBalance = 1_000;
     await checkout.state.confirmOrder();
 
-    assert.deepEqual(checkout.calls.map(call => call.url), ['/frontend/orders']);
-    assert.equal(checkout.calls[0].payload.payment_method, 'wallet');
+    assert.deepEqual(checkout.calls.map(call => call.url), []);
     assert.equal(window.location.href, '');
-    assert.equal(checkout.state.currentStep, 5);
-    assert.deepEqual(snapshot(cartState.wishlist), originalWishlist);
+    assert.notEqual(checkout.state.currentStep, 5);
+    assert.deepEqual(snapshot(cartState.items), originalCart, 'the cart is untouched when the order is refused');
     checkout.app.unmount();
   });
 
@@ -363,10 +363,10 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     checkout.state.useWallet = false;
     await checkout.state.confirmOrder();
 
-    assert.deepEqual(checkout.calls.map(call => call.url), ['/frontend/orders']);
-    assert.equal(checkout.calls[0].payload.payment_method, 'cod');
-    assert.equal(checkout.calls[0].payload.use_wallet, false);
-    assert.equal(checkout.calls[0].payload.total_amount, 0);
+    assert.deepEqual(checkout.calls.map(call => call.url), ['/v1/site/orders']);
+    assert.equal(checkout.calls[0].payload.payment_method, 'cash_on_delivery');
+    assert.deepEqual(checkout.calls[0].payload.items, [{ product_id: 14, quantity: 1 }]);
+    assert.ok(!('total_amount' in checkout.calls[0].payload), 'totals are computed by the server');
     checkout.app.unmount();
   });
 
@@ -385,7 +385,7 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     assert.equal(checkout.calls[0].payload.checkout_attempt_id, attemptId);
     assert.equal(checkout.calls[0].payload.cart_id, attemptId);
     assert.deepEqual(checkout.calls[0].payload.order_data.items, [
-      { product_id: 7, quantity: 1, unit_price: 10, attributes: null },
+      { product_id: 28, quantity: 1, unit_price: 10, attributes: null },
     ]);
     assert.match(checkout.calls[0].payload.return_url, new RegExp(`attempt=${attemptId}`));
     assert.equal(window.location.href, 'https://pay.example.test/session/1');

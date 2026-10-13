@@ -1,5 +1,6 @@
 import api from '../../../config/axios';
 import returnsService from '../../../services/returnsService';
+import { listSiteOrders } from '../../invoice/services/siteOrdersApi';
 
 const unwrap = (response) => response?.data?.data || response?.data || response;
 const unwrapList = (response) => {
@@ -17,7 +18,7 @@ export const profileService = {
   },
 
   async getOrders() {
-    return unwrapList(await api.get('/frontend/orders/me'));
+    return listSiteOrders();
   },
 
   async getNotifications() {

@@ -1,0 +1,1236 @@
+{
+  "summary": {
+    "run": "QA-ORD-MV6GWIP4",
+    "base": "https://backend-tijara.be-kite.com/api/v1",
+    "at": "2026-10-13T09:17:48.558Z",
+    "total": 119,
+    "green": 73,
+    "red": 24,
+    "info": 22,
+    "createdOrders": [
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "createdCoupons": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "validStatuses": [
+      "pending",
+      "paid_confirmed",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled"
+    ]
+  },
+  "results": [
+    {
+      "id": "A01",
+      "group": "Auth",
+      "title": "Admin login returns token",
+      "expected": "HTTP 200 + token",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, role=super_admin",
+      "http": 200,
+      "ms": null
+    },
+    {
+      "id": "A02",
+      "group": "Auth",
+      "title": "GET /site/orders without token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 86
+    },
+    {
+      "id": "A03",
+      "group": "Auth",
+      "title": "POST /site/orders without token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 85
+    },
+    {
+      "id": "A04",
+      "group": "Auth",
+      "title": "GET /orders without token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 82
+    },
+    {
+      "id": "A05",
+      "group": "Auth",
+      "title": "PATCH /orders/1 without token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 83
+    },
+    {
+      "id": "A06",
+      "group": "Auth",
+      "title": "GET /site/orders with invalid token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 84
+    },
+    {
+      "id": "A07",
+      "group": "Auth",
+      "title": "PATCH /orders/1 with invalid token",
+      "expected": "HTTP 401 — no stack trace",
+      "verdict": "RED",
+      "actual": "HTTP 500 [LEAKS exception/trace] Unauthenticated.",
+      "http": 500,
+      "ms": 84
+    },
+    {
+      "id": "C01",
+      "group": "Create",
+      "title": "Create order with 1 item",
+      "expected": "HTTP 201",
+      "verdict": "GREEN",
+      "actual": "HTTP 201 {\"data\":{\"id\":22,\"order_number\":\"ORD-BVWVLULXED\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":\"cash_on_delivery\",\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":876.8500000000000…",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "C02",
+      "group": "Create",
+      "title": "New order defaults",
+      "expected": "status=pending, payment_status=unpaid, order_number set",
+      "verdict": "GREEN",
+      "actual": "status=pending, payment_status=unpaid, order_number=ORD-BVWVLULXED",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "C03",
+      "group": "Create",
+      "title": "Subtotal uses server-side product final_price",
+      "expected": "subtotal=876.85",
+      "verdict": "GREEN",
+      "actual": "subtotal=876.85, unit_price=876.85",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "C04",
+      "group": "Create",
+      "title": "total = subtotal − discount + shipping + tax",
+      "expected": "arithmetic consistent",
+      "verdict": "GREEN",
+      "actual": "subtotal=876.85 discount=0 shipping=25 tax=122.76 (≈14%) total=1024.61",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "C05",
+      "group": "Create",
+      "title": "Money fields are rounded to 2 decimals",
+      "expected": "e.g. 876.85",
+      "verdict": "RED",
+      "actual": "raw float noise in JSON, e.g. \"subtotal\":876.8500000000000227373675443232059478759765625",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "C06",
+      "group": "Stock",
+      "title": "Stock is reserved/decremented when order is created",
+      "expected": "stock 40 → 39",
+      "verdict": "INFO",
+      "actual": "stock 40 → 40",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "C07",
+      "group": "Read",
+      "title": "GET /site/orders/{id} returns the order with items",
+      "expected": "HTTP 200, same id, items[]",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, items=1",
+      "http": 200,
+      "ms": 137
+    },
+    {
+      "id": "C08",
+      "group": "Read",
+      "title": "Order appears in customer list",
+      "expected": "present in /site/orders",
+      "verdict": "GREEN",
+      "actual": "total=18, per_page=10",
+      "http": 200,
+      "ms": 161
+    },
+    {
+      "id": "C09",
+      "group": "Read",
+      "title": "Order appears in admin list",
+      "expected": "present in /orders",
+      "verdict": "GREEN",
+      "actual": "total=18, per_page=20",
+      "http": 200,
+      "ms": 119
+    },
+    {
+      "id": "C10",
+      "group": "Read",
+      "title": "Admin list row exposes customer info",
+      "expected": "user/customer object (name, phone, email)",
+      "verdict": "GREEN",
+      "actual": "user keys: id,name,email (no phone/address on user object)",
+      "http": 200,
+      "ms": 119
+    },
+    {
+      "id": "C11",
+      "group": "Read",
+      "title": "Admin GET /orders/{id} (not in Postman collection)",
+      "expected": "HTTP 200 with order",
+      "verdict": "GREEN",
+      "actual": "HTTP 200 ",
+      "http": 200,
+      "ms": 107
+    },
+    {
+      "id": "C12",
+      "group": "Create",
+      "title": "Multi-item order totals",
+      "expected": "HTTP 201, subtotal=2728.05, 2 items",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, subtotal=2728.05, items=2, total=3134.98",
+      "http": 201,
+      "ms": 144
+    },
+    {
+      "id": "C13",
+      "group": "Create",
+      "title": "order_number unique per order",
+      "expected": "different numbers",
+      "verdict": "GREEN",
+      "actual": "ORD-BVWVLULXED vs ORD-TRQYWQQHTD",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "C14",
+      "group": "Read",
+      "title": "GET /site/orders/99999999 (missing)",
+      "expected": "HTTP 404",
+      "verdict": "RED",
+      "actual": "HTTP 404 [LEAKS exception/trace] No query results for model [App\\Models\\Order] 99999999",
+      "http": 404,
+      "ms": 86
+    },
+    {
+      "id": "C15",
+      "group": "Read",
+      "title": "GET /site/orders/abc (non-numeric)",
+      "expected": "HTTP 404",
+      "verdict": "RED",
+      "actual": "HTTP 404 [LEAKS exception/trace] No query results for model [App\\Models\\Order] abc",
+      "http": 404,
+      "ms": 85
+    },
+    {
+      "id": "C16",
+      "group": "Read",
+      "title": "Admin list page=2",
+      "expected": "honoured",
+      "verdict": "INFO",
+      "actual": "HTTP 200, rows=0, statuses=[], per_page=20",
+      "http": 200,
+      "ms": 88
+    },
+    {
+      "id": "C17",
+      "group": "Read",
+      "title": "Admin list per_page=1",
+      "expected": "honoured",
+      "verdict": "INFO",
+      "actual": "HTTP 200, rows=19, statuses=[pending,cancelled,delivered], per_page=20",
+      "http": 200,
+      "ms": 119
+    },
+    {
+      "id": "C18",
+      "group": "Read",
+      "title": "Admin list status=pending",
+      "expected": "only matching statuses returned",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, rows=15, statuses=[pending], per_page=20",
+      "http": 200,
+      "ms": 120
+    },
+    {
+      "id": "C19",
+      "group": "Read",
+      "title": "Admin list status=delivered",
+      "expected": "only matching statuses returned",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, rows=2, statuses=[delivered], per_page=20",
+      "http": 200,
+      "ms": 98
+    },
+    {
+      "id": "V01",
+      "group": "Validation",
+      "title": "Empty body {}",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items\":[\"The items field is required.\"],\"shipping_address\":[\"The shipping address field is required.\"],\"billing_address\":[\"The billing address field is required.\"]}",
+      "http": 422,
+      "ms": 93
+    },
+    {
+      "id": "V02",
+      "group": "Validation",
+      "title": "Missing items",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items\":[\"The items field is required.\"]}",
+      "http": 422,
+      "ms": 103
+    },
+    {
+      "id": "V03",
+      "group": "Validation",
+      "title": "items = []",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items\":[\"The items field is required.\"]}",
+      "http": 422,
+      "ms": 86
+    },
+    {
+      "id": "V04",
+      "group": "Validation",
+      "title": "items is a string",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items\":[\"The items field must be an array.\"]}",
+      "http": 422,
+      "ms": 89
+    },
+    {
+      "id": "V05",
+      "group": "Validation",
+      "title": "Item without product_id",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.product_id\":[\"The items.0.product_id field is required.\"]}",
+      "http": 422,
+      "ms": 92
+    },
+    {
+      "id": "V06",
+      "group": "Validation",
+      "title": "Item without quantity",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.quantity\":[\"The items.0.quantity field is required.\"]}",
+      "http": 422,
+      "ms": 98
+    },
+    {
+      "id": "V07",
+      "group": "Validation",
+      "title": "Non-existent product_id",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.product_id\":[\"The selected items.0.product_id is invalid.\"]}",
+      "http": 422,
+      "ms": 91
+    },
+    {
+      "id": "V08",
+      "group": "Validation",
+      "title": "quantity = 0",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.quantity\":[\"The items.0.quantity field must be at least 1.\"]}",
+      "http": 422,
+      "ms": 93
+    },
+    {
+      "id": "V09",
+      "group": "Validation",
+      "title": "quantity = -3",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.quantity\":[\"The items.0.quantity field must be at least 1.\"]}",
+      "http": 422,
+      "ms": 94
+    },
+    {
+      "id": "V10",
+      "group": "Validation",
+      "title": "quantity = 1.5",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.quantity\":[\"The items.0.quantity field must be an integer.\"]}",
+      "http": 422,
+      "ms": 88
+    },
+    {
+      "id": "V11",
+      "group": "Validation",
+      "title": "quantity = \"abc\"",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items.0.quantity\":[\"The items.0.quantity field must be an integer.\"]}",
+      "http": 422,
+      "ms": 89
+    },
+    {
+      "id": "V12",
+      "group": "Validation",
+      "title": "quantity above stock (36 of product 14)",
+      "expected": "HTTP 422 — insufficient stock",
+      "verdict": "RED",
+      "actual": "HTTP 201 {\"data\":{\"id\":24,\"order_number\":\"ORD-FCFAI9AGEG\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":\"cash_on_delivery\",\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":35076.59999999999…",
+      "http": 201,
+      "ms": 121
+    },
+    {
+      "id": "V12b",
+      "group": "Stock",
+      "title": "Stock never goes below zero after over-stock attempt",
+      "expected": ">= 0",
+      "verdict": "GREEN",
+      "actual": "stock of 14 = 35",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "V13",
+      "group": "Validation",
+      "title": "Missing shipping_address",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"shipping_address\":[\"The shipping address field is required.\"]}",
+      "http": 422,
+      "ms": 90
+    },
+    {
+      "id": "V14",
+      "group": "Validation",
+      "title": "Empty shipping_address \"\"",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"shipping_address\":[\"The shipping address field is required.\"]}",
+      "http": 422,
+      "ms": 94
+    },
+    {
+      "id": "V15",
+      "group": "Validation",
+      "title": "Missing payment_method",
+      "expected": "HTTP 422",
+      "verdict": "RED",
+      "actual": "HTTP 201 {\"data\":{\"id\":25,\"order_number\":\"ORD-YRF5TFR9DF\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":null,\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":876.850000000000022737367544323…",
+      "http": 201,
+      "ms": 127
+    },
+    {
+      "id": "V16",
+      "group": "Validation",
+      "title": "Unknown payment_method \"bitcoin\"",
+      "expected": "HTTP 422",
+      "verdict": "RED",
+      "actual": "HTTP 201 {\"data\":{\"id\":26,\"order_number\":\"ORD-FAHCW83RSH\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":\"bitcoin\",\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":876.8500000000000227373675…",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "V17",
+      "group": "Validation",
+      "title": "Negative shipping_cost",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"shipping_cost\":[\"The shipping cost field must be at least 0.\"]}",
+      "http": 422,
+      "ms": 90
+    },
+    {
+      "id": "V18",
+      "group": "Validation",
+      "title": "shipping_cost as text",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"shipping_cost\":[\"The shipping cost field must be a number.\"]}",
+      "http": 422,
+      "ms": 91
+    },
+    {
+      "id": "V19",
+      "group": "Tamper",
+      "title": "Client-supplied negative \"discount\": -50",
+      "expected": "ignored (discount=0) or 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, discount=0, total=1024.61",
+      "http": 201,
+      "ms": 126
+    },
+    {
+      "id": "V20",
+      "group": "Validation",
+      "title": "Unknown coupon_code",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code is invalid or has expired.\"]}",
+      "http": 422,
+      "ms": 92
+    },
+    {
+      "id": "V21",
+      "group": "Validation",
+      "title": "Exhausted coupon SUMMER5250 (used_count = max_uses)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code has reached its maximum usage limit.\"]}",
+      "http": 422,
+      "ms": 91
+    },
+    {
+      "id": "V22",
+      "group": "Validation",
+      "title": "Malformed JSON body",
+      "expected": "HTTP 400/422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"items\":[\"The items field is required.\"],\"shipping_address\":[\"The shipping address field is required.\"],\"billing_address\":[\"The billing address field is required.\"]}",
+      "http": 422,
+      "ms": 85
+    },
+    {
+      "id": "V23",
+      "group": "Validation",
+      "title": "Notes longer than 10k chars",
+      "expected": "HTTP 422 — length limit",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"notes\":[\"The notes field must not be greater than 1000 characters.\"]}",
+      "http": 422,
+      "ms": 89
+    },
+    {
+      "id": "T01",
+      "group": "Tamper",
+      "title": "Client-supplied \"discount\": 500 without coupon",
+      "expected": "ignored (discount=0) or 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, discount=0, total=1024.61 (honest total 1024.61)",
+      "http": 201,
+      "ms": 125
+    },
+    {
+      "id": "T02",
+      "group": "Tamper",
+      "title": "Client \"discount\" larger than subtotal",
+      "expected": "422 or ignored; total never <= 0",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, discount=0, total=1024.61",
+      "http": 201,
+      "ms": 123
+    },
+    {
+      "id": "T03",
+      "group": "Tamper",
+      "title": "Client sends unit_price/total/status/payment_status/order_number",
+      "expected": "all ignored; server values used",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, subtotal=876.85, status=pending, payment_status=unpaid, order_number=ORD-ZIXAJ8EAE8",
+      "http": 201,
+      "ms": 126
+    },
+    {
+      "id": "T04",
+      "group": "Tamper",
+      "title": "Client decides shipping_cost (sends 0)",
+      "expected": "server should compute shipping from city/rates",
+      "verdict": "INFO",
+      "actual": "HTTP 201, shipping_cost=0 — client value is trusted as-is",
+      "http": 201,
+      "ms": 126
+    },
+    {
+      "id": "T05",
+      "group": "Create",
+      "title": "Same product on two lines",
+      "expected": "merged into qty 2 or 422",
+      "verdict": "INFO",
+      "actual": "HTTP 201, lines=2, qtys=1+1",
+      "http": 201,
+      "ms": 139
+    },
+    {
+      "id": "T06",
+      "group": "Tamper",
+      "title": "HTML/script in notes & address",
+      "expected": "stored escaped/stripped, or UI must escape on render",
+      "verdict": "INFO",
+      "actual": "HTTP 201, stored raw=true — admin UI must never use v-html for these",
+      "http": 201,
+      "ms": 130
+    },
+    {
+      "id": "T07",
+      "group": "Create",
+      "title": "Accept-Language: ar returns Arabic product name",
+      "expected": "localized item.product.name",
+      "verdict": "GREEN",
+      "actual": "name=سخان مياه غاز فوري رقمي ماسترجاز 12 لتر أمان كامل ODS",
+      "http": 201,
+      "ms": 133
+    },
+    {
+      "id": "K01",
+      "group": "Validation",
+      "title": "Coupon below minimum_amount (subtotal 876.85 < 1000)",
+      "expected": "HTTP 422 — minimum not reached",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"The minimum order amount to use this coupon is 1000.\"]}",
+      "http": 422,
+      "ms": 106
+    },
+    {
+      "id": "K02",
+      "group": "Coupon",
+      "title": "10% coupon capped by max_discount=50",
+      "expected": "HTTP 201, discount=50 (10% of 1753.7 = 175.37 → cap 50)",
+      "verdict": "GREEN",
+      "actual": "HTTP 201, discount=50, coupon_code=QA-ORD-MV6GWIP4-PCT, tax=238.52, total=1967.22 ",
+      "http": 201,
+      "ms": 143
+    },
+    {
+      "id": "K03",
+      "group": "Coupon",
+      "title": "Total arithmetic with coupon",
+      "expected": "total = subtotal − discount + shipping + tax",
+      "verdict": "GREEN",
+      "actual": "tax base: subtotal−discount ; tax=238.52 total=1967.22",
+      "http": 201,
+      "ms": 143
+    },
+    {
+      "id": "K04",
+      "group": "Coupon",
+      "title": "used_count increments after use",
+      "expected": "used_count = 1",
+      "verdict": "GREEN",
+      "actual": "used_count=1",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "K05",
+      "group": "Coupon",
+      "title": "Same user re-uses coupon (collection says one use per user)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422, discount=undefined {\"coupon_code\":[\"You have already used this coupon code.\"]}",
+      "http": 422,
+      "ms": 106
+    },
+    {
+      "id": "K06",
+      "group": "Coupon",
+      "title": "Re-use with the code typed in lowercase (bypass attempt)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422, discount=undefined {\"coupon_code\":[\"You have already used this coupon code.\"]}",
+      "http": 422,
+      "ms": 94
+    },
+    {
+      "id": "K07",
+      "group": "Coupon",
+      "title": "After cancelling the coupon order, same user uses the coupon again",
+      "expected": "business decision: allowed → used_count must drop on cancel",
+      "verdict": "INFO",
+      "actual": "cancel HTTP 200; used_count after cancel=1; re-use HTTP 201, discount=50; used_count now 2",
+      "http": 201,
+      "ms": 154
+    },
+    {
+      "id": "K10",
+      "group": "Coupon",
+      "title": "Race: 2 parallel orders with a max_uses=1 coupon",
+      "expected": "exactly 1 gets the discount",
+      "verdict": "GREEN",
+      "actual": "statuses=201,422, discounted=1, discounts=30,, used_count=1",
+      "http": 201,
+      "ms": 137
+    },
+    {
+      "id": "K11",
+      "group": "Validation",
+      "title": "Coupon after max_uses reached",
+      "expected": "HTTP 422 — usage limit",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code has reached its maximum usage limit.\"]}",
+      "http": 422,
+      "ms": 99
+    },
+    {
+      "id": "K12",
+      "group": "Validation",
+      "title": "Expired coupon",
+      "expected": "HTTP 422 — expired",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code is invalid or has expired.\"]}",
+      "http": 422,
+      "ms": 103
+    },
+    {
+      "id": "K13",
+      "group": "Validation",
+      "title": "Inactive coupon",
+      "expected": "HTTP 422 — inactive",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code is invalid or has expired.\"]}",
+      "http": 422,
+      "ms": 97
+    },
+    {
+      "id": "K14",
+      "group": "Validation",
+      "title": "Coupon not started yet",
+      "expected": "HTTP 422 — not started",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"coupon_code\":[\"This coupon code is invalid or has expired.\"]}",
+      "http": 422,
+      "ms": 94
+    },
+    {
+      "id": "S01",
+      "group": "Status",
+      "title": "pending → paid_confirmed",
+      "expected": "HTTP 200, status=paid_confirmed",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, status=paid_confirmed ",
+      "http": 200,
+      "ms": 125
+    },
+    {
+      "id": "S02",
+      "group": "Status",
+      "title": "paid_confirmed marks payment",
+      "expected": "payment_status=paid and payment_time set",
+      "verdict": "RED",
+      "actual": "payment_status=unpaid, payment_time=null",
+      "http": 200,
+      "ms": 125
+    },
+    {
+      "id": "S03",
+      "group": "Status",
+      "title": "paid_confirmed → processing",
+      "expected": "HTTP 200, status=processing",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, status=processing ",
+      "http": 200,
+      "ms": 126
+    },
+    {
+      "id": "S04",
+      "group": "Status",
+      "title": "processing → shipped",
+      "expected": "HTTP 200, status=shipped",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, status=shipped ",
+      "http": 200,
+      "ms": 137
+    },
+    {
+      "id": "S05",
+      "group": "Status",
+      "title": "shipped sets shipped_at",
+      "expected": "shipped_at timestamp",
+      "verdict": "GREEN",
+      "actual": "shipped_at=2026-10-13T09:17:40+00:00",
+      "http": 200,
+      "ms": 137
+    },
+    {
+      "id": "S06",
+      "group": "Status",
+      "title": "shipped → delivered",
+      "expected": "HTTP 200, status=delivered",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, status=delivered ",
+      "http": 200,
+      "ms": 140
+    },
+    {
+      "id": "S07",
+      "group": "Status",
+      "title": "delivered sets delivered_at",
+      "expected": "delivered_at timestamp",
+      "verdict": "GREEN",
+      "actual": "delivered_at=2026-10-13T09:17:40+00:00, payment_status=unpaid",
+      "http": 200,
+      "ms": 140
+    },
+    {
+      "id": "S08",
+      "group": "Status",
+      "title": "Customer endpoint reflects admin status change",
+      "expected": "site/orders/{id}.status = delivered",
+      "verdict": "GREEN",
+      "actual": "status=delivered",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S09",
+      "group": "Stock",
+      "title": "Product stock decreases somewhere between create and delivered",
+      "expected": "below 40 (start of run)",
+      "verdict": "RED",
+      "actual": "product 16 stock 40 → 40 after 16 orders, one of them delivered",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S10",
+      "group": "Status",
+      "title": "delivered → processing (backward)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "RED",
+      "actual": "HTTP 200, status=processing ",
+      "http": 200,
+      "ms": 127
+    },
+    {
+      "id": "S11",
+      "group": "Status",
+      "title": "delivered → cancelled",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "RED",
+      "actual": "HTTP 200, status=cancelled ",
+      "http": 200,
+      "ms": 129
+    },
+    {
+      "id": "S12",
+      "group": "Status",
+      "title": "delivered → pending (reset)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "RED",
+      "actual": "HTTP 200, status=pending ",
+      "http": 200,
+      "ms": 124
+    },
+    {
+      "id": "S13",
+      "group": "Status",
+      "title": "Timestamps after backward moves",
+      "expected": "delivered_at/shipped_at consistent with status",
+      "verdict": "RED",
+      "actual": "status=pending, shipped_at=2026-10-13T09:17:40+00:00, delivered_at=2026-10-13T09:17:40+00:00, payment_status=unpaid",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S14",
+      "group": "Status",
+      "title": "pending → cancelled",
+      "expected": "HTTP 200, status=cancelled",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, status=cancelled ",
+      "http": 200,
+      "ms": 138
+    },
+    {
+      "id": "S15",
+      "group": "Stock",
+      "title": "Cancel restores reserved stock",
+      "expected": "n/a — stock is never reserved (see C06/S09)",
+      "verdict": "INFO",
+      "actual": "P16: 40 → 40, P14: 35 → 35",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S16",
+      "group": "Status",
+      "title": "cancelled → cancelled (repeat)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=cancelled ",
+      "http": 200,
+      "ms": 135
+    },
+    {
+      "id": "S17",
+      "group": "Stock",
+      "title": "Repeated cancel does not restore stock twice",
+      "expected": "unchanged",
+      "verdict": "GREEN",
+      "actual": "P16: 40 → 40, P14: 35 → 35",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S18",
+      "group": "Status",
+      "title": "cancelled → processing (revive)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "RED",
+      "actual": "HTTP 200, status=processing ",
+      "http": 200,
+      "ms": 135
+    },
+    {
+      "id": "S19",
+      "group": "Status",
+      "title": "cancelled → delivered",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "RED",
+      "actual": "HTTP 200, status=delivered ",
+      "http": 200,
+      "ms": 140
+    },
+    {
+      "id": "S20",
+      "group": "Stock",
+      "title": "Stock after reviving a cancelled order",
+      "expected": "no drift (revive should be rejected)",
+      "verdict": "INFO",
+      "actual": "order status=delivered; P16: 40 → 40, P14: 35 → 35",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S21",
+      "group": "Status",
+      "title": "pending → delivered (skips payment/shipping)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=delivered ",
+      "http": 200,
+      "ms": 128
+    },
+    {
+      "id": "S22",
+      "group": "Status",
+      "title": "Side-effects when jumping straight to delivered",
+      "expected": "shipped_at, delivered_at, payment set consistently",
+      "verdict": "INFO",
+      "actual": "status=delivered, payment_status=unpaid, payment_time=null, shipped_at=null, delivered_at=2026-10-13T09:17:42+00:00",
+      "http": 200,
+      "ms": 128
+    },
+    {
+      "id": "S23",
+      "group": "Status",
+      "title": "pending → shipped (skips payment)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=shipped ",
+      "http": 200,
+      "ms": 127
+    },
+    {
+      "id": "S24",
+      "group": "Status",
+      "title": "shipped → cancelled",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=cancelled ",
+      "http": 200,
+      "ms": 124
+    },
+    {
+      "id": "S25",
+      "group": "Stock",
+      "title": "Stock after cancelling a shipped order",
+      "expected": "documented",
+      "verdict": "INFO",
+      "actual": "P16: 40 → 40",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "S26",
+      "group": "Status",
+      "title": "pending → processing (unpaid order)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=processing ",
+      "http": 200,
+      "ms": 121
+    },
+    {
+      "id": "S27",
+      "group": "Status",
+      "title": "processing → pending (backward)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=pending ",
+      "http": 200,
+      "ms": 128
+    },
+    {
+      "id": "S28",
+      "group": "Status",
+      "title": "same status twice (pending → pending)",
+      "expected": "rejected with HTTP 422/409",
+      "verdict": "INFO",
+      "actual": "HTTP 200, status=pending ",
+      "http": 200,
+      "ms": 152
+    },
+    {
+      "id": "U01",
+      "group": "Update",
+      "title": "status = \"refunded\" (not in enum)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"status\":[\"The selected status is invalid.\"]}",
+      "http": 422,
+      "ms": 93
+    },
+    {
+      "id": "U02",
+      "group": "Update",
+      "title": "status = \"SHIPPED\" (uppercase)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"status\":[\"The selected status is invalid.\"]}",
+      "http": 422,
+      "ms": 188
+    },
+    {
+      "id": "U03",
+      "group": "Update",
+      "title": "status = \"\" (empty)",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"status\":[\"The selected status is invalid.\"]}",
+      "http": 422,
+      "ms": 209
+    },
+    {
+      "id": "U04",
+      "group": "Update",
+      "title": "status = null",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"status\":[\"The selected status is invalid.\"]}",
+      "http": 422,
+      "ms": 216
+    },
+    {
+      "id": "U05",
+      "group": "Update",
+      "title": "status = 123",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"status\":[\"The selected status is invalid.\"]}",
+      "http": 422,
+      "ms": 93
+    },
+    {
+      "id": "U06",
+      "group": "Update",
+      "title": "payment_method = \"bitcoin\"",
+      "expected": "HTTP 422",
+      "verdict": "RED",
+      "actual": "HTTP 200 {\"data\":{\"id\":31,\"order_number\":\"ORD-YNJA8WG1TV\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":\"bitcoin\",\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":876.8500000000000227373675…",
+      "http": 200,
+      "ms": 657
+    },
+    {
+      "id": "U07",
+      "group": "Update",
+      "title": "shipping_address = \"\"",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"shipping_address\":[\"The shipping address field must be a string.\"]}",
+      "http": 422,
+      "ms": 106
+    },
+    {
+      "id": "U08",
+      "group": "Update",
+      "title": "Empty PATCH body {}",
+      "expected": "HTTP 200 no-op or 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 200 {\"data\":{\"id\":31,\"order_number\":\"ORD-YNJA8WG1TV\",\"status\":\"pending\",\"payment_status\":\"unpaid\",\"payment_method\":\"bitcoin\",\"transaction_id\":null,\"coupon_code\":null,\"discount_code\":null,\"subtotal\":876.8500000000000227373675…",
+      "http": 200,
+      "ms": 178
+    },
+    {
+      "id": "U09",
+      "group": "Update",
+      "title": "Update addresses, notes, payment_method",
+      "expected": "HTTP 200 and all four persisted",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, ship=QA-ORD-MV6GWIP4 updated ship addr, bill=QA-ORD-MV6GWIP4 updated bill addr, notes=QA-ORD-MV6GWIP4 updated note, pm=credit_card ",
+      "http": 200,
+      "ms": 288
+    },
+    {
+      "id": "U10",
+      "group": "Update",
+      "title": "Status untouched by a non-status PATCH",
+      "expected": "still pending",
+      "verdict": "GREEN",
+      "actual": "status=pending",
+      "http": 200,
+      "ms": 288
+    },
+    {
+      "id": "U11",
+      "group": "Update",
+      "title": "PATCH cannot rewrite money fields / order_number",
+      "expected": "ignored or 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, total=999.61 (was 999.61), discount=0, order_number=ORD-YNJA8WG1TV",
+      "http": 200,
+      "ms": 658
+    },
+    {
+      "id": "P01",
+      "group": "Payment",
+      "title": "PATCH payment_status=paid (+ transaction_id)",
+      "expected": "HTTP 200, payment_status=paid, payment_time set, transaction_id saved",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, payment_status=paid, payment_time=2026-10-13T09:17:46+00:00, transaction_id=QA-ORD-MV6GWIP4-TX",
+      "http": 200,
+      "ms": 301
+    },
+    {
+      "id": "P02",
+      "group": "Payment",
+      "title": "Marking paid does not move order status",
+      "expected": "status stays pending (two independent fields)",
+      "verdict": "INFO",
+      "actual": "status=pending",
+      "http": 200,
+      "ms": 301
+    },
+    {
+      "id": "P03",
+      "group": "Payment",
+      "title": "payment_status = \"garbage\"",
+      "expected": "HTTP 422",
+      "verdict": "GREEN",
+      "actual": "HTTP 422 {\"payment_status\":[\"The selected payment status is invalid.\"]}",
+      "http": 422,
+      "ms": 94
+    },
+    {
+      "id": "P04",
+      "group": "Payment",
+      "title": "payment_status = refunded",
+      "expected": "HTTP 200",
+      "verdict": "GREEN",
+      "actual": "HTTP 200, payment_status=refunded",
+      "http": 200,
+      "ms": 152
+    },
+    {
+      "id": "P05",
+      "group": "Payment",
+      "title": "paid → unpaid clears payment_time",
+      "expected": "payment_time=null",
+      "verdict": "RED",
+      "actual": "HTTP 200, payment_status=unpaid, payment_time=2026-10-13T09:17:46+00:00 (stale)",
+      "http": 200,
+      "ms": 131
+    },
+    {
+      "id": "U12",
+      "group": "Update",
+      "title": "PUT /orders/{id} (collection uses PATCH)",
+      "expected": "HTTP 200/405",
+      "verdict": "RED",
+      "actual": "HTTP 405 [LEAKS exception/trace] The PUT method is not supported for route api/v1/orders/31. Supported methods: GET, HEAD, PATCH, DELETE.",
+      "http": 405,
+      "ms": 89
+    },
+    {
+      "id": "U13",
+      "group": "Update",
+      "title": "PATCH /orders/99999999 (missing)",
+      "expected": "HTTP 404",
+      "verdict": "RED",
+      "actual": "HTTP 404 [LEAKS exception/trace] No query results for model [App\\Models\\Order] 99999999",
+      "http": 404,
+      "ms": 87
+    },
+    {
+      "id": "U14",
+      "group": "Update",
+      "title": "Malformed JSON on PATCH",
+      "expected": "HTTP 400/422",
+      "verdict": "INFO",
+      "actual": "HTTP 200 — silently treated as an empty update",
+      "http": 200,
+      "ms": 127
+    },
+    {
+      "id": "U15",
+      "group": "Update",
+      "title": "Edit shipping_address after order is delivered",
+      "expected": "rejected (422/409)",
+      "verdict": "INFO",
+      "actual": "HTTP 200, order status=pending",
+      "http": 200,
+      "ms": 140
+    },
+    {
+      "id": "N01",
+      "group": "Perf",
+      "title": "Response time p95",
+      "expected": "< 2000 ms",
+      "verdict": "GREEN",
+      "actual": "median=125 ms, p95=288 ms, max=658 ms over 105 calls",
+      "http": null,
+      "ms": null
+    },
+    {
+      "id": "N02",
+      "group": "Stock",
+      "title": "Net stock movement during run",
+      "expected": "for the record",
+      "verdict": "INFO",
+      "actual": "P16: 40 → 40 | P14: 35 → 35 | P13: 20 → 20 | P12: 30 → 30 | P11: 25 → 25",
+      "http": null,
+      "ms": null
+    }
+  ]
+}

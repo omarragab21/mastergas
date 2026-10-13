@@ -1,4 +1,5 @@
 import api from '../../../config/axios';
+import { getSiteOrder, listSiteOrders } from './siteOrdersApi';
 
 const unwrap = (response) => response?.data?.data || response?.data || response;
 
@@ -14,20 +15,17 @@ export const invoiceService = {
   },
 
   async getOrder(orderId) {
-    const response = await api.get('/frontend/orders/me');
-    const raw = unwrap(response);
-    const orders = Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
-    const found = orders.find((order) => order.id == orderId || order.order_number == orderId);
-    if (found || !orderId) return found || null;
-
+    if (!orderId) return null;
     try {
-      const directResponse = await api.get(`/frontend/orders/${orderId}`);
-      const directOrder = unwrap(directResponse);
-      return directOrder && typeof directOrder === 'object' && !Array.isArray(directOrder)
-        ? directOrder
-        : null;
+      return await getSiteOrder(orderId);
     } catch {
-      return null;
+      // An order number (ORD-…) is not a valid id for the show endpoint; look it up in the customer's list.
+      try {
+        const orders = await listSiteOrders();
+        return orders.find((order) => order.id == orderId || order.order_number == orderId) || null;
+      } catch {
+        return null;
+      }
     }
   },
 };

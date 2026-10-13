@@ -449,11 +449,11 @@ test('WIRE listProducts forwards query params; JSON endpoints declare JSON conte
 // ─── Routing: catalogue resources must never be served from the local snapshot ──
 test('ROUTING live catalogue paths bypass the local snapshot adapter, others do not', async () => {
   const run = async (url) => api.interceptors.request.handlers[0].fulfilled({ url, headers: {} });
-  for (const url of ['/v1/products', '/v1/products/5', '/v1/categories', '/v1/attributes/3/options', '/v1/discount_codes/7', '/v1/users', '/api/v1/products']) {
+  for (const url of ['/v1/products', '/v1/products/5', '/v1/categories', '/v1/attributes/3/options', '/v1/discount_codes/7', '/v1/users', '/v1/orders', '/v1/orders/5', '/api/v1/products']) {
     const config = await run(url);
     assert.notEqual(config.__localApi, true, `${url} must go to the live API`);
   }
-  for (const url of ['/dashboard/statistics', '/v1/orders', '/v1/productsX']) {
+  for (const url of ['/dashboard/statistics', '/v1/productsX']) {
     const config = await run(url);
     assert.equal(config.__localApi, true, `${url} should still be served locally`);
   }

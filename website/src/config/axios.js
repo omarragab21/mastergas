@@ -29,6 +29,10 @@ const REMOTE_AUTH_PATHS = new Set([
   '/frontend/forgot-password',
 ]);
 
+// Customer orders are served by the Tijara API even while the catalogue uses the local snapshot.
+const LIVE_PATH_PREFIXES = ['/v1/site/orders'];
+const isLivePath = (cleanPath) => LIVE_PATH_PREFIXES.some((prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
+
 const normalizePath = (url = '') => String(url).split('?')[0].replace(/^\/api/, '') || '/';
 
 const api = axios.create({
@@ -133,7 +137,7 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  if (!useLiveApi && !REMOTE_AUTH_PATHS.has(cleanPath)) {
+  if (!useLiveApi && !REMOTE_AUTH_PATHS.has(cleanPath) && !isLivePath(cleanPath)) {
     config.adapter = localApiAdapter;
   }
   if (frappeMode && cleanPath.startsWith('/frontend') && config.method?.toLowerCase() === 'get') {

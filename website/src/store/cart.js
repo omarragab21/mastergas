@@ -170,8 +170,15 @@ export const cartState = reactive({
       const currentToken = getCustomerToken() || 'guest';
       if (currentToken !== ownerToken) return;
 
-      this.items = snapshotItems.map((item, index) => {
-        const latestProduct = latestProducts[index];
+      // Hydrate the cart as it is NOW, not as it was when the request started:
+      // lines added, removed or re-quantified while the products were loading
+      // must survive the refresh.
+      const refreshed = new Map();
+      snapshotItems.forEach((item, index) => {
+        if (latestProducts[index]) refreshed.set(item.cart_item_key || `id:${item.id}`, latestProducts[index]);
+      });
+      this.items = this.items.map((item) => {
+        const latestProduct = refreshed.get(item.cart_item_key || `id:${item.id}`);
         if (!latestProduct) return item;
 
         // Hydration replaces the product snapshot, but variant identity belongs
