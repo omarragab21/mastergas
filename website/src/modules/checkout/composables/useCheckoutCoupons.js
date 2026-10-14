@@ -48,10 +48,10 @@ export function useCheckoutCoupons({
         const coupon = response.data || response.coupon || { code: codeClean };
         appliedCoupon.value = coupon;
 
-        let calculatedDiscount = parseFloat(
-          response.discount || response.discount_amount || response.amount || 0
-        );
-        if (!calculatedDiscount && coupon.value) {
+        const responseDiscount = [response.discount, response.discount_amount, response.amount]
+          .find((value) => value !== undefined && value !== null && value !== '');
+        let calculatedDiscount = parseFloat(responseDiscount);
+        if (!Number.isFinite(calculatedDiscount) && coupon.value) {
           if (coupon.type === 'percentage') {
             calculatedDiscount = subtotalWithDiscount.value * (parseFloat(coupon.value) / 100);
             if (coupon.max_discount && calculatedDiscount > parseFloat(coupon.max_discount)) {
@@ -63,10 +63,19 @@ export function useCheckoutCoupons({
         }
         if (!Number.isFinite(calculatedDiscount)) calculatedDiscount = 0;
 
-        discountAmount.value = roundMoney(Math.min(
+        const appliedDiscount = roundMoney(Math.min(
           subtotalWithDiscount.value,
           Math.max(0, calculatedDiscount)
         ));
+        if (appliedDiscount <= 0) {
+          appliedCoupon.value = null;
+          discountAmount.value = 0;
+          couponMessage.value = t('checkout.coupon_no_discount');
+          couponMessageType.value = 'error';
+          return;
+        }
+
+        discountAmount.value = appliedDiscount;
         couponMessage.value = localizeCouponMessage(response.message, true);
         couponMessageType.value = 'success';
       } else {

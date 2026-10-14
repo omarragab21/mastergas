@@ -184,13 +184,13 @@ test('Website Customer Account & Action APIs: Contract and parameter safety', as
     { name: 'Submit Product Review', path: '/frontend/reviews', method: 'POST', body: { product_id: 173, rating: 5, comment: 'Great' } },
     { name: 'Toggle Wishlist', path: '/frontend/wishlist/toggle', method: 'POST', body: { product_id: 173 } },
     { name: 'Contact Us Form', path: '/frontend/contact', method: 'POST', body: { name: 'Ali', email: 'ali@test.com', message: 'Hello' } },
-    { name: 'Validate Coupon', path: '/frontend/coupons/validate', method: 'POST', body: { code: 'SAVE10', amount: 100 } },
+    { name: 'Validate Coupon', path: '/v1/discount_codes?code=SAVE10', method: 'GET' },
     { name: 'Notifications', path: '/frontend/notifications', method: 'GET' },
   ];
 
   await t.test('All customer endpoints are properly structured', () => {
     for (const ep of customerEndpoints) {
-      assert.ok(ep.path.startsWith('/frontend/'));
+      assert.ok(ep.path.startsWith('/frontend/') || ep.path.startsWith('/v1/discount_codes'));
       assert.ok(['GET', 'POST', 'PUT', 'DELETE'].includes(ep.method));
     }
   });

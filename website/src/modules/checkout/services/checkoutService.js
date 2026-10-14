@@ -1,5 +1,6 @@
 import api from '../../../config/axios';
 import { toSiteOrderPayload } from '../../../domain/orders/siteOrder';
+import { couponService } from '../../../services/couponService';
 
 const checkoutRequestOptions = (idempotencyKey) => ({
   timeout: 30_000,
@@ -10,10 +11,7 @@ const checkoutRequestOptions = (idempotencyKey) => ({
 });
 
 export const checkoutService = {
-  validateCoupon: async () => ({
-    valid: false,
-    message: 'Coupons are not available in the Site API.',
-  }),
+  validateCoupon: (code, amount) => couponService.validate(code, amount),
 
   // Both calls resolve with the full axios response: the checkout safety helpers
   // (extractCreatedOrder / extractPaymentUrl) read `response.data` and the HTTP status.

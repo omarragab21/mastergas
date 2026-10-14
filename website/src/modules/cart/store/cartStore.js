@@ -31,9 +31,11 @@ export const useCartStore = defineStore('cartFeature', () => {
 
     try {
       const response = await cartService.validateCoupon(normalizedCode, subtotal);
-      if (response.success || response.valid || response.status === 'success' || (response.data && response.data.value)) {
+      const discount = Number(response.discount);
+      const hasAppliedDiscount = Number.isFinite(discount) && discount > 0;
+      if ((response.success || response.valid || response.status === 'success') && hasAppliedDiscount) {
         appliedCoupon.value = response.data || { code: normalizedCode };
-        discountAmount.value = Number(response.discount || response.data?.value || 0);
+        discountAmount.value = discount;
         couponMessage.value = response.message || fallback('cart.coupon_applied_success', 'تم تطبيق الكوبون بنجاح');
         couponMessageType.value = 'success';
         return true;

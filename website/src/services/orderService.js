@@ -1,15 +1,12 @@
 import api from '../config/axios';
+import { couponService } from './couponService';
 
 export const orderService = {
   /**
    * Validate discount coupon code against current cart
    */
-  async validateCoupon(code, cartTotal = 0) {
-    const response = await api.post('/frontend/coupons/validate', {
-      code,
-      cart_total: cartTotal,
-    });
-    return response.data;
+  validateCoupon(code, cartTotal = 0) {
+    return couponService.validate(code, cartTotal);
   },
 
   /**
