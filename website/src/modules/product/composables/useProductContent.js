@@ -71,10 +71,10 @@ export function useProductContent({ product, locale, localized, selectedAttribut
     const prod = product.value || {};
     const name = (prod.name_i18n?.ar || prod.name || '').toLowerCase();
     const attrs = prod.attributes || prod.raw_attributes || {};
-  
+
     function cleanSpecValue(val) {
       if (val === undefined || val === null) return '';
-      let str = Array.isArray(val) ? val.join(' / ') : String(val).trim();
+      let str = String(localizedText(val) ?? '').trim();
       if (isAr) {
         str = str.replace(/\s*\([A-Za-z0-9\s/&,.-]+\)/g, '').trim();
       }
@@ -415,4 +415,3 @@ export function useProductContent({ product, locale, localized, selectedAttribut
     currentPrice,
   };
 }
-

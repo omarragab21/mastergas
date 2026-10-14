@@ -2,10 +2,9 @@
         <!-- Main Products Column (Left in RTL) -->
         <main class="mockup-main-column">
           <div v-if="dataNotice" class="catalog-data-notice" role="status">{{ dataNotice }}</div>
-          <!-- Loading State -->
-          <div v-if="loading" class="loading-container">
-            <div class="loading-spinner"></div>
-            <p>{{ $t('common.loading') }}</p>
+          <!-- Loading State: shimmer cards in the same grid -->
+          <div v-if="loading" class="mockup-products-grid" role="status" aria-busy="true">
+            <ProductCardSkeleton v-for="n in perPage" :key="`sk-${n}`" />
           </div>
 
           <!-- Empty State -->
@@ -25,12 +24,12 @@
               :key="product.id" 
               :product="product" 
               @click="emit('open-product', product)"
-              @add-to-cart="emit('add-to-cart', product)"
+              @add-to-cart="emit('add-to-cart', $event)"
             />
           </div>
 
           <!-- Bottom Pagination Bar -->
-          <div class="mockup-pagination-row" v-if="products.length > 0">
+          <div class="mockup-pagination-row" v-if="!loading && products.length > 0">
             <!-- Left in RTL: Counter -->
             <div class="pagination-info-text">
               {{ currentLang === 'ar' 
@@ -62,6 +61,7 @@
 </template>
 <script setup>
 import ProductCard from './ProductCard.vue';
+import ProductCardSkeleton from '../../../components/skeleton/ProductCardSkeleton.vue';
 defineProps({ products: { type: Array, default: () => [] }, loading: { type: Boolean, default: false }, dataNotice: { type: String, default: '' }, currentLang: { type: String, required: true }, currentPage: { type: Number, default: 1 }, perPage: { type: Number, default: 9 }, totalProductsCount: { type: Number, default: 0 }, totalPages: { type: Number, default: 1 } });
 const emit = defineEmits(['open-product', 'add-to-cart', 'change-page']);
 </script>

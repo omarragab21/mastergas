@@ -3,8 +3,25 @@ import { getPresetColorHex, normalizeHexColor } from '../constants/colors.js';
 const firstText = (...values) => values.find((value) => value !== undefined && value !== null && String(value).trim() !== '') ?? '';
 
 export const localizedText = (value, fallback = '') => {
+  if (Array.isArray(value)) {
+    const text = value
+      .map((item) => localizedText(item, ''))
+      .filter(Boolean)
+      .join(' / ');
+    return text || fallback;
+  }
+
   if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return firstText(value.ar, value.en, value.name, value.label, fallback);
+    return firstText(
+      localizedText(value.ar, ''),
+      localizedText(value.en, ''),
+      localizedText(value.name, ''),
+      localizedText(value.label, ''),
+      localizedText(value.value, ''),
+      localizedText(value.title, ''),
+      localizedText(value.value_code, ''),
+      fallback,
+    );
   }
   return firstText(value, fallback);
 };

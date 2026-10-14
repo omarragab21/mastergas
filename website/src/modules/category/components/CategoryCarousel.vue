@@ -20,13 +20,17 @@
       </div>
 
       <div class="category-cards-slider" ref="categoriesSliderRef">
+        <template v-if="loading">
+          <PortraitCardSkeleton v-for="n in 6" :key="`sk-${n}`" variant="category" />
+        </template>
+        <template v-else>
         <router-link 
           v-for="cat in categories" 
           :key="cat.id" 
           :to="cat.link"
           class="category-portrait-card"
         >
-          <div class="card-bg-image" :style="{ backgroundImage: `url(${cat.image}), url(/catalog_images/cat_${cat.id}.jpg), url(/images/home/cat_cookers.png)` }"></div>
+          <div class="card-bg-image" :style="{ backgroundImage: `url(${cat.image || '/brand/mastergas-icon.png'})` }"></div>
           <div class="card-gradient-overlay"></div>
           <div class="card-bottom-content">
             <span class="card-count">{{ cat.countText }}</span>
@@ -41,15 +45,18 @@
             </div>
           </div>
         </router-link>
+        </template>
       </div>
     </section>
 </template>
 <script setup>
 import { computed, ref, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
+import PortraitCardSkeleton from '../../../components/skeleton/PortraitCardSkeleton.vue';
 
 const props = defineProps({
   categories: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 });
 const { categories } = toRefs(props);
 const { t, locale } = useI18n();

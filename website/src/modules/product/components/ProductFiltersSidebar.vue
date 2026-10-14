@@ -13,6 +13,14 @@
 
             <!-- Categories Radio List -->
             <div class="sidebar-radio-list">
+              <!-- Categories shimmer while /categories loads -->
+              <template v-if="loading">
+                <div v-for="n in 6" :key="`sk-${n}`" class="sk-sidebar-row" role="status" aria-busy="true">
+                  <span class="sk-shimmer sk-line" :style="{ width: `${48 + (n % 3) * 14}%` }"></span>
+                  <span class="sk-shimmer sk-line" style="width: 28px"></span>
+                </div>
+              </template>
+              <template v-else>
               <!-- All categories option -->
               <label class="sidebar-radio-item" :class="{ active: selectedCategory === null }" @click="selectCategory(null)">
                 <div class="radio-main-col">
@@ -40,6 +48,7 @@
                 </div>
                 <span class="radio-counter">({{ cat.products_count ?? 0 }})</span>
               </label>
+              </template>
             </div>
 
             <div class="sidebar-divider"></div>
@@ -86,6 +95,6 @@
 </template>
 <script setup>
 import { toRefs } from 'vue';
-const props = defineProps({ categories: { type: Array, default: () => [] }, selectedCategory: { type: [Number, String], default: null }, totalAllCount: { type: Number, default: 0 }, currentLang: { type: String, required: true }, inStockOnly: { type: Boolean, default: false }, hasDiscountOnly: { type: Boolean, default: false }, italianOnly: { type: Boolean, default: false }, localized: { type: Function, required: true }, selectCategory: { type: Function, required: true }, toggleInStock: { type: Function, required: true }, toggleDiscount: { type: Function, required: true }, toggleItalian: { type: Function, required: true } });
-const { categories, selectedCategory, totalAllCount, currentLang, inStockOnly, hasDiscountOnly, italianOnly, localized, selectCategory, toggleInStock, toggleDiscount, toggleItalian } = toRefs(props);
+const props = defineProps({ loading: { type: Boolean, default: false }, categories: { type: Array, default: () => [] }, selectedCategory: { type: [Number, String], default: null }, totalAllCount: { type: Number, default: 0 }, currentLang: { type: String, required: true }, inStockOnly: { type: Boolean, default: false }, hasDiscountOnly: { type: Boolean, default: false }, italianOnly: { type: Boolean, default: false }, localized: { type: Function, required: true }, selectCategory: { type: Function, required: true }, toggleInStock: { type: Function, required: true }, toggleDiscount: { type: Function, required: true }, toggleItalian: { type: Function, required: true } });
+const { loading, categories, selectedCategory, totalAllCount, currentLang, inStockOnly, hasDiscountOnly, italianOnly, localized, selectCategory, toggleInStock, toggleDiscount, toggleItalian } = toRefs(props);
 </script>

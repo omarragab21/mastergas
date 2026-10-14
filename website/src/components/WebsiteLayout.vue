@@ -588,6 +588,7 @@ const fetchData = async () => {
 };
 
 const fetchCategories = async () => {
+  if (!authState.token) return;
   try {
     const list = await productService.getCategories();
     categories.value = Array.isArray(list) ? list : [];
@@ -607,7 +608,6 @@ const toggleLanguage = () => {
 };
 
 onMounted(() => {
-  fetchData();
   fetchCategories();
   cartState.syncWithToken();
   authActions.init();

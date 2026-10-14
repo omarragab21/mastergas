@@ -1,20 +1,10 @@
-// Website ↔ Tijara `/v1/site/orders` contract, verified live in
-// reports/tijara-orders-api-qa-2026-10-13.md.
-
-// The website still renders the catalogue from the local snapshot (ids 25–30,
-// pulled from the old backend). Tijara has the same products under other ids.
-// Remove this table once the catalogue itself is served by the Tijara API.
-// 29 (outdoor BBQ grill) does not exist on Tijara, so it cannot be ordered yet.
-export const TIJARA_PRODUCT_IDS = { 25: 11, 26: 12, 27: 13, 28: 14, 30: 16 };
-
 const NOTES_LIMIT = 1000;
 const PAYMENT_METHODS = { cod: 'cash_on_delivery', cash: 'cash_on_delivery', cash_on_delivery: 'cash_on_delivery', card: 'credit_card', credit_card: 'credit_card' };
 
-const toTijaraProductId = (id) => {
-  const mapped = TIJARA_PRODUCT_IDS[Number(id)];
-  if (!mapped) throw new Error(`المنتج رقم ${id} غير متاح للطلب حالياً`);
-  return mapped;
-};
+// Migrate carts created by the previous storefront snapshot. New carts keep
+// the product ids returned by the Site catalog unchanged.
+export const TIJARA_PRODUCT_IDS = Object.freeze({ 25: 11, 26: 12, 27: 13, 28: 14, 30: 16 });
+const normalizeProductId = (id) => TIJARA_PRODUCT_IDS[id] ?? id;
 
 export const toSiteOrderPayload = (order = {}) => {
   const method = PAYMENT_METHODS[String(order.payment_method || '').toLowerCase()];
@@ -32,10 +22,16 @@ export const toSiteOrderPayload = (order = {}) => {
     ...(code ? { coupon_code: code } : {}),
     ...(notes ? { notes } : {}),
     shipping_cost: Math.max(0, Number(order.shipping_cost) || 0),
-    items: order.items.map((item) => ({
-      product_id: toTijaraProductId(item.product_id ?? item.id),
-      quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
-    })),
+    items: order.items.map((item) => {
+      const sourceProductId = Number(item.product_id ?? item.id);
+      if (sourceProductId === 29) {
+        throw new Error('المنتج 29 غير متاح في كتالوج Tijara');
+      }
+      return {
+        product_id: normalizeProductId(sourceProductId),
+        quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
+      };
+    }),
   };
 };
 
@@ -80,6 +76,11 @@ export const toSiteOrder = (raw) => {
     notes: order.notes ?? '',
     coupon_code: order.coupon_code ?? '',
     created_at: order.created_at ?? null,
+    updated_at: order.updated_at ?? null,
+    payment_time: order.payment_time ?? null,
+    shipped_at: order.shipped_at ?? null,
+    delivered_at: order.delivered_at ?? null,
+    estimated_delivery: order.estimated_delivery ?? null,
     date: localDate(order.created_at),
     subtotal: money(order.subtotal),
     discount: money(order.discount),

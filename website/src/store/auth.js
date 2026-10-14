@@ -67,7 +67,13 @@ export const authActions = {
   async register(data) {
     authState.loading = true;
     try {
-      const res = await api.post('/v1/register', data);
+      const form = new FormData();
+      form.append('name', data.name || '');
+      form.append('email', data.email || '');
+      form.append('password', data.password || '');
+      form.append('phone_number', data.phone_number || data.phone || '');
+      if (data.image_file) form.append('image_file', data.image_file);
+      const res = await api.post('/v1/register', form);
       this._setSession(res.data.token, getResponseUser(res.data));
       return res.data;
     } finally {

@@ -63,6 +63,10 @@
                   </span>
                   <span class="currency-code" v-else>{{ currency }}</span>
                 </div>
+                <div v-if="hasDiscount" class="price-before-discount">
+                  <span>{{ formatPrice(product.price) }}</span>
+                  <span v-if="locale === 'ar'">{{ currency }}</span>
+                </div>
                 <span class="vat-tag">{{ locale === 'ar' ? 'شامل ضريبة القيمة المضافة' : 'Includes VAT' }}</span>
               </div>
             </div>
@@ -162,10 +166,11 @@
           </div>
 </template>
 <script setup>
-import { toRefs } from 'vue';
+import { computed, toRefs } from 'vue';
 const props = defineProps({ product: { type: Object, required: true }, locale: { type: String, required: true }, localized: { type: Function, required: true }, localizedValue: { type: Function, required: true }, computedRatingCount: { type: [Number, String], default: 0 }, computedAverageRating: { type: [Number, String], default: 0 }, formatPrice: { type: Function, required: true }, currentPrice: { type: [Number, String], default: 0 }, currency: { type: String, default: '' }, riyalIcon: { type: String, default: '' }, productFeatures: { type: Array, default: () => [] }, colorOptions: { type: Array, default: () => [] }, selectedColorName: { type: String, default: '' }, isLightColor: { type: Function, required: true }, selectableAttributes: { type: Array, default: () => [] }, selectedAttributes: { type: Object, default: () => ({}) }, isProductInStock: { type: Boolean, default: false }, quantity: { type: Number, default: 1 }, isFavorite: { type: Boolean, default: false } });
 const emit = defineEmits(['open-share', 'toggle-favorite', 'select-image', 'select-color', 'select-attribute', 'update:quantity', 'add-to-cart']);
 const { product, locale, localized, localizedValue, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, quantity, isFavorite } = toRefs(props);
+const hasDiscount = computed(() => Number(product.value?.price) > Number(currentPrice.value));
 const increaseQuantity = () => emit('update:quantity', quantity.value + 1);
 const decreaseQuantity = () => emit('update:quantity', quantity.value > 1 ? quantity.value - 1 : quantity.value);
 const selectColor = (value) => emit('select-color', value);

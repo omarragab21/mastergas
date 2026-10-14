@@ -1,8 +1,23 @@
 <template>
   <div class="home-view" :dir="currentLang === 'ar' ? 'rtl' : 'ltr'">
     <!-- 1. Hero Section (Home Banner Multi-Slide Carousel) -->
+    <!-- Shimmer while /v1/site/sliders loads: the hero has no built-in content. -->
+    <div v-if="slidersLoading" class="hero-banner-wrapper" role="status" aria-busy="true" :aria-label="currentLang === 'ar' ? 'جاري التحميل' : 'Loading'">
+      <section class="hero-section">
+        <div class="hero-container hero-skeleton">
+          <div class="hero-content">
+            <span class="sk sk-tag"></span>
+            <span class="sk sk-title"></span>
+            <span class="sk sk-title sk-title-short"></span>
+            <span class="sk sk-desc"></span>
+            <span class="sk sk-desc sk-desc-short"></span>
+            <span class="sk sk-btn"></span>
+          </div>
+        </div>
+      </section>
+    </div>
     <div 
-      v-if="displayHeroSlides.length > 0"
+      v-else-if="displayHeroSlides.length > 0"
       class="hero-banner-wrapper"
       @mouseenter="stopHeroAutoplay"
       @mouseleave="startHeroAutoplay"
@@ -16,7 +31,7 @@
             v-show="currentHeroIndex === idx"
             class="hero-slide-item"
           >
-            <div class="hero-bg" :style="{ backgroundImage: `url(${slide.image})` }"></div>
+            <div class="hero-bg" :style="slide.image ? { backgroundImage: `url(${slide.image})` } : {}"></div>
             <div class="hero-overlay"></div>
             
             <div class="hero-container">
@@ -34,7 +49,17 @@
                 </h1>
                 <p class="hero-desc">{{ slide.description }}</p>
                 <div class="hero-actions">
-                  <router-link :to="slide.link" class="hero-btn-white">
+                  <a
+                    v-if="resolveLink(slide.link).external"
+                    :href="resolveLink(slide.link).href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="hero-btn-white"
+                    @click.stop
+                  >
+                    {{ slide.button_text }}
+                  </a>
+                  <router-link v-else :to="resolveLink(slide.link).href" class="hero-btn-white" @click.stop>
                     {{ slide.button_text }}
                   </router-link>
                 </div>
@@ -49,8 +74,8 @@
           <button 
             type="button"
             class="hero-nav-arrow hero-arrow-right" 
-            @click="nextHeroSlide()" 
-            :aria-label="currentLang === 'ar' ? 'التالي' : 'Next'"
+            @click="currentLang === 'ar' ? prevHeroSlide() : nextHeroSlide()" 
+            :aria-label="currentLang === 'ar' ? 'السابق' : 'Next'"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="9 18 15 12 9 6"/>
@@ -61,8 +86,8 @@
           <button 
             type="button"
             class="hero-nav-arrow hero-arrow-left" 
-            @click="prevHeroSlide()" 
-            :aria-label="currentLang === 'ar' ? 'السابق' : 'Previous'"
+            @click="currentLang === 'ar' ? nextHeroSlide() : prevHeroSlide()" 
+            :aria-label="currentLang === 'ar' ? 'التالي' : 'Previous'"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="15 18 9 12 15 6"/>
@@ -126,7 +151,7 @@
     </section>
 
     <!-- 3. Shop by Category (تسوق حسب التصنيف) -->
-    <CategoryCarousel :categories="displayCategories" />
+    <CategoryCarousel :categories="displayCategories" :loading="categoriesLoading" />
 
     <!-- 4. Featured Products (منتجات مميزة) -->
     <section class="home-section featured-products-section container">
@@ -144,13 +169,18 @@
       </div>
 
       <div class="products-grid-four">
-        <product-card 
-          v-for="product in displayFeaturedProducts" 
-          :key="product.id" 
-          :product="product" 
-          @click="goToProduct(product)" 
-          @add-to-cart="addToCart(product)" 
-        />
+        <template v-if="productsLoading">
+          <ProductCardSkeleton v-for="n in 4" :key="`sk-featured-${n}`" />
+        </template>
+        <template v-else>
+          <product-card 
+            v-for="product in displayFeaturedProducts" 
+            :key="product.id" 
+            :product="product" 
+            @click="goToProduct(product)" 
+            @add-to-cart="addToCart(product)" 
+          />
+        </template>
       </div>
     </section>
 
@@ -176,13 +206,17 @@
       </div>
 
       <div class="offers-cards-slider" ref="offersSliderRef">
+        <template v-if="offersLoading">
+          <PortraitCardSkeleton v-for="n in 4" :key="`sk-offer-${n}`" variant="offer" />
+        </template>
+        <template v-else>
         <router-link 
           v-for="offer in displayOffers" 
           :key="offer.id" 
           :to="offer.link"
           class="offer-portrait-card"
         >
-          <div class="card-bg-image" :style="{ backgroundImage: `url(${offer.image}), url(/catalog_images/prod_${offer.id || 173}_0.jpg), url(/images/home/offer_clearance_pro.jpg)` }"></div>
+          <div class="card-bg-image" :style="{ backgroundImage: `url(${offer.image || '/brand/mastergas-icon.png'})` }"></div>
           <div class="card-gradient-overlay"></div>
           <div class="card-bottom-content">
             <span class="card-count">{{ offer.badgeText }}</span>
@@ -197,6 +231,7 @@
             </div>
           </div>
         </router-link>
+        </template>
       </div>
     </section>
 
@@ -216,13 +251,18 @@
       </div>
 
       <div class="products-grid-four">
-        <product-card 
-          v-for="product in displayNewArrivals" 
-          :key="product.id" 
-          :product="product" 
-          @click="goToProduct(product)" 
-          @add-to-cart="addToCart(product)" 
-        />
+        <template v-if="productsLoading">
+          <ProductCardSkeleton v-for="n in 4" :key="`sk-new-${n}`" />
+        </template>
+        <template v-else>
+          <product-card 
+            v-for="product in displayNewArrivals" 
+            :key="product.id" 
+            :product="product" 
+            @click="goToProduct(product)" 
+            @add-to-cart="addToCart(product)" 
+          />
+        </template>
       </div>
     </section>
 
@@ -253,12 +293,15 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { cartState } from '../../../store/cart';
+import { authState } from '../../../store/auth';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useOffers } from '../../product/composables/useOffers';
 import { useSEO } from '../../../composables/useSEO';
+import { resolveLink } from '../../../utils/externalLink';
 import ProductCard from '../../product/components/ProductCard.vue';
+import ProductCardSkeleton from '../../../components/skeleton/ProductCardSkeleton.vue';
+import PortraitCardSkeleton from '../../../components/skeleton/PortraitCardSkeleton.vue';
 import CategoryCarousel from '../../category/components/CategoryCarousel.vue';
-import { products as fallbackProducts, offers as fallbackOffers } from '../../../data/catalogData';
 import { productService } from '../../product/services/productService';
 import { settingsService } from '../../../services/settingsService';
 import { useCategories } from '../../category/composables/useCategories';
@@ -267,7 +310,7 @@ const router = useRouter();
 const { t, locale } = useI18n();
 const { localized } = useLocalized();
 const { fetchOffers: fetchSharedOffers } = useOffers();
-const { displayCategories, fetchCategories } = useCategories();
+const { displayCategories, categoriesLoading, fetchCategories } = useCategories();
 const currentLang = computed(() => locale.value);
 
 useSEO({
@@ -279,22 +322,21 @@ useSEO({
 const offersSliderRef = ref(null);
 
 const rawProducts = ref([]);
+const rawNewArrivals = ref([]);
 const rawOffers = ref([]);
 const rawSliders = ref([]);
-const slidersLoaded = ref(false);
+const slidersLoading = ref(true);
+// Each API-driven section shows a shimmer until its own request settles.
+const offersLoading = ref(Boolean(authState.token));
+const productsLoading = ref(Boolean(authState.token));
 const currentHeroIndex = ref(0);
 const heroAutoplayTimer = ref(null);
 const heroTransitionName = ref('slide-right');
 
-const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api')
   .replace(/\/api\/?$/, '');
 
-const normalizeSliderImage = (value) => {
-  if (!value) return defaultHeroSlide.image;
-  return normalizeStorageImage(value, defaultHeroSlide.image);
-};
-
-const normalizeStorageImage = (value, fallback = value) => {
+const normalizeStorageImage = (value, fallback = '') => {
   if (!value) return fallback;
   const raw = String(value);
   if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
@@ -309,7 +351,7 @@ const normalizeStorageImage = (value, fallback = value) => {
 const preloadedHeroImages = new Set();
 const preloadHeroImages = (slides = []) => {
   slides.forEach((slide, index) => {
-    const imageUrl = normalizeStorageImage(slide.image, defaultHeroSlide.image);
+    const imageUrl = normalizeStorageImage(slide.image);
     if (!imageUrl || preloadedHeroImages.has(imageUrl)) return;
     preloadedHeroImages.add(imageUrl);
     const image = new Image();
@@ -317,22 +359,6 @@ const preloadHeroImages = (slides = []) => {
     image.fetchPriority = index === 0 ? 'high' : 'low';
     image.src = imageUrl;
   });
-};
-
-const defaultHeroSlide = {
-  id: 0,
-  tag: 'أجهزة طهي متطورة',
-  tag_en: 'Advanced Cooking Appliances',
-  title: 'أجهزة مطبخ',
-  title_sub: 'بمعايير إيطالية فاخرة',
-  title_en: 'Kitchen Appliances',
-  title_sub_en: 'With Italian Standards',
-  description: 'تصميم عصري وموثوقية لا تضاهى - صنعت لتلبي أعلى المعايير الفندقية والمنزلية مع أمان كامل',
-  description_en: 'Modern design - unmatched reliability - crafted to meet the highest hospitality and home standards',
-  image: '/images/home/hero_pristine.png',
-  link: '/products',
-  button_text: 'استكشف التشكيلة',
-  button_text_en: 'Explore Collection'
 };
 
 const displayHeroSlides = computed(() => {
@@ -355,28 +381,19 @@ const displayHeroSlides = computed(() => {
         title: title,
         title_sub: '',
         description: desc,
-        image: normalizeSliderImage(s.image),
+        image: normalizeStorageImage(s.image),
         link: s.link || '/products',
         button_text: btnText
       };
     });
   }
-  // Keep the hero visible while the real slider list is loading.
-  if (!slidersLoaded.value) {
-    return [{
-      ...defaultHeroSlide,
-      tag: currentLang.value === 'ar' ? defaultHeroSlide.tag : defaultHeroSlide.tag_en,
-      title: currentLang.value === 'ar' ? defaultHeroSlide.title : defaultHeroSlide.title_en,
-      title_sub: currentLang.value === 'ar' ? defaultHeroSlide.title_sub : defaultHeroSlide.title_sub_en,
-      description: currentLang.value === 'ar' ? defaultHeroSlide.description : defaultHeroSlide.description_en,
-      button_text: currentLang.value === 'ar' ? defaultHeroSlide.button_text : defaultHeroSlide.button_text_en
-    }];
-  }
+  // No built-in slide: the hero is rendered only from /v1/site/sliders.
   return [];
 });
 
+// Visual direction: in RTL the dots run right-to-left, so "next" moves left.
 const nextHeroSlide = () => {
-  heroTransitionName.value = 'slide-right';
+  heroTransitionName.value = currentLang.value === 'ar' ? 'slide-left' : 'slide-right';
   if (currentHeroIndex.value >= displayHeroSlides.value.length - 1) {
     currentHeroIndex.value = 0;
   } else {
@@ -385,7 +402,7 @@ const nextHeroSlide = () => {
 };
 
 const prevHeroSlide = () => {
-  heroTransitionName.value = 'slide-left';
+  heroTransitionName.value = currentLang.value === 'ar' ? 'slide-right' : 'slide-left';
   if (currentHeroIndex.value <= 0) {
     currentHeroIndex.value = displayHeroSlides.value.length - 1;
   } else {
@@ -394,7 +411,8 @@ const prevHeroSlide = () => {
 };
 
 const goToHeroSlide = (idx) => {
-  heroTransitionName.value = idx > currentHeroIndex.value ? 'slide-right' : 'slide-left';
+  const forward = idx > currentHeroIndex.value;
+  heroTransitionName.value = (forward === (currentLang.value !== 'ar')) ? 'slide-right' : 'slide-left';
   currentHeroIndex.value = idx;
 };
 
@@ -438,20 +456,18 @@ const displayOffers = computed(() => {
   return rawOffers.value.map(offer => {
     const isAr = currentLang.value === 'ar';
     const title = isAr
-      ? (offer.name_i18n?.ar || localized(offer, 'name') || offer.name)
+      ? (offer.name_i18n?.ar || localized(offer, 'name') || offer.name_ar || offer.name)
       : (offer.name_i18n?.en || offer.name_en || localized(offer, 'name') || offer.name);
     let badgeText = isAr ? 'عرض خاص' : 'Special Offer';
-    if (offer.type === 'percentage' && offer.value) {
-      badgeText = isAr ? `خصم ${Math.round(offer.value)}%` : `${Math.round(offer.value)}% OFF`;
-    } else if (offer.value) {
-      badgeText = isAr ? `خصم ${Math.round(offer.value)} دينار` : `Save ${Math.round(offer.value)}`;
+    if (offer.discount_percentage) {
+      badgeText = isAr ? `خصم ${Math.round(offer.discount_percentage)}%` : `${Math.round(offer.discount_percentage)}% OFF`;
     }
     return {
       id: offer.id,
       title,
       badgeText,
       image: normalizeStorageImage(offer.image, '/images/home/offer_clearance_pro.jpg'),
-      link: `/offers?offer=${offer.id}`
+      link: `/product/${offer.id}`
     };
   });
 });
@@ -461,7 +477,7 @@ const displayFeaturedProducts = computed(() => {
 });
 
 const displayNewArrivals = computed(() => {
-  return rawProducts.value.slice(4, 8);
+  return rawNewArrivals.value.slice(0, 4);
 });
 
 // 4. Why Mastergas items matching the mockup exactly
@@ -553,7 +569,11 @@ const addToCart = (product) => {
 };
 
 const fetchSliders = async () => {
-  slidersLoaded.value = false;
+  if (!authState.token) {
+    slidersLoading.value = false;
+    return;
+  }
+  slidersLoading.value = true;
   try {
     const list = await settingsService.getSliders({ is_active: 1 });
     if (Array.isArray(list) && list.length > 0) {
@@ -568,40 +588,54 @@ const fetchSliders = async () => {
     console.error('Failed to fetch sliders from API:', err);
     rawSliders.value = [];
   } finally {
-    slidersLoaded.value = true;
+    slidersLoading.value = false;
   }
 };
 
 const fetchOffers = async () => {
+  if (!authState.token) {
+    offersLoading.value = false;
+    return;
+  }
+  offersLoading.value = true;
   try {
-    const list = await productService.getOffers({ is_active: 1 });
-    if (Array.isArray(list) && list.length > 0) {
-      rawOffers.value = list;
-    } else {
-      rawOffers.value = fallbackOffers;
-    }
+    const result = await productService.getProducts({ has_discount: 1, per_page: 20 });
+    rawOffers.value = Array.isArray(result.items) ? result.items : [];
   } catch (err) {
     console.error('Failed to fetch offers from API:', err);
-    rawOffers.value = fallbackOffers;
+    rawOffers.value = [];
+  } finally {
+    offersLoading.value = false;
   }
 };
 
 const fetchProducts = async () => {
+  if (!authState.token) {
+    productsLoading.value = false;
+    return;
+  }
+  productsLoading.value = true;
   try {
-    const result = await productService.getProducts({ per_page: 20, is_active: 1 });
-    const list = result.items;
-    if (Array.isArray(list) && list.length > 0) {
-      rawProducts.value = list;
-    } else {
-      rawProducts.value = fallbackProducts;
-    }
+    const [featured, newArrivals] = await Promise.all([
+      productService.getFeaturedProducts(),
+      productService.getNewArrivals(),
+    ]);
+    rawProducts.value = Array.isArray(featured) ? featured : [];
+    rawNewArrivals.value = Array.isArray(newArrivals) ? newArrivals : [];
   } catch (err) {
     console.error('Failed to fetch products from API:', err);
-    rawProducts.value = fallbackProducts;
+    rawProducts.value = [];
+    rawNewArrivals.value = [];
+  } finally {
+    productsLoading.value = false;
   }
 };
 
 onMounted(() => {
+  if (!authState.token) {
+    slidersLoading.value = false;
+    return;
+  }
   fetchSliders();
   fetchCategories();
   fetchOffers();
@@ -681,41 +715,12 @@ onUnmounted(() => {
   transition: opacity 0.65s cubic-bezier(0.25, 1, 0.5, 1), transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* In RTL: "يلف يمين" (advancing rightwards in RTL natural flow) */
-.home-view[dir="rtl"] .slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(-48px);
-}
-.home-view[dir="rtl"] .slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(48px);
-}
-.home-view[dir="rtl"] .slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(48px);
-}
-.home-view[dir="rtl"] .slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-48px);
-}
-
-/* In LTR */
-.home-view[dir="ltr"] .slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(48px);
-}
-.home-view[dir="ltr"] .slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(-48px);
-}
-.home-view[dir="ltr"] .slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(-48px);
-}
-.home-view[dir="ltr"] .slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(48px);
-}
+/* Direction-independent: the right arrow brings the new slide in from the
+   right, the left arrow brings it in from the left (same in RTL and LTR). */
+.slide-right-enter-from { opacity: 0; transform: translateX(48px); }
+.slide-right-leave-to { opacity: 0; transform: translateX(-48px); }
+.slide-left-enter-from { opacity: 0; transform: translateX(-48px); }
+.slide-left-leave-to { opacity: 0; transform: translateX(48px); }
 
 /* Navigation arrows */
 .hero-nav-arrow {
@@ -800,6 +805,30 @@ onUnmounted(() => {
   transition: transform 6s ease-out;
 }
 
+
+/* Hero shimmer (loading state) */
+.hero-skeleton { position: relative; z-index: 1; }
+.hero-skeleton .hero-content { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 560px; }
+.sk {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 25%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.06) 75%);
+  background-size: 200% 100%;
+  animation: hero-shimmer 1.4s linear infinite;
+}
+.sk-tag { width: 170px; height: 24px; border-radius: 999px; }
+.sk-title { width: 100%; height: 52px; }
+.sk-title-short { width: 62%; }
+.sk-desc { width: 85%; height: 16px; }
+.sk-desc-short { width: 55%; }
+.sk-btn { width: 190px; height: 52px; margin-top: 8px; border-radius: 10px; }
+@keyframes hero-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk { animation: none; }
+}
 .hero-slide-item:hover .hero-bg {
   transform: scale(1.05);
 }
@@ -824,7 +853,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding-left: 64px;
+  padding-left: 120px; /* start after the left arrow */
   padding-right: 64px;
   height: 100%;
   display: flex;
@@ -834,6 +863,7 @@ onUnmounted(() => {
 }
 
 .home-view[dir="rtl"] .hero-container {
+  padding-right: 120px; /* start after the right arrow */
   justify-content: flex-start; /* Starts on right in RTL */
 }
 
@@ -1436,4 +1466,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

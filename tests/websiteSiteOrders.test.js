@@ -145,7 +145,7 @@ test('ROUTING /v1/site/orders bypasses the local snapshot and carries the custom
     assert.equal(config.adapter, undefined, `${url} must be live`);
     assert.equal(config.headers.Authorization, 'Bearer customer-token');
   }
-  assert.ok((await run('/v1/site/orders-export')).adapter, 'prefix match is segment-safe');
+  assert.equal((await run('/v1/site/orders-export')).adapter, undefined, 'segment-safe Site routing stays live');
 });
 
 test('WIRE checkout createOrder POSTs the mapped payload to /v1/site/orders and returns the full response', async () => {

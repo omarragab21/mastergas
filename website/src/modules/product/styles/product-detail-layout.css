@@ -482,6 +482,17 @@
   color: #000000;
 }
 
+.price-before-discount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #94A3B8;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  line-height: 21px;
+  text-decoration: line-through;
+}
+
 .vat-tag {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
   font-style: normal;
@@ -770,4 +781,3 @@
   color: #000000;
   user-select: none;
 }
-

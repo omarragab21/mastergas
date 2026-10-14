@@ -21,7 +21,7 @@ export const orderService = {
       headers['Idempotency-Key'] = idempotencyKey;
       headers['X-Checkout-Id'] = idempotencyKey;
     }
-    const response = await api.post('/frontend/orders', orderPayload, { ...options, headers });
+    const response = await api.post('/v1/site/orders', orderPayload, { ...options, headers });
     return response.data;
   },
 
@@ -55,7 +55,7 @@ export const orderService = {
    * Fetch customer orders list
    */
   async getOrders(params = {}) {
-    const response = await api.get('/frontend/orders', { params });
+    const response = await api.get('/v1/site/orders', { params });
     return response.data?.data || response.data;
   },
 
@@ -63,7 +63,7 @@ export const orderService = {
    * Fetch single order details / invoice
    */
   async getOrderById(id) {
-    const response = await api.get(`/frontend/orders/${id}`);
+    const response = await api.get(`/v1/site/orders/${id}`);
     return response.data?.data || response.data;
   },
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="cart-page" :class="{ 'is-ltr': !isRtl }">
+  <div class="cart-page" :class="{ 'is-ltr': !isRtl, 'is-empty': cartStore.items.length === 0 }">
     <!-- breadcrumb-flow -->
     <div class="breadcrumb-container">
       <nav class="breadcrumb-flow" aria-label="breadcrumb">
@@ -304,20 +304,15 @@ const getImageUrl = (path, id) => {
   if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
     return rawPath;
   }
-  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
-  const baseUrl = (api.defaults?.baseURL || import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api');
-  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  if (!rawPath) return '/brand/mastergas-icon.png';
+  const baseUrl = (api.defaults?.baseURL || import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api');
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
 const onImageError = (event, item) => {
   const target = event.target;
   if (!target) return;
-  if (item?.id && !target.src.includes(`prod_${item.id}.jpg`)) {
-    target.src = `/catalog_images/prod_${item.id}.jpg`;
-  } else if (!target.src.includes('product_ceramic_hob_60.png')) {
-    target.src = '/images/home/product_ceramic_hob_60.png';
-  }
+  target.src = '/brand/mastergas-icon.png';
 };
 
 const goToProduct = (product) => {
@@ -417,8 +412,8 @@ onMounted(() => {
 
 /* main-content-layout */
 .main-content-layout {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
   align-items: flex-start;
   padding: 0 64px 80px;
   gap: 32px;
@@ -442,6 +437,7 @@ onMounted(() => {
   border: 1px solid #E2E8F0;
   border-radius: 12px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 /* ملخص الطلب */
@@ -754,6 +750,8 @@ onMounted(() => {
   padding: 0px;
   gap: 24px;
   flex: 1;
+  min-width: 0;
+  width: 100%;
 }
 
 /* cart-table-card */
@@ -765,6 +763,7 @@ onMounted(() => {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
+  min-width: 0;
 }
 
 /* cart-item-row */
@@ -795,6 +794,7 @@ onMounted(() => {
   padding: 16px 0px;
   gap: 16px;
   width: 100%;
+  min-width: 0;
 }
 
 /* remove-btn */
@@ -1162,6 +1162,7 @@ onMounted(() => {
     margin-bottom: 20px;
   }
   .main-content-layout {
+    display: flex;
     flex-direction: column-reverse;
     padding: 0 24px 60px;
     gap: 24px;
@@ -1225,5 +1226,60 @@ onMounted(() => {
     line-height: 20px;
     height: auto;
   }
+}
+
+/* Empty cart — follows the Figma frame "mastergas-cart-empty":
+   breadcrumb-section  padding 24px 64px 8px, aligned to the right (start in RTL)
+   main-content-layout padding 40px 64px, one card (1312 wide, 331 tall) */
+.cart-page.is-empty {
+  padding: 120px 0 0; /* announcement bar 40 + header 80 */
+  min-height: 0; /* the footer follows the card (40px gap) as in the frame */
+  background: #F8FAFC;
+}
+.cart-page.is-empty .breadcrumb-container {
+  display: flex;
+  justify-content: flex-start; /* right edge in RTL, left edge in LTR */
+  align-items: flex-start;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 24px 64px 8px;
+}
+.cart-page.is-empty .main-content-layout.empty-layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 40px 64px;
+}
+.cart-page.is-empty .empty-state-card {
+  flex: 0 1 1312px;
+  margin: 0 auto;
+}
+@media (max-width: 1100px) {
+  .cart-page.is-empty .breadcrumb-container { padding: 24px 24px 8px; }
+  .cart-page.is-empty .main-content-layout.empty-layout { padding: 24px; }
+}
+@media (max-width: 1024px) {
+  /* <main> is already offset 100px below the fixed header; tablet headers are 120px tall */
+  .cart-page.is-empty { padding-top: 20px; }
+}
+@media (max-width: 768px) {
+  .cart-page.is-empty { padding-top: 0; } /* phone header is 100px tall */
+}
+@media (max-width: 480px) {
+  .cart-page.is-empty .breadcrumb-container { padding: 16px 16px 8px; }
+  .cart-page.is-empty .main-content-layout.empty-layout { padding: 16px; }
+}
+</style>
+
+<style>
+/* The site shell pins the footer to the bottom of the viewport; keep the grey
+   page colour of the empty cart in the space between the card and the footer. */
+.main-content:has(> .cart-page.is-empty) {
+  background: #F8FAFC;
 }
 </style>

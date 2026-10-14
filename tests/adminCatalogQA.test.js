@@ -668,8 +668,9 @@ test('SERVICE productAttributeService.update → PUT /v1/attributes/:id without 
   assert.deepEqual(Object.keys(body).sort(), ['name_ar', 'name_en', 'type']);
 });
 
-test('PAYLOAD discount: unsupported usage-limit fields are never sent to the API', () => {
-  const p = toDiscountPayload({ code: 'X', value: 5, max_uses: 100, max_per_customer: 2 });
-  assert.equal(Object.hasOwn(p, 'max_uses'), false);
+test('PAYLOAD discount: max_uses is sent as a number (null when empty); max_per_customer is never sent', () => {
+  const p = toDiscountPayload({ code: 'X', value: 5, max_uses: '100', max_per_customer: 2 });
+  assert.equal(p.max_uses, 100);
+  assert.equal(toDiscountPayload({ code: 'X', value: 5, max_uses: '' }).max_uses, null);
   assert.equal(Object.hasOwn(p, 'max_per_customer'), false);
 });

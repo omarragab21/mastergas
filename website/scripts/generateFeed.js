@@ -1,13 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-const API_BASE = process.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-const API_URL = `${API_BASE}/frontend/products?per_page=500`;
+const API_BASE = process.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api';
+const API_URL = `${API_BASE}/v1/site/products/all_products?per_page=500`;
 const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
 
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { timeout: 4000 }, (res) => {
+    const headers = { Accept: 'application/json', 'Accept-Language': 'ar' };
+    if (process.env.VITE_SITE_TOKEN) headers.Authorization = `Bearer ${process.env.VITE_SITE_TOKEN}`;
+    const req = https.get(url, { headers, timeout: 4000 }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -34,7 +36,7 @@ function escapeCSV(val) {
 }
 
 async function main() {
-  console.log('Fetching live products from backend public API (/frontend/products)...');
+  console.log('Fetching live products from Tijara Site API (/v1/site/products/all_products)...');
   let products = [];
   try {
     const resData = await fetchJSON(API_URL);
@@ -42,7 +44,7 @@ async function main() {
     products = Array.isArray(rawList) ? rawList : [];
     console.log(`Fetched ${products.length} live products successfully.`);
   } catch (err) {
-    console.warn('Could not fetch from live API:', err.message);
+    console.warn('Could not fetch from Tijara Site API:', err.message);
   }
 
   // Ensure public and public/feeds directory exist
@@ -55,7 +57,7 @@ async function main() {
   }
 
   const storeUrl = 'https://mastergas.sa';
-  const currency = 'JOD';
+  const currency = 'SAR';
 
   const csvHeaders = [
     'id',
@@ -72,17 +74,17 @@ async function main() {
 
   const csvRows = products.map(product => {
     const id = product.id;
-    const title = product.name_ar || product.name_en || product.name || `Product #${id}`;
-    const description = product.description_ar || product.description_en || product.description || title;
+    const title = product.translations?.ar?.name || product.translations?.en?.name || product.name || `Product #${id}`;
+    const description = product.translations?.ar?.product_description || product.translations?.en?.product_description || product.product_description || title;
     
-    const isAvailable = product.is_active !== false && product.is_active !== 0 && (product.quantity === undefined || product.quantity > 0);
+    const isAvailable = product.is_active !== false && product.is_active !== 0;
     const availability = isAvailable ? 'in stock' : 'out of stock';
     
     const numPrice = parseFloat(product.price || 0).toFixed(2);
     const priceFormatted = `${numPrice} ${currency}`;
     
     const link = `${storeUrl}/product/${id}`;
-    let imageLink = product.image_url || product.image || (Array.isArray(product.images) && product.images[0]) || '';
+    let imageLink = product.images?.find(image => image.is_primary)?.image_url || product.images?.[0]?.image_url || '';
     if (imageLink && !imageLink.startsWith('http')) {
       imageLink = `${storeUrl}${imageLink.startsWith('/') ? '' : '/'}${imageLink}`;
     }

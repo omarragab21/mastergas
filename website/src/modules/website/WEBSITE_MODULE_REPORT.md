@@ -36,7 +36,7 @@ The old `src/views/website` directory is no longer used and has been removed.
 
 - View contents and business behavior were copied without changing the existing Website flow.
 - Relative imports were adjusted only for the new module locations; runtime behavior and visual markup were preserved.
-- Local data mode remains enabled intentionally for testing; `src/data/localData.json` was not changed.
+- Catalog and order data now come from the authenticated Tijara Site API; the old local snapshot was removed.
 - The Product Details view now handles an unknown product ID safely instead of reading `category_id` from `null`.
 - Home category rendering is now composed through `src/modules/category`, including its carousel, service, composable, and styles.
 - Development payment logging no longer sends requests to a missing `__terminal_log` endpoint by default. A custom endpoint can be enabled with `VITE_TERMINAL_LOG_ENDPOINT` or `window.__MASTERGAS_TERMINAL_LOG_ENDPOINT__`.

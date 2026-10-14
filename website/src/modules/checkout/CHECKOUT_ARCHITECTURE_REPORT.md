@@ -42,7 +42,7 @@ Pinia is used for checkout state because it is the standard Vue 3 state-manageme
 - Mobile viewport: same flow passed.
 - Console errors: none observed.
 - Page identity: `http://127.0.0.1:5173/checkout`, title `ماسترجاز | Mastergas`.
-- Local data mode: preserved; `src/data/localData.json` was not changed.
+- Local catalog mode was removed; checkout now submits the Tijara Site order contract.
 
 ## Final verification
 

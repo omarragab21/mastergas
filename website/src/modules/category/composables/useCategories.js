@@ -1,11 +1,13 @@
 import { computed, ref } from 'vue';
 import { useLocalized } from '../../../composables/useLocalized';
-import { categories as fallbackCategories } from '../../../data/catalogData';
+import { authState } from '../../../store/auth';
 import { categoryService } from '../services/categoryService';
 
 export function useCategories() {
   const { currentLang, localized } = useLocalized();
   const rawCategories = ref([]);
+  // True until the first API answer (or immediately false when there is no session to ask with).
+  const categoriesLoading = ref(Boolean(authState.token));
 
   const displayCategories = computed(() => {
     if (!rawCategories.value.length) return [];
@@ -27,15 +29,21 @@ export function useCategories() {
   });
 
   const fetchCategories = async () => {
+    if (!authState.token) {
+      categoriesLoading.value = false;
+      return;
+    }
+    categoriesLoading.value = true;
     try {
-      const list = await categoryService.getCategories({ is_active: 1 });
-      rawCategories.value = Array.isArray(list) && list.length > 0 ? list : fallbackCategories;
+      const list = await categoryService.getCategoriesWithProductCounts({ is_active: 1 });
+      rawCategories.value = Array.isArray(list) ? list : [];
     } catch (error) {
       console.error('Failed to fetch categories from API:', error);
-      rawCategories.value = fallbackCategories;
+      rawCategories.value = [];
+    } finally {
+      categoriesLoading.value = false;
     }
   };
 
-  return { rawCategories, displayCategories, fetchCategories };
+  return { rawCategories, displayCategories, categoriesLoading, fetchCategories };
 }
-

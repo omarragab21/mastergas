@@ -2,8 +2,7 @@ import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocalized } from '../../../composables/useLocalized';
 import { isOfferActive } from '../../product/composables/useOffers';
-import { products as fallbackProducts, offers as fallbackOffers } from '../../../data/catalogData';
-import { offerService } from '../services/offerService';
+import { productService } from '../../product/services/productService';
 
 export function useOffersCatalog() {
   const router = useRouter();
@@ -18,7 +17,7 @@ export function useOffersCatalog() {
   const perPage = ref(9);
   const sortBy = ref('relevant');
   
-  const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api')
+  const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api')
     .replace(/\/api\/?$/, '');
   
   const normalizeOfferImage = (value) => {
@@ -157,14 +156,18 @@ export function useOffersCatalog() {
   
   const fetchOffers = async () => {
     try {
-      const list = await offerService.getOffers({ is_active: 1 });
-      const active = list.filter(isOfferActive);
-      offers.value = active.length > 0
-        ? active.map((offer) => ({ ...offer, image: normalizeOfferImage(offer.image) }))
-        : fallbackOffers;
+      const result = await productService.getProducts({ has_discount: 1, per_page: 50 });
+      offers.value = (result.items || []).filter(isOfferActive).map((product) => ({
+        ...product,
+        name: product.name,
+        name_i18n: product.name_i18n,
+        image: normalizeOfferImage(product.image),
+        value: product.discount_percentage,
+        type: 'percentage',
+      }));
     } catch (err) {
       console.error('Failed to fetch offers from API:', err);
-      offers.value = fallbackOffers;
+      offers.value = [];
     }
   };
   
@@ -174,12 +177,11 @@ export function useOffersCatalog() {
       loading.value = false;
     }, 4000);
     try {
-      const result = await offerService.getProducts({ per_page: 50, is_active: 1 });
-      const list = result.items;
-      allProducts.value = (Array.isArray(list) && list.length > 0) ? list : fallbackProducts;
+      const result = await productService.getProducts({ per_page: 50, is_active: 1 });
+      allProducts.value = Array.isArray(result.items) ? result.items : [];
     } catch (err) {
       console.error('Failed to fetch products for offers from API:', err);
-      allProducts.value = fallbackProducts;
+      allProducts.value = [];
     } finally {
       clearTimeout(safetyTimer);
       loading.value = false;
@@ -216,4 +218,3 @@ export function useOffersCatalog() {
     fetchProducts,
   };
 }
-

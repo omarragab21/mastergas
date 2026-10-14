@@ -639,20 +639,20 @@
                   <div class="order-info-meta">
                     <div class="info-meta-col">
                       <span class="info-meta-label">رقم الطلب</span>
-                      <span class="info-meta-val"><bdi dir="ltr">{{ selectedOrderDetails.orderNumber || '#MS-2024-00847' }}</bdi></span>
+                      <span class="info-meta-val"><bdi dir="ltr">{{ selectedOrderDetails.orderNumber || '—' }}</bdi></span>
                     </div>
 
                     <div class="info-meta-divider"></div>
 
                     <div class="info-meta-col">
                       <span class="info-meta-label">تاريخ الطلب</span>
-                      <span class="info-meta-val">{{ selectedOrderDetails.date || '26 أغسطس 2026' }}</span>
+                      <span class="info-meta-val">{{ selectedOrderDetails.date || '—' }}</span>
                     </div>
                   </div>
 
                   <!-- Status Badge on Left in RTL -->
                   <div class="order-status-badge" :style="{ background: selectedOrderDetails.statusColor || '#F59E1F' }">
-                    {{ selectedOrderDetails.statusLabel || 'قيد التوصيل' }}
+                    {{ selectedOrderDetails.statusLabel || '—' }}
                   </div>
                 </div>
               </div>
@@ -664,104 +664,24 @@
 
                 <!-- Timeline Stepper -->
                 <div class="timeline-row">
-                  <!-- Step 1: Received -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 13L9 17L19 7" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                  <template v-for="(step, index) in trackingSteps" :key="step.key">
+                    <div class="timeline-step" :class="getTrackingStepState(selectedOrderDetails, step.rank)">
+                      <div class="step-indicator-wrapper">
+                        <div class="step-indicator-circle" :class="getTrackingStepState(selectedOrderDetails, step.rank)">
+                          <i :class="getTrackingStepIcon(step, getTrackingStepState(selectedOrderDetails, step.rank))" :aria-label="step.label"></i>
+                        </div>
                       </div>
+                      <span class="step-title" :class="{ 'pending-text': getTrackingStepState(selectedOrderDetails, step.rank) === 'pending' }">
+                        {{ step.label }}
+                      </span>
+                      <span class="step-time">{{ getTrackingStepTime(selectedOrderDetails, step.rank) }}</span>
+                      <span v-if="step.note && getTrackingStepState(selectedOrderDetails, step.rank) === 'active'" class="step-note">{{ step.note }}</span>
                     </div>
-                    <span class="step-title">تم استلام الطلب</span>
-                    <span class="step-time">15 أغسطس 2024 • 10:30 ص</span>
-                  </div>
 
-                  <!-- Connector 1 -->
-                  <div class="timeline-connector">
-                    <div class="connector-bar"></div>
-                  </div>
-
-                  <!-- Step 2: Confirmed -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 13L9 17L19 7" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </div>
+                    <div v-if="index < trackingSteps.length - 1" class="timeline-connector">
+                      <div class="connector-bar" :class="{ dashed: getTrackingStepState(selectedOrderDetails, step.rank + 1) === 'pending' }"></div>
                     </div>
-                    <span class="step-title">تم تأكيد الطلب</span>
-                    <span class="step-time">15 أغسطس 2024 • 11:45 ص</span>
-                  </div>
-
-                  <!-- Connector 2 -->
-                  <div class="timeline-connector">
-                    <div class="connector-bar"></div>
-                  </div>
-
-                  <!-- Step 3: Preparing -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 13L9 17L19 7" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="step-title">جاري تجهيز الطلب</span>
-                    <span class="step-time">16 أغسطس 2024 • 09:00 ص</span>
-                  </div>
-
-                  <!-- Connector 3 -->
-                  <div class="timeline-connector">
-                    <div class="connector-bar"></div>
-                  </div>
-
-                  <!-- Step 4: Shipped -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 13L9 17L19 7" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="step-title">تم شحن الطلب</span>
-                    <span class="step-time">17 أغسطس 2024 • 02:15 م</span>
-                  </div>
-
-                  <!-- Connector 4 -->
-                  <div class="timeline-connector">
-                    <div class="connector-bar"></div>
-                  </div>
-
-                  <!-- Step 5: Transit (Active) -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle active">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: scaleX(-1);">
-                          <path d="M16 3H4C2.89543 3 2 3.89543 2 5V16C2 17.1046 2.89543 18 4 18H5M19 18H20C21.1046 18 22 17.1046 22 16V12.4142C22 11.8838 21.7893 11.3751 21.4142 11L18.5858 8.17157C18.2107 7.79651 17.702 7.58579 17.1716 7.58579H16V18ZM16 7.58579V18M16 11H21M8 18C8 19.6569 6.65685 21 5 21C3.34315 21 2 19.6569 2 18M19 18C19 19.6569 17.6569 21 16 21C14.3431 21 13 19.6569 13 18" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="step-title">الطلب في الطريق</span>
-                    <span class="step-time">18 أغسطس 2024 • 08:30 ص</span>
-                    <span class="step-note">طلبك في طريقه إليك</span>
-                  </div>
-
-                  <!-- Connector 5 (Dashed) -->
-                  <div class="timeline-connector">
-                    <div class="connector-bar dashed"></div>
-                  </div>
-
-                  <!-- Step 6: Delivered (Pending) -->
-                  <div class="timeline-step">
-                    <div class="step-indicator-wrapper">
-                      <div class="step-indicator-circle pending"></div>
-                    </div>
-                    <span class="step-title pending-text">تم التسليم</span>
-                  </div>
+                  </template>
                 </div>
               </div>
 
@@ -786,13 +706,13 @@
                   <!-- Product Details (Right in RTL) -->
                   <div class="col-prod-details">
                     <img
-                      :src="item.image || '/images/products/water_heater_thumb.jpg'"
+                      :src="item.image || '/brand/mastergas-icon.png'"
                       :alt="item.name"
                       class="prod-thumb-img"
                     />
                     <div class="prod-titles-col">
                       <span class="prod-main-name">{{ item.name }}</span>
-                      <span class="prod-model-num">{{ item.model || 'موديل: MWH-10G' }}</span>
+                      <span class="prod-model-num">{{ item.model || item.product_id || '—' }}</span>
                     </div>
                   </div>
 
@@ -831,7 +751,7 @@
                   <div class="summary-item-row">
                     <span class="summary-item-label">إجمالي المنتجات</span>
                     <div class="summary-item-val">
-                      <span>{{ selectedOrderDetails.subtotal || '8,247.00' }}</span>
+                      <span>{{ selectedOrderDetails.subtotal || '0.00' }}</span>
                       <svg class="riyal-icon-dark" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -842,14 +762,14 @@
                   <!-- Row 2: Shipping -->
                   <div class="summary-item-row">
                     <span class="summary-item-label">رسوم الشحن</span>
-                    <span class="summary-item-val free">{{ selectedOrderDetails.shipping || 'مجاني' }}</span>
+                  <span class="summary-item-val free">{{ selectedOrderDetails.shipping || '0.00' }}</span>
                   </div>
 
                   <!-- Row 3: Discount -->
                   <div class="summary-item-row">
                     <span class="summary-item-label">الخصم</span>
                     <div class="summary-item-val discount">
-                      <span>{{ selectedOrderDetails.discount || '-201.60' }}</span>
+                      <span>{{ selectedOrderDetails.discount || '0.00' }}</span>
                       <svg class="riyal-icon-red" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -864,7 +784,7 @@
                 <div class="summary-total-row">
                   <span class="summary-total-label">الإجمالي النهائي</span>
                   <div class="summary-total-val">
-                    <span>{{ selectedOrderDetails.total || '8,045.40' }}</span>
+                    <span>{{ selectedOrderDetails.total || '0.00' }}</span>
                     <svg class="riyal-icon-dark" width="16" height="16" viewBox="0 0 14 16" fill="currentColor">
                       <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                       <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -880,10 +800,10 @@
                   <h4 class="card-heading-md">عنوان التوصيل</h4>
                   <div class="card-divider-line"></div>
                   <div class="delivery-info-list">
-                    <span class="delivery-name">{{ selectedOrderDetails.recipientName || 'محمد أحمد' }}</span>
-                    <span class="delivery-detail">هاتف: {{ selectedOrderDetails.phone || '0501234567' }}</span>
-                    <span class="delivery-detail">{{ selectedOrderDetails.address || 'حي الحمراء، شارع الأمير سلطان، الرياض' }}</span>
-                    <span class="delivery-detail">الرمز البريدي: {{ selectedOrderDetails.postalCode || '12345' }}</span>
+                    <span class="delivery-name">{{ selectedOrderDetails.recipientName || '—' }}</span>
+                    <span class="delivery-detail">هاتف: {{ selectedOrderDetails.phone || '—' }}</span>
+                    <span class="delivery-detail">{{ selectedOrderDetails.address || '—' }}</span>
+                    <span class="delivery-detail">الرمز البريدي: {{ selectedOrderDetails.postalCode || '—' }}</span>
                   </div>
                 </div>
 
@@ -892,7 +812,7 @@
                   <h4 class="card-heading-md">طريقة الدفع</h4>
                   <div class="card-divider-line"></div>
                   <div class="payment-method-row">
-                    <span class="mada-badge">MADA</span>
+                    <span class="mada-badge">{{ selectedOrderDetails.paymentMethod === 'الدفع عند الاستلام' ? 'COD' : 'MADA' }}</span>
                     <span class="payment-method-text">{{ selectedOrderDetails.paymentMethod || 'مدى (mada) **** 4532' }}</span>
                   </div>
                 </div>
@@ -957,9 +877,10 @@
                   <!-- Right in RTL: Tax Invoice Meta -->
                   <div class="invoice-meta-block">
                     <h2 class="invoice-type-title">فاتورة ضريبية</h2>
-                    <span class="invoice-meta-row">رقم الفاتورة: {{ getInvoiceNumber(activeModalOrder || selectedOrderDetails) }}</span>
-                    <span class="invoice-meta-row">رقم الطلب: {{ (activeModalOrder || selectedOrderDetails)?.orderNumber || '#MS-2026-00847' }}</span>
-                    <span class="invoice-meta-row">التاريخ: {{ (activeModalOrder || selectedOrderDetails)?.date || '26 أغسطس 2026' }}</span>
+                    <span class="invoice-meta-row">رقم الفاتورة: {{ getInvoiceNumber(activeModalOrder || selectedOrderDetails) || '—' }}</span>
+                    <span class="invoice-meta-row">رقم الطلب: {{ (activeModalOrder || selectedOrderDetails)?.orderNumber || '—' }}</span>
+                    <span class="invoice-meta-row">التاريخ: {{ (activeModalOrder || selectedOrderDetails)?.date || '—' }}</span>
+                    <span class="invoice-meta-row">حالة الطلب: {{ (activeModalOrder || selectedOrderDetails)?.statusLabel || '—' }}</span>
                   </div>
 
                   <!-- Left in RTL: Logo & Legal info -->
@@ -1043,7 +964,7 @@
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.subtotal || '8,247.00' }}</span>
+                        <span>{{ (activeModalOrder || selectedOrderDetails)?.subtotal || '0.00' }}</span>
                       </div>
                     </div>
 
@@ -1054,7 +975,7 @@
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.tax || '1,075.70' }}</span>
+                        <span>{{ (activeModalOrder || selectedOrderDetails)?.tax || '0.00' }}</span>
                       </div>
                     </div>
 
@@ -1065,13 +986,13 @@
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.discount || '-201.60' }}</span>
+                        <span>{{ (activeModalOrder || selectedOrderDetails)?.discount || '0.00' }}</span>
                       </div>
                     </div>
 
                     <div class="summary-breakdown-row">
                       <span class="breakdown-label">الشحن التوصيل</span>
-                      <span class="breakdown-val free-val">{{ (activeModalOrder || selectedOrderDetails)?.shipping || 'مجاني' }}</span>
+                      <span class="breakdown-val free-val">{{ (activeModalOrder || selectedOrderDetails)?.shipping || '0.00' }}</span>
                     </div>
 
                     <div class="summary-box-line"></div>
@@ -1083,7 +1004,7 @@
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.total || '8,045.40' }}</span>
+                        <span>{{ (activeModalOrder || selectedOrderDetails)?.total || '0.00' }}</span>
                       </div>
                     </div>
                   </div>
@@ -1095,7 +1016,7 @@
                 <!-- 7. Bottom Footer Bar -->
                 <div class="invoice-footer-frame">
                   <span class="invoice-thanks-note">نشكركم لثقتكم واختياركم أجهزة ماستر غاز</span>
-                  <span class="invoice-payment-method">طريقة الدفع: {{ ((activeModalOrder || selectedOrderDetails)?.paymentMethod || 'بطاقة ائتمان **** 4532').replace('مدى (mada)', 'بطاقة ائتمان') }}</span>
+                  <span class="invoice-payment-method">طريقة الدفع: {{ ((activeModalOrder || selectedOrderDetails)?.paymentMethod || 'غير محدد').replace('مدى (mada)', 'بطاقة ائتمان') }}</span>
                 </div>
               </div>
 
@@ -1636,28 +1557,28 @@
 
         <div class="modal-body-content">
           <div class="tracking-timeline-v3">
-            <div class="track-step active">
+            <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 2) }">
               <div class="step-dot"><i class="fas fa-check"></i></div>
               <div class="step-details">
                 <span class="step-title">تم تأكيد الطلب</span>
-                <span class="step-time">{{ activeModalOrder.date }} - 10:30 ص</span>
+                <span class="step-time">{{ activeModalOrder.date || '—' }}</span>
               </div>
             </div>
-            <div class="track-step active">
+            <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 3) }">
               <div class="step-dot"><i class="fas fa-check"></i></div>
               <div class="step-details">
                 <span class="step-title">جاري التجهيز والتعبئة</span>
-                <span class="step-time">{{ activeModalOrder.date }} - 02:15 م</span>
+                <span class="step-time">{{ activeModalOrder.date || '—' }}</span>
               </div>
             </div>
-            <div class="track-step active">
+            <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 5) }">
               <div class="step-dot"><i class="fas fa-truck"></i></div>
               <div class="step-details">
                 <span class="step-title">خرج مع المندوب للتوصيل</span>
                 <span class="step-time">الطلب في الطريق إلى عنوانك</span>
               </div>
             </div>
-            <div class="track-step" :class="{ active: ['delivered', 'completed'].includes((activeModalOrder.status || '').toLowerCase()) }">
+            <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 6) }">
               <div class="step-dot"><i class="fas fa-home"></i></div>
               <div class="step-details">
                 <span class="step-title">تم التسليم بنجاح</span>
@@ -1722,7 +1643,6 @@ import { useOffers } from '../../product/composables/useOffers'
 import { useLocalized } from '../../../composables/useLocalized'
 import { useSettings } from '../../../composables/useSettings'
 import { findCountryByCode } from '../../../data/countries'
-import { products as fallbackProducts } from '../../../data/catalogData'
 import { escapeHtml } from '../../../utils/sanitize'
 import { useProfileStore } from '../store/profileStore'
 
@@ -1772,38 +1692,47 @@ const wishlistCount = computed(() => wishlistItems.value.length)
 const ordersTotalCount = computed(() => ordersList.value.length)
 const notifCount = ref(0) // Default to 0, no longer hardcoded
 
+const ORDER_STATUS_META = {
+  pending: { label: 'قيد المراجعة', color: '#64748B', canTrack: true, rank: 1 },
+  confirmed: { label: 'تم تأكيد الطلب', color: '#2563EB', canTrack: true, rank: 2 },
+  paid_confirmed: { label: 'تم تأكيد الدفع', color: '#2563EB', canTrack: true, rank: 2 },
+  processing: { label: 'قيد التجهيز', color: '#F59E0B', canTrack: true, rank: 3 },
+  shipped: { label: 'تم الشحن', color: '#F59E0B', canTrack: true, rank: 4 },
+  shipping: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
+  delivering: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
+  in_delivery: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
+  delivered: { label: 'مكتملة', color: '#10B981', canTrack: false, rank: 6 },
+  completed: { label: 'مكتملة', color: '#10B981', canTrack: false, rank: 6 },
+  cancelled: { label: 'ملغاة', color: '#EF4444', canTrack: false, rank: 0 },
+  failed: { label: 'فشل الطلب', color: '#EF4444', canTrack: false, rank: 0 },
+  returned: { label: 'مرتجع', color: '#8B5CF6', canTrack: false, rank: 0 },
+  refunded: { label: 'مسترد', color: '#8B5CF6', canTrack: false, rank: 0 },
+}
+
+const DEFAULT_ORDER_STATUS = ORDER_STATUS_META.pending
+
 const activeOrdersCountText = computed(() => {
-  const active = ordersList.value.filter(o => !['delivered', 'cancelled', 'completed'].includes(o.status))
-  return active.length > 0 ? `${active.length} طلبات` : '3 طلبات'
+  const active = ordersList.value.filter(o => !['delivered', 'cancelled', 'completed', 'failed', 'returned', 'refunded'].includes(o.status))
+  return `${active.length} طلبات`
 })
 
 const addressesCountText = computed(() => {
   if (addressesList.value.length > 0) {
     return addressesList.value.length === 1 ? '1 عنوان' : `${addressesList.value.length} عنوان`
   }
-  return '2 عنوان'
+  return '0 عنوان'
 })
 
 const formatDateArabic = (date) => {
-  if (!date) return '25 أغسطس 2024'
+  if (!date) return ''
   const d = new Date(date)
   if (isNaN(d.getTime())) return date
   return d.toLocaleDateString('ar-SA', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const formatStatusLabel = (s) => {
-  const map = {
-    pending: 'قيد المراجعة',
-    paid_confirmed: 'تم تأكيد الدفع',
-    processing: 'قيد التجهيز',
-    shipped: 'قيد التوصيل',
-    delivering: 'قيد التوصيل',
-    in_delivery: 'قيد التوصيل',
-    delivered: 'مكتملة',
-    completed: 'مكتملة',
-    cancelled: 'ملغية'
-  }
-  return map[s] || s || 'قيد التوصيل'
+  const status = String(s || 'pending').toLowerCase()
+  return ORDER_STATUS_META[status]?.label || status
 }
 
 const recentOrders = computed(() => {
@@ -1823,24 +1752,7 @@ const recentOrders = computed(() => {
       }
     })
   }
-  return [
-    {
-      id: 'mock-1',
-      orderNumber: '#MG-2024-00847',
-      date: '25 أغسطس 2024',
-      total: '8,045.40',
-      statusLabel: 'قيد التوصيل',
-      statusType: 'status-delivering',
-    },
-    {
-      id: 'mock-2',
-      orderNumber: '#MG-2024-00831',
-      date: '18 أغسطس 2024',
-      total: '2,499',
-      statusLabel: 'مكتملة',
-      statusType: 'status-completed',
-    }
-  ]
+  return []
 })
 
 const viewOrderDetails = (order) => {
@@ -1861,8 +1773,8 @@ const showCurrentPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-const displayUserName = computed(() => form.name || authState.user?.name || authState.user?.full_name || 'محمد أحمد')
-const displayUserEmail = computed(() => form.email || authState.user?.email || 'mohammed@example.com')
+const displayUserName = computed(() => form.name || authState.user?.name || authState.user?.full_name || '')
+const displayUserEmail = computed(() => form.email || authState.user?.email || '')
 const displayUserPhone = computed(() => form.phone || authState.user?.phone || '0501234567')
 
 const startEditingProfile = () => {
@@ -1950,70 +1862,12 @@ const localizedCountryName = computed(() => {
   return form.country || (locale.value === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia');
 });
 
-// Data Lists
-const defaultMockAddresses = [
-  {
-    id: 1,
-    name: 'أحمد الحربي',
-    full_name: 'أحمد الحربي',
-    phone: '0557654321',
-    city: 'جدة، القصيم',
-    address: 'شارع حراء قيد 18أ',
-    is_default: true
-  },
-  {
-    id: 2,
-    name: 'عبدالله القحطاني',
-    full_name: 'عبدالله القحطاني',
-    phone: '0501234567',
-    city: 'الرياض، الياسمين',
-    address: 'حي الحمراء شارع الأمير سلطان، الدور الثاني',
-    is_default: false
-  },
-  {
-    id: 3,
-    name: 'محمد أحمد',
-    full_name: 'محمد أحمد',
-    phone: '0559876543',
-    city: 'جدة',
-    address: 'المنطقة، شارع المدينة، قرية رقم 15',
-    is_default: false
-  }
-]
-addressesList.value = [...defaultMockAddresses]
-const defaultWishlistImages = [
-  '/images/products/oven_main.jpg',
-  '/images/products/gas_stove_thumb.jpg',
-  '/images/products/water_heater_thumb.jpg',
-  '/images/products/dishwasher_thumb.jpg'
-]
+// Data lists come from the Site APIs. Empty lists are rendered as empty states.
+addressesList.value = []
 
-const defaultMockWishlist = fallbackProducts.slice(0, 4).map((product, index) => ({
-  ...product,
-  image: defaultWishlistImages[index],
-  quantity: product.stock || 1
-}))
-
-const wishlistItems = computed(() => {
-  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
-    return defaultMockWishlist
-  }
-  return cartState.wishlist
-})
-
-const ensureMockWishlist = () => {
-  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
-    cartState.wishlist = [...defaultMockWishlist]
-    cartState.saveWishlist()
-  }
-}
+const wishlistItems = computed(() => cartState.wishlist)
 
 const removeFromWishlist = (product) => {
-  if (route.query.mockAuth === 'true' && cartState.wishlist.length === 0) {
-    cartState.wishlist = defaultMockWishlist.filter(item => item.id !== product.id)
-    cartState.saveWishlist()
-    return
-  }
   cartState.toggleWishlist(product)
 }
 
@@ -2032,45 +1886,7 @@ const selectDefaultAddress = async (addr) => {
     console.error('Failed to update default address:', e)
   }
 }
-const defaultMockNotifications = [
-  {
-    id: 1,
-    title: 'تم تسليم طلبك #MG-2024-00847',
-    time: 'اليوم، 2:30 م',
-    is_read: true,
-    orderId: 'MG-2024-00847'
-  },
-  {
-    id: 2,
-    title: 'طلبك خرج للتوصيل #MG-2024-00921',
-    time: 'اليوم، 11:15 ص',
-    is_read: false,
-    orderId: 'MG-2024-00921'
-  },
-  {
-    id: 3,
-    title: 'تم تأكيد طلبك #MG-2024-00921',
-    time: 'أمس، 4:45 م',
-    is_read: false,
-    orderId: 'MG-2024-00921'
-  },
-  {
-    id: 4,
-    title: 'طلبك قيد التجهيز #MG-2024-00847',
-    time: '25 أغسطس 2024',
-    is_read: true,
-    orderId: 'MG-2024-00847'
-  },
-  {
-    id: 5,
-    title: 'تم تأكيد طلبك #MG-2024-00847',
-    time: '21 أغسطس 2024',
-    is_read: true,
-    orderId: 'MG-2024-00847'
-  }
-]
-
-notificationsList.value = [...defaultMockNotifications]
+notificationsList.value = []
 const orderTab = ref('current')
 const expandedOrders = ref([])
 
@@ -2084,32 +1900,7 @@ const markNotificationAsRead = async (notif) => {
   notifCount.value = profileStore.notificationCount
 }
 
-// Returns State
-const defaultMockReturns = [
-  {
-    id: 'return-preview-1',
-    returnNumber: 'MG-R-2026-0012',
-    status: 'processing',
-    productName: 'سخان مياه غاز ماستر 10 لتر',
-    productImage: '/images/products/water_heater_thumb.jpg',
-    orderNumber: '#MG-2024-00847',
-    reason: 'المنتج لا يعمل بالشكل المتوقع',
-    refundAmount: '1,299.00',
-    date: '2026-08-28'
-  },
-  {
-    id: 'return-preview-2',
-    returnNumber: 'MG-R-2026-0009',
-    status: 'refunded',
-    productName: 'غسالة أطباق ماستر 14 مكان',
-    productImage: '/images/products/dishwasher_thumb.jpg',
-    orderNumber: '#MG-2024-00831',
-    reason: 'تغيير في الطلب قبل الاستخدام',
-    refundAmount: '2,450.00',
-    date: '2026-08-21'
-  }
-]
-returnsList.value = [...defaultMockReturns]
+returnsList.value = []
 const showReturnForm = ref(false)
 const returnStep = ref(1)
 const selectedOrderForReturn = ref(null)
@@ -2240,119 +2031,50 @@ const activeModalOrder = ref(null)
 const selectedOrderDetails = ref(null)
 const isViewingInvoiceDetails = ref(false)
 
-const defaultMockOrders = [
-  {
-    id: 'mock-1',
-    orderNumber: '#MS-2024-00847',
-    date: '26 أغسطس 2026',
-    status: 'in_delivery',
-    statusLabel: 'قيد التوصيل',
-    statusColor: '#F59E1F',
-    productsCount: 3,
-    productsCountText: '3 منتجات',
-    subtitle: 'شامل جميع رسوم الشحن والضمان',
-    subtotal: '8,247.00',
-    shipping: 'مجاني',
-    discount: '-201.60',
-    total: '8,045.40',
-    canTrack: true,
-    recipientName: 'محمد أحمد',
-    phone: '0501234567',
-    address: 'حي الحمراء، شارع الأمير سلطان، الرياض',
-    postalCode: '12345',
-    paymentMethod: 'مدى (mada) **** 4532',
-    items: [
-      {
-        id: 1,
-        name: 'سخان مياه غاز ماستر 10 لتر',
-        model: 'موديل: MWH-10G',
-        quantity: 2,
-        unitPrice: '1,299.00',
-        totalPrice: '2,598.00',
-        image: '/images/products/water_heater_thumb.jpg'
-      },
-      {
-        id: 2,
-        name: 'غسالة أطباق ماستر 14 مكان',
-        model: 'موديل: MDW-14S',
-        quantity: 1,
-        unitPrice: '2,450.00',
-        totalPrice: '2,450.00',
-        image: '/images/products/dishwasher_thumb.jpg'
-      },
-      {
-        id: 3,
-        name: 'فرن غاز ماستر 5 شعلات',
-        model: 'موديل: MGR-5B',
-        quantity: 1,
-        unitPrice: '3,199.00',
-        totalPrice: '3,199.00',
-        image: '/images/products/gas_stove_thumb.jpg'
-      }
-    ]
-  },
-  {
-    id: 'mock-2',
-    orderNumber: '#MG-2024-00831',
-    date: '18 أغسطس 2026',
-    status: 'completed',
-    statusLabel: 'مكتملة',
-    statusColor: '#10B981',
-    productsCount: 1,
-    productsCountText: '1 منتج',
-    subtitle: 'شامل جميع رسوم الشحن والضمان',
-    total: '2,499',
-    canTrack: false,
-    items: [
-      { id: 3, name: 'صمام أمان ماسترجاز الذكي', quantity: 1, price: 2499 }
-    ]
-  },
-  {
-    id: 'mock-3',
-    orderNumber: '#MG-2024-00819',
-    date: '15 أغسطس 2026',
-    status: 'processing',
-    statusLabel: 'قيد التنفيذ',
-    statusColor: '#64748B',
-    productsCount: 2,
-    productsCountText: '2 منتجات',
-    subtitle: 'شامل جميع رسوم الشحن والضمان',
-    total: '3,198',
-    canTrack: false,
-    items: [
-      { id: 4, name: 'مقياس تدفق الغاز الدقيق', quantity: 2, price: 1599 }
-    ]
-  },
-  {
-    id: 'mock-4',
-    orderNumber: '#MG-2024-00795',
-    date: '9 أغسطس 2026',
-    status: 'completed',
-    statusLabel: 'مكتملة',
-    statusColor: '#10B981',
-    productsCount: 1,
-    productsCountText: '1 منتج',
-    subtitle: 'شامل جميع رسوم الشحن والضمان',
-    total: '1,250',
-    canTrack: false,
-    items: [
-      { id: 5, name: 'كاشف تسريب الغاز الرقمي', quantity: 1, price: 1250 }
-    ]
-  }
+const getOrderStatusMeta = (status) => {
+  const normalized = String(status || 'pending').toLowerCase()
+  return ORDER_STATUS_META[normalized] || DEFAULT_ORDER_STATUS
+}
+
+const isTrackingStepActive = (order, step) => {
+  return getTrackingRank(order) >= step
+}
+
+const trackingSteps = [
+  { key: 'received', rank: 1, label: 'تم استلام الطلب', icon: 'fas fa-inbox', dateField: 'created_at' },
+  { key: 'confirmed', rank: 2, label: 'تم تأكيد الطلب', icon: 'fas fa-clipboard-check', dateField: 'paymentTime' },
+  { key: 'processing', rank: 3, label: 'تم تجهيز الطلب', icon: 'fas fa-box-open', dateField: 'updatedAt' },
+  { key: 'shipped', rank: 4, label: 'تم الشحن', icon: 'fas fa-box', dateField: 'shippedAt' },
+  { key: 'transit', rank: 5, label: 'الطلب في الطريق', icon: 'fas fa-truck', dateField: 'shippedAt', note: 'طلبك في طريقه إليك' },
+  { key: 'delivered', rank: 6, label: 'تم الاستلام', icon: 'fas fa-house', dateField: 'deliveredAt' },
 ]
 
-const getOrderStatusMeta = (status) => {
-  const s = (status || '').toLowerCase()
-  if (['in_delivery', 'shipping', 'shipped'].includes(s)) {
-    return { label: 'قيد التوصيل', color: '#F59E1F', canTrack: true }
-  }
-  if (['delivered', 'completed'].includes(s)) {
-    return { label: 'مكتملة', color: '#10B981', canTrack: false }
-  }
-  if (['cancelled'].includes(s)) {
-    return { label: 'ملغاة', color: '#EF4444', canTrack: false }
-  }
-  return { label: 'قيد التنفيذ', color: '#64748B', canTrack: false }
+const getTrackingStepState = (order, step) => {
+  const rank = getTrackingRank(order)
+  if (rank >= step) return rank === step ? 'active' : 'completed'
+  return 'pending'
+}
+
+const getTrackingStepIcon = (step, state) => state === 'pending' ? step.icon : 'fas fa-check'
+
+const getTrackingRank = (order) => {
+  const status = String(order?.status || 'pending').toLowerCase()
+  const statusRank = ORDER_STATUS_META[status]?.rank || 0
+  if (statusRank > 0) return statusRank
+  if (order?.deliveredAt) return 6
+  if (order?.shippedAt) return 5
+  return order?.created_at || order?.date ? 1 : 0
+}
+
+const getTrackingStepTime = (order, step) => {
+  const definition = trackingSteps.find((item) => item.rank === step)
+  if (!definition || getTrackingStepState(order, step) === 'pending') return 'لم تبدأ بعد'
+
+  const rank = getTrackingRank(order)
+  const rawDate = order?.[definition.dateField]
+    || (step === 1 ? order?.date : null)
+    || (rank >= step ? order?.updatedAt : null)
+  return formatDateArabic(rawDate) || order?.date || '—'
 }
 
 const formatProductsCount = (count) => {
@@ -2368,6 +2090,12 @@ const allOrdersMapped = computed(() => {
       const meta = getOrderStatusMeta(o.status)
       const items = o.items || o.products || []
       const count = items.length || 1
+      const mappedItems = items.map(item => ({
+        ...item,
+        name: item.name || item.product?.name || 'منتج',
+        unitPrice: formatPrice(item.price || item.unit_price || 0),
+        totalPrice: formatPrice(item.total || item.total_price || (Number(item.price || item.unit_price || 0) * (item.quantity || 1))),
+      }))
       return {
         id: o.id,
         orderNumber: o.orderNumber || o.order_number || ('#MG-' + o.id),
@@ -2380,11 +2108,28 @@ const allOrdersMapped = computed(() => {
         subtitle: 'شامل جميع رسوم الشحن والضمان',
         total: formatPrice(o.total_amount || o.total || 0),
         canTrack: meta.canTrack,
+        items: mappedItems,
+        recipientName: authState.user?.name || '',
+        phone: authState.user?.phone_number || authState.user?.phone || '',
+        address: o.shipping_address || '',
+        paymentMethod: o.payment_method === 'cash_on_delivery'
+          ? 'الدفع عند الاستلام'
+          : (o.payment_method || ''),
+        paymentTime: o.payment_time,
+        shippedAt: o.shipped_at,
+        deliveredAt: o.delivered_at,
+        estimatedDelivery: o.estimated_delivery,
+        updatedAt: o.updated_at,
+        created_at: o.created_at,
+        subtotal: formatPrice(o.subtotal || 0),
+        tax: formatPrice(o.tax || 0),
+        shipping: formatPrice(o.shipping || 0),
+        discount: formatPrice(o.discount || 0),
         raw: o
       }
     })
   }
-  return defaultMockOrders
+  return []
 })
 
 const filteredOrders = computed(() => {
@@ -2430,20 +2175,7 @@ const openTrackingModal = (order) => {
 
 const openOrderDetails = (order) => {
   if (!order) return
-  if (!order.items || order.items.length === 0 || !order.items[0].unitPrice) {
-    selectedOrderDetails.value = {
-      ...defaultMockOrders[0],
-      ...order,
-      orderNumber: order.orderNumber || '#MS-2024-00847',
-      date: order.date || '26 أغسطس 2026',
-      status: order.status || 'in_delivery',
-      statusLabel: order.statusLabel || 'قيد التوصيل',
-      statusColor: order.statusColor || '#F59E1F',
-      total: order.total || '8,045.40'
-    }
-  } else {
-    selectedOrderDetails.value = order
-  }
+  selectedOrderDetails.value = order
   isViewingInvoiceDetails.value = false
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -2468,31 +2200,31 @@ const closeInvoiceDetails = () => {
 }
 
 const getInvoiceNumber = (order) => {
-  if (!order) return 'INV-2026-00847'
+  if (!order) return ''
   if (order.invoiceNumber) return order.invoiceNumber
   if (order.orderNumber) {
     return order.orderNumber.replace('#MS-', 'INV-').replace('#MG-', 'INV-')
   }
-  return 'INV-2026-00847'
+  return ''
 }
 
 const getCustomerName = (order) => {
-  if (!order) return 'محمد أحمد'
-  return order.recipientName || order.customerName || (order.shippingAddress && order.shippingAddress.fullName) || 'محمد أحمد'
+  if (!order) return authState.user?.name || ''
+  return order.recipientName || order.customerName || (order.shippingAddress && order.shippingAddress.fullName) || authState.user?.name || ''
 }
 
 const getCustomerPhone = (order) => {
-  if (!order) return '0501234567'
-  return order.phone || order.customerPhone || (order.shippingAddress && order.shippingAddress.phone) || '0501234567'
+  if (!order) return authState.user?.phone_number || authState.user?.phone || ''
+  return order.phone || order.customerPhone || (order.shippingAddress && order.shippingAddress.phone) || authState.user?.phone_number || authState.user?.phone || ''
 }
 
 const getCustomerEmail = (order) => {
-  if (!order) return 'mohammed@email.com'
-  return order.email || order.customerEmail || 'mohammed@email.com'
+  if (!order) return authState.user?.email || ''
+  return order.email || order.customerEmail || authState.user?.email || ''
 }
 
 const getDeliveryStreet = (order) => {
-  if (!order) return 'حي الحمراء، شارع الأمير سلطان، الرياض 12345'
+  if (!order) return ''
   if (order.address) {
     if (!order.address.includes('12345') && order.postalCode) {
       return `${order.address} ${order.postalCode}`
@@ -2508,32 +2240,30 @@ const getDeliveryStreet = (order) => {
     ].filter(Boolean)
     if (parts.length > 0) return parts.join('، ')
   }
-  return 'حي الحمراء، شارع الأمير سلطان، الرياض 12345'
+  return ''
 }
 
 const getDeliveryCountry = (order) => {
-  if (!order) return 'المملكة العربية السعودية'
+  if (!order) return ''
   if (order.shippingAddress && order.shippingAddress.country) {
     const c = order.shippingAddress.country
     return (c === 'SA' || c === 'SAUDI ARABIA') ? 'المملكة العربية السعودية' : c
   }
-  return 'المملكة العربية السعودية'
+  return ''
 }
 
 const getInvoiceProducts = (order) => {
-  if (!order) {
-    return defaultMockOrders[0].items
-  }
+  if (!order) return []
   const items = order.items || (order.raw && (order.raw.items || order.raw.products)) || []
   if (items.length > 0) {
     return items.map(item => ({
       name: item.name || item.product?.name || 'منتج ماستر غاز',
       quantity: item.quantity || 1,
-      unitPrice: item.unitPrice || (typeof item.price === 'number' ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (item.price || '1,299.00')),
-      totalPrice: item.totalPrice || ((Number(String(item.unitPrice || item.price || 1299).replace(/[^0-9.]/g, '')) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+      unitPrice: item.unitPrice || (Number(item.price || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      totalPrice: item.totalPrice || ((Number(item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
     }))
   }
-  return defaultMockOrders[0].items
+  return []
 }
 
 const printInvoiceCard = () => {
@@ -2627,9 +2357,6 @@ watch(() => authState.user, (u) => {
 const fetchData = async () => {
   if (!authState.token && !route.query.mockAuth) return router.push('/')
   const user = await profileStore.load({
-    fallbackAddresses: defaultMockAddresses,
-    fallbackReturns: defaultMockReturns,
-    fallbackNotifications: defaultMockNotifications,
     localized,
     formatDate,
   })
@@ -2644,7 +2371,6 @@ onMounted(async () => {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
-  ensureMockWishlist()
   fetchSettings()
   if (currentTab.value === 'wallet') {
     fetchWallet()
@@ -2653,13 +2379,16 @@ onMounted(async () => {
   fetchOffers()
   if (currentTab.value === 'orders' && (route.query.details === 'true' || route.query.orderId)) {
     const match = allOrdersMapped.value.find(o => o.id == route.query.orderId || o.orderNumber == route.query.orderId)
-    openOrderDetails(match || defaultMockOrders[0])
+    if (match) openOrderDetails(match)
     if (route.query.invoice === 'true' || route.query.invoice === '1') {
-      openInvoiceFromDetails()
+      if (match) openInvoiceFromDetails()
     }
   } else if (route.query.invoice === 'true' || route.query.invoice === '1') {
-    openOrderDetails(defaultMockOrders[0])
-    openInvoiceFromDetails()
+    const firstOrder = allOrdersMapped.value[0]
+    if (firstOrder) {
+      openOrderDetails(firstOrder)
+      openInvoiceFromDetails()
+    }
   }
   if (route.query.changePassword === 'true' || route.query.changePassword === '1') {
     openChangePasswordModal()
@@ -2667,7 +2396,7 @@ onMounted(async () => {
   if (route.query.addAddress === 'true' || route.query.addAddress === '1') {
     openAddAddress()
   } else if (route.query.editAddress === 'true' || route.query.editAddress === '1') {
-    editAddress(defaultMockAddresses[0])
+    editAddress(addressesList.value[0])
   }
 })
 
@@ -2681,7 +2410,8 @@ watch(() => route.query.tab, (newTab) => {
     selectedOrderDetails.value = null
     isViewingInvoiceDetails.value = false
   } else if (route.query.details === 'true') {
-    openOrderDetails(defaultMockOrders[0])
+    const firstOrder = allOrdersMapped.value[0]
+    if (firstOrder) openOrderDetails(firstOrder)
   }
   if (newTab === 'wallet') {
     fetchWallet()
@@ -3161,12 +2891,11 @@ const submitRating = async () => {
 }
 
 const getImageUrl = (i) => {
-  if (!i) return '/images/home/product_ceramic_hob_60.png';
+  if (!i) return '/brand/mastergas-icon.png';
   const p = typeof i === 'object' ? (i.image_path || i.image || i.url || '') : i;
-  if (!p) return '/images/home/product_ceramic_hob_60.png';
+  if (!p) return '/brand/mastergas-icon.png';
   if (typeof p === 'string' && (p.startsWith('http') || p.startsWith('/'))) return p;
-  if (typeof p === 'string' && p.includes('catalog_images')) return `/${p.replace(/^\//, '')}`;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api';
   return `${baseUrl.replace('/api', '')}/storage/${p}`;
 };
 </script>
@@ -4840,12 +4569,26 @@ html[dir="ltr"] .input-relative select {
   border-radius: 20px;
 }
 
+.step-indicator-circle.completed {
+  background: #10B981;
+}
+
+.step-indicator-circle i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.step-indicator-circle.active i {
+  font-size: 16px;
+}
+
 .step-indicator-circle.pending {
   width: 32px;
   height: 32px;
   background: transparent;
   border: 2px solid #E2E8F0;
   border-radius: 16px;
+  color: #CBD5E1;
 }
 
 .step-title {

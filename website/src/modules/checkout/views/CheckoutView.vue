@@ -140,25 +140,13 @@
                   <!-- City (المدينة) - Right column in RTL -->
                   <div class="field-group field-type">
                     <label class="field-label">المدينة</label>
-                    <div class="select-wrapper">
-                      <select 
-                        v-model="customerInfo.city_id" 
-                        class="form-select-custom select-bg-white"
-                        :class="{ 'is-placeholder': !customerInfo.city_id }"
-                        @change="onCityChange"
-                        required
-                      >
-                        <option value="" disabled selected>اختر المدينة</option>
-                        <option v-for="c in citiesList" :key="c.id" :value="c.id">
-                          {{ c.name }}
-                        </option>
-                      </select>
-                      <div class="select-arrow-icon arrow-black">
-                        <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M1 1L6 6L11 1" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
+                    <input
+                      v-model="customerInfo.city"
+                      type="text"
+                      class="form-input"
+                      placeholder="اكتب المدينة"
+                      required
+                    />
                   </div>
                 </div>
 
@@ -185,18 +173,6 @@
                   ></textarea>
                 </div>
 
-                <!-- checkbox-row -->
-                <div class="checkbox-row">
-                  <label class="checkbox-label" @click.prevent="saveToMyAddresses = !saveToMyAddresses">
-                    <span class="checkbox-text">حفظ هذا العنوان في عناويني</span>
-                    <span class="checkbox-box-custom" :class="{ checked: saveToMyAddresses }">
-                      <svg v-if="saveToMyAddresses" width="10" height="8" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4L3.8 7L9 1" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  </label>
-                </div>
-
                 <!-- primary-button: متابعة -->
                 <button type="submit" class="submit-continue-btn">
                   متابعة
@@ -209,7 +185,7 @@
           <div v-if="currentStep === 3" class="step-payment-step fadeIn">
             <div class="payment-content-area">
               <!-- Card 1: Wallet -->
-              <div 
+              <div v-if="false"
                 class="payment-method-card" 
                 :class="{ active: useWallet }" 
                 @click="useWallet = !useWallet"
@@ -267,7 +243,7 @@
               </div>
 
               <!-- Card 3: Credit Card -->
-              <div 
+              <div v-if="false"
                 class="payment-method-card card-credit" 
                 :class="{ active: selectedPayment === 'card' }" 
                 @click="selectedPayment = 'card'"
@@ -746,17 +722,13 @@ const { roundMoney, getItemPriceWithDiscount, getItemUnitPrice } = useCheckoutPr
 });
 
 const {
-  citiesList,
   displayAddresses,
   selectAddress,
   switchToSavedAddresses,
   switchToOtherRecipient,
   switchToNewAddress,
-  onCityChange,
   fetchUserData,
   fetchSettings,
-  fetchCountries,
-  fetchCities,
   fetchCityShippingRate,
   fetchWalletBalance,
   handlePageShow,
@@ -785,41 +757,10 @@ const {
 
 
 const handleAddressSubmit = async () => {
-  if (!customerInfo.value.name || !customerInfo.value.phone || !customerInfo.value.address || !customerInfo.value.city_id) {
+  if (!customerInfo.value.name || !customerInfo.value.phone || !customerInfo.value.address || !customerInfo.value.city) {
     alert(t('checkout.required_fields'));
     return;
   }
-  
-  if (saveToMyAddresses.value) {
-    const cityName = citiesList.value.find(c => String(c.id) === String(customerInfo.value.city_id))?.name || customerInfo.value.city || 'الرياض';
-    const newAddr = {
-      id: Date.now(),
-      name: customerInfo.value.name,
-      full_name: customerInfo.value.name,
-      recipient_name: customerInfo.value.name,
-      phone: customerInfo.value.phone,
-      city: cityName,
-      city_id: customerInfo.value.city_id,
-      address: customerInfo.value.address,
-      notes: customerInfo.value.notes,
-      is_default: false
-    };
-    savedAddresses.value.unshift(newAddr);
-    selectedAddressId.value = newAddr.id;
-    try {
-      await checkoutService.addAddress({
-        name: newAddr.name,
-        full_name: newAddr.name,
-        phone: newAddr.phone,
-        city_id: newAddr.city_id,
-        city: newAddr.city,
-        address: newAddr.address
-      });
-    } catch {
-      // fallback
-    }
-  }
-
   await nextStep();
 };
 
@@ -852,8 +793,6 @@ onMounted(async () => {
   await fetchOffers();
   await fetchSettings();
   await fetchWalletBalance();
-  await fetchCountries();
-  await fetchCities();
   await fetchUserData();
 });
 
@@ -1126,7 +1065,7 @@ const nextStep = async () => {
       !customerInfo.value.name ||
       !customerInfo.value.phone ||
       !customerInfo.value.address ||
-      (!customerInfo.value.city && !customerInfo.value.city_id)
+      !customerInfo.value.city
     ) {
       alert(t('checkout.required_fields'));
       return;
@@ -1390,20 +1329,15 @@ const getImageUrl = (path, id) => {
   if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
     return rawPath;
   }
-  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  if (!rawPath) return '/brand/mastergas-icon.png';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api';
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
 const onImageError = (event, item) => {
   const target = event.target;
   if (!target) return;
-  if (item?.id && !target.src.includes(`prod_${item.id}.jpg`)) {
-    target.src = `/catalog_images/prod_${item.id}.jpg`;
-  } else if (!target.src.includes('product_ceramic_hob_60.png')) {
-    target.src = '/images/home/product_ceramic_hob_60.png';
-  }
+  target.src = '/brand/mastergas-icon.png';
 };
 
 const formatPrice = (price) => {

@@ -102,34 +102,27 @@ const productName = computed(() => {
 });
 
 const getImageUrl = (path, id) => {
-  if (!path) {
-    return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
-  }
+  if (!path) return '/brand/mastergas-icon.png';
   const rawPath = typeof path === 'object' && path !== null
     ? (path.image_url || path.url || path.image || path.path || '')
     : path;
-  if (!rawPath) {
-    return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
-  }
+  if (!rawPath) return '/brand/mastergas-icon.png';
   if (String(rawPath).startsWith('/') || String(rawPath).startsWith('http')) {
     return rawPath;
   }
-  if (String(rawPath).includes('catalog_images')) {
-    return `/${String(rawPath).replace(/^\//, '')}`;
-  }
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api';
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
 const productImage = computed(() => {
-  if (!product.value) return '/images/home/product_ceramic_hob_60.png';
+  if (!product.value) return '/brand/mastergas-icon.png';
   const img = product.value.image || product.value.images?.[0] || product.value.thumbnail;
   return getImageUrl(img, product.value.id);
 });
 
 const handleImageError = (e) => {
   if (e?.target) {
-    e.target.src = '/images/home/product_ceramic_hob_60.png';
+    e.target.src = '/brand/mastergas-icon.png';
   }
 };
 

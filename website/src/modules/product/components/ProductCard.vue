@@ -12,10 +12,11 @@
     @keydown.space.prevent="$emit('click', product)"
   >
     <!-- 1. Top Image with rounded corners & internal card padding -->
-    <div class="product-image-wrapper">
+    <div class="product-image-wrapper" :class="{ 'img-loading': !imageSettled }">
       <img 
         :src="getImageUrl(product.image, product.id)" 
         :alt="productName" 
+        ref="primaryImg"
         class="product-image primary-img" 
         loading="lazy" 
         decoding="async"
@@ -23,7 +24,7 @@
         height="480"
         sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 280px"
         @load="handleImageLoad"
-        @error="handleImageError($event, product)" 
+        @error="handleImageSettledError($event, product)" 
       />
       <img 
         v-if="secondaryImageUrl && secondaryVisible"
@@ -140,6 +141,12 @@ const { t } = useI18n();
 const { currentLang, localized } = useLocalized();
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer } = useOffers();
 const secondaryVisible = ref(false);
+const imageSettled = ref(false);
+const primaryImg = ref(null);
+onMounted(() => {
+  // A cached image can finish before Vue attaches @load.
+  if (primaryImg.value?.complete && primaryImg.value.naturalWidth > 0) imageSettled.value = true;
+});
 const isFavorite = computed(() => cartState.isInWishlist(props.product?.id));
 
 const toggleFavorite = () => {
@@ -223,15 +230,17 @@ const currentPrice = computed(() => {
   return price * (1 - (discount / 100));
 });
 
-const handleImageError = (event, product) => {
-  if (product && product.id) {
-    const localPath = `/catalog_images/prod_${product.id}.jpg`;
-    if (!event.target.src.endsWith(localPath)) {
-      event.target.src = localPath;
-      return;
-    }
+const handleImageError = (event) => {
+  event.target.src = '/brand/mastergas-icon.png';
+};
+
+// Keep the shimmer until the image (or its broken-image placeholder) has settled.
+const handleImageSettledError = (event, productRef) => {
+  if (String(event.target.src).endsWith('/brand/mastergas-icon.png')) {
+    imageSettled.value = true;
+    return;
   }
-  event.target.src = '/images/home/product_ceramic_hob_60.png';
+  handleImageError(event, productRef);
 };
 
 const handleSecondaryImageError = (event) => {
@@ -239,6 +248,7 @@ const handleSecondaryImageError = (event) => {
 };
 
 const handleImageLoad = () => {
+  imageSettled.value = true;
   if (typeof performance !== 'undefined' && typeof performance.mark === 'function' && !globalThis.__mastergasImagesLoaded) {
     globalThis.__mastergasImagesLoaded = true;
     performance.mark('mastergas:images-loaded');
@@ -252,9 +262,8 @@ const getImageUrl = (path, id) => {
   if (rawPath && (String(rawPath).startsWith('/') || String(rawPath).startsWith('http'))) {
     return rawPath;
   }
-  if (!rawPath) return id ? `/catalog_images/prod_${id}.jpg` : '/images/home/product_ceramic_hob_60.png';
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-mastergas.be-kite.com/api';
-  if (String(rawPath).includes('catalog_images')) return `/${String(rawPath).replace(/^\//, '')}`;
+  if (!rawPath) return '/brand/mastergas-icon.png';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api';
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 

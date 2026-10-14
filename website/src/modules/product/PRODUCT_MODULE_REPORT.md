@@ -31,7 +31,7 @@ The product catalog and product details are now isolated under `src/modules/prod
 - Existing templates, styles, route names, query parameters, product actions, offer calculations, and fallback behavior were preserved.
 - The original large Product Details view was reduced to a composition shell; its content is now split into focused components/composables. Product listing and product card code follow the same structure.
 - The large detail stylesheet is split by responsibility (layout, tabs/related products, and overlays) while remaining unscoped at the page level so child component markup keeps the same visual rules.
-- No changes were made to `src/data/localData.json`; local data mode remains available for testing until the API is ready.
+- The old local catalog snapshot and adapter were removed; product data now comes from the Tijara Site API.
 - No new global state was introduced because the product list/detail state is route-scoped; shared offer/search behavior remains in module composables, while the existing cart state remains the single cart owner.
 
 ## Verification

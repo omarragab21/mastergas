@@ -85,7 +85,7 @@
         </div>
         <div class="meta-item">
           <span class="meta-label">حالة الطلب:</span>
-          <span class="meta-val status-confirmed">تم الدفع والتأكيد</span>
+          <span class="meta-val status-confirmed">{{ formatOrderStatus(order.status) }}</span>
         </div>
       </div>
 
@@ -132,11 +132,11 @@
       <div class="invoice-totals">
         <div class="total-row">
           <span>المجموع الفرعي (غير شامل الضريبة):</span>
-          <strong>{{ ((order.total || order.total_amount || 0) / 1.15).toFixed(2) }} {{ currency }}</strong>
+          <strong>{{ Number(order.subtotal || 0).toFixed(2) }} {{ currency }}</strong>
         </div>
         <div class="total-row">
           <span>ضريبة القيمة المضافة (15%):</span>
-          <strong>{{ ((order.total || order.total_amount || 0) - ((order.total || order.total_amount || 0) / 1.15)).toFixed(2) }} {{ currency }}</strong>
+          <strong>{{ Number(order.tax || 0).toFixed(2) }} {{ currency }}</strong>
         </div>
         <div class="total-row" v-if="order.shipping > 0">
           <span>تكلفة الشحن والتوصيل:</span>
@@ -200,6 +200,26 @@ export default {
     const invoiceStore = useInvoiceStore()
     const { order, loading, siteLogo, siteName } = storeToRefs(invoiceStore)
 
+    const orderStatusLabels = {
+      pending: 'قيد المراجعة',
+      confirmed: 'تم تأكيد الطلب',
+      paid_confirmed: 'تم تأكيد الدفع',
+      processing: 'قيد التجهيز',
+      shipped: 'تم الشحن',
+      shipping: 'قيد التوصيل',
+      delivering: 'قيد التوصيل',
+      in_delivery: 'قيد التوصيل',
+      delivered: 'مكتملة',
+      completed: 'مكتملة',
+      cancelled: 'ملغاة',
+      failed: 'فشل الطلب',
+      returned: 'مرتجع',
+      refunded: 'مسترد',
+    }
+
+    const formatOrderStatus = (status) => orderStatusLabels[String(status || 'pending').toLowerCase()] || String(status || 'قيد المراجعة')
+    const formatPaymentMethod = (method) => method === 'cash_on_delivery' ? 'الدفع عند الاستلام' : (method || 'غير محدد')
+
     const printInvoice = () => {
       const isRtl = locale.value === 'ar'
       const dir = isRtl ? 'rtl' : 'ltr'
@@ -207,14 +227,15 @@ export default {
       const totalsMargin = isRtl ? 'margin-right: auto;' : 'margin-left: auto;'
       const safeOrderNumber = escapeHtml(order.value.orderNumber || order.value.order_number || order.value.id)
       const safeInvoiceDate = escapeHtml(order.value.date || new Date().toLocaleDateString('ar-SA'))
-      const safePaymentMethod = escapeHtml(order.value.payment_method || 'مدى / فيزا')
+      const safePaymentMethod = escapeHtml(formatPaymentMethod(order.value.payment_method))
+      const safeOrderStatus = escapeHtml(formatOrderStatus(order.value.status))
       const safeCustomerName = escapeHtml(order.value.customerName || order.value.customer?.name || 'عميل ماسترجاز')
       const safeCustomerPhone = escapeHtml(order.value.customerPhone || order.value.customer?.phone || '-')
       const safeCustomerEmail = escapeHtml(order.value.customerEmail || order.value.customer?.email || '-')
       const safeCustomerAddress = escapeHtml(order.value.customerAddress || order.value.shipping_address || 'المملكة العربية السعودية')
       const safeCurrency = escapeHtml(currency.value ?? currency)
-      const subtotalWithoutVat = ((order.value.total || order.value.total_amount || 0) / 1.15).toFixed(2);
-      const vatAmount = ((order.value.total || order.value.total_amount || 0) - ((order.value.total || order.value.total_amount || 0) / 1.15)).toFixed(2);
+      const subtotalWithoutVat = Number(order.value.subtotal || 0).toFixed(2);
+      const vatAmount = Number(order.value.tax || 0).toFixed(2);
       const grandTotal = (order.value.total || order.value.total_amount || 0).toFixed(2);
 
       const printWindow = window.open('', '_blank')
@@ -270,6 +291,7 @@ export default {
             <div><strong>رقم الفاتورة:</strong> #${safeOrderNumber}</div>
             <div><strong>تاريخ الإصدار:</strong> ${safeInvoiceDate}</div>
             <div><strong>طريقة الدفع:</strong> ${safePaymentMethod}</div>
+            <div><strong>حالة الطلب:</strong> ${safeOrderStatus}</div>
           </div>
 
           <div class="customer-box">
@@ -341,7 +363,8 @@ export default {
       printInvoice,
       goBack,
       t,
-      localized
+      localized,
+      formatOrderStatus
     }
   }
 }

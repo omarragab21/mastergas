@@ -1,0 +1,82 @@
+/* Shared shimmer (loading) blocks for API-driven sections.
+   Light surfaces use .sk-shimmer; the dark hero keeps its own .sk. */
+.sk-shimmer {
+  display: block;
+  background: linear-gradient(90deg, #eceff4 25%, #f8fafc 50%, #eceff4 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer-sweep 1.4s linear infinite;
+  border-radius: 8px;
+}
+.sk-line { height: 14px; }
+.sk-pill { border-radius: 999px; }
+.sk-circle { border-radius: 50%; }
+
+@keyframes sk-shimmer-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ProductCard placeholder: same box as .product-card */
+.sk-product-card {
+  width: 100%;
+  max-width: 308px;
+  height: 460px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sk-product-card .sk-image { width: 100%; height: 240px; border-radius: 8px; flex-shrink: 0; }
+.sk-product-card .sk-meta { display: flex; justify-content: space-between; gap: 12px; }
+.sk-product-card .sk-divider { height: 1px; background: #eef1f5; margin-top: auto; }
+.sk-product-card .sk-bottom { display: flex; align-items: center; justify-content: space-between; }
+
+/* Portrait cards (categories 236x340, offers 280x420) */
+.sk-portrait-card { border-radius: 16px; flex: 0 0 auto; }
+.sk-portrait-category { width: 236px; height: 340px; flex-basis: 236px; }
+.sk-portrait-offer { width: 280px; height: 420px; flex-basis: 280px; }
+
+/* Product detail page */
+.sk-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+  width: 100%;
+}
+.sk-detail-gallery .sk-main { width: 100%; height: 480px; border-radius: 12px; }
+.sk-detail-gallery .sk-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+.sk-detail-gallery .sk-thumb { height: 96px; border-radius: 8px; }
+.sk-detail-info { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
+.sk-detail-tabs { display: flex; gap: 24px; margin-top: 48px; }
+
+/* Sidebar category rows */
+.sk-sidebar-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+
+@media (max-width: 992px) {
+  .sk-detail-grid { grid-template-columns: 1fr; gap: 32px; }
+  .sk-detail-gallery .sk-main { height: 340px; }
+}
+@media (max-width: 768px) {
+  .sk-product-card { padding: 12px; border-radius: 14px; }
+  .sk-product-card .sk-image { height: 180px; }
+  .sk-portrait-category { height: 290px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-shimmer { animation: none; }
+}
+
+/* ProductCard image: shimmer until the picture has loaded */
+.product-image-wrapper.img-loading {
+  background: linear-gradient(90deg, #eceff4 25%, #f8fafc 50%, #eceff4 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer-sweep 1.4s linear infinite;
+}
+.product-image-wrapper.img-loading .product-image { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .product-image-wrapper.img-loading { animation: none; }
+}

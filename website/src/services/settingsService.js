@@ -1,5 +1,6 @@
 import api from '../config/axios';
 import { API_TTL, getCached, parseCollectionResponse, parseDataResponse } from './apiClient';
+import { normalizeSiteSlider } from './siteDataMappers';
 
 const clean = (params = {}) => Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== ''));
 
@@ -15,13 +16,13 @@ export const settingsService = {
   },
 
   async getSliders(params = { is_active: 1 }, options = {}) {
-    const body = await getCached('/frontend/sliders', clean(params), {
+    const body = await getCached('/v1/site/sliders', clean(params), {
       ttl: options.ttl ?? API_TTL.settings,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 4000,
     });
-    return parseCollectionResponse(body).items;
+    return parseCollectionResponse(body).items.map(normalizeSiteSlider);
   },
 
   async getCountries(options = {}) {

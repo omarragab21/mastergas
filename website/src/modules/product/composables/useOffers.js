@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 import { productService } from '../services/productService';
-import { offers as fallbackOffers } from '../../../data/catalogData';
 
 const offers = ref([]);
 const loading = ref(false);
@@ -45,16 +44,13 @@ export function useOffers() {
     fetchPromise = productService.getOffers({ is_active: 1 }, options)
       .then((list) => {
         const active = (Array.isArray(list) ? list : []).filter(isOfferActive);
-        // An empty successful API response is a valid business state. Only the
-        // service's error path supplies fallbackOffers, so we never invent a
-        // discount when the backend says there are no active offers.
         offers.value = active;
         lastOffersSource = Array.isArray(list) && list.length ? 'api' : 'empty';
         return offers.value;
       })
       .catch((error) => {
-        offers.value = fallbackOffers.filter(isOfferActive);
-        lastOffersSource = 'fallback';
+        offers.value = [];
+        lastOffersSource = 'empty';
         throw error;
       })
       .finally(() => {

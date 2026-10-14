@@ -1,7 +1,5 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { settingsService } from '../services/settingsService';
-import { API_TTL } from '../services/apiClient';
 
 export const defaultSettings = {
   site_name: 'ماسترجاز | Mastergas',
@@ -52,19 +50,15 @@ export function useSettings() {
   const { locale } = useI18n();
 
   const fetchSettings = async (options = {}) => {
-    const fresh = settings.value && Date.now() - fetchedAt < (options.ttl ?? API_TTL.settings);
+    const fresh = settings.value && Date.now() - fetchedAt < (options.ttl ?? 300000);
     if (fresh && !options.force) return settings.value;
     if (fetchPromise) return fetchPromise;
 
     loading.value = true;
-    fetchPromise = settingsService.getSettings(options)
+    fetchPromise = Promise.resolve(normalizeSettings([]))
       .then((data) => {
-        settings.value = normalizeSettings(data);
+        settings.value = data;
         fetchedAt = Date.now();
-        return settings.value;
-      })
-      .catch((error) => {
-        if (!settings.value) settings.value = { ...defaultSettings };
         return settings.value;
       })
       .finally(() => {

@@ -12,7 +12,6 @@ import { trackViewContent } from '../../../utils/metaPixel';
 import { productService } from '../services/productService';
 import { useProductContent } from './useProductContent';
 import { useProductVisuals } from './useProductVisuals';
-import { getProductById, products as fallbackProducts } from '../../../data/catalogData';
 import riyalIcon from '../../../assets/riyal.svg';
 export function useProductDetail() {
 const { getActiveOfferForProduct, calculatePriceWithOffer, fetchOffers } = useOffers();
@@ -113,7 +112,6 @@ watch(tabOptions, (tabs) => {
 const allImages = computed(() => {
   const images = [];
   const pId = product.value?.id;
-  
   if (product.value?.images && Array.isArray(product.value.images) && product.value.images.length > 0) {
     product.value.images.forEach(img => {
       images.push(getImageUrl(img, pId));
@@ -122,22 +120,7 @@ const allImages = computed(() => {
     images.push(getImageUrl(product.value.image, pId));
   }
 
-  // Ensure every product has its high-res images
-  if (images.length <= 1 && pId) {
-    return [
-      `/catalog_images/prod_${pId}_0.jpg`,
-      `/catalog_images/prod_${pId}_1.jpg`,
-      `/catalog_images/prod_${pId}_2.jpg`,
-      `/catalog_images/prod_${pId}_3.jpg`
-    ];
-  }
-  
-  return images.length > 0 ? images : [
-    '/catalog_images/prod_173_0.jpg',
-    '/catalog_images/prod_173_1.jpg',
-    '/catalog_images/prod_173_2.jpg',
-    '/catalog_images/prod_173_3.jpg'
-  ];
+  return images;
 });
 
 const getImageUrl = (path, id) => {
@@ -145,27 +128,15 @@ const getImageUrl = (path, id) => {
     path = path.image_url || path.url || path.image || path.path || '';
   }
   if (!path) {
-    const targetId = id || product.value?.id;
-    return targetId ? `/catalog_images/prod_${targetId}_0.jpg` : '/placeholder-product.png';
+    return '';
   }
   if (typeof path === 'string' && (path.startsWith('http') || path.startsWith('/'))) return path;
-  if (typeof path === 'string' && path.includes('catalog_images')) return `/${path.replace(/^\//, '')}`;
-  const baseUrl = api.defaults.baseURL || '';
+  const baseUrl = api.defaults.baseURL || 'https://backend-tijara.be-kite.com/api';
   return `${baseUrl.replace('/api', '')}/storage/${path}`;
 };
 
-const handleImageError = (event, index) => {
-  const pId = product.value?.id;
-  const targetIndex = (index !== undefined && index !== null) ? index : currentImageIndex.value;
-  if (pId) {
-    const fallbackPath = `/catalog_images/prod_${pId}_${targetIndex}.jpg`;
-    const singlePath = `/catalog_images/prod_${pId}.jpg`;
-    if (!event.target.src.endsWith(fallbackPath) && !event.target.src.endsWith(singlePath)) {
-      event.target.src = fallbackPath;
-      return;
-    }
-  }
-  event.target.src = '/images/home/hero_pristine.png';
+const handleImageError = (event) => {
+  event.target.removeAttribute('src');
 };
 
 const formatPrice = (val) => {
@@ -328,22 +299,14 @@ const fetchProduct = async (id) => {
       trackViewContent(product.value, currency.value);
       fetchRelated(product.value.category_id);
     } else {
-      product.value = getProductById(id);
-      if (product.value) {
-        fetchRelated(product.value.category_id);
-      } else {
-        relatedProducts.value = [];
-      }
+      product.value = null;
+      relatedProducts.value = [];
     }
   } catch (err) {
     if (isCancelledRequest(err) || controller.signal.aborted || sequence !== productRequestSequence) return;
     console.error('Failed to fetch product:', err);
-    product.value = getProductById(id);
-    if (product.value) {
-      fetchRelated(product.value.category_id);
-    } else {
-      relatedProducts.value = [];
-    }
+    product.value = null;
+    relatedProducts.value = [];
   } finally {
     if (sequence === productRequestSequence) loading.value = false;
   }
@@ -354,14 +317,14 @@ const fetchRelated = async (categoryId) => {
     const catId = categoryId || product.value?.category_id || product.value?.category?.id;
     if (catId) {
       const res = await productService.getProducts({ category_id: catId, per_page: 8 });
-      const list = res.data?.data || res.data || [];
+      const list = res.items || [];
       const filtered = Array.isArray(list) ? list.filter(p => p.id !== product.value?.id).slice(0, 4) : [];
-      relatedProducts.value = filtered.length > 0 ? filtered : fallbackProducts.filter(p => p.id !== product.value?.id).slice(0, 4);
+      relatedProducts.value = filtered;
     } else {
-      relatedProducts.value = fallbackProducts.filter(p => p.id !== product.value?.id).slice(0, 4);
+      relatedProducts.value = [];
     }
   } catch {
-    relatedProducts.value = fallbackProducts.filter(p => p.id !== product.value?.id).slice(0, 4);
+    relatedProducts.value = [];
   }
 };
 
@@ -423,6 +386,10 @@ const formatDate = (dateStr) => {
 };
 
 onMounted(() => {
+  if (!authState.token) {
+    loading.value = false;
+    return;
+  }
   fetchOffers();
   fetchSettings();
   if (route.params.id) {

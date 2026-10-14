@@ -31,9 +31,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="detail-loader">
-      <div class="spinner"></div>
-    </div>
+    <ProductDetailSkeleton v-if="loading" />
 
     <!-- 2. Product Main Section -->
     <div v-else-if="product" class="product-main-section">
@@ -165,6 +163,7 @@
 <script setup>
 import { useProductDetail } from '../composables/useProductDetail';
 import ProductGallery from '../components/ProductGallery.vue';
+import ProductDetailSkeleton from '../../../components/skeleton/ProductDetailSkeleton.vue';
 import ProductInfoPanel from '../components/ProductInfoPanel.vue';
 import ProductTabs from '../components/ProductTabs.vue';
 import ProductCard from '../components/ProductCard.vue';

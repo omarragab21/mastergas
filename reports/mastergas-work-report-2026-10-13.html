@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تقرير العمل اليومي - Master Gas - 2026-10-13</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #dce3eb;
+      --soft: #f5f7fa;
+      --accent: #0f766e;
+      --success: #166534;
+      --warning: #92400e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef2f6;
+      color: var(--ink);
+      direction: rtl;
+      text-align: right;
+      font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+      line-height: 1.85;
+    }
+
+    .page {
+      width: min(980px, calc(100% - 32px));
+      margin: 24px auto;
+      padding: 34px 38px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(23, 32, 51, .07);
+    }
+
+    header {
+      padding-bottom: 20px;
+      border-bottom: 3px solid var(--accent);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 6px; font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1.35; }
+    h2 { margin: 28px 0 10px; font-size: 1.25rem; color: var(--accent); }
+    h3 { margin: 20px 0 6px; font-size: 1rem; }
+    .subtitle { margin-bottom: 16px; color: var(--muted); font-size: 1rem; }
+
+    .meta, .summary, .checks {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+    }
+
+    .meta td, .summary td, .checks td, .checks th {
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .meta td:first-child, .summary td:first-child {
+      width: 25%;
+      color: var(--muted);
+      background: var(--soft);
+      font-weight: 700;
+    }
+
+    .checks th { background: var(--soft); font-weight: 700; }
+    .ok { color: var(--success); font-weight: 700; }
+    .note { color: var(--warning); }
+
+    ul, ol { margin: 8px 0 0; padding-right: 24px; }
+    li { margin: 5px 0; }
+
+    .code {
+      direction: ltr;
+      unicode-bidi: isolate;
+      text-align: left;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .9em;
+      background: #f1f4f7;
+      border-radius: 4px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid #bbf7d0;
+      border-right: 5px solid #16a34a;
+      border-radius: 8px;
+      background: #f0fdf4;
+    }
+
+    footer {
+      margin-top: 30px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 640px) {
+      .page { width: calc(100% - 18px); margin: 9px auto; padding: 22px 16px; }
+      .meta td:first-child, .summary td:first-child { width: 34%; }
+      .code { white-space: normal; overflow-wrap: anywhere; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>تقرير العمل اليومي — مشروع Master Gas</h1>
+      <p class="subtitle">ملخص الأعمال البرمجية والتحقق الفني المنفذة بتاريخ 13 أكتوبر 2026</p>
+      <table class="meta" aria-label="بيانات التقرير">
+        <tr><td>المشروع</td><td>Master Gas</td></tr>
+        <tr><td>تاريخ التقرير</td><td>2026-10-13</td></tr>
+        <tr><td>الفرع</td><td><span class="code">main</span></td></tr>
+        <tr><td>آخر إصدار مسجل</td><td><span class="code">4824083</span> — إضافة شاشات العروض والخصومات وتحديثات لوحة الإدارة</td></tr>
+      </table>
+    </header>
+
+    <section>
+      <h2>الملخص التنفيذي</h2>
+      <p>
+        تم تطوير وتحسين أجزاء من لوحة الإدارة الخاصة بالعروض والخصومات، مع تحديث ربط البيانات والتحقق من حدود الاستخدام، وإضافة توجيه آمن للمسارات القديمة. كما تم استكمال أعمال إدارة الطلبات والتكاملات المرتبطة بها ضمن تغييرات اليوم، ثم التحقق من سلامة المشروع عبر الاختبارات والبناء الإنتاجي للوحة الإدارة.
+      </p>
+    </section>
+
+    <section>
+      <h2>الأعمال المنجزة</h2>
+      <ol>
+        <li>
+          <strong>تحديث شاشة العروض والخصومات:</strong>
+          إضافة واجهة منظمة تتضمن العنوان والوصف، بطاقات الإحصاءات، أدوات البحث والتصفية، حقول التاريخ، وجدولًا لحالة عدم وجود البيانات، مع دعم كامل لاتجاه الكتابة من اليمين إلى اليسار.
+        </li>
+        <li>
+          <strong>تحسين التنقل داخل لوحة الإدارة:</strong>
+          توحيد تسمية قسم «العروض والخصومات»، وإعادة توجيه المسار القديم <span class="code">/admin/promotions</span> إلى المسار الموحد <span class="code">/admin/offers</span>.
+        </li>
+        <li>
+          <strong>دعم حد الاستخدام للخصومات:</strong>
+          إضافة حقل الحد الأقصى للاستخدام، إرساله إلى الواجهة البرمجية كرقم، تحميله عند تعديل الخصم، والتحقق من كونه عددًا صحيحًا أكبر من الصفر.
+        </li>
+        <li>
+          <strong>تحسين قراءة إحصاءات الخصومات:</strong>
+          دعم الحقل البديل <span class="code">used_count</span>، واحتساب نسبة الاستخدام تلقائيًا عند عدم إرسالها من الواجهة البرمجية مع احترام الحد الأقصى للاستخدام.
+        </li>
+        <li>
+          <strong>استكمال أعمال الطلبات والتكاملات:</strong>
+          توحيد أزرار الإجراءات في لوحة الإدارة، إضافة خدمات ونماذج إدارة الطلبات، وتحسين تدفقات الطلب والدفع في واجهة المتجر، مع تغطية ذلك باختبارات مخصصة.
+        </li>
+        <li>
+          <strong>تحديث اختبارات الجودة:</strong>
+          إضافة وتعديل اختبارات عقد بيانات الخصومات، بما يضمن إرسال <span class="code">max_uses</span> بالشكل الصحيح وعدم إرسال الحقول غير المدعومة.
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>الملفات الرئيسية المتأثرة اليوم</h2>
+      <ul>
+        <li><span class="code">admin/src/components/AppLayout.vue</span></li>
+        <li><span class="code">admin/src/domain/catalog/adminCatalog.js</span></li>
+        <li><span class="code">admin/src/router/index.js</span></li>
+        <li><span class="code">admin/src/views/ApiPendingView.vue</span></li>
+        <li><span class="code">admin/src/views/DiscountsView.vue</span></li>
+        <li><span class="code">tests/adminCatalogQA.test.js</span></li>
+        <li>إضافة تقارير وفحوصات مرتبطة بإدارة الطلبات وتكاملات المتجر ضمن تغييرات اليوم.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>نتائج التحقق الفني</h2>
+      <table class="checks" aria-label="نتائج التحقق الفني">
+        <thead><tr><th>الفحص</th><th>النتيجة</th><th>التفاصيل</th></tr></thead>
+        <tbody>
+          <tr><td><span class="code">npm test</span></td><td class="ok">ناجح</td><td>232 اختبارًا: 231 ناجحًا، 0 فشل، اختبار واحد متخطى بسبب عدم تشغيل خادم Vite المحلي.</td></tr>
+          <tr><td><span class="code">npm run build:admin</span></td><td class="ok">ناجح</td><td>اكتمل بناء لوحة الإدارة بنجاح، مع تحويل 168 وحدة.</td></tr>
+          <tr><td><span class="code">git diff --check</span></td><td class="ok">ناجح</td><td>لا توجد أخطاء مسافات بيضاء أو مشكلات تنسيق في الفروقات الحالية.</td></tr>
+        </tbody>
+      </table>
+      <p class="note">ملاحظة: الاختبار المتخطى فحص تكاملي اختياري يحتاج إلى تشغيل خادم Vite على المنفذ 5173، ولم يؤثر في نجاح بقية الاختبارات.</p>
+    </section>
+
+    <section>
+      <h2>حالة التسليم</h2>
+      <div class="status">
+        <strong>الحالة: جاهز للمراجعة والرفع على Trello.</strong>
+        <p>
+          التغييرات المحلية الحالية موجودة في ستة ملفات، ولم يتم تنفيذ عملية commit جديدة بعد آخر إصدار مسجل. واجهة العروض والخصومات تعرض حالة انتظار البيانات إلى حين توفير API الخاص بها، ولذلك تبقى أدوات الإنشاء والبحث والتصفية معطلة حاليًا بصورة مقصودة.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>الخطوة التالية المقترحة</h2>
+      <p>توفير أو اعتماد API الخاص بالعروض والخصومات، ثم تفعيل عمليات الإنشاء والتعديل والحذف والبحث والتصفية، وإجراء اختبار تكاملي على البيانات الحقيقية قبل النشر.</p>
+    </section>
+
+    <footer>
+      أُعدّ هذا التقرير باللغة العربية الفصحى، مع اتجاه كتابة RTL ومحاذاة يمين وتصميم متجاوب للقراءة على الحاسوب والهاتف والطباعة.
+    </footer>
+  </main>
+</body>
+</html>

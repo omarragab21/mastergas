@@ -1,20 +1,16 @@
 import api from '../../../config/axios';
 import returnsService from '../../../services/returnsService';
 import { listSiteOrders } from '../../invoice/services/siteOrdersApi';
+import { authState } from '../../../store/auth';
 
 const unwrap = (response) => response?.data?.data || response?.data || response;
-const unwrapList = (response) => {
-  const value = unwrap(response);
-  return Array.isArray(value) ? value : (Array.isArray(value?.data) ? value.data : []);
-};
-
 export const profileService = {
   async getUser() {
-    return unwrap(await api.get('/frontend/user'));
+    return authState.user;
   },
 
   async getAddresses() {
-    return unwrapList(await api.get('/frontend/addresses'));
+    return [];
   },
 
   async getOrders() {
@@ -22,11 +18,11 @@ export const profileService = {
   },
 
   async getNotifications() {
-    return unwrapList(await api.get('/frontend/notifications'));
+    return [];
   },
 
   async getReturns() {
-    return returnsService.listMine();
+    return [];
   },
 
   createReturn(payload) {
@@ -34,19 +30,19 @@ export const profileService = {
   },
 
   async getWallet() {
-    return unwrap(await api.get('/frontend/wallet', { timeout: 8000 })) || {};
+    return { balance: 0, transactions: [] };
   },
 
   async getSettings() {
-    return unwrapList(await api.get('/frontend/settings'));
+    return [];
   },
 
   async getCountries() {
-    return unwrapList(await api.get('/frontend/countries'));
+    return [];
   },
 
   async getCities(params = {}) {
-    return unwrapList(await api.get('/frontend/cities', { params }));
+    return [];
   },
 
   updateProfile(payload) {

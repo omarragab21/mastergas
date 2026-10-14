@@ -1,39 +1,12 @@
 import axios from 'axios';
-import { localApiAdapter } from './localApi';
 import { getCustomerToken } from '../utils/customerSession.js';
 
-const serverUrl = 'https://backend-mastergas.be-kite.com/api';
+const serverUrl = 'https://backend-tijara.be-kite.com/api';
 const envUrl = import.meta.env.VITE_API_BASE_URL;
 
 const isBrowser = typeof window !== 'undefined';
 const isDev = import.meta.env?.DEV;
-const frappeMode = import.meta.env.VITE_FRAPPE_MODE === 'true';
-// VITE_DATA_MODE=api sends every request to the backend; anything else keeps the local snapshot for catalog/content.
-const useLiveApi = import.meta.env.VITE_DATA_MODE === 'api';
-
-// Catalog/content requests intentionally use the local snapshot while auth stays remote.
 const baseURL = envUrl || (isDev && isBrowser ? '/api' : serverUrl);
-
-const REMOTE_AUTH_PATHS = new Set([
-  '/v1/login',
-  '/v1/register',
-  '/v1/logout',
-  '/v1/user',
-  '/v1/admin/login',
-  '/frontend/login',
-  '/frontend/register',
-  '/frontend/logout',
-  '/frontend/user',
-  '/frontend/profile',
-  '/frontend/change-password',
-  '/frontend/forgot-password',
-]);
-
-// Customer orders are served by the Tijara API even while the catalogue uses the local snapshot.
-const LIVE_PATH_PREFIXES = ['/v1/site/orders'];
-const isLivePath = (cleanPath) => LIVE_PATH_PREFIXES.some((prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
-
-const normalizePath = (url = '') => String(url).split('?')[0].replace(/^\/api/, '') || '/';
 
 const api = axios.create({
   baseURL,
@@ -130,28 +103,10 @@ api.interceptors.request.use(config => {
   }
   performanceMark(`mastergas:api:start:${requestId}`);
 
-  const requestUrl = config.url || '';
-  const cleanPath = normalizePath(requestUrl);
   const token = getCustomerToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  }
-  if (!useLiveApi && !REMOTE_AUTH_PATHS.has(cleanPath) && !isLivePath(cleanPath)) {
-    config.adapter = localApiAdapter;
-  }
-  if (frappeMode && cleanPath.startsWith('/frontend') && config.method?.toLowerCase() === 'get') {
-    const parts = cleanPath.split('/').filter(Boolean);
-    const resource = parts[1];
-    const methodMap = { products: 'get_products', categories: 'get_categories', offers: 'get_offers', brands: 'get_brands', settings: 'get_settings', sliders: 'get_sliders', reviews: 'get_product_reviews', coupons: 'get_coupons', topics: 'get_topics' };
-    if (resource === 'products' && parts[2]) {
-      config.baseURL = '/api';
-      config.url = '/method/mastergas_core.api.frontend.get_product_detail';
-      config.params = { ...(config.params || {}), id_or_slug: decodeURIComponent(parts[2]) };
-    } else if (methodMap[resource]) {
-      config.baseURL = '/api';
-      config.url = `/method/mastergas_core.api.frontend.${methodMap[resource]}`;
-    }
   }
   return config;
 });
@@ -189,8 +144,7 @@ const finalizeMetric = (config, overrides = {}) => {
 api.interceptors.response.use(
   response => {
     finalizeMetric(response.config, { status: response.status });
-    if (frappeMode && response.data?.message?.success) response.data = response.data.message;
-    if (getRequestPath(response.config).startsWith('/frontend/products')) {
+    if (getRequestPath(response.config).startsWith('/v1/site/products')) {
       performanceMark('mastergas:products-api-complete');
     }
     return response;

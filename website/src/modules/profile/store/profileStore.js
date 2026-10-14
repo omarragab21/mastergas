@@ -27,7 +27,7 @@ export const useProfileStore = defineStore('profileFeature', {
   },
 
   actions: {
-    async load({ fallbackAddresses = [], fallbackReturns = [], fallbackNotifications = [], localized, formatDate }) {
+    async load({ localized, formatDate }) {
       this.loadingData = true;
       const [userResult, addressesResult, ordersResult, notificationsResult, returnsResult] = await Promise.allSettled([
         profileService.getUser(),
@@ -38,16 +38,12 @@ export const useProfileStore = defineStore('profileFeature', {
       ]);
 
       if (userResult.status === 'fulfilled') this.user = userResult.value;
-      this.addressesList = addressesResult.status === 'fulfilled' && addressesResult.value.length > 0
-        ? addressesResult.value
-        : [...fallbackAddresses];
+      this.addressesList = addressesResult.status === 'fulfilled' ? addressesResult.value : [];
       this.ordersList = ordersResult.status === 'fulfilled' ? ordersResult.value : [];
-      this.notificationsList = notificationsResult.status === 'fulfilled' && notificationsResult.value.length > 0
+      this.notificationsList = notificationsResult.status === 'fulfilled'
         ? notificationsResult.value.map((notification) => normalizeNotification(notification, { localized, formatDate }))
-        : [...fallbackNotifications];
-      this.returnsList = returnsResult.status === 'fulfilled' && returnsResult.value.length > 0
-        ? returnsResult.value
-        : [...fallbackReturns];
+        : [];
+      this.returnsList = returnsResult.status === 'fulfilled' ? returnsResult.value : [];
       this.loadingData = false;
       return this.user;
     },
@@ -77,14 +73,14 @@ export const useProfileStore = defineStore('profileFeature', {
       return profileService.getSettings();
     },
 
-    async fetchNotifications({ fallback = [], localized, formatDate }) {
+    async fetchNotifications({ localized, formatDate }) {
       try {
         const notifications = await profileService.getNotifications();
         this.notificationsList = notifications.length > 0
           ? notifications.map((notification) => normalizeNotification(notification, { localized, formatDate }))
-          : [...fallback];
+          : [];
       } catch {
-        this.notificationsList = [...fallback];
+        this.notificationsList = [];
       }
     },
 

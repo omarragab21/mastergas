@@ -16,7 +16,8 @@
       <!-- Page Title Row -->
       <div class="mockup-title-row">
         <h1 class="mockup-page-title">{{ currentCategoryTitle || (currentLang === 'ar' ? 'جميع منتجات' : 'All Products') }}</h1>
-        <span class="mockup-count-badge">({{ totalProductsCount }} {{ currentLang === 'ar' ? 'منتج' : 'products' }})</span>
+        <span v-if="loading && !products.length" class="sk-shimmer sk-line" style="width: 90px" role="status" aria-busy="true"></span>
+        <span v-else class="mockup-count-badge">({{ totalProductsCount }} {{ currentLang === 'ar' ? 'منتج' : 'products' }})</span>
       </div>
     </div>
 
@@ -24,7 +25,8 @@
     <div class="mockup-results-bar-fullwidth">
       <div class="container bar-inner-content">
         <!-- Right side (in RTL): Results Count -->
-        <div class="mockup-results-count">
+ <div v-if="loading && !products.length" class="sk-shimmer sk-line" style="width: 200px" role="status" aria-busy="true"></div>
+        <div v-else class="mockup-results-count">
           {{ currentLang === 'ar' 
             ? `عرض ${products.length} من أصل ${totalProductsCount} منتج متوفر` 
             : `Showing ${products.length} of ${totalProductsCount} available products` 
@@ -53,6 +55,7 @@
     <div class="container">
       <div class="mockup-content-layout">
         <ProductFiltersSidebar
+          :loading="categoriesLoading"
           :categories="categories"
           :selected-category="selectedCategory"
           :total-all-count="totalAllCount"
@@ -76,7 +79,7 @@
           :total-products-count="totalProductsCount"
           :total-pages="totalPages"
           @open-product="goToProduct"
-          @add-to-cart="cartState.addToCart"
+          @add-to-cart="addProductToCart"
           @change-page="changePage"
         />
     </div>
@@ -91,12 +94,12 @@ import { isCancelledRequest } from '../../../config/axios';
 import ProductFiltersSidebar from '../components/ProductFiltersSidebar.vue';
 import ProductResultsGrid from '../components/ProductResultsGrid.vue';
 import { cartState } from '../../../store/cart';
+import { authState } from '../../../store/auth';
 import { useOffers } from '../composables/useOffers';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSEO } from '../../../composables/useSEO';
 import { trackSearch } from '../../../utils/metaPixel';
 import { productService } from '../services/productService';
-import { products as fallbackProducts, categories as fallbackCategories } from '../../../data/catalogData';
 
 const router = useRouter();
 const route = useRoute();
@@ -114,8 +117,10 @@ useSEO({
 const products = ref([]);
 const categories = ref([]);
 const loading = ref(true);
+const categoriesLoading = ref(Boolean(authState.token));
 const dataNotice = ref('');
 const totalCount = ref(0);
+const allProductsCount = ref(0);
 const totalPages = ref(1);
 const currentPage = ref(1);
 const perPage = ref(9);
@@ -128,11 +133,7 @@ const hasDiscountOnly = ref(false);
 const italianOnly = ref(false);
 
 const totalAllCount = computed(() => {
-  if (categories.value && categories.value.length) {
-    const categoryTotal = categories.value.reduce((acc, c) => acc + (Number(c.products_count) || 0), 0);
-    return categoryTotal || totalCount.value || 0;
-  }
-  return totalCount.value || 0;
+  return allProductsCount.value || totalCount.value || 0;
 });
 
 const totalProductsCount = computed(() => {
@@ -180,6 +181,10 @@ const goToProduct = (product) => {
   router.push(`/product/${product.id}`);
 };
 
+const addProductToCart = (product, quantity = 1, selectedAttributes = null) => {
+  cartState.addToCart(product, quantity, selectedAttributes);
+};
+
 const changePage = (page) => {
   currentPage.value = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -187,12 +192,25 @@ const changePage = (page) => {
 };
 
 const fetchCategories = async () => {
+  if (!authState.token) {
+    categoriesLoading.value = false;
+    return;
+  }
+  categoriesLoading.value = true;
   try {
-    const list = await productService.getCategories();
-    categories.value = Array.isArray(list) && list.length > 0 ? list : fallbackCategories;
+    const list = await productService.getCategoriesWithProductCounts({ is_active: 1 });
+    categories.value = Array.isArray(list) ? list : [];
+    try {
+      allProductsCount.value = await productService.getProductCount({ is_active: 1 });
+    } catch (countError) {
+      console.error('Failed to fetch all products count:', countError);
+      allProductsCount.value = 0;
+    }
   } catch (err) {
     console.error('Failed to fetch categories:', err);
-    categories.value = fallbackCategories;
+    categories.value = [];
+  } finally {
+    categoriesLoading.value = false;
   }
 };
 
@@ -200,6 +218,10 @@ let requestController = null;
 let requestSequence = 0;
 
 const fetchProducts = async () => {
+  if (!authState.token) {
+    loading.value = false;
+    return;
+  }
   requestController?.abort();
   const controller = new AbortController();
   requestController = controller;
@@ -248,8 +270,8 @@ const fetchProducts = async () => {
   } catch (err) {
     if (isCancelledRequest(err) || controller.signal.aborted || sequence !== requestSequence) return;
     console.error('Failed to fetch products:', err);
-    products.value = fallbackProducts;
-    totalCount.value = fallbackProducts.length;
+    products.value = [];
+    totalCount.value = 0;
     totalPages.value = 1;
     dataNotice.value = currentLang.value === 'ar'
       ? 'تعذر تحميل المنتجات. تحقق من الاتصال وحاول مرة أخرى.'

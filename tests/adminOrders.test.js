@@ -6,6 +6,7 @@ import { createServer } from 'vite';
 import {
   ORDER_STATUSES,
   ORDER_STEPS,
+  ORDER_TRACKING_STEPS,
   canTransition,
   isFinalStatus,
   money,
@@ -13,6 +14,10 @@ import {
   nextStatuses,
   paymentMethodLabel,
   statusLabel,
+  trackingRank,
+  trackingStepIcon,
+  trackingStepState,
+  trackingStatusLabel,
   toOrder,
   toStatusPayload,
 } from '../admin/src/domain/orders/adminOrder.js';
@@ -191,6 +196,11 @@ test('STATUS enum matches the API exactly (no legacy "completed")', () => {
   assert.deepEqual(ORDER_STEPS, ['pending', 'paid_confirmed', 'processing', 'shipped', 'delivered']);
   for (const status of ORDER_STATUSES) assert.notEqual(statusLabel(status), status, `${status} needs an Arabic label`);
   assert.equal(statusLabel('weird'), 'weird');
+  assert.equal(trackingStatusLabel('pending'), 'تم استلام الطلب');
+  assert.equal(trackingStatusLabel('paid_confirmed'), 'تم تأكيد الطلب');
+  assert.equal(trackingStatusLabel('processing'), 'تم تجهيز الطلب');
+  assert.equal(trackingStatusLabel('shipped'), 'تم الشحن');
+  assert.equal(trackingStatusLabel('delivered'), 'تم الاستلام');
 });
 
 test('STATUS forward flow: pending → paid_confirmed → processing → shipped → delivered', () => {
@@ -228,6 +238,33 @@ test('STATUS delivered and cancelled are final', () => {
   assert.ok(isFinalStatus('cancelled'));
   assert.equal(isFinalStatus('pending'), false);
   assert.deepEqual(nextStatuses('unknown'), []);
+});
+
+test('TRACKING timeline matches the website six-stage contract', () => {
+  assert.deepEqual(
+    ORDER_TRACKING_STEPS.map(({ key, label, icon }) => [key, label, icon]),
+    [
+      ['received', 'تم استلام الطلب', 'fas fa-inbox'],
+      ['confirmed', 'تم تأكيد الطلب', 'fas fa-clipboard-check'],
+      ['processing', 'تم تجهيز الطلب', 'fas fa-box-open'],
+      ['shipped', 'تم الشحن', 'fas fa-box'],
+      ['transit', 'الطلب في الطريق', 'fas fa-truck'],
+      ['delivered', 'تم الاستلام', 'fas fa-house'],
+    ],
+  );
+
+  const pending = toOrder(rawOrder());
+  assert.equal(trackingRank(pending), 1);
+  assert.equal(trackingStepState(pending, 1), 'active');
+  assert.equal(trackingStepState(pending, 2), 'pending');
+  assert.equal(trackingStepIcon(ORDER_TRACKING_STEPS[0], 'active'), 'fas fa-check');
+  assert.equal(trackingStepIcon(ORDER_TRACKING_STEPS[1], 'pending'), 'fas fa-clipboard-check');
+
+  const delivered = toOrder(rawOrder({ status: 'delivered', delivered_at: '2026-10-14T09:00:00+00:00' }));
+  assert.equal(trackingRank(delivered), 6);
+  assert.equal(trackingStepState(delivered, 5), 'completed');
+  assert.equal(trackingStepState(delivered, 6), 'active');
+  assert.equal(trackingStepIcon(ORDER_TRACKING_STEPS[5], 'active'), 'fas fa-check');
 });
 
 test('PAYLOAD paid_confirmed also marks the payment as paid (backend leaves it unpaid, QA MEDIUM-5)', () => {
