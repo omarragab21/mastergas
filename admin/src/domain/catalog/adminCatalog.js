@@ -23,6 +23,36 @@ export const categoryName = (category) => {
   );
 };
 
+// Search the complete bilingual category record, not only the current display
+// language. Common Arabic variants should not make a valid search miss.
+export const normalizeCatalogSearchText = (value) => String(value ?? '')
+  .normalize('NFKC')
+  .toLocaleLowerCase('ar')
+  .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+  .replace(/[إأآ]/g, 'ا')
+  .replace(/ـ/g, '')
+  .trim();
+
+export const categoryMatchesSearch = (category = {}, query = '') => {
+  const normalizedQuery = normalizeCatalogSearchText(query);
+  if (!normalizedQuery) return true;
+
+  const fields = [
+    category.name,
+    category.name_i18n?.ar,
+    category.name_i18n?.en,
+    category.description,
+    category.description_i18n?.ar,
+    category.description_i18n?.en,
+    category.translations?.ar?.name,
+    category.translations?.en?.name,
+    category.translations?.ar?.description,
+    category.translations?.en?.description,
+  ];
+
+  return fields.some((field) => normalizeCatalogSearchText(field).includes(normalizedQuery));
+};
+
 // The products endpoint can return the relationship as an object, a name, or
 // only as category_id. Resolve all of those shapes before the table falls back
 // to "غير محدد". `categories` may contain parent categories with `subchildren`.
@@ -117,13 +147,34 @@ export const toAttribute = (raw = {}) => {
     is_active: raw.is_active !== false && raw.is_active !== 0,
     values: options.map((option, index) => {
       const optionTranslations = option?.translations || {};
-      const optionName = typeof option === 'string'
-        ? option.split('|')[0].trim()
-        : firstText(option.name, option.label, optionTranslations.ar?.name, optionTranslations.en?.name);
-      const valueCode = typeof option === 'string' ? option.split('|')[1] : option?.value_code;
+      const optionParts = typeof option === 'string' ? option.split('|') : [];
+      const nameAr = typeof option === 'string'
+        ? optionParts[0]?.trim()
+        : firstText(
+          option.name_ar,
+          optionTranslations.ar?.name,
+          optionTranslations.ar?.label,
+          option.label_ar,
+          option.name,
+          option.label,
+        );
+      const nameEn = typeof option === 'string'
+        ? optionParts[0]?.trim()
+        : firstText(
+          option.name_en,
+          optionTranslations.en?.name,
+          optionTranslations.en?.label,
+          option.label_en,
+          option.name,
+          option.label,
+        );
+      const optionName = firstText(nameAr, nameEn);
+      const valueCode = typeof option === 'string' ? optionParts[1] : option?.value_code;
       return {
         ...(typeof option === 'object' ? option : {}),
         id: option?.id ?? `${optionName}-${index}`,
+        name_ar: nameAr,
+        name_en: nameEn,
         label: optionName,
         name: optionName,
         color: valueCode || option?.color || option?.hex || null,
@@ -165,6 +216,29 @@ export const toDiscountCode = (raw = {}) => {
   };
 };
 
+export const toOffer = (raw = {}) => {
+  const translations = raw.translations || {};
+  const items = Array.isArray(raw.items) ? raw.items : [];
+  return {
+    ...raw,
+    name_i18n: {
+      ar: firstText(translations.ar?.name, raw.name_ar, raw.name),
+      en: firstText(translations.en?.name, raw.name_en, raw.name),
+    },
+    description_i18n: {
+      ar: firstText(translations.ar?.description, raw.description_ar, raw.description),
+      en: firstText(translations.en?.description, raw.description_en, raw.description),
+    },
+    items: items.map((item) => ({
+      ...item,
+      product_id: item.product_id ?? item.product?.id,
+      quantity: Number(item.quantity) || 1,
+    })),
+    total_uses: Number(raw.total_uses ?? raw.used_count ?? 0),
+    is_active: raw.is_active !== false && raw.is_active !== 0,
+  };
+};
+
 export const listFromResponse = (payload) => {
   const body = unwrap(payload);
   if (Array.isArray(body)) return body;
@@ -182,7 +256,7 @@ export const toCategoryPayload = (form) => ({
   description_ar: String(form.description_ar || '').trim(),
   parent_id: form.parent_id || undefined,
   is_active: form.is_active === false ? 0 : 1,
-  sort_order: Number(form.sort_order || 0),
+  sort_order: Number.isFinite(Number(form.sort_order)) ? Number(form.sort_order) : 0,
 });
 
 export const toProductPayload = (form) => ({
@@ -223,6 +297,34 @@ export const toDiscountPayload = (form) => ({
   description_ar: String(form.description_ar || '').trim(),
 });
 
+export const toOfferPayload = (form) => {
+  const items = Array.isArray(form.items)
+    ? form.items
+    : (Array.isArray(form.selected_products)
+      ? form.selected_products.map((product_id) => ({ product_id, quantity: 1 }))
+      : []);
+  const payload = {
+    name_en: String(form.name_en || '').trim(),
+    name_ar: String(form.name_ar || '').trim(),
+    description_en: String(form.description_en || '').trim(),
+    description_ar: String(form.description_ar || '').trim(),
+    bundle_price: Number(form.bundle_price || 0),
+    start_date: form.start_date ? `${form.start_date} 00:00:00` : null,
+    end_date: form.no_end_date || !form.end_date ? null : `${form.end_date} 23:59:59`,
+    max_uses: optionalNumber(form.max_uses),
+    max_per_customer: optionalNumber(form.max_per_customer),
+    // Multipart form values are serialized as strings. Tijara's offer
+    // validator accepts the numeric boolean contract (`1`/`0`).
+    is_active: form.is_active ? 1 : 0,
+  };
+  items.slice(0, 20).forEach((item, index) => {
+    if (item?.product_id === undefined || item?.product_id === null || item?.product_id === '') return;
+    payload[`items[${index}][product_id]`] = item.product_id;
+    payload[`items[${index}][quantity]`] = Math.max(1, Number(item.quantity) || 1);
+  });
+  return payload;
+};
+
 export const toAttributePayload = (form) => {
   const payload = {
     // Tijara accepts only `color_swatch` and `select`. The Admin UI calls the
@@ -254,7 +356,7 @@ export const toAttributeUpdatePayload = (form) => {
 };
 
 export const toAttributeOptionPayload = (form) => ({
-  name_en: String(form.label || '').trim(),
-  name_ar: String(form.label || '').trim(),
-  value_code: form.color || null,
+  name_en: String(form.name_en ?? form.label ?? '').trim(),
+  name_ar: String(form.name_ar ?? form.label ?? '').trim(),
+  value_code: String(form.color ?? form.value_code ?? '').trim() || null,
 });

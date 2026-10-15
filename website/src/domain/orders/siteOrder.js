@@ -19,6 +19,9 @@ export const toSiteOrderPayload = (order = {}) => {
     shipping_address: order.shipping_address,
     billing_address: order.billing_address || order.shipping_address,
     payment_method: method,
+    ...(Number.isInteger(Number(order.offer_id)) && Number(order.offer_id) > 0
+      ? { offer_id: Number(order.offer_id) }
+      : {}),
     ...(code ? { coupon_code: code } : {}),
     ...(notes ? { notes } : {}),
     shipping_cost: Math.max(0, Number(order.shipping_cost) || 0),
@@ -30,6 +33,9 @@ export const toSiteOrderPayload = (order = {}) => {
       return {
         product_id: normalizeProductId(sourceProductId),
         quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
+        ...(Number.isInteger(Number(item.offer_id)) && Number(item.offer_id) > 0
+          ? { offer_id: Number(item.offer_id) }
+          : {}),
       };
     }),
   };

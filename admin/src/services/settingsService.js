@@ -51,7 +51,13 @@ export const settingsService = {
   },
 
   async sendContactMessage(messageData) {
-    const response = await api.post('/frontend/contact', messageData);
+    const response = await api.post('/v1/site/contacts', {
+      name: messageData.name,
+      email: messageData.email,
+      phone: messageData.phone,
+      type: messageData.type || messageData.subject || 'Inquiry',
+      message: messageData.message,
+    });
     return response.data;
   },
 };

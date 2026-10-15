@@ -1,3 +1,5 @@
+import { clearActiveCoupon, readActiveCoupon, saveActiveCoupon } from '../../../services/activeCouponStorage';
+
 export function useCheckoutCoupons({
   couponCode,
   appliedCoupon,
@@ -70,17 +72,20 @@ export function useCheckoutCoupons({
         if (appliedDiscount <= 0) {
           appliedCoupon.value = null;
           discountAmount.value = 0;
+          clearActiveCoupon();
           couponMessage.value = t('checkout.coupon_no_discount');
           couponMessageType.value = 'error';
           return;
         }
 
         discountAmount.value = appliedDiscount;
+        saveActiveCoupon({ code: codeClean, coupon, discount: appliedDiscount });
         couponMessage.value = localizeCouponMessage(response.message, true);
         couponMessageType.value = 'success';
       } else {
         appliedCoupon.value = null;
         discountAmount.value = 0;
+        clearActiveCoupon();
         couponMessage.value = localizeCouponMessage(response.message || response.error, false);
         couponMessageType.value = 'error';
       }
@@ -88,6 +93,7 @@ export function useCheckoutCoupons({
       console.error('Coupon validation error:', error);
       appliedCoupon.value = null;
       discountAmount.value = 0;
+      clearActiveCoupon();
       const serverMessage = error.response?.data?.message || error.response?.data?.error || error.response?.data?.data?.message;
       couponMessage.value = localizeCouponMessage(serverMessage, false);
       couponMessageType.value = 'error';
@@ -100,7 +106,16 @@ export function useCheckoutCoupons({
     couponCode.value = '';
     couponMessage.value = '';
     couponMessageType.value = '';
+    clearActiveCoupon();
   };
 
-  return { applyCoupon, removeCoupon, localizeCouponMessage };
+  const restoreCoupon = async () => {
+    const savedCoupon = readActiveCoupon();
+    if (!savedCoupon?.code) return false;
+    couponCode.value = savedCoupon.code;
+    await applyCoupon();
+    return discountAmount.value > 0;
+  };
+
+  return { applyCoupon, removeCoupon, restoreCoupon, localizeCouponMessage };
 }

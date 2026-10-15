@@ -156,14 +156,10 @@ export function useOffersCatalog() {
   
   const fetchOffers = async () => {
     try {
-      const result = await productService.getProducts({ has_discount: 1, per_page: 50 });
-      offers.value = (result.items || []).filter(isOfferActive).map((product) => ({
-        ...product,
-        name: product.name,
-        name_i18n: product.name_i18n,
-        image: normalizeOfferImage(product.image),
-        value: product.discount_percentage,
-        type: 'percentage',
+      const result = await productService.getOffers({ is_active: 1 });
+      offers.value = (Array.isArray(result) ? result : []).filter(isOfferActive).map((offer) => ({
+        ...offer,
+        image: normalizeOfferImage(offer.image),
       }));
     } catch (err) {
       console.error('Failed to fetch offers from API:', err);

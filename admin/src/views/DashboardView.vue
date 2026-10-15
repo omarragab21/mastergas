@@ -296,6 +296,7 @@ import { useTheme } from '../composables/useTheme';
 Chart.register(...registerables);
 
 const { isDark } = useTheme();
+const useLiveApi = import.meta.env.VITE_DATA_MODE === 'api';
 
 // ─── Canvas refs ───────────────────────────────────────────────────────────────
 const donutCanvas = ref(null);
@@ -527,6 +528,82 @@ const fetchLowStock = async (signal) => {
   }
 };
 
+// The live Tijara API exposes the dashboard resources used by the rest of the
+// admin app, but does not expose the legacy aggregate dashboard routes. Build
+// the same dashboard contract from those live resources in production so the
+// screen remains useful instead of failing on /dashboard/statistics (404).
+const fetchLiveDashboardFallback = async (signal) => {
+  const [productsRes, ordersRes, usersRes] = await Promise.all([
+    api.get('/v1/products', { params: { per_page: 1000, include_inactive: 1, show_all: 1 }, signal }),
+    api.get('/v1/orders', { params: { per_page: 1000 }, signal }),
+    api.get('/v1/users', { params: { per_page: 1000 }, signal }),
+  ]);
+  const products = extractList(productsRes.data) || [];
+  const orders = extractList(ordersRes.data) || [];
+  const users = extractList(usersRes.data) || [];
+  const customers = users.filter((user) => {
+    const role = String(user.role || user.user_type || user.type || '').toLowerCase();
+    return !role || role === 'customer' || role === 'user';
+  });
+  const now = new Date();
+  const isSameDay = (value) => {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime())
+      && date.getFullYear() === now.getFullYear()
+      && date.getMonth() === now.getMonth()
+      && date.getDate() === now.getDate();
+  };
+  const isSameMonth = (value) => {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime())
+      && date.getFullYear() === now.getFullYear()
+      && date.getMonth() === now.getMonth();
+  };
+  const amount = (order) => Number(order.total_amount ?? order.total ?? order.amount ?? 0) || 0;
+  const todayOrders = orders.filter((order) => isSameDay(order.created_at || order.createdAt));
+  const monthOrders = orders.filter((order) => isSameMonth(order.created_at || order.createdAt));
+  const statusCounts = orders.reduce((counts, order) => {
+    const status = String(order.status || '').toLowerCase();
+    if (['delivered', 'completed'].includes(status)) counts.completed += 1;
+    else if (['processing', 'prepared'].includes(status)) counts.processing += 1;
+    else if (['shipped', 'out_for_delivery'].includes(status)) counts.shipped += 1;
+    else if (['cancelled', 'canceled'].includes(status)) counts.cancelled += 1;
+    else if (['returned', 'refunded'].includes(status)) counts.returned += 1;
+    else counts.pending += 1;
+    return counts;
+  }, { completed: 0, pending: 0, processing: 0, shipped: 0, cancelled: 0, returned: 0 });
+  const lowStock = products
+    .map((product) => ({ ...product, stock: Number(product.number ?? product.quantity ?? product.stock ?? 0) || 0 }))
+    .filter((product) => product.stock <= 5)
+    .sort((a, b) => a.stock - b.stock)
+    .slice(0, 5);
+  const summary = {
+    total_products: products.length,
+    total_customers: customers.length,
+    total_orders: orders.length,
+    today_orders: todayOrders.length,
+    monthly_sales: monthOrders.reduce((sum, order) => sum + amount(order), 0),
+    today_sales: todayOrders.reduce((sum, order) => sum + amount(order), 0),
+  };
+  const recentOrders = [...orders]
+    .sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0))
+    .slice(0, 5);
+
+  return {
+    data: {
+      data: {
+        summary,
+        orders_by_status: statusCounts,
+        monthly_data: [],
+        daily_data: [],
+        recent_orders: recentOrders,
+        best_selling_products: [],
+        low_stock_products: lowStock,
+      },
+    },
+  };
+};
+
 // ─── Fetch All ─────────────────────────────────────────────────────────────────
 const fetchAll = async () => {
   if (abortController) {
@@ -540,8 +617,8 @@ const fetchAll = async () => {
 
   try {
     const [statsRes, returnsRes] = await Promise.allSettled([
-      api.get('/dashboard/statistics', { signal }),
-      api.get('/dashboard/returns?per_page=4', { signal }),
+      useLiveApi ? fetchLiveDashboardFallback(signal) : api.get('/dashboard/statistics', { signal }),
+      useLiveApi ? Promise.resolve({ data: { data: [] } }) : api.get('/dashboard/returns?per_page=4', { signal }),
     ]);
 
     if (isDisposed) return;

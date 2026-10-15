@@ -293,7 +293,6 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { cartState } from '../../../store/cart';
-import { authState } from '../../../store/auth';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useOffers } from '../../product/composables/useOffers';
 import { useSEO } from '../../../composables/useSEO';
@@ -327,8 +326,8 @@ const rawOffers = ref([]);
 const rawSliders = ref([]);
 const slidersLoading = ref(true);
 // Each API-driven section shows a shimmer until its own request settles.
-const offersLoading = ref(Boolean(authState.token));
-const productsLoading = ref(Boolean(authState.token));
+const offersLoading = ref(true);
+const productsLoading = ref(true);
 const currentHeroIndex = ref(0);
 const heroAutoplayTimer = ref(null);
 const heroTransitionName = ref('slide-right');
@@ -459,15 +458,15 @@ const displayOffers = computed(() => {
       ? (offer.name_i18n?.ar || localized(offer, 'name') || offer.name_ar || offer.name)
       : (offer.name_i18n?.en || offer.name_en || localized(offer, 'name') || offer.name);
     let badgeText = isAr ? 'عرض خاص' : 'Special Offer';
-    if (offer.discount_percentage) {
-      badgeText = isAr ? `خصم ${Math.round(offer.discount_percentage)}%` : `${Math.round(offer.discount_percentage)}% OFF`;
+    if (offer.savings) {
+      badgeText = isAr ? `وفّر ${Number(offer.savings).toLocaleString('en-US')}` : `Save ${Number(offer.savings).toLocaleString('en-US')}`;
     }
     return {
       id: offer.id,
       title,
       badgeText,
       image: normalizeStorageImage(offer.image, '/images/home/offer_clearance_pro.jpg'),
-      link: `/product/${offer.id}`
+      link: `/offers?offer=${offer.id}`
     };
   });
 });
@@ -569,10 +568,6 @@ const addToCart = (product) => {
 };
 
 const fetchSliders = async () => {
-  if (!authState.token) {
-    slidersLoading.value = false;
-    return;
-  }
   slidersLoading.value = true;
   try {
     const list = await settingsService.getSliders({ is_active: 1 });
@@ -593,14 +588,10 @@ const fetchSliders = async () => {
 };
 
 const fetchOffers = async () => {
-  if (!authState.token) {
-    offersLoading.value = false;
-    return;
-  }
   offersLoading.value = true;
   try {
-    const result = await productService.getProducts({ has_discount: 1, per_page: 20 });
-    rawOffers.value = Array.isArray(result.items) ? result.items : [];
+    const result = await productService.getOffers({ is_active: 1 });
+    rawOffers.value = Array.isArray(result) ? result : [];
   } catch (err) {
     console.error('Failed to fetch offers from API:', err);
     rawOffers.value = [];
@@ -610,10 +601,6 @@ const fetchOffers = async () => {
 };
 
 const fetchProducts = async () => {
-  if (!authState.token) {
-    productsLoading.value = false;
-    return;
-  }
   productsLoading.value = true;
   try {
     const [featured, newArrivals] = await Promise.all([
@@ -632,10 +619,6 @@ const fetchProducts = async () => {
 };
 
 onMounted(() => {
-  if (!authState.token) {
-    slidersLoading.value = false;
-    return;
-  }
   fetchSliders();
   fetchCategories();
   fetchOffers();
@@ -1375,8 +1358,34 @@ onUnmounted(() => {
     padding: 0;
   }
 
-  .hero-container {
-    padding: 24px 16px;
+  .hero-container,
+  .home-view[dir="rtl"] .hero-container {
+    padding: 24px 16px 76px;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  /* Arrows sit on the bottom row beside the dots so they never cover the slide text */
+  .hero-nav-arrow {
+    top: auto;
+    bottom: 14px;
+    width: 36px;
+    height: 36px;
+    transform: none;
+  }
+
+  .hero-nav-arrow:hover {
+    transform: none;
+  }
+
+  .hero-arrow-right {
+    right: 16px;
+  }
+
+  .hero-arrow-left {
+    left: 16px;
   }
 
   .hero-title {

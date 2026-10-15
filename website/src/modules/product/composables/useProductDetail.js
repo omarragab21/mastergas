@@ -10,6 +10,7 @@ import { useSettings } from '../../../composables/useSettings';
 import { useSEO } from '../../../composables/useSEO';
 import { trackViewContent } from '../../../utils/metaPixel';
 import { productService } from '../services/productService';
+import { normalizeSiteReview } from '../../../services/siteDataMappers';
 import { useProductContent } from './useProductContent';
 import { useProductVisuals } from './useProductVisuals';
 import riyalIcon from '../../../assets/riyal.svg';
@@ -92,14 +93,33 @@ const prevLightbox = () => {
 };
 
 // Tabs definition matching exact Figma order and titles
+const hasProductContent = (field) => {
+  const value = localized(product.value, field);
+  if (Array.isArray(value)) return value.some((item) => String(item ?? '').trim());
+  return String(value ?? '').trim() !== '';
+};
+
+const hasProductAttributes = computed(() => {
+  const attrs = product.value?.attributes || product.value?.raw_attributes;
+  return Boolean(attrs && typeof attrs === 'object' && Object.keys(attrs).length > 0);
+});
+
 const tabOptions = computed(() => {
-  return [
-    { id: 'overview', label: locale.value === 'ar' ? 'نظرة عامة' : 'Overview' },
-    { id: 'specs', label: locale.value === 'ar' ? 'المواصفات الفنية' : 'Technical Specifications' },
-    { id: 'installation', label: locale.value === 'ar' ? 'التركيب' : 'Installation' },
-    { id: 'shipping', label: locale.value === 'ar' ? 'الشحن والإرجاع' : 'Shipping & Returns' },
-    { id: 'reviews', label: locale.value === 'ar' ? 'التقييمات' : 'Reviews' }
-  ];
+  const tabs = [];
+  if (hasProductContent('description') || hasProductContent('features')) {
+    tabs.push({ id: 'overview', label: locale.value === 'ar' ? 'نظرة عامة' : 'Overview' });
+  }
+  if (hasProductAttributes.value) {
+    tabs.push({ id: 'specs', label: locale.value === 'ar' ? 'المواصفات الفنية' : 'Technical Specifications' });
+  }
+  if (hasProductContent('tips')) {
+    tabs.push({ id: 'installation', label: locale.value === 'ar' ? 'التركيب' : 'Installation' });
+  }
+  if (hasProductContent('shipping_info')) {
+    tabs.push({ id: 'shipping', label: locale.value === 'ar' ? 'الشحن والإرجاع' : 'Shipping & Returns' });
+  }
+  tabs.push({ id: 'reviews', label: locale.value === 'ar' ? 'التقييمات' : 'Reviews' });
+  return tabs;
 });
 
 watch(tabOptions, (tabs) => {
@@ -159,71 +179,48 @@ const isProductInStock = computed(() => {
 // Rating & Reviews logic
 const reviews = ref([]);
 
-const defaultReviews = computed(() => [
-  {
-    id: 'def-1',
-    user_name: 'أحمد محمد',
-    date: locale.value === 'ar' ? '15 أغسطس 2026' : 'August 15, 2026',
-    rating: 4,
-    comment: locale.value === 'ar' ? 'منتج ممتاز والجودة كانت كما توقعت، التركيب كان سهل والأداء فاق التوقعات.' : 'Excellent product, quality was as expected. Installation was easy and performance exceeded expectations.'
-  },
-  {
-    id: 'def-2',
-    user_name: 'سارة العتيبي',
-    date: locale.value === 'ar' ? '3 يوليو 2026' : 'July 3, 2026',
-    rating: 4,
-    comment: locale.value === 'ar' ? 'فرن رائع بتصميم أنيق. الطهي متساوي والحرارة ممتازة. أنصح به بشدة.' : 'Wonderful oven with elegant design. Cooking is even and heat is excellent. Highly recommend.'
-  },
-  {
-    id: 'def-3',
-    user_name: 'خالد الشمري',
-    date: locale.value === 'ar' ? '22 يونيو 2026' : 'June 22, 2026',
-    rating: 4,
-    comment: locale.value === 'ar' ? 'أفضل فرن استخدمته. الجودة الإيطالية واضحة في كل التفاصيل. يستحق كل ريال.' : 'Best oven I have used. Italian quality is evident in every detail. Worth every riyal.'
-  }
-]);
-
 const displayReviews = computed(() => {
-  if (Array.isArray(reviews.value) && reviews.value.length > 0) {
-    return reviews.value;
-  }
-  return defaultReviews.value;
+  return Array.isArray(reviews.value) ? reviews.value : [];
 });
 
 const computedRatingCount = computed(() => {
-  if (product.value?.reviews_count !== undefined && product.value?.reviews_count !== null) {
-    return Number(product.value.reviews_count);
+  const summary = product.value?.reviews_summary;
+  if (summary?.count !== undefined || summary?.total !== undefined || summary?.total_reviews !== undefined) {
+    return Number(summary.count ?? summary.total ?? summary.total_reviews) || 0;
   }
   if (Array.isArray(reviews.value) && reviews.value.length > 0) {
     return reviews.value.length;
   }
-  return 24;
+  return 0;
 });
 
 const computedAverageRating = computed(() => {
+  const summary = product.value?.reviews_summary;
+  if (summary?.average !== undefined || summary?.average_rating !== undefined) {
+    return Number(summary.average ?? summary.average_rating) || 0;
+  }
   if (product.value?.rating !== undefined && product.value?.rating !== null) {
-    return Number(product.value.rating);
+    return Number(product.value.rating) || 0;
   }
   if (Array.isArray(reviews.value) && reviews.value.length > 0) {
-    const sum = reviews.value.reduce((acc, r) => acc + Number(r.rating || 5), 0);
+    const sum = reviews.value.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
     return Number((sum / reviews.value.length).toFixed(1));
   }
-  return 4.0;
+  return 0;
 });
 
 const getRatingPercentage = (star) => {
   if (Array.isArray(reviews.value) && reviews.value.length > 0) {
-    const count = reviews.value.filter(r => Math.round(Number(r.rating || 5)) === star).length;
+    const count = reviews.value.filter(r => Math.round(Number(r.rating) || 0) === star).length;
     return Math.round((count / reviews.value.length) * 100);
   }
-  const map = { 5: 80, 4: 15, 3: 5, 2: 0, 1: 0 };
-  return map[star] || 0;
+  return 0;
 };
 
 const fetchReviews = async (productId) => {
   try {
     const list = await productService.getProductReviews(productId);
-    if (Array.isArray(list) && list.length > 0) {
+    if (Array.isArray(list)) {
       reviews.value = list;
     }
   } catch (err) {
@@ -233,6 +230,8 @@ const fetchReviews = async (productId) => {
 
 const {
   productFeatures,
+  installationItems,
+  shippingItems,
   dynamicOverviewTitle,
   dynamicOverviewDesc,
   dynamicOverviewFeatures,
@@ -287,6 +286,7 @@ const fetchProduct = async (id) => {
     if (controller.signal.aborted || sequence !== productRequestSequence) return;
     if (pData && typeof pData === 'object' && !Array.isArray(pData) && pData.id) {
       product.value = pData;
+      reviews.value = Array.isArray(pData.reviews) ? pData.reviews.map(normalizeSiteReview) : [];
       selectColor(colorOptions.value[0]?.name);
 
       useSEO({
@@ -343,11 +343,7 @@ const submitReview = async () => {
   isSubmittingReview.value = true;
   reviewMessage.value = '';
   try {
-    await api.post('/frontend/reviews', {
-      product_id: route.params.id,
-      rating: reviewForm.value.rating,
-      comment: reviewForm.value.comment
-    });
+    await productService.submitReview(route.params.id, reviewForm.value);
     reviewStatus.value = 'success';
     reviewMessage.value = locale.value === 'ar' ? 'شكراً لك! تم إرسال تقييمك بنجاح.' : 'Thank you! Your review has been submitted.';
     if (route.params.id) {
@@ -386,10 +382,6 @@ const formatDate = (dateStr) => {
 };
 
 onMounted(() => {
-  if (!authState.token) {
-    loading.value = false;
-    return;
-  }
   fetchOffers();
   fetchSettings();
   if (route.params.id) {
@@ -406,6 +398,6 @@ onUnmounted(() => {
 });
   const addToCart = (productToAdd) => cartState.addToCart(productToAdd);
   return {
-    t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, isFavorite, toggleFavorite, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
+    t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, isFavorite, toggleFavorite, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
   };
 }

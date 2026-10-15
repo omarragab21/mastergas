@@ -189,8 +189,8 @@
               <!-- stat-card 1: الطلبات النشطة (on right in RTL) -->
               <div class="stat-card" @click="router.push('/profile?tab=orders')" style="cursor: pointer;">
                 <div class="stat-txt">
-                  <span class="stat-label">الطلبات النشطة</span>
-                  <span class="stat-val">{{ activeOrdersCountText }}</span>
+                  <span class="stat-label">{{ t('profile.total_orders') || 'إجمالي الطلبات' }}</span>
+                  <span class="stat-val">{{ totalOrdersCountText }}</span>
                 </div>
                 <div class="icon-container">
                   <svg width="28" height="28" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1157,10 +1157,13 @@
 
              <div class="wishlist-grid" v-else>
                 <div v-for="product in wishlistItems" :key="product.id" class="wish-card">
-                   <img :src="getImageUrl(product.image || product.images?.[0])" @click="$router.push('/product/'+product.id)" />
+                   <img :src="getImageUrl(product.image || product.images?.[0])" @click="$router.push('/product/'+product.id)" @error="$event.target.src = '/brand/mastergas-icon.png'" />
                    <div class="wish-body">
-                      <h4 @click="$router.push('/product/'+product.id)">{{ product.name }}</h4>
-                      <div class="wish-price">{{ product.price }} {{ currency }}</div>
+                      <h4 @click="$router.push('/product/'+product.id)">{{ (locale === 'ar' ? product.name_ar : product.name_en) || product.name }}</h4>
+                      <div class="wish-price">
+                        <span>{{ formatPrice(product.sale_price || product.price) }}</span>
+                        <img :src="riyalIcon" alt="ريال" class="wish-riyal" aria-hidden="true" />
+                      </div>
                       <div class="wish-card-actions">
                         <button class="wish-add-cart" @click="cartState.addToCart(product)">
                           <i class="fas fa-shopping-cart"></i> {{ t('cart.title') }}
@@ -1634,6 +1637,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed, watch } from 'vue'
+import riyalIcon from '../../../assets/riyal.svg'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -1697,7 +1701,9 @@ const ORDER_STATUS_META = {
   confirmed: { label: 'تم تأكيد الطلب', color: '#2563EB', canTrack: true, rank: 2 },
   paid_confirmed: { label: 'تم تأكيد الدفع', color: '#2563EB', canTrack: true, rank: 2 },
   processing: { label: 'قيد التجهيز', color: '#F59E0B', canTrack: true, rank: 3 },
-  shipped: { label: 'تم الشحن', color: '#F59E0B', canTrack: true, rank: 4 },
+  // `shipped` is the API state for the parcel being out for delivery.
+  // `delivered` remains a separate state and is the only completed state.
+  shipped: { label: 'الطلب في الطريق', color: '#F59E0B', canTrack: true, rank: 5 },
   shipping: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
   delivering: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
   in_delivery: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
@@ -1711,9 +1717,10 @@ const ORDER_STATUS_META = {
 
 const DEFAULT_ORDER_STATUS = ORDER_STATUS_META.pending
 
-const activeOrdersCountText = computed(() => {
-  const active = ordersList.value.filter(o => !['delivered', 'cancelled', 'completed', 'failed', 'returned', 'refunded'].includes(o.status))
-  return `${active.length} طلبات`
+const totalOrdersCountText = computed(() => {
+  const count = ordersTotalCount.value
+  if (locale.value === 'en') return `${count} ${count === 1 ? 'order' : 'orders'}`
+  return `${count} ${count === 1 ? 'طلب' : 'طلبات'}`
 })
 
 const addressesCountText = computed(() => {
@@ -1866,6 +1873,7 @@ const localizedCountryName = computed(() => {
 addressesList.value = []
 
 const wishlistItems = computed(() => cartState.wishlist)
+watch(currentTab, (tab) => { if (tab === 'wishlist') cartState.hydrateWishlist() })
 
 const removeFromWishlist = (product) => {
   cartState.toggleWishlist(product)
@@ -2099,7 +2107,7 @@ const allOrdersMapped = computed(() => {
       return {
         id: o.id,
         orderNumber: o.orderNumber || o.order_number || ('#MG-' + o.id),
-        date: o.date || formatDateArabic(o.created_at) || '25 أغسطس 2026',
+        date: o.date || formatDateArabic(o.created_at) || '—',
         status: o.status,
         statusLabel: meta.label,
         statusColor: meta.color,
@@ -2372,6 +2380,9 @@ onMounted(async () => {
     return
   }
   fetchSettings()
+  if (currentTab.value === 'wishlist') {
+    cartState.hydrateWishlist()
+  }
   if (currentTab.value === 'wallet') {
     fetchWallet()
   }
@@ -5448,7 +5459,8 @@ html[dir="ltr"] .input-relative select {
 .wish-card img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; cursor: pointer; }
 .wish-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .wish-body h4 { font-size: 16px; font-weight: 800; margin: 0; cursor: pointer; }
-.wish-price { font-weight: 800; color: #000000; font-size: 17px; }
+.wish-price { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; color: #000000; font-size: 17px; }
+.wish-card .wish-price .wish-riyal { width: 14px; height: 16px; border-radius: 0; cursor: default; display: block; flex: 0 0 14px; }
 .wish-card-actions { display: flex; gap: 8px; }
 .wish-add-cart { flex: 1; border: none; background: #f3f4f6; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #000000; cursor: pointer; transition: 0.3s; }
 .wish-add-cart:hover { background: #000000; color: #fff; }
@@ -8042,5 +8054,366 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
   .invoice-action-controls {
     display: none !important;
   }
+}
+
+/* ==========================================================================
+   Orders tab on phones: the Figma frames use fixed heights/widths, so rows
+   overlapped when text wrapped. Let every block size to its content and stack.
+   ========================================================================== */
+@media (max-width: 640px) {
+  .orders-tab-view,
+  .orders-detailed-list { gap: 12px; }
+
+  /* filter bar: tabs on top (2x2), search below, full width */
+  .filter-sort-bar {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+  .filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+    gap: 8px;
+  }
+  .filter-tabs .tab-btn {
+    height: 38px;
+    padding: 6px 8px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .search-box { width: 100%; box-sizing: border-box; }
+  .search-box .search-input { width: auto; min-width: 0; font-size: 13px; }
+
+  /* card */
+  .order-detailed-card {
+    padding: 16px;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  /* top: status badge, then order number + date */
+  .card-top-info {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    height: auto;
+    gap: 12px;
+  }
+  .status-area { height: auto; justify-content: flex-start; }
+  .status-badge {
+    height: 30px;
+    padding: 4px 14px;
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .main-meta {
+    height: auto;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .meta-col { height: auto; flex: 1 1 0; min-width: 0; gap: 2px; }
+  .meta-label { font-size: 11px; line-height: 16px; }
+  .meta-val { font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
+  .meta-divider { height: 28px; flex: none; }
+
+  /* middle: products on the first row, total on its own row */
+  .card-middle-content {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 12px;
+  }
+  .products-description {
+    flex: 1 1 100%;
+    height: auto;
+    gap: 12px;
+    min-width: 0;
+  }
+  .prod-icon-frame { width: 44px; height: 44px; }
+  .prod-icon-frame svg { width: 20px; height: 20px; }
+  .prod-text-frame { height: auto; gap: 2px; min-width: 0; }
+  .prod-count { font-size: 14px; line-height: 21px; }
+  .prod-subtitle { font-size: 12px; line-height: 18px; }
+  .price-actions {
+    flex: 1 1 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
+    direction: rtl;
+    text-align: right;
+    padding: 10px 12px;
+    background: #F8FAFC;
+    border-radius: 8px;
+  }
+  .price-label { font-size: 12px; }
+  .price-unit { height: auto; direction: ltr; }
+  .price-amount { font-size: 16px; line-height: 24px; font-weight: 700; }
+
+  /* bottom: help text, then the details link */
+  .card-bottom-actions {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    gap: 8px;
+  }
+  .help-prompt { height: auto; flex-wrap: wrap; gap: 4px 8px; }
+  .help-question,
+  .help-link,
+  .order-action-link { font-size: 13px; line-height: 20px; }
+  .actions-left { height: auto; justify-content: flex-start; }
+  .order-action-link { height: auto; }
+}
+
+/* Order details on phones: stack the header, turn the stepper vertical, full-width buttons */
+@media (max-width: 640px) {
+  .order-details-view { gap: 12px; }
+
+  .order-info-card,
+  .order-tracking-card,
+  .products-card,
+  .summary-card { padding: 16px; gap: 12px; min-height: 0; }
+
+  .tracking-title,
+  .products-card-title,
+  .summary-card-title { font-size: 18px; line-height: 26px; }
+
+  /* order number + date, then the status badge */
+  .order-info-frame { flex-direction: column-reverse; align-items: stretch; gap: 12px; }
+  .order-info-meta { gap: 12px; justify-content: space-between; }
+  .info-meta-col { flex: 1 1 0; min-width: 0; gap: 2px; }
+  .info-meta-label { font-size: 11px; line-height: 16px; }
+  .info-meta-val { font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
+  .info-meta-divider { height: 28px; flex: none; }
+  .order-status-badge { align-self: flex-start; min-width: 0; height: 30px; padding: 4px 14px; font-size: 12px; line-height: 18px; }
+
+  /* vertical tracking: circle on the start side, text beside it */
+  .timeline-row {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding-bottom: 0;
+    overflow: visible;
+  }
+  .timeline-step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 12px;
+    row-gap: 0;
+    align-items: center;
+    flex: none;
+    min-width: 0;
+    text-align: right;
+  }
+  .step-indicator-wrapper { grid-row: 1 / span 3; grid-column: 1; }
+  .step-title,
+  .step-time,
+  .step-note { grid-column: 2; text-align: right; }
+  .step-title { font-size: 14px; line-height: 21px; }
+  .step-time,
+  .step-note { font-size: 12px; line-height: 18px; }
+  .timeline-connector {
+    width: 40px;
+    height: 20px;
+    margin: 2px 0;
+    align-self: flex-start;
+  }
+  .connector-bar { height: 20px; }
+
+  /* buttons */
+  .bottom-action-buttons {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    height: auto;
+    gap: 12px;
+  }
+  .help-prompt-col { flex-wrap: wrap; justify-content: center; gap: 4px 8px; }
+  .help-q-text,
+  .help-link-bold { font-size: 13px; line-height: 20px; }
+  .action-buttons-wrap { flex-direction: column-reverse; align-items: stretch; width: 100%; gap: 10px; }
+  .btn-primary-invoice,
+  .btn-secondary-back {
+    width: 100%;
+    height: 48px;
+    padding: 12px 16px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+}
+
+/* Order details on phones, part 2: products as stacked rows, compact summary / address / payment */
+@media (max-width: 640px) {
+  .address-payment-split { gap: 12px; }
+  .delivery-card,
+  .payment-card { padding: 16px; gap: 10px; }
+  .card-heading-md { font-size: 15px; line-height: 22px; }
+  .delivery-name { font-size: 14px; line-height: 21px; }
+  .delivery-detail { font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
+  .payment-method-row { height: auto; gap: 8px; }
+  .payment-method-text { font-size: 14px; line-height: 21px; }
+
+  .summary-rows-wrap { gap: 10px; }
+  .summary-item-row { height: auto; min-height: 24px; }
+  .summary-item-label { font-size: 14px; line-height: 21px; }
+  .summary-item-val { font-size: 13px; line-height: 20px; }
+  .summary-total-row { height: auto; }
+  .summary-total-label { font-size: 16px; line-height: 24px; }
+  .summary-total-val { font-size: 20px; line-height: 30px; }
+
+  /* products: header row is replaced by per-cell labels */
+  .products-table-header { display: none; }
+  .product-row-item {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 12px;
+    padding: 12px 0;
+  }
+  .col-prod-details { grid-column: 1 / -1; gap: 12px; min-width: 0; }
+  .prod-thumb-img { width: 56px; height: 56px; }
+  .prod-main-name { font-size: 14px; line-height: 21px; }
+  .prod-model-num { font-size: 11px; line-height: 16px; }
+  .col-unit-price-cell,
+  .col-qty-cell,
+  .col-total-cell {
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px 4px;
+    padding: 8px 10px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 700;
+  }
+  .col-unit-price-cell::before,
+  .col-qty-cell::before,
+  .col-total-cell::before {
+    flex: 1 0 100%;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 400;
+    color: #64748B;
+  }
+  .col-unit-price-cell::before { content: 'السعر'; }
+  .col-qty-cell::before { content: 'الكمية'; }
+  .col-total-cell::before { content: 'الإجمالي'; }
+}
+/* Breadcrumb -> tabs -> content: equal breathing room above and below the tabs row on phones */
+@media (max-width: 900px) {
+  .breadcrumb-flow { margin-bottom: 12px; }
+  .profile-mobile-tabs-container { margin-bottom: 12px !important; }
+  .profile-mobile-tabs { padding: 4px 0 !important; }
+  .main-content-layout { padding-top: 0 !important; }
+}
+
+/* In-page invoice on phones: single column, symmetric padding, products as stacked cells */
+@media (max-width: 640px) {
+  .inpage-invoice-view { width: 100%; gap: 12px; align-items: stretch; }
+  .inpage-invoice-top-bar { width: 100%; gap: 8px; }
+  .btn-back-to-order-details,
+  .btn-back-to-orders-list { padding: 10px 14px; font-size: 13px; line-height: 20px; white-space: nowrap; }
+  .btn-back-to-order-details { flex: 1 1 auto; justify-content: center; }
+  .btn-back-to-orders-list { flex: 0 0 auto; }
+
+  .printable-invoice-card {
+    width: 100%;
+    padding: 20px 16px;
+    gap: 20px;
+    min-height: 0;
+    align-items: stretch;
+    border-radius: 14px;
+  }
+
+  .invoice-header-frame {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    height: auto;
+    gap: 16px;
+  }
+  .invoice-meta-block { min-width: 0; height: auto; gap: 4px; }
+  .invoice-type-title { font-size: 22px; line-height: 32px; }
+  .invoice-meta-row { white-space: normal; overflow-wrap: anywhere; }
+  .invoice-company-block { width: auto; height: auto; gap: 6px; }
+  .invoice-logo-wrapper { width: auto; height: auto; }
+  .invoice-company-name,
+  .invoice-vat-number { width: auto; height: auto; }
+
+  .invoice-parties-frame { gap: 16px; }
+  .invoice-party-col { gap: 6px; width: 100%; }
+  .invoice-party-item { overflow-wrap: anywhere; text-align: start; }
+
+  .invoice-table-frame { overflow: visible; }
+  .invoice-table-header { display: none; }
+  .invoice-product-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 10px;
+    height: auto;
+    padding: 12px 0;
+    align-items: stretch;
+  }
+  .invoice-product-row .col-product {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    line-height: 22px;
+    overflow-wrap: anywhere;
+  }
+  .invoice-product-row .col-price,
+  .invoice-product-row .col-qty,
+  .invoice-product-row .col-total {
+    width: auto;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px 4px;
+    padding: 8px 10px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 700;
+    color: #000000;
+  }
+  .invoice-product-row .col-price { color: #64748B; }
+  .invoice-product-row .col-price::before,
+  .invoice-product-row .col-qty::before,
+  .invoice-product-row .col-total::before {
+    flex: 1 0 100%;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 400;
+    color: #64748B;
+  }
+  .invoice-product-row .col-price::before { content: 'سعر الوحدة'; }
+  .invoice-product-row .col-qty::before { content: 'الكمية'; }
+  .invoice-product-row .col-total::before { content: 'الإجمالي'; }
+
+  .invoice-summary-card { width: 100%; align-self: stretch; margin: 0; }
+  .summary-breakdown-row,
+  .summary-final-row,
+  .summary-box-line { width: 100%; }
+  .summary-breakdown-row { height: auto; min-height: 21px; }
+  .summary-final-row { height: auto; }
+  .final-total-val { font-size: 20px; line-height: 30px; }
+
+  .invoice-footer-frame { height: auto; flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  .invoice-action-controls { width: 100%; gap: 12px; }
+  .invoice-buttons-wrap { flex-direction: column-reverse; align-items: stretch; width: 100%; gap: 10px; }
+  .primary-download-button,
+  .secondary-print-button { width: 100%; min-width: 0; height: 48px; padding: 12px 16px; font-size: 15px; }
 }
 </style>

@@ -54,6 +54,20 @@ export const tijaraAdminApi = {
   getDiscountCode: (id) => api.get(`/v1/discount_codes/${id}`),
   deleteDiscountCode: (id) => api.delete(`/v1/discount_codes/${id}`),
 
+  listOffers: (params = {}) => api.get('/v1/offers', { params }),
+  createOffer: (payload, image) => api.post('/v1/offers', multipart(payload, { image_file: image }), formHeaders),
+  updateOffer: (id, payload, image) => api.put(`/v1/offers/${id}`, multipart(payload, { image_file: image }), formHeaders),
+  getOffer: (id) => api.get(`/v1/offers/${id}`),
+  deleteOffer: (id) => api.delete(`/v1/offers/${id}`),
+
+  listReviews: (params = {}) => api.get('/v1/reviews', { params }),
+  updateReview: (id, payload) => api.patch(`/v1/reviews/${id}`, payload, json),
+  deleteReview: (id) => api.delete(`/v1/reviews/${id}`),
+
+  listContacts: (params = {}) => api.get('/v1/contacts', { params }),
+  getContact: (id) => api.get(`/v1/contacts/${id}`),
+  deleteContact: (id) => api.delete(`/v1/contacts/${id}`),
+
   listSliders: (params = {}) => api.get('/v1/sliders', { params }),
   createSlider: (payload, image) => api.post('/v1/sliders', multipart(payload, { image_file: image }), formHeaders),
   updateSlider: (id, payload, image) => api.put(`/v1/sliders/${id}`, multipart(payload, { image_file: image }), formHeaders),

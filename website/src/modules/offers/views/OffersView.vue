@@ -90,7 +90,7 @@
           :current-page="currentPage"
           :total-pages="totalPages"
           @open-product="goToProduct"
-          @add-to-cart="cartState.addToCart"
+          @add-to-cart="addOfferProductToCart"
           @change-page="changePage"
         />
       </div>
@@ -138,6 +138,15 @@ const {
   fetchOffers,
   fetchProducts,
 } = useOffersCatalog();
+
+const addOfferProductToCart = (product) => {
+  const offerId = Number(currentOffer.value?.id);
+  cartState.addToCart(
+    Number.isInteger(offerId) && offerId > 0
+      ? { ...product, offer_id: offerId }
+      : product
+  );
+};
 
 onMounted(async () => {
   fetchSettings();

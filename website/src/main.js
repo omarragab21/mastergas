@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './style.css';
 import './components/skeleton/skeleton.css';
+import './styles/mobile-typography.css';
 import App from './App.vue';
 import router from './router/index.js';
 import i18n from './i18n/index.js';

@@ -94,7 +94,6 @@ import { isCancelledRequest } from '../../../config/axios';
 import ProductFiltersSidebar from '../components/ProductFiltersSidebar.vue';
 import ProductResultsGrid from '../components/ProductResultsGrid.vue';
 import { cartState } from '../../../store/cart';
-import { authState } from '../../../store/auth';
 import { useOffers } from '../composables/useOffers';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSEO } from '../../../composables/useSEO';
@@ -117,7 +116,7 @@ useSEO({
 const products = ref([]);
 const categories = ref([]);
 const loading = ref(true);
-const categoriesLoading = ref(Boolean(authState.token));
+const categoriesLoading = ref(true);
 const dataNotice = ref('');
 const totalCount = ref(0);
 const allProductsCount = ref(0);
@@ -192,10 +191,6 @@ const changePage = (page) => {
 };
 
 const fetchCategories = async () => {
-  if (!authState.token) {
-    categoriesLoading.value = false;
-    return;
-  }
   categoriesLoading.value = true;
   try {
     const list = await productService.getCategoriesWithProductCounts({ is_active: 1 });
@@ -218,10 +213,6 @@ let requestController = null;
 let requestSequence = 0;
 
 const fetchProducts = async () => {
-  if (!authState.token) {
-    loading.value = false;
-    return;
-  }
   requestController?.abort();
   const controller = new AbortController();
   requestController = controller;

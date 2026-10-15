@@ -45,18 +45,22 @@
           </header>
 
           <div v-if="cartState.wishlist.length === 0" class="empty-wishlist">
-            <div class="heart-icon">❤️</div>
-            <h3>{{ t('wishlist.empty_title') }}</h3>
-            <p>{{ t('wishlist.empty_desc') }}</p>
-            <router-link to="/products" class="shop-btn">{{ t('home.shop_now') }}</router-link>
+            <div class="empty-icon-container">
+              <i class="far fa-heart empty-heart-icon" aria-hidden="true"></i>
+            </div>
+            <div class="empty-text-container">
+              <h3 class="empty-title">{{ t('wishlist.empty_title') }}</h3>
+              <p class="empty-subtitle">{{ t('wishlist.empty_desc') }}</p>
+            </div>
+            <router-link to="/products" class="empty-btn-primary">{{ t('home.shop_now') }}</router-link>
           </div>
 
           <div v-else class="wishlist-list">
             <div v-for="item in cartState.wishlist" :key="item.id" class="wishlist-item">
               <div class="item-visual" @click="goToProduct(item)" style="cursor: pointer;">
-                <img :src="getImageUrl(item.image || item.images?.[0], item.id)" :alt="localized(item, 'name')" @error="$event.target.src = '/images/home/product_ceramic_hob_60.png'">
+                <img :src="getImageUrl(item.image || item.images?.[0], item.id)" :alt="localized(item, 'name')" @error="onImageError">
                 <div class="discount-label" v-if="item.discount > 0">
-                  -{{ Math.round((item.discount / item.price) * 100) }}%
+                  -{{ Math.round(item.discount) }}%
                 </div>
               </div>
               
@@ -72,8 +76,14 @@
 
                 <div class="item-price-actions">
                   <div class="price-box">
-                    <span class="current-price">{{ (item.price * (1 - (item.discount/100 || 0))).toLocaleString('en-US') }} {{ currency }}</span>
-                    <span class="old-price" v-if="item.discount > 0">{{ item.price.toLocaleString('en-US') }} {{ currency }}</span>
+                    <span class="current-price">
+                      <span>{{ formatPrice(item.sale_price || (item.price * (1 - (item.discount / 100 || 0)))) }}</span>
+                      <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg" aria-hidden="true" />
+                    </span>
+                    <span class="old-price" v-if="item.discount > 0">
+                      <span>{{ formatPrice(item.price) }}</span>
+                      <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg is-muted" aria-hidden="true" />
+                    </span>
                   </div>
                   
                   <div class="action-btns">
@@ -102,10 +112,11 @@ import { useSettings } from '../../../composables/useSettings';
 import { cartState } from '../../../store/cart';
 import { authState, authActions } from '../../../store/auth';
 import { useLocalized } from '../../../composables/useLocalized';
+import riyalIcon from '../../../assets/riyal.svg';
 
 const router = useRouter();
 const { t } = useI18n();
-const { currency, fetchSettings } = useSettings();
+const { fetchSettings } = useSettings();
 const { localized } = useLocalized();
 const isLoggedIn = computed(() => !!authState.token);
 
@@ -121,12 +132,24 @@ const getImageUrl = (path, id) => {
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
+const formatPrice = (price) => {
+  const num = parseFloat(price) || 0;
+  return num.toLocaleString('en-US', { minimumFractionDigits: num % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 });
+};
+
 const goToProduct = (product) => {
   router.push(`/product/${product.id}`);
 };
 
+const onImageError = (event) => {
+  if (!String(event.target.src).endsWith('/brand/mastergas-icon.png')) {
+    event.target.src = '/brand/mastergas-icon.png';
+  }
+};
+
 onMounted(() => {
   fetchSettings();
+  cartState.hydrateWishlist();
 });
 
 const handleLogout = () => {
@@ -385,15 +408,39 @@ const handleLogout = () => {
 }
 
 .current-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 20px;
   font-weight: 800;
   color: #000000;
 }
 
 .old-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 13px;
   color: #9ca3af;
+}
+
+.old-price > span {
   text-decoration: line-through;
+}
+
+/* Same riyal SVG as the product card */
+.currency-symbol-svg {
+  width: 14px;
+  height: 16px;
+  display: block;
+  flex: 0 0 14px;
+}
+
+.currency-symbol-svg.is-muted {
+  width: 11px;
+  height: 13px;
+  flex-basis: 11px;
+  opacity: 0.45;
 }
 
 .action-btns {
@@ -435,34 +482,83 @@ const handleLogout = () => {
   color: #fff;
 }
 
+/* Empty state: same design as the empty cart (grey circle, text, black button) */
 .empty-wishlist {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 64px 24px;
   text-align: center;
-  padding: 100px 20px;
 }
 
-.heart-icon {
-  font-size: 80px;
-  margin-bottom: 25px;
+.empty-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  background: #F1F5F9;
+  border-radius: 9999px;
+  flex: none;
 }
 
-.empty-wishlist h3 {
-  font-size: 22px;
-  font-weight: 800;
-  margin-bottom: 10px;
+/* Outline heart (Font Awesome regular), black, nothing inside */
+.empty-heart-icon {
+  font-size: 36px;
+  line-height: 1;
+  color: #000000;
 }
 
-.empty-wishlist p {
-  color: #9ca3af;
-  margin-bottom: 30px;
+.empty-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 520px;
 }
 
-.shop-btn {
-  padding: 14px 40px;
+.empty-title {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #000000;
+}
+
+.empty-subtitle {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #64748B;
+}
+
+.empty-btn-primary {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 155px;
+  height: 45px;
+  padding: 12px 24px;
   background: #000000;
-  color: #fff;
+  border-radius: 8px;
   text-decoration: none;
-  border-radius: 12px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 21px;
+  color: #FFFFFF;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.empty-btn-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .sidebar-guest-msg {
@@ -481,9 +577,21 @@ const handleLogout = () => {
   font-weight: 600;
 }
 
+@media (max-width: 1024px) {
+  .wishlist-page {
+    padding: 24px 0 60px;
+  }
+  .main-container {
+    padding: 0 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .wishlist-page {
-    padding: 100px 0 60px;
+    padding: 24px 0 60px;
+  }
+  .main-container {
+    padding: 0 16px;
   }
   .account-layout {
     grid-template-columns: 1fr;
@@ -495,10 +603,41 @@ const handleLogout = () => {
   .page-title {
     font-size: 22px;
   }
+  .wishlist-main {
+    padding: 16px;
+    min-height: 0;
+    border-radius: 16px;
+  }
+  .empty-wishlist {
+    gap: 16px;
+    padding: 40px 8px;
+  }
+  .empty-title {
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .empty-subtitle {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .wishlist-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
   .wishlist-item {
     flex-direction: column;
     gap: 12px;
-    padding: 14px;
+    padding: 12px;
+  }
+  .item-details {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .item-text {
+    padding-left: 0;
+  }
+  .item-name {
+    font-size: 16px;
   }
   .item-visual {
     width: 100%;

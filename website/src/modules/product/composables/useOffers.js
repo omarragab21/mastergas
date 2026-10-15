@@ -80,6 +80,10 @@ export function useOffers() {
 
   const calculateDiscountFromOffer = (product, offer) => {
     if (!offer) return 0;
+    // A bundle price belongs to the group, not to each product card. Do not
+    // render it as a per-product percentage (which can produce nonsense such
+    // as -999% when the bundle price is larger than one line item).
+    if (offer.type === 'bundle') return 0;
     if (offer.type === 'percentage' || offer.discount_type === 'percentage') {
       return Number(offer.value ?? offer.discount_value ?? offer.discount ?? 0) || 0;
     }
@@ -90,6 +94,10 @@ export function useOffers() {
 
   const calculatePriceWithOffer = (product, offer) => {
     const price = Number(product?.price) || 0;
+    if (offer?.type === 'bundle') {
+      const salePrice = Number(product?.sale_price) || 0;
+      return salePrice > 0 && salePrice < price ? salePrice : price;
+    }
     return price * (1 - calculateDiscountFromOffer(product, offer) / 100);
   };
 

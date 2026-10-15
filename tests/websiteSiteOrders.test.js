@@ -59,6 +59,17 @@ test('PAYLOAD sends coupon_code only when there is one, and keeps notes free of 
   assert.equal(payload.notes, 'Ring');
 });
 
+test('PAYLOAD carries offer_id for offer orders without requiring a discount code', () => {
+  const payload = toSiteOrderPayload(checkoutData({
+    offer_id: '4',
+    items: [{ product_id: 42, quantity: 1, offer_id: '4' }],
+  }));
+
+  assert.equal(payload.offer_id, 4);
+  assert.equal(payload.items[0].offer_id, 4);
+  assert.equal('coupon_code' in payload, false);
+});
+
 test('PAYLOAD payment method: cod → cash_on_delivery, card → credit_card, wallet is unsupported', () => {
   assert.equal(toSiteOrderPayload(checkoutData({ payment_method: 'cod' })).payment_method, 'cash_on_delivery');
   assert.equal(toSiteOrderPayload(checkoutData({ payment_method: 'card' })).payment_method, 'credit_card');

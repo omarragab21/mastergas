@@ -6,6 +6,18 @@
       <div class="checkout-layout" :class="{ 'confirmation-layout': currentStep === 5 }">
         <!-- Main Content (Steps) -->
         <div class="main-checkout-content">
+          <div
+            v-if="checkoutStockError"
+            class="checkout-unavailable-warning"
+            :class="{ 'is-ltr': currentLocale !== 'ar' }"
+            role="alert"
+          >
+            <svg class="checkout-unavailable-warning-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2" />
+              <path d="M12 7.5v5.5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span>{{ t('cart.unavailable_product', { name: checkoutUnavailableName }) }}</span>
+          </div>
           
           <!-- Step 2: Shipping Address -->
           <!-- Step 2: Shipping Address (Figma 1:1 Design) -->
@@ -601,6 +613,10 @@
               <i class="fas fa-tag"></i>
               <span>{{ appliedCoupon.code }}</span>
             </div>
+            <span class="coupon-active-label">
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+              {{ currentLocale === 'ar' ? 'مفعل' : 'Active' }}
+            </span>
             <button type="button" class="coupon-remove-btn" @click="removeCoupon">
               {{ t('cart.remove') || 'إزالة' }}
             </button>
@@ -641,7 +657,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -713,10 +729,21 @@ const currentLocale = computed(() => {
     return 'ar';
   }
 });
+const checkoutStockError = ref(null);
 const { localized } = useLocalized();
+const checkoutUnavailableName = computed(() => {
+  const item = checkoutStockError.value;
+  if (!item) return '';
+  return localized(item, 'name')
+    || (currentLocale.value === 'ar' ? item.name_ar : item.name_en)
+    || item.name_ar
+    || item.name_en
+    || item.name
+    || (currentLocale.value === 'ar' ? 'هذا المنتج' : 'This product');
+});
 const { getActiveOfferForProduct, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { currency } = useSettings();
-const { roundMoney, getItemPriceWithDiscount, getItemUnitPrice } = useCheckoutPricing({
+const { roundMoney, getItemPriceWithDiscount, getItemUnitPrice, getCartPricing } = useCheckoutPricing({
   getActiveOfferForProduct,
   calculatePriceWithOffer,
 });
@@ -794,6 +821,7 @@ onMounted(async () => {
   await fetchSettings();
   await fetchWalletBalance();
   await fetchUserData();
+  await restoreCoupon();
 });
 
 // Preserve the original view-scoped lifecycle: a fresh checkout starts from
@@ -821,7 +849,7 @@ const {
   useWallet,
   walletBalance,
   selectedPayment,
-  getItemPriceWithDiscount,
+  getCartPricing,
   roundMoney,
 });
 
@@ -863,7 +891,7 @@ const displayReviewItems = computed(() => {
       sku: item.sku || item.model || 'O604S',
       specs: getReviewItemSpecs(item),
       quantity: item.quantity || 1,
-      price: getItemPriceWithDiscount(item) || item.price || 0,
+      price: getItemPriceWithDiscount(item, cartState.items) || item.price || 0,
       image: getImageUrl(item.image || item.images?.[0], item.id)
     }));
   }
@@ -930,7 +958,7 @@ const reviewPaymentMethod = computed(() => {
   }
 });
 
-const { applyCoupon, removeCoupon } = useCheckoutCoupons({
+const { applyCoupon, removeCoupon, restoreCoupon } = useCheckoutCoupons({
   couponCode,
   appliedCoupon,
   discountAmount,
@@ -960,7 +988,7 @@ const receiptProducts = computed(() => {
       id: item.cart_item_key || item.id,
       name: localized(item, 'name') || item.name_ar || item.name || 'منتج',
       quantity: item.quantity || 1,
-      price: getItemPriceWithDiscount(item) || item.price || 0
+      price: getItemPriceWithDiscount(item, cartState.items) || item.price || 0
     }));
   }
   return [
@@ -1117,6 +1145,12 @@ const requireSecureUrl = (rawUrl, label) => {
 };
 
 const buildOrderData = () => {
+  const offerIds = [...new Set(
+    cartState.items
+      .map(item => Number(item.offer_id))
+      .filter(offerId => Number.isInteger(offerId) && offerId > 0)
+  )];
+  const offerId = offerIds.length === 1 ? offerIds[0] : null;
   const fullAddress = [
     customerInfo.value.address,
     customerInfo.value.building ? `${t('checkout.building_number')} ${customerInfo.value.building}` : '',
@@ -1146,10 +1180,12 @@ const buildOrderData = () => {
     notes: (appliedCoupon.value ? `Coupon: ${appliedCoupon.value.code}. ` : '') + (customerInfo.value.notes || ''),
     is_gift: isGift.value,
     gift_message: isGift.value ? giftMessage.value : null,
+    ...(offerId ? { offer_id: offerId } : {}),
     items: cartState.items.map(item => ({
       product_id: item.id,
       quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
-      unit_price: getItemUnitPrice(item),
+      unit_price: getItemUnitPrice(item, cartState.items),
+      ...(item.offer_id ? { offer_id: Number(item.offer_id) } : {}),
       attributes: item.selectedAttributes || item.attributes || null
     }))
   };
@@ -1162,6 +1198,7 @@ const confirmOrder = async () => {
     return;
   }
 
+  checkoutStockError.value = null;
   orderSubmitting.value = true;
   try {
     const orderData = buildOrderData();
@@ -1261,7 +1298,9 @@ const confirmOrder = async () => {
       quantity: it.quantity,
       price: it.price
     }));
-    lastPurchasedTotal.value = grandTotal.value;
+    const serverOrder = createdOrder?.order || createdOrder;
+    const serverTotal = Number(serverOrder?.total_amount ?? serverOrder?.total ?? 0);
+    lastPurchasedTotal.value = serverTotal > 0 ? serverTotal : grandTotal.value;
     lastPurchasedDate.value = new Date().toLocaleDateString(currentLocale.value === 'ar' ? 'ar-SA' : 'en-US', {
       day: 'numeric',
       month: 'long',
@@ -1308,6 +1347,14 @@ const confirmOrder = async () => {
     }
   } catch (err) {
     console.error('Order error:', err);
+    const rawErrorMessage = String(err.response?.data?.message || err.response?.data?.error || err.message || '');
+    const isStockError = [409, 422].includes(Number(err.response?.status))
+      && /(insufficient stock|out of stock|المخزون|غير متوفر|نفد)/i.test(rawErrorMessage);
+    if (isStockError) {
+      const unavailableItem = cartState.items[0];
+      checkoutStockError.value = unavailableItem || null;
+      return;
+    }
     const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message;
     alert(errorMsg || t('checkout.order_error'));
   } finally {

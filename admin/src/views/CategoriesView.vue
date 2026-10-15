@@ -246,7 +246,7 @@
           <!-- Sort Order -->
           <div class="form-group">
             <label class="form-label">الترتيب</label>
-            <input type="number" v-model="form.sort_order" class="form-control" placeholder="1" min="1" />
+            <input type="number" v-model="form.sort_order" class="form-control" placeholder="0" min="0" />
           </div>
 
           <div class="form-actions">
@@ -312,7 +312,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import adminCatalogService from '../application/adminCatalogService';
-import { toCategoryPayload } from '../domain/catalog/adminCatalog';
+import { categoryMatchesSearch, toCategoryPayload } from '../domain/catalog/adminCatalog';
 
 // State
 const categories = ref([]);
@@ -345,7 +345,7 @@ const totalProductsCount = computed(() => allProducts.value.length || categories
 // Filtered categories
 const filteredCategories = computed(() => {
   return categories.value.filter(cat => {
-    const matchSearch = (cat.name_i18n?.ar || cat.name).includes(searchQuery.value);
+    const matchSearch = categoryMatchesSearch(cat, searchQuery.value);
     const matchStatus = statusFilter.value === '' ? true : (cat.is_active.toString() === statusFilter.value);
     return matchSearch && matchStatus;
   }).sort((a, b) => {
@@ -452,7 +452,7 @@ const openEditModal = (cat) => {
     description_en: descObj?.en ?? '',
     parent_id: cat.parent_id || '',
     is_active: cat.is_active,
-    sort_order: cat.sort_order || 0,
+    sort_order: cat.sort_order ?? 0,
     image: null
   };
   imagePreview.value = cat.image || null;

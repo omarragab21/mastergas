@@ -2,6 +2,7 @@ import test, { before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
 import {
+  categoryMatchesSearch,
   categoryName,
   productCategoryName,
   dataFromResponse,
@@ -18,6 +19,23 @@ import {
   toProduct,
   toProductPayload,
 } from '../admin/src/domain/catalog/adminCatalog.js';
+
+test('CATEGORY-1 search matches Arabic/English names and descriptions', () => {
+  const category = toCategory({
+    name: 'Gas Accessories',
+    translations: {
+      ar: { name: 'ملحقات الغاز', description: 'قطع غيار وأدوات الغاز' },
+      en: { name: 'Gas Accessories', description: 'Gas spare parts and tools' },
+    },
+  });
+
+  assert.equal(categoryMatchesSearch(category, 'ملحقات'), true);
+  assert.equal(categoryMatchesSearch(category, 'gas accessories'), true);
+  assert.equal(categoryMatchesSearch(category, 'قطع غيار'), true);
+  assert.equal(categoryMatchesSearch(category, 'spare parts'), true);
+  assert.equal(categoryMatchesSearch(category, 'غير موجود'), false);
+  assert.equal(categoryMatchesSearch(category, ''), true);
+});
 
 // ─── Browser globals the admin axios client expects ─────────────────────────
 class MemoryStorage {
@@ -208,6 +226,17 @@ test('DOMAIN toAttribute: options without a name are dropped, inactive flag pres
   assert.ok(a.values[1].id, 'string options get a synthetic id');
 });
 
+test('DOMAIN toAttribute: preserves bilingual option names and colour code', () => {
+  const attribute = toAttribute({
+    type: 'color_swatch',
+    options: [{ id: 7, name_ar: 'أسود ملكي', name_en: 'Royal Black', value_code: '#111827' }],
+  });
+  assert.equal(attribute.values[0].name_ar, 'أسود ملكي');
+  assert.equal(attribute.values[0].name_en, 'Royal Black');
+  assert.equal(attribute.values[0].label, 'أسود ملكي');
+  assert.equal(attribute.values[0].color, '#111827');
+});
+
 test('DOMAIN toAttribute: colour name heuristic does NOT hijack an explicit non-colour type (fixed QA-F1)', () => {
   assert.equal(toAttribute({ type: 'select', name: 'Color family' }).type, 'select');
   assert.equal(toAttribute({ type: 'text', name: 'الألوان' }).type, 'text');
@@ -269,6 +298,7 @@ test('PAYLOAD category: trims, maps is_active to 0/1, parent_id optional, numeri
   assert.equal(toCategoryPayload({ parent_id: 4 }).parent_id, 4);
   assert.equal(toCategoryPayload({}).is_active, 1);
   assert.equal(toCategoryPayload({ sort_order: '' }).sort_order, 0);
+  assert.equal(toCategoryPayload({ sort_order: 0 }).sort_order, 0);
   assert.doesNotThrow(() => toCategoryPayload({}));
 });
 
@@ -358,6 +388,7 @@ test('PAYLOAD attribute: a value containing a comma is split in two (known limit
 
 test('PAYLOAD attribute option: label doubles as both languages; colour optional', () => {
   assert.deepEqual(toAttributeOptionPayload({ label: ' أحمر ', color: '#f00' }), { name_en: 'أحمر', name_ar: 'أحمر', value_code: '#f00' });
+  assert.deepEqual(toAttributeOptionPayload({ name_ar: 'أسود ملكي', name_en: 'Royal Black', color: '#111827' }), { name_en: 'Royal Black', name_ar: 'أسود ملكي', value_code: '#111827' });
   assert.equal(toAttributeOptionPayload({ label: 'XL' }).value_code, null);
   assert.equal(toAttributeOptionPayload({ label: 'XL', color: '' }).value_code, null);
 });

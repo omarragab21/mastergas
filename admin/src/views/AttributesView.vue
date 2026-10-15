@@ -6,7 +6,7 @@
         <h2 class="page-title">خصائص المنتجات</h2>
         <p class="page-subtitle">إدارة القيم المتاحة ضمن خصائص المنتجات المعرفة مسبقاً</p>
       </div>
-      <button class="add-btn" type="button" @click="openAttributeModal">
+      <button class="header-add-btn" type="button" @click="openAttributeModal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
@@ -19,11 +19,11 @@
     <div class="modal-overlay" v-if="showAttributeModal" @click.self="closeAttributeModal">
       <div class="modal-content form-modal">
         <button class="modal-close" @click="closeAttributeModal">×</button>
-        <div class="form-header"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ editingAttributeId ? 'تعديل خاصية منتج' : 'إضافة خاصية منتج' }}</h3><p class="modal-subtitle-main">{{ editingAttributeId ? 'عدّل الاسم أو النوع — القيم تُدار من زر إدارة القيم' : 'أضف خاصية نصية أو خاصية لون، ثم أضف قيمها لاحقاً من زر إدارة القيم' }}</p></div>
+        <div class="form-header"><div class="modal-heading-row"><div v-if="!editingAttributeId" class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ editingAttributeId ? 'تعديل خاصية منتج' : 'إضافة خاصية منتج' }}</h3></div><p class="modal-subtitle-main">{{ editingAttributeId ? 'عدّل الاسم أو النوع — القيم تُدار من زر إدارة القيم' : 'أضف خاصية نصية أو خاصية لون، ثم أضف قيمها لاحقاً من زر إدارة القيم' }}</p></div>
         <form class="value-form" @submit.prevent="submitAttribute">
-          <div class="form-group"><label class="form-label">الاسم بالعربي *</label><input v-model="attributeForm.name_ar" class="form-control" required placeholder="اللون" /></div>
-          <div class="form-group"><label class="form-label">الاسم بالإنجليزية *</label><input v-model="attributeForm.name_en" class="form-control" required placeholder="Color" /></div>
-          <div class="form-group"><label class="form-label">نوع الخاصية</label><select v-model="attributeForm.type" class="form-control"><option value="color">لون</option><option value="text">نص</option><option v-if="editingAttributeId && attributeForm.type === 'select'" value="select">اختيارات (قديم)</option></select></div>
+          <div class="form-group"><label class="form-label">الاسم بالعربي *</label><input v-model="attributeForm.name_ar" class="form-control" required placeholder="مثال: اللون" /></div>
+          <div class="form-group"><label class="form-label">الاسم بالإنجليزية *</label><input v-model="attributeForm.name_en" class="form-control" required placeholder="Example: Color" /></div>
+          <div class="form-group"><label class="form-label">نوع الخاصية *</label><select v-model="attributeForm.type" class="form-control" required><option value="" disabled>اختر نوع الخاصية (لون أو نص)</option><option value="color">لون / Color</option><option value="text">نص / Text</option></select></div>
           <div class="form-actions">
             <button class="btn-cancel" type="button" @click="closeAttributeModal">إلغاء</button>
             <button class="btn-submit" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'جاري الحفظ...' : (editingAttributeId ? 'حفظ التعديلات' : 'حفظ الخاصية') }}</button>
@@ -55,8 +55,8 @@
               <td class="col-name">
                 <div class="attr-name-cell">
                   <div class="attr-text">
-                    <span class="attr-title">{{ attr.name }}</span>
-                    <span class="attr-desc">{{ attr.label }}</span>
+                    <span class="attr-title">{{ attributeName(attr) }}</span>
+                    <span class="attr-desc">{{ secondaryAttributeName(attr) }}</span>
                   </div>
                 </div>
               </td>
@@ -65,7 +65,7 @@
                   <!-- Show up to 5 values -->
                   <span v-for="val in attr.values.slice(0, 5)" :key="val.id" class="value-chip" :class="{ 'inactive-chip': !val.is_active }">
                     <span v-if="val.color" class="color-dot" :style="{ background: val.color }"></span>
-                    {{ val.label }}
+                    <span class="value-chip-labels"><span>{{ valueName(val) }}</span><small v-if="secondaryValueName(val)">{{ secondaryValueName(val) }}</small></span>
                   </span>
                   <span v-if="attr.values.length > 5" class="value-chip more-chip">
                     +{{ attr.values.length - 5 }}
@@ -88,14 +88,14 @@
                   <button class="action-btn edit-btn" @click="openEditAttributeModal(attr)" title="تعديل الخاصية" aria-label="تعديل الخاصية">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn add-btn" @click="openAddValueModal(attr)" title="إضافة قيمة جديدة">
+                  <button class="action-btn add-value-btn" @click="openAddValueModal(attr)" title="إضافة قيمة جديدة" aria-label="إضافة قيمة جديدة">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                   </button>
                   <button class="action-btn delete-btn" @click="deleteAttributeItem(attr)" title="حذف الخاصية" aria-label="حذف الخاصية">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="5" y1="12" x2="19" y2="12"/>
+                      <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
                     </svg>
                   </button>
                 </div>
@@ -113,7 +113,7 @@
         <button class="modal-close" @click="closeValueModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="form-header"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEditingValue ? 'تعديل قيمة خاصية' : 'إضافة قيمة جديدة' }}</h3><p class="modal-subtitle-main">إضافة أو تعديل قيمة لظهورها في خيارات المنتج</p></div>
+        <div class="form-header"><h3 class="modal-title-main">{{ isEditingValue ? 'تعديل قيمة خاصية' : 'إضافة قيمة جديدة' }}</h3><p class="modal-subtitle-main">أدخل اسم القيمة بالعربي والإنجليزي ليتم حفظها في الـ API</p></div>
         
         <form @submit.prevent="submitValue" class="value-form">
           
@@ -124,7 +124,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              <span>{{ selectedAttribute?.name }} ({{ selectedAttribute?.label }})</span>
+              <span>{{ attributeName(selectedAttribute) }} ({{ secondaryAttributeName(selectedAttribute) }})</span>
             </div>
           </div>
 
@@ -138,10 +138,14 @@
             <span class="help-text">اختر لوناً إذا كانت القيمة تمثل لوناً مخصصاً (كود Hex)</span>
           </div>
 
-          <!-- Value Name -->
+          <!-- Bilingual Value Names -->
           <div class="form-group">
-            <label class="form-label">اسم القيمة <span class="req">*</span></label>
-            <input type="text" v-model="valueForm.label" class="form-control" placeholder="مثال: أحمر أو XL ... إلخ" required />
+            <label class="form-label">اسم القيمة بالعربي <span class="req">*</span></label>
+            <input type="text" v-model="valueForm.name_ar" class="form-control" placeholder="مثال: أسود ملكي أو 90 سم" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم القيمة بالإنجليزية <span class="req">*</span></label>
+            <input type="text" v-model="valueForm.name_en" class="form-control" placeholder="Example: Royal Black or 90 cm" dir="ltr" required />
           </div>
 
           <!-- Status -->
@@ -172,7 +176,7 @@
         <button class="modal-close" @click="closeManageModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <h3 class="modal-title">القيم الخاصة بـ: {{ selectedAttribute?.name }}</h3>
+        <h3 class="modal-title">القيم الخاصة بـ: {{ attributeName(selectedAttribute) }}</h3>
         <p class="modal-subtitle">عرض القيم المتاحة ليتم تعيينها لخيارات المنتجات</p>
         
         <div class="manage-list">
@@ -183,7 +187,7 @@
           <div v-for="val in selectedAttribute?.values" :key="val.id" class="manage-item">
             <div class="manage-item-info">
               <span class="status-dot" :class="val.is_active ? 'active-dot' : 'inactive-dot'"></span>
-              <span class="manage-item-label">{{ val.label }}</span>
+              <span class="manage-item-labels"><span class="manage-item-label">{{ valueName(val) }}</span><small v-if="secondaryValueName(val)">{{ secondaryValueName(val) }}</small></span>
               <div v-if="val.color" class="manage-item-color" :style="{ background: val.color }"></div>
             </div>
             
@@ -220,8 +224,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import productAttributeService from '../services/productAttributeService';
+
+const { locale } = useI18n();
+const isEnglish = computed(() => locale.value === 'en');
+
+const attributeName = (attribute) => {
+  if (!attribute) return '';
+  return isEnglish.value
+    ? attribute.translations?.en?.name || attribute.name_en || attribute.name || attribute.label
+    : attribute.translations?.ar?.name || attribute.name_ar || attribute.label || attribute.name;
+};
+
+const secondaryAttributeName = (attribute) => {
+  if (!attribute) return '';
+  return isEnglish.value
+    ? attribute.translations?.ar?.name || attribute.name_ar || attribute.label || ''
+    : attribute.translations?.en?.name || attribute.name_en || attribute.name || '';
+};
+
+const valueName = (value) => {
+  if (!value) return '';
+  return isEnglish.value
+    ? value.name_en || value.translations?.en?.name || value.label || value.name_ar
+    : value.name_ar || value.translations?.ar?.name || value.label || value.name_en;
+};
+
+const secondaryValueName = (value) => {
+  if (!value) return '';
+  return isEnglish.value
+    ? value.name_ar || value.translations?.ar?.name || value.label || ''
+    : value.name_en || value.translations?.en?.name || value.label || '';
+};
 
 const attributes = ref([]);
 const loading = ref(false);
@@ -234,6 +270,8 @@ const isEditingValue = ref(false);
 const isSubmitting = ref(false);
 const currentEditValueId = ref(null);
 const valueForm = ref({
+  name_ar: '',
+  name_en: '',
   label: '',
   color: '',
   is_active: true
@@ -241,7 +279,7 @@ const valueForm = ref({
 
 const showManageModal = ref(false);
 const showAttributeModal = ref(false);
-const attributeForm = ref({ name_ar: '', name_en: '', label_ar: '', label_en: '', type: 'text', is_active: true, sort_order: 1 });
+const attributeForm = ref({ name_ar: '', name_en: '', label_ar: '', label_en: '', type: '', is_active: true, sort_order: 1 });
 
 // Alerts
 const showAlert = ref(false);
@@ -279,7 +317,14 @@ onMounted(() => {
 
 // Checks if we should show color picker for attribute
 const hasColorType = (attr) => {
-  return attr?.name?.includes('لون') || attr?.name?.includes('Color'); // simple heuristic
+  const values = [
+    attr?.type,
+    attr?.name,
+    attr?.label,
+    attr?.translations?.ar?.name,
+    attr?.translations?.en?.name,
+  ].filter(Boolean).join(' ').toLowerCase();
+  return values.includes('color') || values.includes('لون') || values.includes('ألوان') || values.includes('الوان');
 };
 
 // Value Form Actions
@@ -287,7 +332,7 @@ const openAddValueModal = (attr) => {
   selectedAttribute.value = attr;
   isEditingValue.value = false;
   currentEditValueId.value = null;
-  valueForm.value = { label: '', color: hasColorType(attr) ? '#000000' : '', is_active: true };
+  valueForm.value = { name_ar: '', name_en: '', label: '', color: hasColorType(attr) ? '#000000' : '', is_active: true };
   showValueModal.value = true;
 };
 
@@ -303,14 +348,14 @@ const openEditAttributeModal = (attr) => {
   attributeForm.value = {
     name_ar: attr.translations?.ar?.name || attr.name || '',
     name_en: attr.translations?.en?.name || attr.name || '',
-    type: attr.type || 'text',
+    type: attr.type === 'color' ? 'color' : 'text',
   };
   showAttributeModal.value = true;
 };
 
 const openAttributeModal = () => {
   editingAttributeId.value = null;
-  attributeForm.value = { name_ar: '', name_en: '', label_ar: '', label_en: '', type: 'text', is_active: true, sort_order: attributes.value.length + 1 };
+  attributeForm.value = { name_ar: '', name_en: '', label_ar: '', label_en: '', type: '', is_active: true, sort_order: attributes.value.length + 1 };
   showAttributeModal.value = true;
 };
 
@@ -319,6 +364,10 @@ const closeAttributeModal = () => { showAttributeModal.value = false; };
 const submitAttribute = async () => {
   isSubmitting.value = true;
   try {
+    if (!attributeForm.value.type) {
+      triggerAlert('نوع الخاصية مطلوب', 'error');
+      return;
+    }
     if (editingAttributeId.value) {
       await productAttributeService.update(editingAttributeId.value, attributeForm.value);
     } else {
@@ -343,7 +392,13 @@ const submitValue = async () => {
   if (!selectedAttribute.value) return;
   isSubmitting.value = true;
   try {
-    const payload = { ...valueForm.value };
+    const nameAr = String(valueForm.value.name_ar || '').trim();
+    const nameEn = String(valueForm.value.name_en || '').trim();
+    if (!nameAr || !nameEn) {
+      triggerAlert('اسم القيمة بالعربي والإنجليزي مطلوب', 'error');
+      return;
+    }
+    const payload = { ...valueForm.value, name_ar: nameAr, name_en: nameEn, label: nameAr };
     if (!payload.color) payload.color = null;
 
     if (isEditingValue.value) {
@@ -382,7 +437,9 @@ const editValueItem = (val) => {
   isEditingValue.value = true;
   currentEditValueId.value = val.id;
   valueForm.value = {
-    label: val.label,
+    name_ar: val.name_ar || val.translations?.ar?.name || val.label || '',
+    name_en: val.name_en || val.translations?.en?.name || val.label || '',
+    label: val.label || '',
     color: val.color || (hasColorType(selectedAttribute.value) ? '#000000' : ''),
     is_active: val.is_active
   };
@@ -565,6 +622,17 @@ const deleteValueItem = async (val) => {
   color: #374151;
   background: #f9fafb;
 }
+.value-chip-labels {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+.value-chip-labels small {
+  color: #6b7280;
+  font-size: 0.68rem;
+  font-weight: 500;
+  direction: ltr;
+}
 .inactive-chip {
   opacity: 0.6;
   text-decoration: line-through;
@@ -596,8 +664,8 @@ const deleteValueItem = async (val) => {
   cursor: pointer; color: #9ca3af; transition: all 0.2s;
 }
 .action-btn:hover { background: #f3f4f6; color: #111827; }
-.action-btn.add-btn { color: #000000; }
-.action-btn.add-btn:hover { background: #f3f4f6; color: #000000; }
+.action-btn.add-value-btn { color: #000000; }
+.action-btn.add-value-btn:hover { background: #f3f4f6; color: #000000; }
 .view-btn { color: #f59e0b; }
 .view-btn:hover { background: #fef3c7; color: #d97706; }
 .delete-btn { color: #dc2626; }
@@ -694,10 +762,12 @@ const deleteValueItem = async (val) => {
   border: 1px solid #f3f4f6; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 .manage-item-info { display: flex; align-items: center; gap: 0.6rem; }
+.manage-item-labels { display: flex; flex-direction: column; gap: 0.1rem; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .active-dot { background: #10b981; }
 .inactive-dot { background: #d1d5db; }
 .manage-item-label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+.manage-item-labels small { color: #6b7280; font-size: 0.7rem; direction: ltr; }
 .manage-item-color { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 .manage-item-actions { display: flex; align-items: center; gap: 0.3rem; }
 .manage-btn {
@@ -750,7 +820,8 @@ const deleteValueItem = async (val) => {
 .modal-content.form-modal.form-content { max-width: 700px; }
 .form-modal .modal-close { top: 1.5rem; left: 1.5rem; background: #f3f4f6; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; color: #9ca3af; font-size: 1.2rem; line-height: 1; }
 .form-modal .form-header { text-align: center; padding: 2rem 2rem 1.5rem 2rem; position: relative; }
-.form-modal .header-icon-main { width: 50px; height: 50px; background: #f3f4f6; color: #000000; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.form-modal .modal-heading-row { display: flex; align-items: center; justify-content: center; gap: 0.65rem; direction: rtl; }
+.form-modal .header-icon-main { width: 38px; height: 38px; background: #f3f4f6; color: #000000; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
 .form-modal .modal-title-main { font-size: 1.3rem; font-weight: 800; color: #111827; margin: 0; }
 .form-modal .modal-subtitle-main { font-size: 0.85rem; color: #9ca3af; margin-top: 0.4rem; }
 .form-modal .cat-form, .form-modal .prod-form, .form-modal .value-form { padding: 0 2.5rem 2.5rem 2.5rem; }

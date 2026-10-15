@@ -54,7 +54,7 @@ export const profileService = {
   },
 
   submitReview(payload) {
-    return api.post('/frontend/reviews', payload);
+    return api.post('/v1/site/reviews', payload);
   },
 
   createAddress(payload) {

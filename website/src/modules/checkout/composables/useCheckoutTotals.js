@@ -11,13 +11,11 @@ export function useCheckoutTotals({
   useWallet,
   walletBalance,
   selectedPayment,
-  getItemPriceWithDiscount,
+  getCartPricing,
   roundMoney,
 }) {
-  const subtotalWithDiscount = computed(() => roundMoney(cartState.items.reduce(
-    (sum, item) => sum + getItemPriceWithDiscount(item),
-    0
-  )));
+  const cartPricing = computed(() => getCartPricing(cartState.items));
+  const subtotalWithDiscount = computed(() => cartPricing.value.subtotal);
 
   const taxableAmount = computed(() => roundMoney(
     Math.max(0, subtotalWithDiscount.value - discountAmount.value)
@@ -69,5 +67,6 @@ export function useCheckoutTotals({
     walletPayment,
     remainingAmount,
     effectivePaymentMethod,
+    cartPricing,
   };
 }

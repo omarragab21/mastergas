@@ -5,6 +5,7 @@ import {
   toAttribute,
   toCategory,
   toDiscountCode,
+  toOffer,
   toProduct,
 } from '../domain/catalog/adminCatalog';
 
@@ -68,6 +69,12 @@ export const adminCatalogService = {
   updateDiscountCode: (id, payload) => mapData(() => tijaraAdminApi.updateDiscountCode(id, payload), toDiscountCode),
   getDiscountCode: (id) => mapData(() => tijaraAdminApi.getDiscountCode(id), toDiscountCode),
   deleteDiscountCode: tijaraAdminApi.deleteDiscountCode,
+
+  listOffers: (params = {}) => mapList(tijaraAdminApi.listOffers, toOffer, params),
+  createOffer: (payload, image) => mapData(() => tijaraAdminApi.createOffer(payload, image), toOffer),
+  updateOffer: (id, payload, image) => mapData(() => tijaraAdminApi.updateOffer(id, payload, image), toOffer),
+  getOffer: (id) => mapData(() => tijaraAdminApi.getOffer(id), toOffer),
+  deleteOffer: tijaraAdminApi.deleteOffer,
 };
 
 export default adminCatalogService;

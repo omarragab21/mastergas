@@ -768,6 +768,9 @@ useSEO({
 
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
+  .about-hero-section {
+    margin-top: 0;
+  }
   .container {
     padding: 0 32px;
   }
@@ -790,7 +793,7 @@ useSEO({
     height: auto;
     min-height: 380px;
     padding: 60px 0;
-    margin-top: 100px;
+    margin-top: 0;
   }
   .container {
     padding: 0 20px;

@@ -199,7 +199,7 @@ test('STATUS enum matches the API exactly (no legacy "completed")', () => {
   assert.equal(trackingStatusLabel('pending'), 'تم استلام الطلب');
   assert.equal(trackingStatusLabel('paid_confirmed'), 'تم تأكيد الطلب');
   assert.equal(trackingStatusLabel('processing'), 'تم تجهيز الطلب');
-  assert.equal(trackingStatusLabel('shipped'), 'تم الشحن');
+  assert.equal(trackingStatusLabel('shipped'), 'الطلب في الطريق');
   assert.equal(trackingStatusLabel('delivered'), 'تم الاستلام');
 });
 
@@ -259,6 +259,11 @@ test('TRACKING timeline matches the website six-stage contract', () => {
   assert.equal(trackingStepState(pending, 2), 'pending');
   assert.equal(trackingStepIcon(ORDER_TRACKING_STEPS[0], 'active'), 'fas fa-check');
   assert.equal(trackingStepIcon(ORDER_TRACKING_STEPS[1], 'pending'), 'fas fa-clipboard-check');
+
+  const shipped = toOrder(rawOrder({ status: 'shipped', shipped_at: '2026-10-14T08:00:00+00:00' }));
+  assert.equal(trackingRank(shipped), 5);
+  assert.equal(trackingStepState(shipped, 5), 'active');
+  assert.equal(trackingStepState(shipped, 6), 'pending');
 
   const delivered = toOrder(rawOrder({ status: 'delivered', delivered_at: '2026-10-14T09:00:00+00:00' }));
   assert.equal(trackingRank(delivered), 6);

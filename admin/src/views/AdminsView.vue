@@ -28,7 +28,8 @@ const initialForm = { ...form.value };
 const fetchAdmins = async () => {
     loading.value = true;
     try {
-        admins.value = await adminManagementService.listUsers({ search: searchQuery.value });
+        const users = await adminManagementService.listUsers({ search: searchQuery.value });
+        admins.value = users.filter((user) => !['user', 'customer'].includes(String(user.role).toLowerCase()));
     } catch (error) {
         console.error('Failed to fetch admins', error);
         triggerAlert('فشل تحميل قائمة المديرين', 'error');

@@ -341,7 +341,7 @@
           <p class="modal-subtitle">اختر الحالة الجديدة للطلب رقم #{{ viewOrder?.orderNumber }}</p>
         </div>
 
-        <form @submit.prevent="submitStatusUpdate" class="status-form">
+        <form @submit.prevent="requestStatusUpdate" class="status-form">
           <div class="form-group">
             <label class="form-label">الحالة الحالية: <span class="status-badge" :class="viewOrder?.status">{{ trackingStatusLabel(viewOrder?.status) }}</span></label>
           </div>
@@ -357,10 +357,37 @@
           <div class="form-actions">
             <button type="button" class="btn-cancel" @click="showStatusModal = false;">إلغاء</button>
             <button type="submit" class="btn-submit" :disabled="isSubmittingStatus">
-              {{ isSubmittingStatus ? 'جاري التحديث...' : 'تحديث الحالة' }}
+              متابعة للتأكيد
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Separate confirmation for entering delivery and confirming receipt. -->
+    <div class="modal-overlay" v-if="showStatusConfirm" @click.self="cancelStatusConfirmation">
+      <div class="modal-content status-content status-confirm-content" role="dialog" aria-modal="true" aria-labelledby="status-confirm-title">
+        <button class="modal-close" @click="cancelStatusConfirmation" aria-label="إغلاق">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="status-header">
+          <div class="icon-circle status-confirm-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17h3l2-8h8l2 8h3"/><path d="M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0"/><path d="M10 9V6h4l2 3"/></svg>
+          </div>
+          <h3 id="status-confirm-title" class="modal-title">{{ statusConfirmationTitle }}</h3>
+          <p class="modal-subtitle">{{ statusConfirmationMessage }}</p>
+        </div>
+        <div class="status-transition-summary">
+          <span>{{ trackingStatusLabel(viewOrder?.status) }}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          <strong>{{ trackingStatusLabel(pendingStatus) }}</strong>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" @click="cancelStatusConfirmation">إلغاء</button>
+          <button type="button" class="btn-submit" :disabled="isSubmittingStatus" @click="confirmStatusUpdate">
+            {{ isSubmittingStatus ? 'جاري التحديث...' : 'تأكيد التحديث' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -401,13 +428,25 @@ const dateTo = ref('');
 
 const showViewModal = ref(false);
 const showStatusModal = ref(false);
+const showStatusConfirm = ref(false);
 const viewOrder = ref(null);
 
 const isSubmittingStatus = ref(false);
 const statusForm = ref({ status: '' });
+const pendingStatus = ref('');
 
 const statusText = statusLabel;
 const allowedStatuses = computed(() => nextStatuses(viewOrder.value?.status));
+const statusConfirmationTitle = computed(() => {
+  if (pendingStatus.value === 'shipped') return 'تأكيد أن الطلب في الطريق';
+  if (pendingStatus.value === 'delivered') return 'تأكيد استلام العميل';
+  return 'تأكيد تحديث حالة الطلب';
+});
+const statusConfirmationMessage = computed(() => {
+  if (pendingStatus.value === 'shipped') return 'سيصبح الطلب في الطريق فقط. لن يتم اعتباره مستلماً حتى تؤكد خطوة منفصلة.';
+  if (pendingStatus.value === 'delivered') return 'أكد فقط بعد التحقق من أن العميل استلم الطلب فعلاً.';
+  return 'راجع الحالة الجديدة قبل إرسالها إلى النظام.';
+});
 
 // Stats
 const totalOrders = computed(() => orders.value.length);
@@ -488,12 +527,27 @@ const getTrackingStepTime = (step) => {
     : date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-const submitStatusUpdate = async () => {
+const requestStatusUpdate = () => {
+  if (!statusForm.value.status) return;
+  pendingStatus.value = statusForm.value.status;
+  showStatusModal.value = false;
+  showStatusConfirm.value = true;
+};
+
+const cancelStatusConfirmation = () => {
+  showStatusConfirm.value = false;
+  pendingStatus.value = '';
+};
+
+const confirmStatusUpdate = async () => {
+  const nextStatus = pendingStatus.value;
+  if (!nextStatus) return;
   isSubmittingStatus.value = true;
   try {
-    const updated = await adminOrderService.updateStatus(viewOrder.value, statusForm.value.status);
+    const updated = await adminOrderService.updateStatus(viewOrder.value, nextStatus);
     triggerAlert('تم تحديث حالة الطلب بنجاح');
-    showStatusModal.value = false;
+    showStatusConfirm.value = false;
+    pendingStatus.value = '';
     viewOrder.value = updated; // update local view
     // Update in array
     const idx = orders.value.findIndex(o => o.id === updated.id);
@@ -710,6 +764,10 @@ const confirmDelete = async (order) => {
 
 /* Status Modal */
 .status-content { max-width: 450px; padding: 2rem; background: #fff; }
+.status-confirm-content { max-width: 480px; }
+.status-confirm-icon { background: #fff7ed; color: #ea580c; }
+.status-transition-summary { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.9rem 1rem; margin: 0.25rem 0 1.25rem; border: 1px solid #fed7aa; border-radius: 10px; background: #fff7ed; color: #7c2d12; font-size: 0.85rem; font-weight: 700; }
+.status-transition-summary strong { color: #c2410c; }
 .status-header { text-align: center; margin-bottom: 1.5rem; }
 .icon-circle { width: 50px; height: 50px; background: #f3f4f6; color: #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
 .modal-title { font-size: 1.25rem; font-weight: 800; color: #111827; margin: 0 0 0.5rem 0; }

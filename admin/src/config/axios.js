@@ -33,10 +33,13 @@ const LIVE_ADMIN_PATH_PREFIXES = [
   '/v1/users',
   '/v1/categories',
   '/v1/discount_codes',
+  '/v1/offers',
   '/v1/products',
   '/v1/attributes',
   '/v1/orders',
   '/v1/sliders',
+  '/v1/reviews',
+  '/v1/contacts',
 ];
 
 const normalizePath = (url = '') => String(url).split('?')[0].replace(/^\/api/, '') || '/';

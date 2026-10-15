@@ -7,7 +7,13 @@
             <div class="banner-gradient-overlay"></div>
             <div class="banner-content">
               <span class="banner-badge-pill">
-                {{ currentOffer.badgeText || (currentOffer.value ? (currentLang === 'ar' ? `خصم ${Math.round(currentOffer.value)}%` : `${Math.round(currentOffer.value)}% OFF`) : (currentLang === 'ar' ? 'عرض خاص' : 'Special Offer')) }}
+                {{ currentOffer.badgeText || (currentOffer.type === 'bundle'
+                  ? (currentLang === 'ar'
+                    ? `باقة بسعر ${Number(currentOffer.bundle_price || currentOffer.value || 0).toLocaleString('en-US')}`
+                    : `Bundle ${Number(currentOffer.bundle_price || currentOffer.value || 0).toLocaleString('en-US')}`)
+                  : (currentOffer.value
+                    ? (currentLang === 'ar' ? `خصم ${Math.round(currentOffer.value)}%` : `${Math.round(currentOffer.value)}% OFF`)
+                    : (currentLang === 'ar' ? 'عرض خاص' : 'Special Offer'))) }}
               </span>
               <h2 class="banner-title">{{ localized(currentOffer, 'name') || currentOffer.name }}</h2>
               <p class="banner-desc">{{ localized(currentOffer, 'description') || currentOffer.description }}</p>

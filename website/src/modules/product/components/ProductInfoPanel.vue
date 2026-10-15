@@ -6,7 +6,7 @@
               <!-- image-actions-bar -->
               <div class="image-actions-bar">
                 <div class="category-origin-group">
-                  <span class="category-name">{{ localizedValue(product.category) || (locale === 'ar' ? 'الأفران' : 'Ovens') }}</span>
+                  <span v-if="localized(product.category, 'name')" class="category-name">{{ localized(product.category, 'name') }}</span>
                 </div>
                 <button class="share-action-btn" @click.stop="emit('open-share')" type="button" :title="locale === 'ar' ? 'مشاركة المنتج' : 'Share product'">
                   <span>{{ locale === 'ar' ? 'مشاركة' : 'Share' }}</span>
@@ -32,11 +32,11 @@
               </div>
 
               <!-- Product Title -->
-              <h1 class="main-title">{{ localized(product, 'name') || (locale === 'ar' ? 'فرن غاز بلت-إن 60 سم' : 'Built-in Gas Oven 60 cm') }}</h1>
+              <h1 v-if="localized(product, 'name')" class="main-title">{{ localized(product, 'name') }}</h1>
 
               <!-- Model & Rating Row -->
               <div class="model-rating-bar">
-                <span class="model-code">{{ locale === 'ar' ? 'الموديل' : 'Model' }}: {{ product.sku || product.model_number || 'O604S' }}</span>
+                <span v-if="product.sku || product.model_number" class="model-code">{{ locale === 'ar' ? 'الموديل' : 'Model' }}: {{ product.sku || product.model_number }}</span>
                 <span class="v-line"></span>
                 <div class="rating-group">
                   <span class="rating-count">({{ locale === 'ar' ? `${computedRatingCount} تقييم` : `${computedRatingCount} reviews` }})</span>
@@ -54,10 +54,10 @@
             <div class="section-divider"></div>
 
             <!-- Price Block (Aligned to the Right, Stock Pill Removed) -->
-            <div class="price-status-bar">
+            <div v-if="currentPrice !== null" class="price-status-bar">
               <div class="price-group">
                 <div class="price-unit">
-                  <span class="price-amount">{{ formatPrice(currentPrice || 2499) }}</span>
+                  <span class="price-amount">{{ formatPrice(currentPrice) }}</span>
                   <span class="riyal-symbol" v-if="locale === 'ar'">
                     <img :src="riyalIcon" alt="ريال" class="riyal-svg" aria-hidden="true" />
                   </span>
@@ -72,10 +72,10 @@
             </div>
 
             <!-- Divider Line -->
-            <div class="section-divider"></div>
+            <div v-if="productFeatures.length > 0" class="section-divider"></div>
 
             <!-- Bullet Specs List (Checkmark circle on the Right, Text on the Left) -->
-            <ul class="bullet-specs-list">
+            <ul v-if="productFeatures.length > 0" class="bullet-specs-list">
               <li v-for="(feat, idx) in productFeatures" :key="idx" class="bullet-spec-item">
                 <span class="check-circle-icon">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">

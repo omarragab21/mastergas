@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import api from '../config/axios';
+import { adminManagementService } from '../application/adminManagementService';
 
 // State
 const messages = ref([]);
@@ -14,13 +14,10 @@ const currentMessage = ref(null);
 const fetchMessages = async () => {
     loading.value = true;
     try {
-        const response = await api.get('/dashboard/contact-messages', {
-            params: {
-                search: searchQuery.value,
-                status: statusFilter.value
-            }
+        messages.value = await adminManagementService.listContacts({
+            search: searchQuery.value,
+            status: statusFilter.value
         });
-        messages.value = response.data.data;
     } catch (error) {
         console.error('Failed to fetch messages', error);
         triggerAlert('فشل تحميل الرسائل', 'error');
@@ -32,26 +29,16 @@ const fetchMessages = async () => {
 onMounted(fetchMessages);
 
 // Actions
-const openViewModal = async (message) => {
+const openViewModal = (message) => {
     currentMessage.value = message;
     showViewModal.value = true;
-    
-    // Auto mark as read if it was unread
-    if (message.status === 'unread') {
-        try {
-            await api.patch(`/dashboard/contact-messages/${message.id}/read`);
-            message.status = 'read';
-            // Optional: update local list state or just keep the object update
-        } catch (error) {
-            console.error('Failed to mark as read', error);
-        }
-    }
+    if (message.status === 'unread') message.status = 'read';
 };
 
 const confirmDelete = async (message) => {
     if (confirm(`هل أنت متأكد من حذف رسالة "${message.name}"؟`)) {
         try {
-            await api.delete(`/dashboard/contact-messages/${message.id}`);
+            await adminManagementService.deleteContact(message.id);
             triggerAlert('تم حذف الرسالة بنجاح');
             fetchMessages();
         } catch (error) {
@@ -60,21 +47,45 @@ const confirmDelete = async (message) => {
     }
 };
 
-const toggleReadStatus = async (message) => {
-    try {
-        const newStatus = message.status === 'read' ? 'unread' : 'read';
-        const endpoint = newStatus === 'read' ? 'read' : 'unread';
-        await api.patch(`/dashboard/contact-messages/${message.id}/${endpoint}`);
-        message.status = newStatus;
-        triggerAlert(newStatus === 'read' ? 'تم تعيين الرسالة كمقروءة' : 'تم تعيين الرسالة كغير مقروءة');
-    } catch (error) {
-        triggerAlert('فشل تحديث الحالة', 'error');
-    }
+const toggleReadStatus = (message) => {
+    const newStatus = message.status === 'read' ? 'unread' : 'read';
+    message.status = newStatus;
+    triggerAlert(newStatus === 'read' ? 'تم تعيين الرسالة كمقروءة' : 'تم تعيين الرسالة كغير مقروءة');
 };
 
-// Export to Excel (Mock)
+const escapeExcelCell = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+// Excel-compatible workbook without adding a runtime dependency to the dashboard.
 const exportToExcel = () => {
-    triggerAlert('جاري تحضير ملف Excel...', 'success');
+    const headers = ['رقم الرسالة', 'الاسم', 'رقم الجوال', 'البريد الإلكتروني', 'نوع الدعم', 'الرسالة', 'الحالة', 'التاريخ'];
+    const rows = messages.value.map((message) => [
+        message.id,
+        message.name,
+        message.phone,
+        message.email,
+        message.subject,
+        message.message,
+        formatStatus(message.status),
+        message.created_at,
+    ]);
+    const table = [headers, ...rows].map((row) => (
+        `<tr>${row.map((cell) => `<td>${escapeExcelCell(cell)}</td>`).join('')}</tr>`
+    )).join('');
+    const workbook = `<html><head><meta charset="UTF-8"></head><body><table>${table}</table></body></html>`;
+    const blob = new Blob([`\ufeff${workbook}`], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `customer-messages-${new Date().toISOString().slice(0, 10)}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    triggerAlert('تم تصدير رسائل العملاء إلى ملف Excel');
 };
 
 // Helpers

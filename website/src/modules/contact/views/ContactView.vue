@@ -219,10 +219,10 @@
 
 <script setup>
 import { ref, reactive, computed, onUnmounted } from 'vue';
-import api from '../../../config/axios';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSEO } from '../../../composables/useSEO';
 import { escapeHtml } from '../../../utils/sanitize';
+import { settingsService } from '../../../services/settingsService';
 
 const { currentLang } = useLocalized();
 
@@ -338,7 +338,7 @@ const handleSubmit = async () => {
       message: sanitize(form.message)
     };
 
-    await api.post('/frontend/contact', payload);
+    await settingsService.sendContactMessage(payload);
 
     successMsg.value = currentLang.value === 'ar'
       ? 'تم استلام رسالتك بنجاح! سيتواصل معك فريق الدعم الفني في أقرب وقت.'
@@ -806,10 +806,16 @@ const handleSubmit = async () => {
 }
 
 /* Responsive adjustments */
+@media (max-width: 1024px) {
+  .support-hero-banner {
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 960px) {
   .support-hero-banner {
     height: 360px;
-    margin-top: 20px;
+    margin-top: 0;
   }
   .hero-title {
     font-size: 34px;
@@ -823,4 +829,3 @@ const handleSubmit = async () => {
   }
 }
 </style>
-

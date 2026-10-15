@@ -27,8 +27,8 @@
         :is-color-spec="isColorSpec"
         :get-spec-colors-list="getSpecColorsList"
       />
-      <ProductInstallationTab v-if="activeTab === 'installation'" :locale="locale" />
-      <ProductShippingTab v-if="activeTab === 'shipping'" :locale="locale" />
+      <ProductInstallationTab v-if="activeTab === 'installation'" :locale="locale" :items="installationItems" />
+      <ProductShippingTab v-if="activeTab === 'shipping'" :locale="locale" :items="shippingItems" />
       <ProductReviewsTab
         v-if="activeTab === 'reviews'"
         :locale="locale"
@@ -59,6 +59,8 @@ const props = defineProps({
   dynamicOverviewTitle: { type: String, default: '' },
   dynamicOverviewDesc: { type: String, default: '' },
   dynamicOverviewFeatures: { type: Array, default: () => [] },
+  installationItems: { type: Array, default: () => [] },
+  shippingItems: { type: Array, default: () => [] },
   specRows: { type: Array, default: () => [] },
   isColorSpec: { type: Function, required: true },
   getSpecColorsList: { type: Function, required: true },
@@ -79,6 +81,8 @@ const {
   dynamicOverviewTitle,
   dynamicOverviewDesc,
   dynamicOverviewFeatures,
+  installationItems,
+  shippingItems,
   specRows,
   isColorSpec,
   getSpecColorsList,
@@ -90,4 +94,3 @@ const {
   handleAddReviewClick,
 } = toRefs(props);
 </script>
-

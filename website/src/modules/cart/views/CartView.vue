@@ -49,10 +49,24 @@
       <template v-else>
         <!-- Cart Items List Area (Right in RTL, Left in LTR) -->
         <div class="cart-list-area">
+          <div
+            v-for="item in unavailableItems"
+            :key="`unavailable-${item.cart_item_key || item.id}`"
+            class="unavailable-warning"
+            :class="{ 'is-ltr': !isRtl }"
+            role="alert"
+          >
+            <svg class="unavailable-warning-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2" />
+              <path d="M12 7.5v5.5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span>{{ t('cart.unavailable_product', { name: getItemName(item) }) }}</span>
+          </div>
+
           <div class="cart-table-card">
             <template v-for="(item, index) in cartStore.items" :key="item.cart_item_key || item.id">
               <div v-if="index > 0" class="cart-divider"></div>
-              <div class="cart-item-row">
+              <div class="cart-item-row" :class="{ 'is-unavailable': item.unavailable }">
                 <div class="row-content">
                   <!-- Remove Button (Circle with trash icon on far left in RTL) -->
                   <button
@@ -76,11 +90,12 @@
                   </div>
 
                   <!-- Quantity Selector (+, 1, −) -->
-                  <div class="qty-selector">
+                  <div class="qty-selector" :class="{ 'is-disabled': item.unavailable }">
                     <button
                       type="button"
                       class="qty-btn"
                       @click="cartStore.updateQuantity(item.cart_item_key || item.id, item.quantity + 1)"
+                      :disabled="item.unavailable"
                       :aria-label="tr('cart.increase_qty', 'زيادة الكمية')"
                     >+</button>
                     <span class="qty-num">{{ item.quantity }}</span>
@@ -88,21 +103,21 @@
                       type="button"
                       class="qty-btn"
                       @click="cartStore.updateQuantity(item.cart_item_key || item.id, item.quantity - 1)"
-                      :disabled="item.quantity <= 1"
+                      :disabled="item.unavailable || item.quantity <= 1"
                       :aria-label="tr('cart.decrease_qty', 'إنقاص الكمية')"
                     >−</button>
                   </div>
 
                   <!-- Item Details (Title, SKU, Features) -->
-                  <div class="item-details" @click="goToProduct(item)">
-                    <h3 class="item-title">{{ localized(item, 'name') }}</h3>
+                  <div class="item-details" :class="{ 'is-unavailable': item.unavailable }" @click="!item.unavailable && goToProduct(item)">
+                    <h3 class="item-title">{{ getItemName(item) }}</h3>
                     <p class="item-code" v-if="getItemSku(item)">{{ getItemSku(item) }}</p>
                     <p class="item-features" v-if="getItemSubtitle(item)">{{ getItemSubtitle(item) }}</p>
                   </div>
 
                   <!-- Product Thumbnail (80x80px on far right in RTL) -->
-                  <div class="product-thumb" @click="goToProduct(item)">
-                    <img :src="getImageUrl(item.image || item.images?.[0], item.id)" :alt="localized(item, 'name')" @error="onImageError($event, item)">
+                  <div class="product-thumb" @click="!item.unavailable && goToProduct(item)">
+                    <img :src="getImageUrl(item.image || item.images?.[0], item.id)" :alt="getItemName(item)" @error="onImageError($event, item)">
                   </div>
                 </div>
               </div>
@@ -130,6 +145,11 @@
               />
             </div>
             <p v-if="cartStore.couponMessage" class="coupon-msg" :class="cartStore.couponMessageType">{{ cartStore.couponMessage }}</p>
+            <div v-if="cartStore.appliedCoupon && discountAmount > 0" class="coupon-active-state">
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+              <span>{{ tr('cart.coupon_active', 'الكوبون مفعل') }}</span>
+              <strong>{{ cartStore.couponCode }}</strong>
+            </div>
           </div>
 
           <!-- Summary Rows -->
@@ -207,9 +227,15 @@
 
           <!-- Summary Actions -->
           <div class="summary-actions">
-            <router-link to="/checkout" class="primary-button">
+            <button
+              type="button"
+              class="primary-button"
+              :disabled="hasUnavailableItems"
+              :aria-disabled="hasUnavailableItems"
+              @click="goToCheckout"
+            >
               {{ tr('cart.continue_order', 'متابعة الطلب') }}
-            </router-link>
+            </button>
             <router-link to="/products" class="secondary-button">
               {{ tr('cart.continue_shopping', 'متابعة التسوق') }}
             </router-link>
@@ -231,6 +257,7 @@ import { useLocalized } from '../../../composables/useLocalized';
 import { useSettings } from '../../../composables/useSettings';
 import { useCartSummary } from '../../../composables/useCartSummary';
 import { getCartItemSku, getCartItemSubtitle } from '../../../domain/cart/cartItemPresentation';
+import { calculateBundleCartPricing, cartItemKey } from '../../../composables/useBundlePricing.js';
 
 const router = useRouter();
 const { t, te, locale } = useI18n();
@@ -258,19 +285,47 @@ const tr = (key, fallback, params = {}) => {
 };
 
 const discountAmount = toRef(cartStore, 'discountAmount');
+const unavailableItems = computed(() => cartStore.items.filter(item => item.unavailable));
+const hasUnavailableItems = computed(() => unavailableItems.value.length > 0);
 
 // Calculate item price with offer discount
+const getLineTotalWithoutBundle = (item) => {
+  const price = Math.max(0, Number(item.price) || 0);
+  const discount = Math.max(0, Number(item.discount) || 0);
+  if (item.type === 'fixed') {
+    return Math.max(0, price - discount) * Math.max(1, Number(item.quantity) || 1);
+  }
+  return price * (1 - Math.min(100, discount) / 100) * Math.max(1, Number(item.quantity) || 1);
+};
+
+const bundlePricing = computed(() => calculateBundleCartPricing({
+  items: cartStore.items,
+  getActiveOfferForProduct,
+  getLineTotalWithoutBundle,
+}));
+
 const getItemPriceWithDiscount = (item) => {
+  const bundleLineTotal = bundlePricing.value.lineTotals.get(cartItemKey(item));
+  if (bundleLineTotal !== undefined) return bundleLineTotal;
+
   const offer = getActiveOfferForProduct(item);
-  if (offer) {
+  if (offer && offer.type !== 'bundle') {
     const price = calculatePriceWithOffer(item, offer);
     return price * item.quantity;
   }
-  return (item.price * (1 - (item.discount / 100 || 0))) * item.quantity;
+  return getLineTotalWithoutBundle(item);
 };
 
 const getItemSku = getCartItemSku;
+const getItemName = (item) => localized(item, 'name')
+  || item?.name_ar
+  || item?.name_en
+  || item?.name
+  || '';
 const getItemSubtitle = (item) => getCartItemSubtitle(item, { isEnglish: !isRtl.value });
+// The Site checkout payload currently uses tax_rate = 0. Keep the cart
+// summary on the same rule so it cannot display a different payable total.
+const getCheckoutSetting = (key, fallback) => key === 'tax_rate' ? 0 : getSetting(key, fallback);
 
 const {
   subtotalWithDiscount,
@@ -281,7 +336,7 @@ const {
 } = useCartSummary({
   items: computed(() => cartStore.items),
   getItemPrice: getItemPriceWithDiscount,
-  getSetting,
+  getSetting: getCheckoutSetting,
   discountAmount,
   translate: tr,
 });
@@ -319,6 +374,10 @@ const goToProduct = (product) => {
   router.push(`/product/${product.id}`);
 };
 
+const goToCheckout = () => {
+  if (!hasUnavailableItems.value) router.push('/checkout');
+};
+
 const applyCoupon = async () => {
   return cartStore.applyCoupon({
     subtotal: subtotalWithDiscount.value,
@@ -326,8 +385,9 @@ const applyCoupon = async () => {
   });
 };
 
-onMounted(() => {
-  cartStore.initialize();
+onMounted(async () => {
+  await cartStore.initialize();
+  await cartStore.restoreCoupon({ subtotal: subtotalWithDiscount.value, translate: tr });
   fetchSettings();
   fetchOffers();
 });
@@ -557,6 +617,27 @@ onMounted(() => {
   color: #dc2626;
 }
 
+.coupon-active-state {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 8px;
+  color: #15803d;
+  font-size: 12px;
+  direction: rtl;
+}
+
+.cart-page.is-ltr .coupon-active-state {
+  direction: ltr;
+  justify-content: flex-start;
+}
+
+.coupon-active-state strong {
+  color: #166534;
+  font-weight: 700;
+}
+
 /* summary-rows */
 .summary-rows {
   display: flex;
@@ -716,6 +797,13 @@ onMounted(() => {
   background: #1f2937;
 }
 
+.primary-button:disabled {
+  background: #CBD5E1;
+  color: #64748B;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .secondary-button {
   box-sizing: border-box;
   display: flex;
@@ -754,6 +842,44 @@ onMounted(() => {
   width: 100%;
 }
 
+.unavailable-warning {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: #FFF2F2;
+  border: 1px solid #E53333;
+  border-radius: 8px;
+  color: #E53333;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  direction: rtl;
+  text-align: right;
+}
+
+.unavailable-warning.is-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.unavailable-warning > span {
+  flex: 1;
+}
+
+.unavailable-warning-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+}
+
 /* cart-table-card */
 .cart-table-card {
   box-sizing: border-box;
@@ -774,6 +900,19 @@ onMounted(() => {
   align-items: stretch;
   padding: 0px;
   width: 100%;
+}
+
+.cart-item-row.is-unavailable .item-title,
+.cart-item-row.is-unavailable .item-code,
+.cart-item-row.is-unavailable .item-features,
+.cart-item-row.is-unavailable .item-line-total {
+  color: #B6C0CF;
+}
+
+.cart-item-row.is-unavailable .product-thumb {
+  opacity: 0.55;
+  filter: grayscale(0.25);
+  cursor: default;
 }
 
 .cart-divider {
@@ -857,6 +996,11 @@ onMounted(() => {
   border-radius: 6px;
   flex-shrink: 0;
 }
+
+.qty-selector.is-disabled {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+}
 .qty-btn {
   border: none;
   background: transparent;
@@ -905,6 +1049,10 @@ onMounted(() => {
   flex: 1;
   min-width: 0;
   cursor: pointer;
+}
+
+.item-details.is-unavailable {
+  cursor: default;
 }
 .item-title {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
@@ -1157,6 +1305,10 @@ onMounted(() => {
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* <main> already clears the fixed header, so the page only needs a small top gap */
+  .cart-page:not(.is-empty) {
+    padding-top: 24px;
+  }
   .breadcrumb-container {
     padding: 0 24px;
     margin-bottom: 20px;

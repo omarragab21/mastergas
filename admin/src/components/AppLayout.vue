@@ -147,7 +147,6 @@
               
               <div class="dropdown-divider"></div>
 
-              <!-- Language & Dark Mode commented out as requested:
               <div class="dropdown-item split-item" @click="toggleLanguage">
                 <span class="lang-text">{{ currentLang === 'ar' ? 'ع' : 'En' }}</span>
                 <div class="lang-switch-container">
@@ -158,6 +157,8 @@
                 </div>
               </div>
 
+              <!-- Dark mode is intentionally kept disabled for the dashboard. -->
+              <!--
               <div class="dropdown-item split-item" @click="toggleTheme">
                 <label class="toggle-switch" @click.stop>
                   <input type="checkbox" v-model="isDark" />

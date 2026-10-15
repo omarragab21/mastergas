@@ -430,7 +430,7 @@
     padding: 12px;
     border-radius: 14px;
     width: 100%;
-    height: 460px;
+    height: auto;
     flex-basis: 100%;
   }
   .product-image-wrapper {
@@ -442,8 +442,14 @@
     font-size: 15px;
     min-height: 40px;
   }
+  /* No fixed card height on phones: the divider sits right under the text
+     (auto margin only absorbs height when a taller card in the same row stretches this one) */
+  .product-meta-row {
+    margin-bottom: 12px;
+  }
   .product-divider {
-    margin-bottom: 6px;
+    margin-top: auto;
+    margin-bottom: 8px;
   }
   .price-val {
     font-size: 18px;
@@ -454,5 +460,16 @@
   }
   .btn-text {
     font-size: 12px;
+  }
+}
+
+/* Tablet/mobile: grid cards fill their column so side gutters stay equal */
+@media (max-width: 1024px) {
+  .mockup-products-grid > .product-card,
+  .mockup-products-grid > .sk-product-card,
+  .related-products-grid > .product-card,
+  .products-grid-four > .product-card,
+  .products-grid-four > .sk-product-card {
+    max-width: none;
   }
 }

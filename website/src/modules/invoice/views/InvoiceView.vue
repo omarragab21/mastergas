@@ -205,7 +205,7 @@ export default {
       confirmed: 'تم تأكيد الطلب',
       paid_confirmed: 'تم تأكيد الدفع',
       processing: 'قيد التجهيز',
-      shipped: 'تم الشحن',
+      shipped: 'الطلب في الطريق',
       shipping: 'قيد التوصيل',
       delivering: 'قيد التوصيل',
       in_delivery: 'قيد التوصيل',

@@ -18,7 +18,9 @@ const TRACKING_STATUS_RANKS = {
   confirmed: 2,
   paid_confirmed: 2,
   processing: 3,
-  shipped: 4,
+  // The API's `shipped` state means the parcel is in the delivery flow.
+  // `delivered` remains a separate, explicit customer-received step.
+  shipped: 5,
   shipping: 5,
   delivering: 5,
   in_delivery: 5,
@@ -30,7 +32,7 @@ const STATUS_LABELS = {
   pending: 'قيد الانتظار',
   paid_confirmed: 'تم تأكيد الدفع',
   processing: 'قيد المعالجة',
-  shipped: 'قيد الشحن',
+  shipped: 'الطلب في الطريق',
   delivered: 'تم التوصيل',
   cancelled: 'ملغي',
 };

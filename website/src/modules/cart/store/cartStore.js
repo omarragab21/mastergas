@@ -2,6 +2,7 @@ import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { cartState as legacyCartState } from '../../../store/cart';
 import { cartService } from '../services/cartService';
+import { clearActiveCoupon, readActiveCoupon, saveActiveCoupon } from '../../../services/activeCouponStorage';
 
 export const useCartStore = defineStore('cartFeature', () => {
   const items = computed({
@@ -36,6 +37,7 @@ export const useCartStore = defineStore('cartFeature', () => {
       if ((response.success || response.valid || response.status === 'success') && hasAppliedDiscount) {
         appliedCoupon.value = response.data || { code: normalizedCode };
         discountAmount.value = discount;
+        saveActiveCoupon({ code: normalizedCode, coupon: appliedCoupon.value, discount });
         couponMessage.value = response.message || fallback('cart.coupon_applied_success', 'تم تطبيق الكوبون بنجاح');
         couponMessageType.value = 'success';
         return true;
@@ -43,12 +45,14 @@ export const useCartStore = defineStore('cartFeature', () => {
 
       appliedCoupon.value = null;
       discountAmount.value = 0;
+      clearActiveCoupon();
       couponMessage.value = response.message || fallback('cart.coupon_invalid', 'رمز الكوبون غير صالح');
       couponMessageType.value = 'error';
       return false;
     } catch (error) {
       appliedCoupon.value = null;
       discountAmount.value = 0;
+      clearActiveCoupon();
       couponMessage.value = error.response?.data?.message || fallback('cart.coupon_invalid', 'رمز الكوبون غير صالح');
       couponMessageType.value = 'error';
       return false;
@@ -58,6 +62,12 @@ export const useCartStore = defineStore('cartFeature', () => {
   };
 
   const initialize = () => cartService.refreshItems();
+
+  const restoreCoupon = async ({ subtotal = 0, translate } = {}) => {
+    const savedCoupon = readActiveCoupon();
+    if (!savedCoupon?.code) return false;
+    return applyCoupon({ code: savedCoupon.code, subtotal, translate });
+  };
 
   return {
     items,
@@ -71,6 +81,7 @@ export const useCartStore = defineStore('cartFeature', () => {
     removeItem,
     updateQuantity,
     applyCoupon,
+    restoreCoupon,
     initialize,
   };
 });

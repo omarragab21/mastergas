@@ -183,7 +183,7 @@
         <button class="modal-close" @click="closeModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="form-header"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? 'تعديل المنتج' : 'إضافة منتج جديدة' }}</h3><p class="modal-subtitle-main">أدخل معلومات السلعة للجدول</p></div>
+        <div class="form-header"><div class="modal-heading-row"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? 'تعديل المنتج' : 'إضافة منتج جديدة' }}</h3></div><p class="modal-subtitle-main">أدخل معلومات السلعة للجدول</p></div>
 
         <div class="i18n-toggle" role="tablist" aria-label="Language">
           <button type="button" class="i18n-btn" :class="{ active: activeLang === 'en' }" @click="activeLang = 'en'">English</button>
@@ -1560,6 +1560,14 @@ const submitForm = async () => {
   }
 };
 
+const getDeleteErrorMessage = (error) => {
+  const message = String(error?.response?.data?.message || '').trim();
+  if (/order_items|foreign key constraint|cannot delete|طلبات|مرتبط/i.test(message)) {
+    return 'لا يمكن حذف هذا المنتج لأنه مرتبط بطلبات سابقة. عطّل المنتج من التعديل بدل حذفه نهائياً.';
+  }
+  return message || 'فشل عملية الحذف';
+};
+
 const confirmDelete = async (prod) => {
   if (confirm(`تأكيد حذف المنتج "${prod.name_i18n?.ar || prod.name}"؟`)) {
     try {
@@ -1567,8 +1575,8 @@ const confirmDelete = async (prod) => {
       triggerAlert('تم الحذف بنجاح');
       fetchProducts();
       fetchStats();
-    } catch {
-      triggerAlert('فشل عملية الحذف', 'error');
+    } catch (error) {
+      triggerAlert(getDeleteErrorMessage(error), 'error');
     }
   }
 };
@@ -1960,7 +1968,8 @@ const confirmDelete = async (prod) => {
 .modal-content.form-modal.form-content { max-width: 700px; }
 .form-modal .modal-close { top: 1.5rem; left: 1.5rem; background: #f3f4f6; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; color: #9ca3af; font-size: 1.2rem; line-height: 1; }
 .form-modal .form-header { text-align: center; padding: 2rem 2rem 1.5rem 2rem; position: relative; }
-.form-modal .header-icon-main { width: 50px; height: 50px; background: #f3f4f6; color: #000000; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.form-modal .modal-heading-row { display: flex; align-items: center; justify-content: center; gap: 0.65rem; direction: rtl; }
+.form-modal .header-icon-main { width: 38px; height: 38px; background: #f3f4f6; color: #000000; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
 .form-modal .modal-title-main { font-size: 1.3rem; font-weight: 800; color: #111827; margin: 0; }
 .form-modal .modal-subtitle-main { font-size: 0.85rem; color: #9ca3af; margin-top: 0.4rem; }
 .form-modal .cat-form, .form-modal .prod-form, .form-modal .value-form { padding: 0 2.5rem 2.5rem 2.5rem; }

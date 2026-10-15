@@ -5,6 +5,7 @@ import { getCheckoutOwner } from '../utils/checkoutSafety';
 import { trackAddToCart, trackEvent } from '../utils/metaPixel';
 import { getCustomerToken } from '../utils/customerSession.js';
 import { createCartItemKey, normalizeCartItems } from '../domain/cart/cartItem';
+import { normalizeSiteProduct } from '../services/siteDataMappers';
 
 // Per-token localStorage keys (shared-preferences style)
 // Using the customer token guarantees the same cart is loaded even if authState.user
@@ -52,6 +53,26 @@ const loadCart = () => {
   return normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
 };
 const loadWishlist = () => loadWithMigration(getWishlistKey(), 'wishlist');
+
+const extractList = (payload) => {
+  const body = payload?.data ?? payload;
+  if (Array.isArray(body)) return body;
+  if (Array.isArray(body?.data)) return body.data;
+  if (Array.isArray(body?.items)) return body.items;
+  return [];
+};
+
+const wishlistProduct = (entry) => {
+  const nestedProduct = entry?.product || entry?.product_item;
+  const product = nestedProduct || (entry?.product_id !== undefined
+    ? { ...entry, id: entry.product_id }
+    : entry);
+  if (!product || product.id === undefined) return null;
+  return {
+    ...normalizeSiteProduct(product),
+    wishlist_id: entry?.id,
+  };
+};
 
 export const cartState = reactive({
   items: loadCart(),
@@ -159,9 +180,18 @@ export const cartState = reactive({
       const latestProducts = await Promise.all(
         snapshotItems.map(async (item) => {
           try {
-            return await productService.getProductById(item.id);
-          } catch (_) {
-            return null;
+            const product = await productService.getProductById(item.id);
+            // A successful response with no product is not proof that the
+            // product was deleted. Only an explicit 404 should mark it
+            // unavailable so transient/odd API payloads do not block checkout.
+            return { product, unavailable: false };
+          } catch (error) {
+            // Only a confirmed 404 means the product was removed. Temporary
+            // network/API failures must not disable checkout by accident.
+            return {
+              product: null,
+              unavailable: Number(error?.response?.status) === 404,
+            };
           }
         })
       );
@@ -175,18 +205,23 @@ export const cartState = reactive({
       // must survive the refresh.
       const refreshed = new Map();
       snapshotItems.forEach((item, index) => {
-        if (latestProducts[index]) refreshed.set(item.cart_item_key || `id:${item.id}`, latestProducts[index]);
+        const result = latestProducts[index];
+        const key = item.cart_item_key || `id:${item.id}`;
+        if (result?.product) refreshed.set(key, { product: result.product, unavailable: false });
+        else if (result?.unavailable) refreshed.set(key, { product: null, unavailable: true });
       });
       this.items = this.items.map((item) => {
-        const latestProduct = refreshed.get(item.cart_item_key || `id:${item.id}`);
-        if (!latestProduct) return item;
+        const latest = refreshed.get(item.cart_item_key || `id:${item.id}`);
+        if (!latest) return item;
+        if (latest.unavailable) return { ...item, unavailable: true };
 
         // Hydration replaces the product snapshot, but variant identity belongs
         // to the cart line. Preserve it so same-product variants remain
         // independently addressable after refresh/reload.
         return {
-          ...latestProduct,
+          ...latest.product,
           quantity: item.quantity,
+          ...(item.offer_id ? { offer_id: item.offer_id } : {}),
           ...(item.selectedAttributes && typeof item.selectedAttributes === 'object'
             ? { selectedAttributes: item.selectedAttributes }
             : {}),
@@ -209,7 +244,9 @@ export const cartState = reactive({
       return;
     }
 
-    const index = this.wishlist.findIndex(item => item.id === product.id);
+    const index = this.wishlist.findIndex(item => Number(item.id) === Number(product.id));
+    const wasInWishlist = index > -1;
+    const previousWishlist = [...this.wishlist];
     if (index > -1) {
       this.wishlist.splice(index, 1);
     } else {
@@ -225,12 +262,57 @@ export const cartState = reactive({
     }
     this.save();
 
-    // Sync with backend if logged in
+    // Sync with the Tijara wishlist API. The UI is optimistic, but rolls back
+    // when the server rejects the change so local and remote state do not drift.
     try {
-      await api.post('/frontend/wishlist/toggle', { product_id: product.id });
+      if (wasInWishlist) {
+        await api.delete(`/v1/site/wishlists/${encodeURIComponent(product.id)}`, {
+          data: { product_id: product.id },
+        });
+      } else {
+        await api.post('/v1/site/wishlists/toggle', { product_id: product.id });
+      }
+      await this.syncWishlistFromBackend();
     } catch (err) {
+      this.wishlist = previousWishlist;
+      this.saveWishlist();
       console.error('Wishlist sync failed', err);
     }
+  },
+
+  async syncWishlistFromBackend() {
+    const token = getCustomerToken();
+    // mockAuth is a local preview token, not a backend customer credential.
+    // Do not send it to the wishlist endpoint, which responds with 500.
+    if (!token || token === 'preview_token' || typeof window === 'undefined' || !window.document || !window.location?.origin) return;
+    try {
+      const response = await api.get('/v1/site/wishlists');
+      const remote = extractList(response).map(wishlistProduct).filter(Boolean);
+      this.wishlist = remote;
+      this.saveWishlist();
+    } catch (err) {
+      console.error('Wishlist load failed', err);
+    }
+  },
+
+  // Wishlist entries are snapshots. Reload each product from the API so its image,
+  // name and price are exactly what the product cards show (and what the admin set).
+  async hydrateWishlist() {
+    await this.syncWishlistFromBackend();
+    const snapshot = [...this.wishlist];
+    if (!snapshot.length) return;
+    const fresh = await Promise.all(snapshot.map(async (item) => {
+      try {
+        const product = await productService.getProductById(item.id);
+        return product ? { ...item, ...product, wishlist_id: item.wishlist_id } : item;
+      } catch (_) {
+        return item;
+      }
+    }));
+    // The list may have changed (item removed) while the requests were running.
+    const stillWanted = new Set(this.wishlist.map((item) => String(item.id)));
+    this.wishlist = fresh.filter((item) => stillWanted.has(String(item.id)));
+    this.saveWishlist();
   },
 
   isInWishlist(productId) {
@@ -300,6 +382,9 @@ export const cartState = reactive({
   syncWithToken() {
     this.items = loadCart();
     this.wishlist = loadWishlist();
+    if (typeof window !== 'undefined' && window.document) {
+      void this.syncWishlistFromBackend();
+    }
   },
 
   // Guest carts are no longer supported. Remove stale guest cart data so old

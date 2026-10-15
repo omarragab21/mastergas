@@ -49,6 +49,6 @@ import { toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 const props = defineProps({ visible: { type: Boolean, default: false }, user: { type: Object, default: null }, reviewForm: { type: Object, required: true }, isSubmittingReview: { type: Boolean, default: false }, reviewMessage: { type: String, default: '' }, reviewStatus: { type: String, default: '' }, openLoginModal: { type: Function, required: true }, submitReview: { type: Function, required: true } });
 const emit = defineEmits(['close', 'update-rating', 'update-comment']);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { reviewForm } = toRefs(props);
 </script>

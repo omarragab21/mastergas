@@ -6,8 +6,11 @@ import {
 } from '../../../services/apiClient';
 import {
   normalizeSiteCategory,
+  normalizeSiteOffer,
   normalizeSiteProduct,
+  normalizeSiteReview,
 } from '../../../services/siteDataMappers';
+import api from '../../../config/axios';
 
 const cleanParams = (params = {}) => Object.fromEntries(
   Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -174,18 +177,34 @@ export const productService = {
     }));
   },
 
-  // Discounts are part of product responses; the site collection has no offers endpoint.
-  async getOffers() {
-    return [];
+  async getOffers(params = {}, options = {}) {
+    const body = await getCached('/v1/site/offers', cleanParams(params), {
+      ttl: options.ttl ?? API_TTL.offers,
+      signal: options.signal,
+      retries: options.retries ?? 2,
+      timeout: options.timeout ?? 6000,
+    });
+    return listFromBody(body, normalizeSiteOffer);
   },
 
-  // Reviews are outside the supplied Tijara site collection.
-  async getProductReviews() {
-    return [];
+  async getProductReviews(productId, options = {}) {
+    const body = await getCached(`/v1/site/products/${encodeURIComponent(productId)}`, {}, {
+      ttl: options.ttl ?? API_TTL.productDetail,
+      signal: options.signal,
+      retries: options.retries ?? 2,
+      timeout: options.timeout ?? 6000,
+    });
+    const product = parseDataResponse(body);
+    return Array.isArray(product?.reviews) ? product.reviews.map(normalizeSiteReview) : [];
   },
 
-  async submitReview() {
-    throw new Error('Product reviews are not available in the Tijara site API');
+  async submitReview(productId, reviewData = {}) {
+    const response = await api.post('/v1/site/reviews', {
+      product_id: productId,
+      rating: Number(reviewData.rating),
+      comment: String(reviewData.comment || '').trim(),
+    });
+    return response.data;
   },
 };
 
