@@ -2,7 +2,7 @@
   <div class="cart-page" :class="{ 'is-ltr': !isRtl, 'is-empty': cartStore.items.length === 0 }">
     <!-- breadcrumb-flow -->
     <div class="breadcrumb-container">
-      <nav class="breadcrumb-flow" aria-label="breadcrumb">
+      <nav class="breadcrumb-flow" :aria-label="t('common.breadcrumb')">
         <!-- crumb-0 (الرئيسية) -->
         <router-link to="/" class="crumb-link">
           {{ isRtl ? 'الرئيسية' : 'Home' }}
@@ -96,7 +96,7 @@
                       class="qty-btn"
                       @click="cartStore.updateQuantity(item.cart_item_key || item.id, item.quantity + 1)"
                       :disabled="item.unavailable"
-                      :aria-label="tr('cart.increase_qty', 'زيادة الكمية')"
+                      :aria-label="t('cart.increase_qty')"
                     >+</button>
                     <span class="qty-num">{{ item.quantity }}</span>
                     <button
@@ -104,7 +104,7 @@
                       class="qty-btn"
                       @click="cartStore.updateQuantity(item.cart_item_key || item.id, item.quantity - 1)"
                       :disabled="item.unavailable || item.quantity <= 1"
-                      :aria-label="tr('cart.decrease_qty', 'إنقاص الكمية')"
+                      :aria-label="t('cart.decrease_qty')"
                     >−</button>
                   </div>
 
@@ -255,6 +255,7 @@ import api from '../../../config/axios';
 import { useOffers } from '../../product/composables/useOffers';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSettings } from '../../../composables/useSettings';
+import { formatPrice } from '../../../utils/price';
 import { useCartSummary } from '../../../composables/useCartSummary';
 import { getCartItemSku, getCartItemSubtitle } from '../../../domain/cart/cartItemPresentation';
 import { calculateBundleCartPricing, cartItemKey } from '../../../composables/useBundlePricing.js';
@@ -323,10 +324,6 @@ const getItemName = (item) => localized(item, 'name')
   || item?.name
   || '';
 const getItemSubtitle = (item) => getCartItemSubtitle(item, { isEnglish: !isRtl.value });
-// The Site checkout payload currently uses tax_rate = 0. Keep the cart
-// summary on the same rule so it cannot display a different payable total.
-const getCheckoutSetting = (key, fallback) => key === 'tax_rate' ? 0 : getSetting(key, fallback);
-
 const {
   subtotalWithDiscount,
   shippingAmount,
@@ -336,20 +333,11 @@ const {
 } = useCartSummary({
   items: computed(() => cartStore.items),
   getItemPrice: getItemPriceWithDiscount,
-  getSetting: getCheckoutSetting,
+  getSetting,
   discountAmount,
   translate: tr,
 });
 
-// Format prices with standard thousands separators and decimals
-const formatPrice = (price) => {
-  const val = Number(price);
-  if (isNaN(val)) return '0';
-  return val.toLocaleString('en-US', {
-    minimumFractionDigits: val % 1 !== 0 ? 2 : 0,
-    maximumFractionDigits: 2
-  });
-};
 
 // Image URL handling
 const getImageUrl = (path, id) => {
@@ -567,7 +555,7 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 .btn-apply:hover:not(:disabled) {
-  opacity: 0.85;
+  background: var(--color-button-hover);
 }
 .btn-apply:disabled {
   opacity: 0.6;
@@ -794,7 +782,7 @@ onMounted(async () => {
   transition: opacity 0.2s, background 0.2s;
 }
 .primary-button:hover {
-  background: #1f2937;
+  background: var(--color-button-hover);
 }
 
 .primary-button:disabled {
@@ -1258,7 +1246,7 @@ onMounted(async () => {
 }
 
 .empty-btn-primary:hover {
-  opacity: 0.88;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

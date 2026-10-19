@@ -31,7 +31,7 @@ function escapeXML(val) {
  * Generate Meta / Facebook Catalog Feed in CSV format
  * Fields: id, title, description, availability, condition, price, link, image_link, brand, google_product_category
  */
-export function generateMetaCSV(products = [], storeUrl = 'https://mastergas.sa', currency = 'JOD') {
+export function generateMetaCSV(products = [], storeUrl = 'https://mastergas.sa', currency = 'SAR') {
   const headers = [
     'id',
     'title',
@@ -91,7 +91,7 @@ export function generateMetaCSV(products = [], storeUrl = 'https://mastergas.sa'
 /**
  * Generate Google Merchant Center RSS 2.0 XML Feed
  */
-export function generateGoogleXML(products = [], storeUrl = 'https://mastergas.sa', currency = 'JOD') {
+export function generateGoogleXML(products = [], storeUrl = 'https://mastergas.sa', currency = 'SAR') {
   const baseUrl = storeUrl.replace(/\/$/, '');
   
   const itemsXML = products.map(product => {
@@ -144,7 +144,7 @@ export function generateGoogleXML(products = [], storeUrl = 'https://mastergas.s
 /**
  * Generate JSON Catalog Feed
  */
-export function generateJSONFeed(products = [], storeUrl = 'https://mastergas.sa', currency = 'JOD') {
+export function generateJSONFeed(products = [], storeUrl = 'https://mastergas.sa', currency = 'SAR') {
   const baseUrl = storeUrl.replace(/\/$/, '');
   
   const items = products.map(product => {

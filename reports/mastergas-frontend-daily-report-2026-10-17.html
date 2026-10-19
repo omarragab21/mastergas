@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>تقرير Frontend اليومي - Mastergas - 17 أكتوبر 2026</title>
+  <style>
+    @page { size: A4; margin: 13mm 14mm 15mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #162033; font-family: "SF Arabic", "Geeza Pro", "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; font-size: 10.7pt; line-height: 1.62; }
+    header { border-bottom: 3px solid #172554; padding-bottom: 11px; margin-bottom: 13px; display: flex; justify-content: space-between; gap: 20px; }
+    h1 { margin: 0; color: #172554; font-size: 20pt; line-height: 1.25; }
+    h2 { margin: 14px 0 5px; color: #172554; font-size: 13.5pt; border-right: 4px solid #2563eb; padding-right: 8px; }
+    h3 { margin: 9px 0 2px; color: #1e3a8a; font-size: 11.5pt; }
+    p { margin: 4px 0 7px; }
+    ul { margin: 3px 0 8px; padding-right: 21px; }
+    li { margin-bottom: 3px; }
+    .meta { min-width: 190px; text-align: left; color: #475569; font-size: 9.5pt; }
+    .subtitle { color: #475569; margin-top: 3px; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 10px 0 14px; }
+    .stat { border: 1px solid #cbd5e1; border-radius: 7px; background: #f8fafc; padding: 7px 5px; text-align: center; }
+    .stat b { display: block; color: #172554; font-size: 14pt; line-height: 1.2; }
+    .stat span { color: #64748b; font-size: 8.8pt; }
+    .box { border: 1px solid #bfdbfe; border-radius: 7px; background: #eff6ff; padding: 8px 11px; margin: 7px 0; }
+    .warning { border-color: #fcd34d; background: #fffbeb; }
+    .success { border-color: #86efac; background: #f0fdf4; }
+    table { width: 100%; border-collapse: collapse; margin: 6px 0 9px; font-size: 9.2pt; }
+    th { background: #172554; color: white; font-weight: 600; }
+    th, td { border: 1px solid #cbd5e1; padding: 5px 6px; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .status { white-space: nowrap; font-weight: 600; }
+    .done { color: #166534; }
+    .pending { color: #92400e; }
+    code { direction: ltr; unicode-bidi: embed; font-family: Menlo, Consolas, monospace; font-size: 8.7pt; background: #e2e8f0; padding: 1px 3px; border-radius: 3px; }
+    .small { color: #64748b; font-size: 9pt; }
+    footer { margin-top: 14px; border-top: 1px solid #cbd5e1; padding-top: 6px; color: #64748b; font-size: 8.8pt; }
+    .page-break { break-before: page; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>تقرير أعمال الـ Frontend اليومي</h1>
+      <div class="subtitle">مشروع Mastergas — الموقع الإلكتروني ولوحة التحكم</div>
+      <div class="subtitle">تقرير متابعة وتسليم إلى المهندس عبد الرحمن</div>
+    </div>
+    <div class="meta">التاريخ: السبت 17 أكتوبر 2026<br>النطاق: Frontend فقط<br>الإصدار: Production</div>
+  </header>
+
+  <div class="summary">
+    <div class="stat"><b>20 / 20</b><span>اختبارات آلية ناجحة</span></div>
+    <div class="stat"><b>2</b><span>تطبيقان منشوران</span></div>
+    <div class="stat"><b>0</b><span>أخطاء JavaScript في Smoke QA</span></div>
+    <div class="stat"><b>7</b><span>مسارات Profile غير متاحة بالـ API</span></div>
+  </div>
+
+  <section>
+    <h2>1. ملخص التنفيذ اليوم</h2>
+    <p>تمت مراجعة تقرير QA المرسل للمهندس عبد الرحمن، ومعالجة البنود الخاصة بالواجهة فقط. لم يتم حذف أو تعديل بيانات Backend، وتم نشر تغييرات الـ Frontend على بيئة Production.</p>
+    <div class="box success"><strong>حالة النشر:</strong> الموقع ولوحة التحكم في Production بحالة READY، وتم إجراء اختبار تشغيل بعد النشر.</div>
+  </section>
+
+  <section>
+    <h2>2. الأعمال المنفذة في الـ Frontend</h2>
+    <h3>أولًا: الموقع الإلكتروني</h3>
+    <ul>
+      <li><strong>BUG-01 — روابط الـ Hero:</strong> تم منع تحويل أزرار التصفح إلى Google وتحويل الرابط العام إلى <code>/products</code> داخل <code>website/src/utils/externalLink.js</code>.</li>
+      <li><strong>BUG-04 — الصور:</strong> تم إضافة صورة بديلة للمنتجات التي لا تحتوي على صورة أو التي تفشل في التحميل، مع معالجة صور صفحة تفاصيل المنتج.</li>
+      <li><strong>BUG-05 وBUG-07 — بيانات الاختبار:</strong> تم إخفاء التصنيف <code>Test 2</code> والمنتجات التجريبية من العرض العام، بدون حذفها من Backend.</li>
+      <li><strong>BUG-08 — روابط التواصل:</strong> تم منع عرض روابط التواصل الوهمية مثل حسابات <code>tijara</code> بدل توجيه المستخدم لحساب غير رسمي.</li>
+      <li><strong>BUG-09 — سلة الزائر:</strong> أصبح الزائر قادرًا على إضافة المنتجات وفتح السلة، مع بقاء تسجيل الدخول مطلوبًا عند إتمام الطلب.</li>
+      <li><strong>Profile:</strong> إزالة رقم الهاتف التجريبي من الواجهة، ضبط البلد الافتراضي للسوق السعودي، وإيقاف مسح قوائم العناوين والإشعارات بعد تحميل الصفحة.</li>
+      <li><strong>Performance وUX:</strong> تم الحفاظ على التخزين المؤقت، منع الطلبات المكررة، وإعادة المحاولة الآمنة الموجودة في طبقة API، مع منع الروابط الخطرة.</li>
+    </ul>
+
+    <h3>ثانيًا: لوحة التحكم</h3>
+    <ul>
+      <li><strong>تسجيل الدخول:</strong> رفع مهلة طلب المصادقة من 6 إلى 15 ثانية حتى لا يظهر فشل كاذب عند بطء الاستجابة الأولى من الـ API.</li>
+      <li><strong>المنتجات والتصنيفات:</strong> إخفاء البيانات التجريبية من القوائم والإحصائيات، وإضافة fallback للصور المفقودة.</li>
+      <li><strong>العملة:</strong> استبدال عرض <code>JOD / د.أ</code> في الواجهة الإدارية بـ <code>SAR / ر.س</code> حسب السوق المستهدف.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. نتائج الاختبار بعد الإصلاح</h2>
+    <table>
+      <thead><tr><th>المسار</th><th>النتيجة</th><th>الدليل</th></tr></thead>
+      <tbody>
+        <tr><td>Homepage</td><td class="status done">ناجح</td><td>صفحة تعمل، بدون Google links أو أخطاء JavaScript.</td></tr>
+        <tr><td>Products</td><td class="status done">ناجح</td><td>9 كروت ظاهرة، بدون Test 2 أو test product، وبدون صور مكسورة.</td></tr>
+        <tr><td>Guest Cart</td><td class="status done">ناجح</td><td>تمت إضافة منتج وظهر داخل <code>/cart</code> بدون إجبار تسجيل الدخول.</td></tr>
+        <tr><td>Product Details</td><td class="status done">ناجح</td><td>المنتج بدون صورة يعرض fallback صالحًا.</td></tr>
+        <tr><td>Admin Login</td><td class="status done">ناجح</td><td>تم الوصول إلى Dashboard بعد رفع مهلة المصادقة، بدون failed requests.</td></tr>
+        <tr><td>Admin Products</td><td class="status done">ناجح</td><td>لا توجد بيانات تجريبية أو JOD، والصور البديلة تعمل.</td></tr>
+        <tr><td>Product Reviews</td><td class="status done">ناجح من جهة Frontend</td><td><code>GET /api/v1/site/products/11</code> رجع 200. لا يتم استدعاء مسار GET reviews الذي يرجع 405.</td></tr>
+      </tbody>
+    </table>
+    <p class="small">تم استخدام Playwright كبديل للاختبار من خلال Browser plugin لأن Browser plugin غير متاح في بيئة التنفيذ.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>4. المتبقي في الموقع بسبب نقص أو اختلاف الـ API</h2>
+    <table>
+      <thead><tr><th>البند</th><th>الحالة الحالية</th><th>المطلوب من Backend / الإدارة</th></tr></thead>
+      <tbody>
+        <tr><td>BUG-03 — Reviews GET</td><td class="status pending">Backend</td><td>مسار GET reviews العام يرجع 405. الـ Collection يحتوي على POST فقط، والواجهة تستخدم product detail الذي رجع 200. يلزم اعتماد endpoint GET أو توثيق المسار الصحيح.</td></tr>
+        <tr><td>BUG-06 — العملة والضريبة والدعم</td><td class="status pending">بيانات رسمية</td><td>الواجهة تعرض SAR وتستخدم fallback آمن، لكن قيمة الضريبة ورقم الدعم الرسمي يجب اعتمادهما من الإدارة وتوفيرهما في Settings API.</td></tr>
+        <tr><td>BUG-08 — روابط التواصل الرسمية</td><td class="status pending">بيانات رسمية</td><td>القيم الحالية في Settings API تشير إلى روابط عامة مثل <code>facebook.com/tijara</code>. يلزم تزويد API بروابط حسابات Mastergas الرسمية.</td></tr>
+        <tr><td>صور المنتجات</td><td class="status pending">بيانات</td><td>الواجهة بها fallback، لكن الصور الرسمية للمنتجات التي لا تملك صورًا يجب رفعها واعتمادها من الإدارة.</td></tr>
+        <tr><td>صفحات الموقع والروابط</td><td class="status pending">محتوى / API</td><td>أي روابط صفحات أو حسابات رسمية غير موجودة في Settings/Sliders يجب إضافتها من خلال API أو اعتماد مسارات داخلية ثابتة من الإدارة.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. النواقص التي تم التحقق منها في Profile الموقع</h2>
+    <p>تم اختبار المسارات المقترحة باستخدام token اختبار صالح. النتيجة التالية تخص توفر الـ API فقط، وليست خطأ في تصميم الواجهة:</p>
+    <table>
+      <thead><tr><th>الميزة</th><th>المسار المختبر</th><th>النتيجة</th></tr></thead>
+      <tbody>
+        <tr><td>بيانات المستخدم</td><td><code>/api/frontend/user</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>تحديث Profile</td><td><code>/api/frontend/profile</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>العناوين</td><td><code>/api/frontend/addresses</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>الإشعارات</td><td><code>/api/frontend/notifications</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>الدول</td><td><code>/api/frontend/countries</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>المدن</td><td><code>/api/frontend/cities</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>المحفظة</td><td><code>/api/frontend/wallet</code></td><td class="status pending">404 — المسار غير موجود</td></tr>
+        <tr><td>الطلبات</td><td><code>/api/v1/site/orders</code></td><td class="status done">200 — يعمل</td></tr>
+        <tr><td>المرتجعات</td><td><code>/api/v1/site/returns</code></td><td class="status done">200 — يعمل</td></tr>
+      </tbody>
+    </table>
+    <div class="box warning"><strong>مطلوب من Backend:</strong> إضافة مسارات Profile السبعة إلى الـ API وPostman collection، أو تزويد الـ Frontend بالمسارات البديلة الرسمية. بعد ذلك يمكن تفعيل تحميل وحفظ بيانات المستخدم والعناوين والإشعارات والدول والمدن والمحفظة بشكل كامل.</div>
+  </section>
+
+  <section>
+    <h2>6. الملفات والبيئات</h2>
+    <ul>
+      <li>الموقع: <code>https://mastergas-website.vercel.app/</code></li>
+      <li>لوحة التحكم: <code>https://mastergas-admin.vercel.app/admin/login</code></li>
+      <li>تم إنشاء screenshots لاختبار Homepage وGuest Cart وAdmin Products داخل مجلد الأدلة المؤقت.</li>
+      <li>تم تنفيذ build للموقع واللوحة، ونجحت اختبارات الـ Frontend وعددها 20/20.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>7. الخلاصة</h2>
+    <p>بنود الـ Frontend القابلة للتنفيذ تم إصلاحها ونشرها وإعادة اختبارها. المتبقي الأساسي ليس في الواجهة، بل في اعتماد البيانات الرسمية وإضافة مسارات Profile وReviews الناقصة في Backend. بعد توفير هذه المسارات والبيانات، يلزم إجراء Retest نهائي للـ Profile والروابط الرسمية.</p>
+  </section>
+
+  <footer>إعداد: Frontend QA / Development — تاريخ التقرير: 17 أكتوبر 2026 — التقرير مخصص للمتابعة مع المهندس عبد الرحمن.</footer>
+</body>
+</html>

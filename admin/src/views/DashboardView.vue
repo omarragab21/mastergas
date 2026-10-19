@@ -1,18 +1,59 @@
 <template>
-  <div class="dashboard" dir="rtl">
+  <div class="dashboard" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
 
     <!-- ===== PAGE HEADER ===== -->
     <div class="dash-header">
       <div>
-        <h1 class="dash-title">لوحة القيادة</h1>
-        <p class="dash-subtitle">نظرة عامة على أداء المتجر - {{ formattedDate }}</p>
+        <h1 class="dash-title">{{ t('admin.dashboard.title') }}</h1>
+        <p class="dash-subtitle">{{ t('admin.dashboard.subtitle') }} · {{ formattedDate }}</p>
       </div>
     </div>
 
-    <!-- ===== LOADING STATE ===== -->
-    <div v-if="loading" class="dashboard-loading">
-      <div class="spinner"></div>
-      <p>جاري تحميل البيانات...</p>
+    <!-- ===== LOADING STATE (skeleton in the real layout) ===== -->
+    <div v-if="loading" class="dashboard-skeleton" aria-busy="true" :aria-label="t('admin.dashboard.loading')">
+      <div class="stats-grid">
+        <div v-for="n in 5" :key="'sk-stat-' + n" class="stat-card">
+          <div class="stat-top">
+            <span class="shimmer sk-icon"></span>
+            <span class="shimmer sk-pill"></span>
+          </div>
+          <div class="stat-bottom">
+            <span class="shimmer sk-value"></span>
+            <span class="shimmer sk-line sk-w-40"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card donut-card">
+          <span class="shimmer sk-line sk-title"></span>
+          <div class="donut-body">
+            <span class="shimmer sk-donut"></span>
+            <div class="donut-legend-grid">
+              <span v-for="n in 6" :key="'sk-leg-' + n" class="shimmer sk-line"></span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card line-card">
+          <span class="shimmer sk-line sk-title"></span>
+          <span class="shimmer sk-chart"></span>
+        </div>
+      </div>
+
+      <div v-for="row in ['tables-row', 'bottom-row']" :key="row" :class="row">
+        <div v-for="n in 2" :key="row + n" class="section-card">
+          <div class="section-header">
+            <span class="shimmer sk-line sk-title"></span>
+          </div>
+          <div class="sk-rows">
+            <div v-for="r in 5" :key="r" class="sk-row">
+              <span class="shimmer sk-avatar"></span>
+              <span class="shimmer sk-line"></span>
+              <span class="shimmer sk-line sk-w-20"></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ===== ERROR STATE ===== -->
@@ -21,7 +62,7 @@
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       <p>{{ error }}</p>
-      <button @click="fetchAll" class="retry-btn">إعادة المحاولة</button>
+      <button @click="fetchAll({ force: true })" class="retry-btn">{{ t('admin.dashboard.retry') }}</button>
     </div>
 
     <!-- ===== MAIN CONTENT ===== -->
@@ -42,8 +83,11 @@
             </div>
           </div>
           <div class="stat-bottom">
-            <div class="stat-value">{{ card.value }}</div>
-            <div class="stat-label">{{ card.label }}</div>
+            <div class="stat-value">
+              <span>{{ card.value }}</span>
+              <img v-if="card.currency" :src="riyalIcon" class="currency-icon" alt="ريال سعودي" />
+            </div>
+            <div class="stat-label">{{ t(`admin.dashboard.${card.labelKey}`) }}</div>
           </div>
         </div>
       </div>
@@ -54,21 +98,21 @@
         <!-- Donut: Order Distribution -->
         <div class="chart-card donut-card">
           <div class="chart-header">
-            <h3 class="chart-title">توزيع الطلبات</h3>
+            <h3 class="chart-title">{{ t('admin.dashboard.orders_distribution') }}</h3>
           </div>
           <div class="donut-body">
             <div class="donut-canvas-wrap">
               <canvas ref="donutCanvas" width="160" height="160"></canvas>
               <div class="donut-center-text">
                 <span class="donut-total-num">{{ totalOrdersCount }}</span>
-                <span class="donut-total-lbl">طلب</span>
+                <span class="donut-total-lbl">{{ t('admin.dashboard.orders_total') }}</span>
               </div>
             </div>
             <div class="donut-legend-grid">
               <div v-for="item in orderStatusData" :key="item.key" class="legend-row">
                 <div class="legend-left-part">
                   <span class="legend-dot" :style="{ background: item.color }"></span>
-                  <span class="legend-lbl">{{ item.label }}</span>
+                  <span class="legend-lbl">{{ t(`admin.dashboard.${item.labelKey}`) }}</span>
                 </div>
                 <span class="legend-count">{{ Number.isFinite(item.count) ? item.count : 0 }}</span>
               </div>
@@ -79,18 +123,18 @@
         <!-- Line: Sales Chart -->
         <div class="chart-card line-card">
           <div class="chart-header">
-            <h3 class="chart-title">مخطط المبيعات</h3>
+            <h3 class="chart-title">{{ t('admin.dashboard.sales_chart') }}</h3>
             <div class="period-toggle">
               <button
                 class="toggle-btn"
                 :class="{ active: salesPeriod === 'monthly' }"
                 @click="setSalesPeriod('monthly')"
-              >شهري</button>
+              >{{ t('admin.dashboard.monthly') }}</button>
               <button
                 class="toggle-btn"
                 :class="{ active: salesPeriod === 'daily' }"
                 @click="setSalesPeriod('daily')"
-              >يومي</button>
+              >{{ t('admin.dashboard.daily') }}</button>
             </div>
           </div>
           <div class="line-wrapper">
@@ -111,32 +155,32 @@
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
-              <span class="section-title">أحدث الطلبات</span>
+              <span class="section-title">{{ t('admin.dashboard.recent_orders') }}</span>
             </div>
             <router-link to="/admin/orders" class="view-all-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-              عرض الكل
+              {{ t('admin.dashboard.view_all') }}
             </router-link>
           </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>الحالة</th>
-                  <th>المبلغ</th>
-                  <th>العميل</th>
-                  <th>رقم الطلب</th>
+                  <th>{{ t('admin.dashboard.status') }}</th>
+                  <th>{{ t('admin.dashboard.amount') }}</th>
+                  <th>{{ t('admin.dashboard.customer') }}</th>
+                  <th>{{ t('admin.dashboard.order_number') }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="order in recentOrders" :key="order.id">
-                  <td><span class="status-badge" :class="order.statusClass">{{ order.status }}</span></td>
-                  <td class="td-amount">{{ order.amount }}</td>
+                  <td><span class="status-badge" :class="order.statusClass">{{ localizeOrderStatus(order.status) }}</span></td>
+                  <td class="td-amount"><span class="amount-with-currency">{{ formatAmountValue(order.amount) }}<img :src="riyalIcon" class="currency-icon" :alt="t('admin.dashboard.sar')" /></span></td>
                   <td>{{ order.customer }}</td>
                   <td class="td-order-id">{{ formatOrderNum(order.orderNumber || order.id) }}</td>
                 </tr>
                 <tr v-if="!recentOrders.length">
-                  <td colspan="4" class="td-empty">لا توجد طلبات</td>
+                  <td colspan="4" class="td-empty">{{ t('admin.dashboard.no_orders') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -151,42 +195,44 @@
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
                 <path d="M12 6v6l4 2"/>
               </svg>
-              <span class="section-title">أفضل المنتجات مبيعاً</span>
+              <span class="section-title">{{ t('admin.dashboard.best_sellers') }}</span>
             </div>
             <router-link to="/admin/products" class="view-all-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-              عرض الكل
+              {{ t('admin.dashboard.view_all') }}
             </router-link>
           </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>الإيرادات</th>
-                  <th>المبيعات</th>
-                  <th>المنتج</th>
+                  <th>{{ t('admin.dashboard.revenue') }}</th>
+                  <th>{{ t('admin.dashboard.sales') }}</th>
+                  <th>{{ t('admin.dashboard.product') }}</th>
                   <th>#</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="bestSellersLoading">
-                  <td colspan="4" class="td-loading">جاري التحميل...</td>
-                </tr>
+                <template v-if="bestSellersLoading">
+                  <tr v-for="r in 5" :key="'sk-best-' + r">
+                    <td colspan="4" class="td-loading"><span class="shimmer sk-line"></span></td>
+                  </tr>
+                </template>
                 <tr v-else-if="bestSellersError">
                   <td colspan="4" class="td-error">
                     <span>{{ bestSellersError }}</span>
-                    <button @click="fetchBestSellers(abortController?.signal)" class="section-retry-btn">إعادة المحاولة</button>
+                    <button @click="fetchBestSellers(abortController?.signal)" class="section-retry-btn">{{ t('admin.dashboard.retry') }}</button>
                   </td>
                 </tr>
                 <template v-else>
                   <tr v-for="(prod, idx) in bestSellers" :key="prod.id || idx">
-                    <td class="td-amount">{{ formatAmount(prod.revenue ?? prod.total_revenue ?? 0) }}</td>
+                    <td class="td-amount"><span class="amount-with-currency">{{ formatAmountValue(prod.revenue ?? prod.total_revenue ?? 0) }}<img :src="riyalIcon" class="currency-icon" :alt="t('admin.dashboard.sar')" /></span></td>
                     <td class="td-num">{{ prod.sales ?? prod.total_sold ?? 0 }}</td>
                     <td class="td-product-name">{{ prod.name ?? prod.product_name ?? '-' }}</td>
                     <td><span class="rank-num" :class="'rank-' + (idx + 1)">{{ idx + 1 }}</span></td>
                   </tr>
                   <tr v-if="!bestSellers.length">
-                    <td colspan="4" class="td-empty">لا توجد بيانات</td>
+                    <td colspan="4" class="td-empty">{{ t('admin.dashboard.no_data') }}</td>
                   </tr>
                 </template>
               </tbody>
@@ -208,19 +254,24 @@
                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 0-6.74-2.74L3 16"/>
                 <path d="M3 21v-5h5"/>
               </svg>
-              <span class="section-title">طلبات مرتجعة</span>
-              <span v-if="pendingReturnsCount > 0" class="badge-pending">{{ pendingReturnsCount }} بانتظار</span>
+              <span class="section-title">{{ t('admin.dashboard.returns') }}</span>
+              <span v-if="pendingReturnsCount > 0" class="badge-pending">{{ pendingReturnsCount }} {{ t('admin.dashboard.pending') }}</span>
             </div>
             <router-link to="/admin/returns" class="view-all-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-              عرض الكل
+              {{ t('admin.dashboard.view_all') }}
             </router-link>
           </div>
           <div class="returns-list">
-            <div v-if="returnsLoading" class="section-loading">جاري التحميل...</div>
+            <div v-if="returnsLoading" class="sk-rows" aria-busy="true">
+              <div v-for="r in 4" :key="'sk-ret-' + r" class="sk-row">
+                <span class="shimmer sk-line"></span>
+                <span class="shimmer sk-line sk-w-20"></span>
+              </div>
+            </div>
             <div v-else-if="returnsError" class="section-error">
               <span>{{ returnsError }}</span>
-              <button @click="fetchReturns(abortController?.signal)" class="section-retry-btn">إعادة المحاولة</button>
+              <button @click="fetchReturns(abortController?.signal)" class="section-retry-btn">{{ t('admin.dashboard.retry') }}</button>
             </div>
             <template v-else>
               <div v-for="ret in recentReturns" :key="ret.id" class="return-item">
@@ -231,9 +282,9 @@
                     <span class="return-product-txt">{{ ret.product_name }}</span>
                   </div>
                 </div>
-                <span class="return-amt">{{ formatAmount(ret.refund_amount ?? 0) }}</span>
+                <span class="return-amt amount-with-currency">{{ formatAmountValue(ret.refund_amount ?? 0) }}<img :src="riyalIcon" class="currency-icon" :alt="t('admin.dashboard.sar')" /></span>
               </div>
-              <div v-if="!recentReturns.length" class="empty-section">لا توجد طلبات إرجاع</div>
+              <div v-if="!recentReturns.length" class="empty-section">{{ t('admin.dashboard.no_returns') }}</div>
             </template>
           </div>
         </div>
@@ -247,18 +298,24 @@
                 <line x1="12" y1="9" x2="12" y2="13"/>
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
-              <span class="section-title">تنبيهات المخزون</span>
+              <span class="section-title">{{ t('admin.dashboard.inventory') }}</span>
             </div>
             <router-link to="/admin/products" class="view-all-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-              إدارة المخزون
+              {{ t('admin.dashboard.manage_inventory') }}
             </router-link>
           </div>
           <div class="inventory-list">
-            <div v-if="lowStockLoading" class="section-loading">جاري التحميل...</div>
+            <div v-if="lowStockLoading" class="sk-rows" aria-busy="true">
+              <div v-for="r in 5" :key="'sk-inv-' + r" class="sk-row">
+                <span class="shimmer sk-avatar"></span>
+                <span class="shimmer sk-line"></span>
+                <span class="shimmer sk-line sk-w-20"></span>
+              </div>
+            </div>
             <div v-else-if="lowStockError" class="section-error">
               <span>{{ lowStockError }}</span>
-              <button @click="fetchLowStock(abortController?.signal)" class="section-retry-btn">إعادة المحاولة</button>
+              <button @click="fetchLowStock(abortController?.signal)" class="section-retry-btn">{{ t('admin.dashboard.retry') }}</button>
             </div>
             <template v-else>
               <div v-for="(item, idx) in lowStockItems" :key="item.id || idx" class="inv-item">
@@ -274,10 +331,10 @@
                   <span class="inv-name">{{ item.name ?? item.product_name ?? '-' }}</span>
                 </div>
                 <span class="inv-stock-badge" :class="(item.stock ?? item.quantity ?? 0) <= 0 ? 'out-stock' : 'low-stock-badge'">
-                  {{ (item.stock ?? item.quantity ?? 0) <= 0 ? 'نفذ المخزون' : (item.stock ?? item.quantity) + ' متبقي' }}
+                  {{ (item.stock ?? item.quantity ?? 0) <= 0 ? t('admin.dashboard.out_of_stock') : `${item.stock ?? item.quantity} ${t('admin.dashboard.remaining')}` }}
                 </span>
               </div>
-              <div v-if="!lowStockItems.length" class="empty-section">لا توجد تنبيهات مخزون</div>
+              <div v-if="!lowStockItems.length" class="empty-section">{{ t('admin.dashboard.no_inventory') }}</div>
             </template>
           </div>
         </div>
@@ -288,15 +345,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, onActivated, nextTick, watch } from 'vue';
 import { Chart, registerables } from 'chart.js';
 import api from '../config/axios';
+import { toProduct, listFromResponse } from '../domain/catalog/adminCatalog';
+import { toAdminUser } from '../domain/adminManagement';
+import { toOrder } from '../domain/orders/adminOrder';
+import { normalizeReturn } from '../services/returnsService';
+import riyalIcon from '../assets/riyal.svg';
 import { useTheme } from '../composables/useTheme';
+import { useI18n } from 'vue-i18n';
+import { freshness } from '../utils/dataFreshness';
 
 Chart.register(...registerables);
 
 const { isDark } = useTheme();
-const useLiveApi = import.meta.env.VITE_DATA_MODE === 'api';
+const { locale, t } = useI18n();
+// The dashboard must reflect the authenticated Tijara data by default. The
+// legacy /dashboard/statistics route is not available on the current backend,
+// so the screen is always assembled from the live v1 resources below.
+const useLiveApi = true;
 
 // ─── Canvas refs ───────────────────────────────────────────────────────────────
 const donutCanvas = ref(null);
@@ -324,22 +392,23 @@ const bestSellersError   = ref(null);
 const lowStockLoading    = ref(false);
 const lowStockError      = ref(null);
 
+const pendingReturnsTotal = ref(null);
 const serverTotalOrders  = ref(null);
 const hasStatusBreakdown = ref(false);
 
 const orderStatusData = ref([
-  { key: 'completed',  label: 'مكتمل',        count: 0, color: '#10B981' },
-  { key: 'pending',    label: 'قيد الانتظار', count: 0, color: "#9ca3af" },
-  { key: 'processing', label: 'قيد المعالجة', count: 0, color: "#374151" },
-  { key: 'shipped',    label: 'قيد الشحن',    count: 0, color: "#6b7280" },
-  { key: 'cancelled',  label: 'ملغي',         count: 0, color: '#000000' },
-  { key: 'returned',   label: 'مرتجع',        count: 0, color: '#EF4444' },
+  { key: 'completed',  labelKey: 'completed',  count: 0, color: '#10B981' },
+  { key: 'pending',    labelKey: 'pending',    count: 0, color: "#9ca3af" },
+  { key: 'processing', labelKey: 'processing', count: 0, color: "#374151" },
+  { key: 'shipped',    labelKey: 'shipped',    count: 0, color: "#6b7280" },
+  { key: 'cancelled',  labelKey: 'cancelled', count: 0, color: '#000000' },
+  { key: 'returned',   labelKey: 'returned',   count: 0, color: '#EF4444' },
 ]);
 
 const statCards = ref([
   {
     key: 'products',
-    label: 'المنتجات',
+    labelKey: 'products',
     value: '0',
     trend: '0%',
     trendUp: true,
@@ -348,7 +417,7 @@ const statCards = ref([
   },
   {
     key: 'customers',
-    label: 'العملاء',
+    labelKey: 'customers',
     value: '0',
     trend: '0%',
     trendUp: true,
@@ -357,7 +426,7 @@ const statCards = ref([
   },
   {
     key: 'today_orders',
-    label: 'طلبات اليوم',
+    labelKey: 'today_orders',
     value: '0',
     trend: '0%',
     trendUp: true,
@@ -366,8 +435,9 @@ const statCards = ref([
   },
   {
     key: 'monthly_sales',
-    label: 'مبيعات الشهر',
-    value: '0 د.أ',
+    labelKey: 'monthly_sales',
+    value: '0',
+    currency: true,
     trend: '0%',
     trendUp: true,
     iconBg: "#f3f4f6",
@@ -375,8 +445,9 @@ const statCards = ref([
   },
   {
     key: 'today_sales',
-    label: 'مبيعات اليوم',
-    value: '0 د.أ',
+    labelKey: 'today_sales',
+    value: '0',
+    currency: true,
     trend: '0%',
     trendUp: true,
     iconBg: '#f3f4f6',
@@ -388,10 +459,9 @@ const INV_COLORS = ["#000000", "#374151", "#6b7280", "#9ca3af", "#d1d5db"];
 
 // ─── Computed ──────────────────────────────────────────────────────────────────
 const formattedDate = computed(() => {
-  const d = new Date();
-  const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  return new Intl.DateTimeFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  }).format(new Date());
 });
 
 const totalOrdersCount = computed(() => {
@@ -406,7 +476,7 @@ const totalOrdersCount = computed(() => {
 });
 
 const pendingReturnsCount = computed(() =>
-  recentReturns.value.filter(r => r.status === 'pending').length
+  pendingReturnsTotal.value ?? recentReturns.value.filter(r => r.status === 'pending').length
 );
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -432,10 +502,12 @@ const fmt = (n) => {
   return Number.isFinite(v) ? v.toLocaleString('en-US') : '-';
 };
 
-const formatAmount = (n) => {
+const formatAmountValue = (n) => {
   const v = Number(n);
-  return Number.isFinite(v) ? v.toLocaleString('en-US') + ' د.أ' : '-';
+  return Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : '-';
 };
+
+const CURRENCY_TEXT = () => t('admin.dashboard.sar');
 
 const formatOrderNum = (val) => {
   if (!val) return '-';
@@ -462,10 +534,26 @@ const sortBySales = (arr) => {
 };
 
 const returnStatusLabel = (s) => ({
-  pending:  'انتظار المراجعة',
-  approved: 'تمت الموافقة',
-  rejected: 'مرفوض',
-}[s] || s);
+  pending:  'pending_review',
+  approved: 'approved',
+  rejected: 'rejected',
+  refunded: 'refunded',
+}[s] ? t(`admin.dashboard.${{
+  pending: 'pending_review', approved: 'approved', rejected: 'rejected', refunded: 'refunded'
+}[s]}`) : s);
+
+const localizeOrderStatus = (status) => {
+  const key = String(status || '').toLowerCase();
+  const statusKey = {
+    completed: 'completed', delivered: 'completed',
+    pending: 'pending', awaiting: 'pending',
+    processing: 'processing', prepared: 'processing', paid_confirmed: 'processing',
+    shipped: 'shipped', out_for_delivery: 'shipped',
+    cancelled: 'cancelled', canceled: 'cancelled',
+    returned: 'returned', refunded: 'returned',
+  }[key];
+  return statusKey ? t(`admin.dashboard.${statusKey}`) : status;
+};
 
 const trend = (val) => {
   const v = parseFloat(val);
@@ -478,7 +566,7 @@ const fetchReturns = async (signal) => {
   returnsLoading.value = true;
   returnsError.value = null;
   try {
-    const res = await api.get('/dashboard/returns?per_page=4', { signal });
+    const res = await getDashboardResource(useLiveApi ? '/v1/returns' : '/dashboard/returns?per_page=4', { signal });
     const list = extractList(res.data);
     if (!list) {
       throw new Error('بنية بيانات المرتجعات غير مدعومة');
@@ -496,7 +584,7 @@ const fetchBestSellers = async (signal) => {
   bestSellersLoading.value = true;
   bestSellersError.value = null;
   try {
-    const res = await api.get('/dashboard/products?per_page=7&sort_by=total_sold&sort_dir=desc', { signal });
+    const res = await getDashboardResource(useLiveApi ? '/v1/products?per_page=1000&include_inactive=1&show_all=1' : '/dashboard/products?per_page=7&sort_by=total_sold&sort_dir=desc', { signal });
     const list = extractList(res.data);
     if (!list) {
       throw new Error('بنية بيانات المنتجات غير مدعومة');
@@ -514,7 +602,7 @@ const fetchLowStock = async (signal) => {
   lowStockLoading.value = true;
   lowStockError.value = null;
   try {
-    const res = await api.get('/dashboard/products?low_stock=1&per_page=5', { signal });
+    const res = await getDashboardResource(useLiveApi ? '/v1/products?per_page=1000&include_inactive=1&show_all=1' : '/dashboard/products?low_stock=1&per_page=5', { signal });
     const list = extractList(res.data);
     if (!list) {
       throw new Error('بنية بيانات المخزون غير مدعومة');
@@ -528,230 +616,380 @@ const fetchLowStock = async (signal) => {
   }
 };
 
-// The live Tijara API exposes the dashboard resources used by the rest of the
-// admin app, but does not expose the legacy aggregate dashboard routes. Build
-// the same dashboard contract from those live resources in production so the
-// screen remains useful instead of failing on /dashboard/statistics (404).
-const fetchLiveDashboardFallback = async (signal) => {
-  const [productsRes, ordersRes, usersRes] = await Promise.all([
-    api.get('/v1/products', { params: { per_page: 1000, include_inactive: 1, show_all: 1 }, signal }),
-    api.get('/v1/orders', { params: { per_page: 1000 }, signal }),
-    api.get('/v1/users', { params: { per_page: 1000 }, signal }),
+// The live Tijara API has no aggregate dashboard route (/dashboard/statistics
+// is a 404), so the same dashboard contract is built from the paginated admin
+// resources. The orders endpoint is fixed at 20 per page and ignores per_page,
+// so every page is collected through the shared services instead of one request.
+const ORDER_STATUS_BUCKETS = {
+  delivered: 'completed', completed: 'completed',
+  processing: 'processing', paid_confirmed: 'processing', prepared: 'processing',
+  shipped: 'shipped', out_for_delivery: 'shipped',
+  cancelled: 'cancelled', canceled: 'cancelled',
+  returned: 'returned', refunded: 'returned',
+};
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const dayKey = (date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+const percentChange = (current, previous) => {
+  if (!previous) return current ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100);
+};
+
+const DASHBOARD_MAX_ORDER_PAGES = 50;
+// Orders pages are fetched a few at a time; firing all of them at once made
+// the backend drop or time out random pages, which failed the whole screen.
+const DASHBOARD_ORDER_CONCURRENCY = 4;
+// The aggregate requests (1000 products, every user) are heavy, so they get
+// more time than the 6s default before counting as a failure.
+const DASHBOARD_REQUEST_TIMEOUT = 20000;
+const DASHBOARD_STORAGE_KEY = 'admin_dashboard_cache_v1';
+// The snapshot has no time-to-live: it is current until a write, a manual refresh
+// or a language change moves freshness.version past the version it was fetched
+// at. It lives on globalThis so SPA navigation never repeats the API fan-out, and
+// in localStorage so a browser reload paints the last dashboard instantly while
+// one background refresh runs.
+const dashboardCache = globalThis.__mastergasDashboardCache || { data: null, version: -1, owner: null, inFlight: null };
+globalThis.__mastergasDashboardCache = dashboardCache;
+
+const cacheOwner = () => {
+  try {
+    return String(localStorage.getItem('token') || '').slice(-16) || null;
+  } catch {
+    return null;
+  }
+};
+
+const readDashboardCache = () => {
+  const owner = cacheOwner();
+  if (dashboardCache.data && dashboardCache.owner === owner) return dashboardCache;
+  try {
+    const stored = JSON.parse(localStorage.getItem(DASHBOARD_STORAGE_KEY) || 'null');
+    if (stored?.data && stored.owner === owner) {
+      // Version -1: a snapshot from a previous browser session is shown at once but refreshed once.
+      Object.assign(dashboardCache, { data: stored.data, version: -1, owner });
+      return dashboardCache;
+    }
+  } catch {
+    // A corrupt or blocked cache only costs a fresh request.
+  }
+  return null;
+};
+
+const writeDashboardCache = (data, version) => {
+  const owner = cacheOwner();
+  Object.assign(dashboardCache, { data, version, owner });
+  try {
+    localStorage.setItem(DASHBOARD_STORAGE_KEY, JSON.stringify({ data, owner }));
+  } catch {
+    // Storage full or blocked: the in-memory snapshot still works.
+  }
+};
+
+const mapWithConcurrency = async (items, limit, worker) => {
+  const results = new Array(items.length);
+  let next = 0;
+  const run = async () => {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      results[index] = await worker(items[index]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, run));
+  return results;
+};
+
+const waitBeforeRetry = (delay, signal) => new Promise((resolve, reject) => {
+  const timer = setTimeout(resolve, delay);
+  if (!signal) return;
+  signal.addEventListener('abort', () => {
+    clearTimeout(timer);
+    const error = new Error('Dashboard request cancelled');
+    error.name = 'AbortError';
+    reject(error);
+  }, { once: true });
+});
+
+const isTransientDashboardError = (error) => (
+  !error?.response ||
+  error.response.status >= 500 ||
+  ['ECONNABORTED', 'ETIMEDOUT'].includes(error.code)
+);
+
+const getDashboardResource = async (path, config = {}) => {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await api.get(path, { timeout: DASHBOARD_REQUEST_TIMEOUT, ...config });
+    } catch (error) {
+      lastError = error;
+      if (!isTransientDashboardError(error) || attempt === 2 || error.name === 'CanceledError' || error.name === 'AbortError') {
+        throw error;
+      }
+      await waitBeforeRetry(400 * (attempt + 1), config.signal);
+    }
+  }
+  throw lastError;
+};
+
+const fetchDashboardOrders = async (signal) => {
+  const first = await getDashboardResource('/v1/orders', { params: { page: 1 }, signal });
+  const items = [...listFromResponse(first.data)];
+  const lastPage = Math.min(Number(first.data?.meta?.last_page) || 1, DASHBOARD_MAX_ORDER_PAGES);
+  if (lastPage > 1) {
+    const pageNumbers = Array.from({ length: lastPage - 1 }, (_, index) => index + 2);
+    const pages = await mapWithConcurrency(pageNumbers, DASHBOARD_ORDER_CONCURRENCY, (page) =>
+      getDashboardResource('/v1/orders', { params: { page }, signal })
+        .then((response) => listFromResponse(response.data))
+    );
+    pages.forEach((page) => items.push(...page));
+  }
+  return items.map(toOrder);
+};
+
+const fetchDashboardResources = async (signal) => {
+  const [productsResult, ordersResult, usersResult, returnsResult] = await Promise.allSettled([
+    getDashboardResource('/v1/products', { params: { per_page: 1000, include_inactive: 1, show_all: 1 }, signal })
+      .then((response) => listFromResponse(response.data).map(toProduct)),
+    fetchDashboardOrders(signal),
+    getDashboardResource('/v1/users', { params: { per_page: 1000 }, signal })
+      .then((response) => listFromResponse(response.data).map(toAdminUser)),
+    getDashboardResource('/v1/returns', { params: { per_page: 4 }, signal })
+      .then((response) => listFromResponse(response.data).map(normalizeReturn)),
   ]);
-  const products = extractList(productsRes.data) || [];
-  const orders = extractList(ordersRes.data) || [];
-  const users = extractList(usersRes.data) || [];
-  const customers = users.filter((user) => {
-    const role = String(user.role || user.user_type || user.type || '').toLowerCase();
-    return !role || role === 'customer' || role === 'user';
-  });
+  if (ordersResult.status === 'rejected') throw ordersResult.reason;
+  return {
+    products: productsResult.status === 'fulfilled' ? productsResult.value : [],
+    orders: ordersResult.value,
+    users: usersResult.status === 'fulfilled' ? usersResult.value : [],
+    returns: returnsResult.status === 'fulfilled' ? returnsResult.value : [],
+  };
+};
+
+// One fan-out at a time: a second mount or retry while a refresh is running
+// reuses it instead of doubling the load on the backend.
+const fetchFreshDashboard = () => {
+  if (!dashboardCache.inFlight) {
+    const controller = new AbortController();
+    const startedAtVersion = freshness.version;
+    dashboardCache.inFlight = buildLiveDashboardFallback(controller.signal)
+      .then((data) => {
+        writeDashboardCache(data, startedAtVersion);
+        return data;
+      })
+      .finally(() => {
+        dashboardCache.inFlight = null;
+      });
+  }
+  return dashboardCache.inFlight;
+};
+
+const buildLiveDashboardFallback = async (signal) => {
+  const { products, orders, users, returns } = await fetchDashboardResources(signal);
+  const customers = users.filter((user) => ['user', 'customer'].includes(String(user.role).toLowerCase()));
+
   const now = new Date();
-  const isSameDay = (value) => {
-    const date = new Date(value);
-    return Number.isFinite(date.getTime())
-      && date.getFullYear() === now.getFullYear()
-      && date.getMonth() === now.getMonth()
-      && date.getDate() === now.getDate();
-  };
-  const isSameMonth = (value) => {
-    const date = new Date(value);
-    return Number.isFinite(date.getTime())
-      && date.getFullYear() === now.getFullYear()
-      && date.getMonth() === now.getMonth();
-  };
-  const amount = (order) => Number(order.total_amount ?? order.total ?? order.amount ?? 0) || 0;
-  const todayOrders = orders.filter((order) => isSameDay(order.created_at || order.createdAt));
-  const monthOrders = orders.filter((order) => isSameMonth(order.created_at || order.createdAt));
+  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const dated = orders
+    .map((order) => ({ order, date: order.createdAt ? new Date(order.createdAt) : null }))
+    .filter(({ date }) => date && Number.isFinite(date.getTime()));
+  // Cancelled orders are not revenue.
+  const sold = dated.filter(({ order }) => String(order.status).toLowerCase() !== 'cancelled');
+  const sum = (rows) => rows.reduce((total, { order }) => total + (Number(order.total) || 0), 0);
+  const onDay = (rows, day) => rows.filter(({ date }) => dayKey(date) === dayKey(day));
+  const inMonth = (rows, month) => rows.filter(({ date }) => date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth());
+
+  const todayRows = onDay(sold, now);
+  const yesterdayRows = onDay(sold, yesterday);
+  const monthRows = inMonth(sold, now);
+  const lastMonthRows = inMonth(sold, lastMonth);
+
   const statusCounts = orders.reduce((counts, order) => {
-    const status = String(order.status || '').toLowerCase();
-    if (['delivered', 'completed'].includes(status)) counts.completed += 1;
-    else if (['processing', 'prepared'].includes(status)) counts.processing += 1;
-    else if (['shipped', 'out_for_delivery'].includes(status)) counts.shipped += 1;
-    else if (['cancelled', 'canceled'].includes(status)) counts.cancelled += 1;
-    else if (['returned', 'refunded'].includes(status)) counts.returned += 1;
-    else counts.pending += 1;
+    counts[ORDER_STATUS_BUCKETS[String(order.status).toLowerCase()] || 'pending'] += 1;
     return counts;
   }, { completed: 0, pending: 0, processing: 0, shipped: 0, cancelled: 0, returned: 0 });
+
+  const monthly = Array.from({ length: 6 }, (_, index) => {
+    const month = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    return { month_ar: MONTHS_AR[month.getMonth()], month_en: MONTHS_EN[month.getMonth()], sales: sum(inMonth(sold, month)) };
+  });
+  const daily = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (6 - index));
+    return { day_ar: DAYS_AR[day.getDay()], day_en: DAYS_EN[day.getDay()], sales: sum(onDay(sold, day)) };
+  });
+
+  const bySales = new Map();
+  sold.forEach(({ order }) => order.products.forEach((item) => {
+    const key = item.productId ?? item.name;
+    if (key === undefined || key === '') return;
+    const row = bySales.get(key) || { id: key, name: item.name || '-', sales: 0, revenue: 0 };
+    row.sales += item.quantity;
+    row.revenue += item.total;
+    bySales.set(key, row);
+  }));
+
+  const recent = [...dated]
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 5)
+    .map(({ order }) => {
+      const key = String(order.status).toLowerCase();
+      const bucket = ORDER_STATUS_BUCKETS[key] || 'pending';
+      return {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customer: order.customerName || '-',
+        amount: order.total,
+        status: bucket,
+        statusClass: 'status-' + (bucket === 'completed' ? 'completed' : bucket),
+      };
+    });
+
   const lowStock = products
-    .map((product) => ({ ...product, stock: Number(product.number ?? product.quantity ?? product.stock ?? 0) || 0 }))
+    .map((product) => ({ ...product, stock: Number(product.stock ?? product.quantity ?? 0) || 0 }))
     .filter((product) => product.stock <= 5)
     .sort((a, b) => a.stock - b.stock)
     .slice(0, 5);
-  const summary = {
-    total_products: products.length,
-    total_customers: customers.length,
-    total_orders: orders.length,
-    today_orders: todayOrders.length,
-    monthly_sales: monthOrders.reduce((sum, order) => sum + amount(order), 0),
-    today_sales: todayOrders.reduce((sum, order) => sum + amount(order), 0),
-  };
-  const recentOrders = [...orders]
-    .sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0))
-    .slice(0, 5);
 
   return {
-    data: {
-      data: {
-        summary,
-        orders_by_status: statusCounts,
-        monthly_data: [],
-        daily_data: [],
-        recent_orders: recentOrders,
-        best_selling_products: [],
-        low_stock_products: lowStock,
-      },
+    returns: returns && {
+      recent: returns.slice(0, 4).map((ret) => ({
+        id: ret.id,
+        status: ret.status,
+        order_id: ret.orderNumber || ret.orderId,
+        customer_name: ret.customerName,
+        product_name: ret.productName,
+        refund_amount: ret.refundAmount,
+      })),
+      pending: returns.filter((ret) => ret.status === 'pending').length,
     },
+    summary: {
+      total_products: products.length,
+      total_customers: customers.length,
+      total_orders: orders.length,
+      today_orders: onDay(dated, now).length,
+      today_orders_change: percentChange(onDay(dated, now).length, onDay(dated, yesterday).length),
+      monthly_sales: sum(monthRows),
+      monthly_sales_change: percentChange(sum(monthRows), sum(lastMonthRows)),
+      today_sales: sum(todayRows),
+      today_sales_change: percentChange(sum(todayRows), sum(yesterdayRows)),
+    },
+    orders_by_status: statusCounts,
+    monthly_data: monthly,
+    daily_data: daily,
+    recent_orders: recent,
+    best_selling_products: sortBySales([...bySales.values()]).slice(0, 7),
+    low_stock_products: lowStock,
   };
 };
 
 // ─── Fetch All ─────────────────────────────────────────────────────────────────
-const fetchAll = async () => {
-  if (abortController) {
-    abortController.abort();
-  }
-  abortController = new AbortController();
-  const signal = abortController.signal;
+const setStatCard = (index, value, change, format) => {
+  const card = statCards.value[index];
+  card.value   = (value !== undefined && value !== null && Number.isFinite(Number(value))) ? format(value) : '-';
+  card.trend   = trend(change ?? 0);
+  card.trendUp = parseFloat(change ?? 0) >= 0;
+};
 
-  loading.value = true;
-  error.value   = null;
+let renderedSnapshot = null;
+
+const applyDashboard = async (data) => {
+  const s = data.summary || {};
+
+  setStatCard(0, s.total_products ?? s.products_count, s.products_change, fmt);
+  setStatCard(1, s.total_customers ?? s.customers_count, s.customers_change, fmt);
+  setStatCard(2, s.today_orders, s.today_orders_change, fmt);
+  setStatCard(3, s.monthly_sales, s.monthly_sales_change, formatAmountValue);
+  setStatCard(4, s.today_sales, s.today_sales_change, formatAmountValue);
+
+  // Order status distribution for donut
+  serverTotalOrders.value = parseNonNegativeInt(s.total_orders, null);
+  const obs = data.orders_by_status;
+  if (obs && typeof obs === 'object') {
+    hasStatusBreakdown.value = true;
+    const counts = {
+      completed:  obs.completed ?? obs.delivered,
+      pending:    obs.pending ?? obs.awaiting,
+      processing: obs.processing,
+      shipped:    obs.shipped,
+      cancelled:  obs.cancelled ?? obs.canceled,
+      returned:   obs.returned,
+    };
+    orderStatusData.value.forEach(d => { d.count = parseNonNegativeInt(counts[d.key], 0); });
+  } else {
+    hasStatusBreakdown.value = false;
+    orderStatusData.value.forEach(d => { d.count = 0; });
+  }
+
+  monthlyData.value  = Array.isArray(data.monthly_data) ? data.monthly_data : [];
+  dailyData.value    = Array.isArray(data.daily_data) ? data.daily_data : [];
+  recentOrders.value = Array.isArray(data.recent_orders) ? data.recent_orders.slice(0, 5) : [];
+
+  bestSellers.value = sortBySales(data.best_selling_products || []).slice(0, 7);
+  bestSellersError.value = null;
+  lowStockItems.value = sortByStock(data.low_stock_products || []).slice(0, 5);
+  lowStockError.value = null;
+
+  if (data.returns) {
+    recentReturns.value = data.returns.recent;
+    pendingReturnsTotal.value = data.returns.pending;
+    returnsError.value = null;
+  } else {
+    returnsError.value = 'فشل في تحميل طلبات الإرجاع';
+  }
+
+  if (isDisposed) return;
+  loading.value = false;
+  // Charts are rebuilt only when the numbers changed, so a background refresh
+  // that returns the same data does not make them flash.
+  const snapshot = JSON.stringify([data.orders_by_status, data.monthly_data, data.daily_data]);
+  if (snapshot === renderedSnapshot && donutChartInstance && lineChartInstance) return;
+  renderedSnapshot = snapshot;
+  await nextTick();
+  if (isDisposed) return;
+  initDonutChart();
+  initLineChart();
+};
+
+const describeLoadError = (err) => {
+  if (err.response) {
+    return `خطأ من السيرفر (${err.response.status}): ${err.response.data?.message || 'فشل في تحميل البيانات'}`;
+  }
+  if (err.request) {
+    return 'لا يوجد استجابة من السيرفر. تأكد من الاتصال بالإنترنت ثم أعد المحاولة';
+  }
+  return 'خطأ: ' + err.message;
+};
+
+const fetchAll = async ({ force = false } = {}) => {
+  error.value = null;
+
+  // Stale-while-revalidate: paint the last snapshot right away (even after a
+  // browser reload) and refresh it in the background.
+  const cached = readDashboardCache();
+  if (cached) {
+    await applyDashboard(cached.data);
+    if (!force && cached.version === freshness.version) return;
+  } else {
+    loading.value = true;
+  }
 
   try {
-    const [statsRes, returnsRes] = await Promise.allSettled([
-      useLiveApi ? fetchLiveDashboardFallback(signal) : api.get('/dashboard/statistics', { signal }),
-      useLiveApi ? Promise.resolve({ data: { data: [] } }) : api.get('/dashboard/returns?per_page=4', { signal }),
-    ]);
-
+    const data = await fetchFreshDashboard();
     if (isDisposed) return;
-
-    // ── Statistics ──
-    if (statsRes.status === 'fulfilled') {
-      const data = statsRes.value.data?.data || {};
-      const s    = data.summary || {};
-
-      // Stat cards: strict check against undefined / null before displaying
-      const prodVal = s.total_products ?? s.products_count;
-      statCards.value[0].value   = (prodVal !== undefined && prodVal !== null && Number.isFinite(Number(prodVal))) ? fmt(prodVal) : '-';
-      statCards.value[0].trend   = trend(s.products_change ?? 0);
-      statCards.value[0].trendUp = parseFloat(s.products_change ?? 0) >= 0;
-
-      const custVal = s.total_customers ?? s.customers_count;
-      statCards.value[1].value   = (custVal !== undefined && custVal !== null && Number.isFinite(Number(custVal))) ? fmt(custVal) : '-';
-      statCards.value[1].trend   = trend(s.customers_change ?? 0);
-      statCards.value[1].trendUp = parseFloat(s.customers_change ?? 0) >= 0;
-
-      const todayOrd = s.today_orders;
-      statCards.value[2].value   = (todayOrd !== undefined && todayOrd !== null && Number.isFinite(Number(todayOrd))) ? fmt(todayOrd) : '-';
-      statCards.value[2].trend   = trend(s.today_orders_change ?? 0);
-      statCards.value[2].trendUp = parseFloat(s.today_orders_change ?? 0) >= 0;
-
-      const monthSales = s.monthly_sales;
-      statCards.value[3].value   = (monthSales !== undefined && monthSales !== null && Number.isFinite(Number(monthSales))) ? formatAmount(monthSales) : '-';
-      statCards.value[3].trend   = trend(s.monthly_sales_change ?? 0);
-      statCards.value[3].trendUp = parseFloat(s.monthly_sales_change ?? 0) >= 0;
-
-      const todaySales = s.today_sales;
-      statCards.value[4].value   = (todaySales !== undefined && todaySales !== null && Number.isFinite(Number(todaySales))) ? formatAmount(todaySales) : '-';
-      statCards.value[4].trend   = trend(s.today_sales_change ?? 0);
-      statCards.value[4].trendUp = parseFloat(s.today_sales_change ?? 0) >= 0;
-
-      // Order status distribution for donut
-      serverTotalOrders.value = parseNonNegativeInt(s.total_orders, null);
-      const obs = data.orders_by_status;
-      if (obs && typeof obs === 'object') {
-        hasStatusBreakdown.value = true;
-        const compVal = obs.completed ?? obs.delivered ?? s.completed_orders;
-        orderStatusData.value.find(d => d.key === 'completed').count = parseNonNegativeInt(compVal, 0);
-
-        const pendVal = obs.pending ?? obs.awaiting ?? s.pending_orders;
-        orderStatusData.value.find(d => d.key === 'pending').count = parseNonNegativeInt(pendVal, 0);
-
-        const procVal = obs.processing ?? s.processing_orders;
-        orderStatusData.value.find(d => d.key === 'processing').count = parseNonNegativeInt(procVal, 0);
-
-        const shipVal = obs.shipped ?? s.shipped_orders;
-        orderStatusData.value.find(d => d.key === 'shipped').count = parseNonNegativeInt(shipVal, 0);
-
-        const cancVal = obs.cancelled ?? obs.canceled ?? s.cancelled_orders ?? s.canceled_orders;
-        orderStatusData.value.find(d => d.key === 'cancelled').count = parseNonNegativeInt(cancVal, 0);
-
-        const retVal = obs.returned ?? s.returned_orders;
-        orderStatusData.value.find(d => d.key === 'returned').count = parseNonNegativeInt(retVal, 0);
-      } else {
-        hasStatusBreakdown.value = false;
-        orderStatusData.value.forEach(d => { d.count = 0; });
-      }
-
-      // Monthly data
-      monthlyData.value = Array.isArray(data.monthly_data) ? data.monthly_data : [];
-
-      // Daily data
-      dailyData.value = Array.isArray(data.daily_data) ? data.daily_data : [];
-
-      // Recent orders
-      recentOrders.value = Array.isArray(data.recent_orders) ? data.recent_orders.slice(0, 5) : [];
-
-      // Best sellers
-      if (data.best_selling_products !== undefined && data.best_selling_products !== null) {
-        const list = extractList(data.best_selling_products) || (Array.isArray(data.best_selling_products) ? data.best_selling_products : null);
-        if (list !== null) {
-          bestSellers.value = sortBySales(list).slice(0, 7);
-          bestSellersError.value = null;
-        } else {
-          bestSellersError.value = 'بنية بيانات أفضل المنتجات غير مدعومة';
-        }
-      } else {
-        await fetchBestSellers(signal);
-      }
-
-      // Low stock items
-      if (data.low_stock_products !== undefined && data.low_stock_products !== null) {
-        const list = extractList(data.low_stock_products) || (Array.isArray(data.low_stock_products) ? data.low_stock_products : null);
-        if (list !== null) {
-          lowStockItems.value = sortByStock(list).slice(0, 5);
-          lowStockError.value = null;
-        } else {
-          lowStockError.value = 'بنية بيانات المخزون غير مدعومة';
-        }
-      } else {
-        await fetchLowStock(signal);
-      }
-    } else {
-      throw statsRes.reason;
-    }
-
-    // ── Returns ──
-    if (returnsRes.status === 'fulfilled') {
-      const list = extractList(returnsRes.value.data);
-      if (list !== null) {
-        recentReturns.value = list.slice(0, 4);
-        returnsError.value = null;
-      } else {
-        returnsError.value = 'بنية بيانات المرتجعات غير مدعومة';
-      }
-    } else {
-      returnsError.value = 'فشل في تحميل طلبات الإرجاع';
-    }
-
-    if (isDisposed) return;
-    loading.value = false;
-    await nextTick();
-    if (isDisposed) return;
-    initDonutChart();
-    initLineChart();
+    await applyDashboard(data);
   } catch (err) {
     if (isDisposed) return;
     loading.value = false;
     if (err.name === 'CanceledError' || err.name === 'AbortError') return;
-    if (err.response?.status === 401) {
-      return;
-    }
-    if (err.response) {
-      error.value = `خطأ من السيرفر (${err.response.status}): ${err.response.data?.message || 'فشل في تحميل البيانات'}`;
-    } else if (err.request) {
-      error.value = 'لا يوجد استجابة من السيرفر. تأكد من تشغيل Laravel (php artisan serve)';
-    } else {
-      error.value = 'خطأ: ' + err.message;
-    }
+    if (err.response?.status === 401) return;
+    // With a snapshot on screen a failed background refresh stays silent; the
+    // next visit or retry replaces it once the backend answers again.
+    if (cached) return;
+    error.value = describeLoadError(err);
   }
 };
 
@@ -763,12 +1001,12 @@ function initDonutChart() {
   const active = orderStatusData.value.filter(d => Number.isFinite(d.count) && d.count > 0);
   const chartData = active.length
     ? active
-    : [{ label: 'لا توجد بيانات', count: 1, color: '#e5e7eb' }];
+    : [{ labelKey: 'no_data', count: 1, color: '#e5e7eb' }];
 
   donutChartInstance = new Chart(donutCanvas.value, {
     type: 'doughnut',
     data: {
-      labels: chartData.map(d => d.label),
+      labels: chartData.map(d => t(`admin.dashboard.${d.labelKey}`)),
       datasets: [{
         data: chartData.map(d => d.count),
         backgroundColor: chartData.map(d => d.color),
@@ -795,7 +1033,9 @@ function initLineChart() {
   if (lineChartInstance) lineChartInstance.destroy();
 
   const src    = salesPeriod.value === 'daily' ? dailyData.value : monthlyData.value;
-  const labels = Array.isArray(src) ? src.map(i => i.day_ar ?? i.month_ar ?? i.label ?? '') : [];
+  const labels = Array.isArray(src) ? src.map(i => locale.value === 'en'
+    ? (i.day_en ?? i.month_en ?? i.label ?? '')
+    : (i.day_ar ?? i.month_ar ?? i.label ?? '')) : [];
   const values = Array.isArray(src) ? src.map(i => {
     const v = parseFloat(i.sales ?? i.total ?? 0);
     return Number.isFinite(v) ? v : 0;
@@ -804,9 +1044,9 @@ function initLineChart() {
   lineChartInstance = new Chart(lineCanvas.value, {
     type: 'line',
     data: {
-      labels: labels.length ? labels : ['لا توجد بيانات'],
+      labels: labels.length ? labels : [t('admin.dashboard.no_data')],
       datasets: [{
-        label: 'المبيعات',
+        label: t('admin.dashboard.sales'),
         data: values.length ? values : [0],
         borderColor: '#000000',
         backgroundColor: (ctx) => {
@@ -831,7 +1071,7 @@ function initLineChart() {
         tooltip: {
           mode: 'index',
           intersect: false,
-          callbacks: { label: ctx => ` ${Number(ctx.parsed.y || 0).toLocaleString('en-US')} د.أ` },
+          callbacks: { label: ctx => ` ${formatAmountValue(ctx.parsed.y || 0)} ${CURRENCY_TEXT()}` },
         },
       },
       scales: {
@@ -840,7 +1080,7 @@ function initLineChart() {
           ticks: { font: { family: 'IBM Plex Sans Arabic', size: 11 }, color: isDark.value ? '#94a3b8' : '#9ca3af' },
         },
         y: {
-          position: 'right',
+          position: locale.value === 'ar' ? 'right' : 'left',
           grid: { color: isDark.value ? '#334155' : '#f3f4f6' },
           ticks: {
             font: { family: 'IBM Plex Sans Arabic', size: 11 },
@@ -863,8 +1103,15 @@ function setSalesPeriod(period) {
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(() => {
   isDisposed = false;
-  localStorage.setItem('lang', 'ar');
   fetchAll();
+});
+
+// The page is kept alive between tab clicks: charts only need a resize after
+// being re-attached, no request is made.
+onActivated(() => {
+  if (loading.value || isDisposed) return;
+  lineChartInstance?.resize();
+  donutChartInstance?.resize();
 });
 
 onUnmounted(() => {
@@ -883,7 +1130,7 @@ onUnmounted(() => {
   }
 });
 
-watch(isDark, () => {
+watch([isDark, locale], () => {
   if (!loading.value && !isDisposed) {
     initDonutChart();
     initLineChart();
@@ -897,7 +1144,6 @@ watch(isDark, () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  direction: rtl;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -908,7 +1154,7 @@ watch(isDark, () => {
 .dash-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding-bottom: 0.25rem;
 }
 .dash-title {
@@ -916,13 +1162,13 @@ watch(isDark, () => {
   font-weight: 800;
   color: #111827;
   margin: 0 0 0.2rem 0;
-  text-align: right;
+  text-align: start;
 }
 .dash-subtitle {
   font-size: 0.8rem;
   color: #6b7280;
   margin: 0;
-  text-align: right;
+  text-align: start;
 }
 
 /* ─── Stat Cards ───────────────────────────────────────────────────────────── */
@@ -975,7 +1221,7 @@ watch(isDark, () => {
 .trend-up   { color: #059669; background: #d1fae5; }
 .trend-down { color: #dc2626; background: #fee2e2; }
 
-.stat-bottom { text-align: right; }
+.stat-bottom { text-align: start; }
 .stat-value {
   font-size: 1.55rem;
   font-weight: 800;
@@ -1062,11 +1308,13 @@ watch(isDark, () => {
   flex-direction: column;
   gap: 0.55rem;
   flex: 1;
+  min-width: 130px;
 }
 .legend-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   font-size: 0.75rem;
 }
 .legend-left-part {
@@ -1162,6 +1410,8 @@ watch(isDark, () => {
   transition: opacity 0.2s;
 }
 .view-all-link:hover { opacity: 0.7; }
+/* The chevron is drawn for RTL; mirror it in English. */
+.dashboard[dir="ltr"] .view-all-link svg { transform: scaleX(-1); }
 .table-wrap { overflow-x: auto; }
 .data-table {
   width: 100%;
@@ -1169,7 +1419,7 @@ watch(isDark, () => {
   font-size: 0.78rem;
 }
 .data-table th {
-  text-align: right;
+  text-align: start;
   padding: 0.55rem 0.9rem;
   font-size: 0.7rem;
   font-weight: 700;
@@ -1182,13 +1432,15 @@ watch(isDark, () => {
   padding: 0.65rem 0.9rem;
   border-bottom: 1px solid #f9f9f9;
   color: #374151;
-  text-align: right;
+  text-align: start;
   white-space: nowrap;
 }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: #fafafa; }
 .td-order-id { font-weight: 700; color: #000000; }
 .td-amount   { font-weight: 700; color: #111827; }
+.amount-with-currency { display: inline-flex; align-items: center; gap: 4px; direction: ltr; white-space: nowrap; }
+.currency-icon { width: 13px; height: 15px; object-fit: contain; display: inline-block; flex: 0 0 auto; }
 .td-num      { font-weight: 600; color: #374151; }
 .td-product-name { color: #374151; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
 .td-empty    { text-align: center; color: #9ca3af; padding: 1.5rem; }
@@ -1353,25 +1605,50 @@ watch(isDark, () => {
   padding: 1.5rem;
 }
 
-/* ─── Loading / Error ──────────────────────────────────────────────────────── */
-.dashboard-loading {
+/* ─── Loading skeleton ─────────────────────────────────────────────────────── */
+.dashboard-skeleton {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  gap: 1.5rem;
-  color: #6b7280;
+  gap: 1rem;
+  --sk-base: #eef0f3;
+  --sk-glint: #f8f9fb;
 }
-.spinner {
-  width: 38px;
-  height: 38px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #000000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+:global(.dark) .dashboard-skeleton,
+:global(.dark) .sk-rows,
+:global(.dark) .td-loading {
+  --sk-base: #1e293b;
+  --sk-glint: #2b3a50;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+.shimmer {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--sk-base, #eef0f3) 25%, var(--sk-glint, #f8f9fb) 50%, var(--sk-base, #eef0f3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+[dir="rtl"] .shimmer { animation-direction: reverse; }
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}
+.sk-icon   { width: 48px; height: 48px; border-radius: 10px; }
+.sk-pill   { width: 44px; height: 20px; }
+.sk-value  { width: 60%; height: 26px; margin-bottom: 0.4rem; }
+.sk-line   { width: 100%; height: 12px; }
+.sk-title  { width: 40%; height: 14px; margin-bottom: 1rem; }
+.sk-w-40   { width: 40%; }
+.sk-w-20   { width: 20%; flex-shrink: 0; }
+.sk-donut  { width: 160px; height: 160px; border-radius: 50%; flex-shrink: 0; }
+.sk-chart  { width: 100%; height: 200px; }
+.dashboard-skeleton .donut-legend-grid { display: flex; flex-direction: column; gap: 0.7rem; flex: 1; }
+.sk-rows   { display: flex; flex-direction: column; gap: 0.9rem; padding: 1rem 1.1rem; }
+.sk-row    { display: flex; align-items: center; gap: 0.75rem; }
+.sk-avatar { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+
+/* ─── Error ────────────────────────────────────────────────────────────────── */
 .error-alert {
   background: #fef2f2;
   border: 1px solid #fee2e2;
@@ -1430,7 +1707,9 @@ watch(isDark, () => {
 .section-retry-btn:hover {
   opacity: 0.9;
 }
-.td-loading,
+.td-loading {
+  padding: 0.85rem 1rem !important;
+}
 .td-error {
   padding: 1.5rem !important;
   text-align: center;

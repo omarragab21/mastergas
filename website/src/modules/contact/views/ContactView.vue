@@ -2,7 +2,7 @@
   <div class="contact-page" :dir="currentLang === 'ar' ? 'rtl' : 'ltr'">
     <!-- 1. Hero Banner with High Quality Gemini Generated Image -->
     <section class="support-hero-banner">
-      <div class="hero-bg" :style="{ backgroundImage: `url('/images/support/hero_banner.jpg')` }"></div>
+      <div class="hero-bg" :style="{ backgroundImage: `url('${contactHeroImage}')` }"></div>
       <div class="hero-overlay"></div>
       <div class="container hero-container">
         <div class="hero-content">
@@ -167,10 +167,10 @@
             <!-- Contact Cards Stack -->
             <div class="contact-cards-stack">
               <!-- Card 1: الرقم المجاني الموحد -->
-              <a href="tel:8001240198" class="contact-detail-card">
+              <a v-if="contactPhone" :href="`tel:${contactPhone}`" class="contact-detail-card">
                 <div class="detail-text-wrap">
                   <span class="detail-label">{{ currentLang === 'ar' ? 'الرقم المجاني الموحد' : 'Toll-Free Number' }}</span>
-                  <span class="detail-val font-num">8001240198</span>
+                <span class="detail-val font-num phone-ltr" dir="ltr">{{ contactPhone }}</span>
                 </div>
                 <div class="detail-icon-wrap">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -180,11 +180,10 @@
               </a>
 
               <!-- Card 2: الدعم عبر البريد الإلكتروني -->
-              <div class="contact-detail-card">
+              <div v-if="contactEmail" class="contact-detail-card">
                 <div class="detail-text-wrap">
                   <span class="detail-label">{{ currentLang === 'ar' ? 'الدعم عبر البريد الإلكتروني' : 'Email Support' }}</span>
-                  <a href="mailto:info@mastergas.com.sa" class="detail-val-link">info@mastergas.com.sa</a>
-                  <a href="mailto:info@saudietqaan.com.sa" class="detail-val-link">info@saudietqaan.com.sa</a>
+                  <a :href="`mailto:${contactEmail}`" class="detail-val-link">{{ contactEmail }}</a>
                 </div>
                 <div class="detail-icon-wrap">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -195,11 +194,11 @@
               </div>
 
               <!-- Card 3: الموقع والمكتب الرئيسي -->
-              <div class="contact-detail-card">
+              <div v-if="contactAddress" class="contact-detail-card">
                 <div class="detail-text-wrap">
                   <span class="detail-label">{{ currentLang === 'ar' ? 'الموقع والمكتب الرئيسي' : 'Location & Headquarters' }}</span>
-                  <span class="detail-val">{{ currentLang === 'ar' ? 'المملكة العربية السعودية - الرياض' : 'Saudi Arabia - Riyadh' }}</span>
-                  <span class="detail-sub">{{ currentLang === 'ar' ? 'مجمع صالات العرض لشركة إتقان السعودية' : 'Itqan Saudi Showroom Complex' }}</span>
+                  <span class="detail-val">{{ contactAddress }}</span>
+                  <span v-if="contactAddressSecondary" class="detail-sub">{{ contactAddressSecondary }}</span>
                 </div>
                 <div class="detail-icon-wrap">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -218,13 +217,59 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSEO } from '../../../composables/useSEO';
 import { escapeHtml } from '../../../utils/sanitize';
 import { settingsService } from '../../../services/settingsService';
+import { firstSetting, settingsToObject } from '../../../utils/siteSettings';
 
 const { currentLang } = useLocalized();
+
+const contactSettings = ref({});
+const siteImages = ref([]);
+
+const localizedSetting = (arKey, enKey, fallback = '') => {
+  const key = currentLang.value === 'ar' ? arKey : enKey;
+  return contactSettings.value[key] || contactSettings.value[arKey] || contactSettings.value[enKey] || fallback;
+};
+
+const contactPhone = computed(() => firstSetting(contactSettings.value, 'site_contact_phone', 'support_phone', 'phone_number') || '');
+const contactEmail = computed(() => firstSetting(contactSettings.value, 'support_email', 'email') || '');
+const contactAddress = computed(() => localizedSetting('address_ar', 'address_en', ''));
+const contactAddressSecondary = computed(() => localizedSetting('contact_address_details_ar', 'contact_address_details_en', ''));
+
+const imageValue = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  return item.image_url || item.url || item.image || item.path || item.file || '';
+};
+
+const contactHeroImage = computed(() => {
+  const configured = firstSetting(contactSettings.value, 'contact_image', 'contact_hero_image', 'contact_banner');
+  if (configured) return imageValue(configured);
+  const match = siteImages.value.find((item) => {
+    const searchable = [item.key, item.slug, item.type, item.section, item.name, item.title]
+      .filter(Boolean).join(' ').toLowerCase();
+    return searchable.includes('contact') || searchable.includes('support');
+  });
+  return imageValue(match) || '/images/support/hero_banner.jpg';
+});
+
+const fetchContactContent = async () => {
+  const [settingsResult, imagesResult] = await Promise.allSettled([
+    settingsService.getSettings(),
+    settingsService.getSiteImages(),
+  ]);
+  if (settingsResult.status === 'fulfilled') {
+    contactSettings.value = settingsToObject(settingsResult.value);
+  }
+  if (imagesResult.status === 'fulfilled') {
+    siteImages.value = Array.isArray(imagesResult.value) ? imagesResult.value : [];
+  }
+};
+
+onMounted(fetchContactContent);
 
 useSEO({
   title: 'الدعم الفني وخدمة العملاء - متجر ماسترجاز Mastergas',
@@ -334,7 +379,7 @@ const handleSubmit = async () => {
       name: sanitize(form.name),
       email: sanitize(form.email).toLowerCase(),
       phone: sanitize(form.phone),
-      subject: sanitize(form.subject) || 'استفسار عن منتج',
+      subject: sanitize(form.subject) || (currentLang.value === 'ar' ? 'استفسار عن منتج' : 'Product inquiry'),
       message: sanitize(form.message)
     };
 
@@ -550,6 +595,13 @@ const handleSubmit = async () => {
 .detail-val.font-num {
   font-size: 18px;
   letter-spacing: 0.5px;
+}
+
+.phone-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+  text-align: left;
 }
 
 .detail-val-link {
@@ -782,7 +834,7 @@ const handleSubmit = async () => {
 }
 
 .submit-action-btn:hover:not(:disabled) {
-  background: #1f2937;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

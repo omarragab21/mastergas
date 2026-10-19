@@ -4,21 +4,21 @@
     <div class="page-header">
       <div class="header-titles">
         <div class="title-with-icon">
-          <h2 class="page-title">أكواد الخصم</h2>
+          <h2 class="page-title">{{ tx('أكواد الخصم', 'Discount Codes') }}</h2>
           <div class="tag-icon-wrapper">
              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
              </svg>
           </div>
         </div>
-        <p class="page-subtitle">إنشاء وإدارة أكواد الخصم</p>
+        <p class="page-subtitle">{{ tx('إنشاء وإدارة أكواد الخصم', 'Create and manage discount codes') }}</p>
       </div>
       <button class="add-btn" @click="openAddModal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        إنشاء كود خصم
+        {{ tx('إنشاء كود خصم', 'Add Discount Code') }}
       </button>
     </div>
 
@@ -31,7 +31,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي أكواد الخصم</span>
+          <span class="stat-label">{{ tx('إجمالي أكواد الخصم', 'Total Discount Codes') }}</span>
           <h3 class="stat-value">{{ offers.length }}</h3>
         </div>
       </div>
@@ -43,7 +43,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">الأكواد النشطة</span>
+          <span class="stat-label">{{ tx('الأكواد النشطة', 'Active Codes') }}</span>
           <h3 class="stat-value">{{ activeOffersCount }}</h3>
         </div>
       </div>
@@ -55,7 +55,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">المنتهية</span>
+          <span class="stat-label">{{ tx('المنتهية', 'Expired') }}</span>
           <h3 class="stat-value">{{ expiredOffersCount }}</h3>
         </div>
       </div>
@@ -67,7 +67,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي الاستخدام</span>
+          <span class="stat-label">{{ tx('إجمالي الاستخدام', 'Total Usage') }}</span>
           <h3 class="stat-value">{{ totalUsageCount }}</h3>
         </div>
       </div>
@@ -79,34 +79,34 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="البحث باسم كود الخصم أو الكود..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('البحث باسم كود الخصم أو الكود...', 'Search by discount name or code...')" class="search-input" />
       </div>
       
       <div class="filter-select">
         <select v-model="typeFilter" class="form-select">
-          <option value="">كل أكواد الخصم</option>
-          <option value="percentage">نسبة مئوية</option>
-          <option value="fixed">قيمة ثابتة</option>
+          <option value="">{{ tx('كل أكواد الخصم', 'All discount codes') }}</option>
+          <option value="percentage">{{ tx('نسبة مئوية', 'Percentage') }}</option>
+          <option value="fixed">{{ tx('قيمة ثابتة', 'Fixed amount') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
 
       <div class="filter-select">
         <select v-model="statusFilter" class="form-select">
-          <option value="">كل الحالات</option>
-          <option value="active">نشط</option>
-          <option value="paused">متوقف</option>
-          <option value="expired">منتهي</option>
-          <option value="scheduled">مجدول</option>
+          <option value="">{{ tx('كل الحالات', 'All statuses') }}</option>
+          <option value="active">{{ tx('نشط', 'Active') }}</option>
+          <option value="paused">{{ tx('متوقف', 'Paused') }}</option>
+          <option value="expired">{{ tx('منتهي', 'Expired') }}</option>
+          <option value="scheduled">{{ tx('مجدول', 'Scheduled') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
 
       <div class="date-comp">
-        <input type="date" v-model="startDateFilter" class="date-input" placeholder="من تاريخ" title="من تاريخ" />
+        <input type="date" v-model="startDateFilter" class="date-input" :placeholder="tx('من تاريخ', 'From date')" :title="tx('من تاريخ', 'From date')" />
       </div>
       <div class="date-comp">
-        <input type="date" v-model="endDateFilter" class="date-input" placeholder="إلى تاريخ" title="إلى تاريخ" />
+        <input type="date" v-model="endDateFilter" class="date-input" :placeholder="tx('إلى تاريخ', 'To date')" :title="tx('إلى تاريخ', 'To date')" />
       </div>
     </div>
 
@@ -115,20 +115,20 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name text-right">اسم كود الخصم</th>
-            <th class="col-type">النوع</th>
-            <th class="col-value">قيمة الخصم</th>
-            <th class="col-code">كود الخصم</th>
-            <th class="col-start">تاريخ البداية</th>
-            <th class="col-end">تاريخ النهاية</th>
-            <th class="col-used">استخدم</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name text-right">{{ tx('اسم كود الخصم', 'Discount name') }}</th>
+            <th class="col-type">{{ tx('النوع', 'Type') }}</th>
+            <th class="col-value">{{ tx('قيمة الخصم', 'Discount value') }}</th>
+            <th class="col-code">{{ tx('كود الخصم', 'Discount code') }}</th>
+            <th class="col-start">{{ tx('تاريخ البداية', 'Start date') }}</th>
+            <th class="col-end">{{ tx('تاريخ النهاية', 'End date') }}</th>
+            <th class="col-used">{{ tx('استخدم', 'Used') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="9">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredOffers.length === 0" class="state-row"><td colspan="9">لا توجد أكواد خصم مطابقة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="9">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredOffers.length === 0" class="state-row"><td colspan="9">{{ tx('لا توجد أكواد خصم مطابقة', 'No matching discount codes found') }}</td></tr>
           <template v-else>
             <tr v-for="offer in filteredOffers" :key="offer.id" class="data-row">
               <td class="col-name text-right">
@@ -172,16 +172,16 @@
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                   <button class="action-btn delete-btn" @click="confirmDelete(offer)" title="حذف">
+                   <button class="action-btn delete-btn" @click="confirmDelete(offer)" :title="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
-                  <button class="action-btn copy-btn-action" @click="duplicateOffer(offer)" title="تكرار">
+                  <button class="action-btn copy-btn-action" @click="duplicateOffer(offer)" :title="tx('تكرار', 'Duplicate')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openViewModal(offer)" title="عرض">
+                  <button class="action-btn view-btn" @click="openViewModal(offer)" :title="tx('عرض', 'View')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button class="action-btn edit-btn" @click="openEditModal(offer)" title="تعديل">
+                  <button class="action-btn edit-btn" @click="openEditModal(offer)" :title="tx('تعديل', 'Edit')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
                 </div>
@@ -194,7 +194,7 @@
 
     <!-- Pagination placeholder -->
     <div class="pagination-footer" v-if="totalOffersCount > perPage">
-       <span class="results-text">عرض {{ (currentPage - 1) * perPage + 1 }} - {{ Math.min(currentPage * perPage, totalOffersCount) }} من {{ totalOffersCount }} كود خصم</span>
+       <span class="results-text">{{ tx('عرض', 'Showing') }} {{ (currentPage - 1) * perPage + 1 }} - {{ Math.min(currentPage * perPage, totalOffersCount) }} {{ tx('من', 'of') }} {{ totalOffersCount }} {{ tx('كود خصم', 'discount codes') }}</span>
        <div class="pagination-btns">
          <button class="p-btn prev" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -218,22 +218,22 @@
             <div class="header-icon-main">
                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
             </div>
-            <h3 class="modal-title-main">{{ isView ? 'تفاصيل كود الخصم' : (isEdit ? 'تعديل كود الخصم' : 'إنشاء كود خصم جديد') }}</h3>
-            <p class="modal-subtitle-main">{{ isView ? 'عرض البيانات فقط — للتعديل استخدم زر التعديل' : 'أدخل تفاصيل كود الخصم الجديد' }}</p>
+            <h3 class="modal-title-main">{{ isView ? tx('تفاصيل كود الخصم', 'Discount Code Details') : (isEdit ? tx('تعديل كود الخصم', 'Edit Discount Code') : tx('إنشاء كود خصم جديد', 'Add New Discount Code')) }}</h3>
+            <p class="modal-subtitle-main">{{ isView ? tx('عرض البيانات فقط — للتعديل استخدم زر التعديل', 'Read-only view — use Edit to make changes') : tx('أدخل تفاصيل كود الخصم الجديد', 'Enter the new discount code details') }}</p>
         </div>
 
         <form @submit.prevent="submitForm" class="offer-form">
           <fieldset class="form-fieldset" :disabled="isView">
             <div class="form-section">
-                <label class="form-label">صورة كود الخصم <span class="req">*</span></label>
+                <label class="form-label">{{ tx('صورة كود الخصم', 'Discount code image') }} <span class="req">*</span></label>
                 <div class="upload-wrapper" @click="fileInputRef?.click()">
                     <input type="file" ref="fileInputRef" @change="handleImageUpload" accept="image/*" hidden />
                     <div class="upload-box">
                         <img v-if="imagePreview" :src="imagePreview" class="preview-image" alt="Preview" />
                         <div v-else class="upload-placeholder">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <p>انقر لرفع صورة كود الخصم</p>
-                            <span>الحد الأقصى 1 ميجابايت</span>
+                            <p>{{ tx('انقر لرفع صورة كود الخصم', 'Click to upload discount code image') }}</p>
+                            <span>{{ tx('الحد الأقصى 1 ميجابايت', 'Maximum 1 MB') }}</span>
                         </div>
                     </div>
                 </div>
@@ -245,56 +245,56 @@
                   <button type="button" class="i18n-btn" :class="{ active: activeLang === 'ar' }" @click="activeLang = 'ar'">العربية</button>
                 </div>
 
-                <label class="form-label">اسم كود الخصم <span class="req">*</span></label>
+                <label class="form-label">{{ tx('اسم كود الخصم', 'Discount name') }} <span class="req">*</span></label>
                 <input v-show="activeLang === 'ar'" type="text" v-model="form.name_ar" class="form-control" placeholder="مثلاً: خصم الربيع الكبير" />
                 <input v-show="activeLang === 'en'" type="text" v-model="form.name_en" class="form-control" placeholder="Discount code name in English" />
             </div>
 
             <div class="form-section">
-                <label class="form-label">وصف كود الخصم (اختياري)</label>
+                <label class="form-label">{{ tx('وصف كود الخصم (اختياري)', 'Discount description (optional)') }}</label>
                 <textarea v-show="activeLang === 'ar'" v-model="form.description_ar" class="form-control" placeholder="وصف قصير للعرض بالعربي..." rows="3"></textarea>
                 <textarea v-show="activeLang === 'en'" v-model="form.description_en" class="form-control" placeholder="Short discount code description in English..." rows="3"></textarea>
             </div>
 
             <div class="form-section">
-                <label class="form-label">نوع كود الخصم <span class="req">*</span></label>
+                <label class="form-label">{{ tx('نوع كود الخصم', 'Discount type') }} <span class="req">*</span></label>
                 <div class="type-cards-grid">
                     <div class="type-card" :class="{ active: form.type === 'fixed' }" @click="form.type = 'fixed'">
                         <div class="card-icon">💵</div>
-                        <span class="card-label">قيمة ثابتة</span>
-                        <p class="card-desc">خصم مبلغ محدد من الطلب</p>
+                        <span class="card-label">{{ tx('قيمة ثابتة', 'Fixed amount') }}</span>
+                        <p class="card-desc">{{ tx('خصم مبلغ محدد من الطلب', 'Deduct a fixed amount from the order') }}</p>
                     </div>
                     <div class="type-card" :class="{ active: form.type === 'percentage' }" @click="form.type = 'percentage'">
                         <div class="card-icon">％</div>
-                        <span class="card-label">نسبة مئوية</span>
-                        <p class="card-desc">خصم نسبة مئوية من الإجمالي</p>
+                        <span class="card-label">{{ tx('نسبة مئوية', 'Percentage') }}</span>
+                        <p class="card-desc">{{ tx('خصم نسبة مئوية من الإجمالي', 'Deduct a percentage from the total') }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label">قيمة الخصم {{ form.type === 'percentage' ? '%' : '(د.أ)' }} <span class="req">*</span></label>
+                    <label class="form-label">{{ tx('قيمة الخصم', 'Discount value') }} {{ form.type === 'percentage' ? '%' : '(SAR)' }} <span class="req">*</span></label>
                     <input type="number" step="0.01" min="0.01" :max="form.type === 'percentage' ? 100 : undefined" v-model="form.value" class="form-control" placeholder="0.00" required />
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">كود الخصم <span class="req">*</span></label>
+                    <label class="form-label">{{ tx('كود الخصم', 'Discount code') }} <span class="req">*</span></label>
                     <input type="text" v-model="form.code" class="form-control ltr-text" placeholder="SPRING20" required />
                 </div>
 
                 <div class="form-group" v-if="form.type === 'percentage'">
-                    <label class="form-label">الحد الأقصى للخصم (د.أ)</label>
+                    <label class="form-label">{{ tx('الحد الأقصى للخصم (ر.س)', 'Maximum discount (SAR)') }}</label>
                     <input type="number" step="0.01" min="0" v-model="form.max_discount" class="form-control" placeholder="مثلاً: 10.00" />
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">الحد الأدنى للطلب</label>
+                    <label class="form-label">{{ tx('الحد الأدنى للطلب', 'Minimum order value') }}</label>
                     <input type="number" step="0.01" min="0" v-model="form.min_order_value" class="form-control" placeholder="0.00" />
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">الحد الأقصى للاستخدام (عدد المرات)</label>
+                    <label class="form-label">{{ tx('الحد الأقصى للاستخدام (عدد المرات)', 'Maximum uses') }}</label>
                     <input type="number" step="1" min="1" inputmode="numeric" v-model="form.max_uses" class="form-control" placeholder="مثلاً: 100" />
                 </div>
 
@@ -302,21 +302,21 @@
 
             <div class="form-grid mt-1">
                 <div class="form-group">
-                    <label class="form-label">تاريخ البدء <span class="req">*</span></label>
+                    <label class="form-label">{{ tx('تاريخ البدء', 'Start date') }} <span class="req">*</span></label>
                     <input type="date" v-model="form.start_date" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label class="form-label">تاريخ الانتهاء <span class="req" v-if="!form.no_end_date">*</span></label>
+                    <label class="form-label">{{ tx('تاريخ الانتهاء', 'End date') }} <span class="req" v-if="!form.no_end_date">*</span></label>
                     <input type="date" v-model="form.end_date" class="form-control" :required="!form.no_end_date" :disabled="form.no_end_date" />
                     <label class="chk-item mt-2">
                         <input type="checkbox" v-model="form.no_end_date">
-                        <span>مفتوح (غير محدد المدة)</span>
+                        <span>{{ tx('مفتوح (غير محدد المدة)', 'Open-ended') }}</span>
                     </label>
                 </div>
             </div>
 
             <div class="form-section-toggle">
-               <span class="toggle-lbl">تفعيل كود الخصم</span>
+               <span class="toggle-lbl">{{ tx('تفعيل كود الخصم', 'Enable discount code') }}</span>
                <label class="toggle-switch">
                   <input type="checkbox" v-model="form.is_active" hidden>
                   <div class="t-slider" :class="{ on: form.is_active }">
@@ -327,10 +327,10 @@
 
           </fieldset>
             <div class="form-footer-btns">
-                <button type="button" class="btn-cancel-form" @click="showFormModal = false">{{ isView ? 'إغلاق' : 'إلغاء' }}</button>
-                  <button v-if="isView" type="button" class="btn-submit-form" @click="openEditModal(viewedOffer)">تعديل كود الخصم</button>
+                <button type="button" class="btn-cancel-form" @click="showFormModal = false">{{ isView ? tx('إغلاق', 'Close') : tx('إلغاء', 'Cancel') }}</button>
+                  <button v-if="isView" type="button" class="btn-submit-form" @click="openEditModal(viewedOffer)">{{ tx('تعديل كود الخصم', 'Edit Discount Code') }}</button>
                 <button v-else type="submit" class="btn-submit-form" :disabled="isSubmitting">
-                    {{ isSubmitting ? 'جاري الحفظ...' : (isEdit ? 'حفظ التعديلات' : 'إنشاء كود الخصم') }}
+                    {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (isEdit ? tx('حفظ التعديلات', 'Save changes') : tx('إنشاء كود الخصم', 'Add Discount Code')) }}
                 </button>
             </div>
         </form>
@@ -346,14 +346,14 @@
           </svg>
         </div>
         <div class="delete-copy">
-          <h2 id="delete-offer-title">تأكيد حذف كود الخصم</h2>
-          <p>هل أنت متأكد من حذف كود الخصم «{{ deleteTarget.code || deleteTarget.name_i18n?.ar || deleteTarget.name }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+          <h2 id="delete-offer-title">{{ tx('تأكيد حذف كود الخصم', 'Confirm Discount Code Deletion') }}</h2>
+          <p>{{ tx('هل أنت متأكد من حذف كود الخصم؟ لا يمكن التراجع عن هذا الإجراء.', 'Are you sure you want to delete this discount code? This action cannot be undone.') }}</p>
         </div>
         <div class="modal-footer delete-footer">
-          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">{{ tx('إلغاء', 'Cancel') }}</button>
           <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
             <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
-            {{ isDeleting ? 'جاري الحذف...' : 'حذف كود الخصم' }}
+            {{ isDeleting ? tx('جاري الحذف...', 'Deleting...') : tx('حذف كود الخصم', 'Delete Discount Code') }}
           </button>
         </div>
       </div>
@@ -372,8 +372,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 import adminCatalogService from '../application/adminCatalogService';
 import { toDiscountPayload } from '../domain/catalog/adminCatalog';
+import { validateAdminImageFile, safeObjectUrl, sanitizeAssetUrl } from '../utils/adminSecurity';
+
+const { tx, locale } = useAdminText();
 
 // States
 const offers = ref([]);
@@ -405,14 +409,15 @@ const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tij
 const normalizeOfferImage = (value) => {
     if (!value) return value;
     const raw = String(value);
-    if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
-    if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
-        return raw.replace('/storage/', '/public/storage/');
-    }
-    return raw;
+    const resolved = raw.startsWith('/storage/')
+        ? `${backendOrigin}/public${raw}`
+        : (raw.includes('/storage/') && !raw.includes('/public/storage/')
+            ? raw.replace('/storage/', '/public/storage/')
+            : raw);
+    return sanitizeAssetUrl(resolved, '');
 };
 
-const activeLang = ref('ar');
+const activeLang = ref(locale.value);
 
 const initialForm = {
     name_ar: '',
@@ -475,30 +480,30 @@ const triggerAlert = (msg, type = 'success') => {
 
 const formatType = (t) => {
     const map = {
-        'percentage': 'نسبة مئوية',
-        'fixed': 'قيمة ثابتة',
-        'buy_x_get_y': 'اشتري X واحصل على Y',
-        'free_shipping': 'شحن مجاني'
+        'percentage': ['نسبة مئوية', 'Percentage'],
+        'fixed': ['قيمة ثابتة', 'Fixed amount'],
+        'buy_x_get_y': ['اشتري X واحصل على Y', 'Buy X get Y'],
+        'free_shipping': ['شحن مجاني', 'Free shipping']
     };
-    return map[t] || t;
+    return map[t] ? tx(...map[t]) : t;
 };
 
 const formatValue = (offer) => {
     if (offer.type === 'percentage') return offer.value + '%';
-    if (offer.type === 'fixed') return formatPrice(offer.value) + ' د.أ';
-    if (offer.type === 'buy_x_get_y') return `اشتري ${offer.buy_x} خذ ${offer.get_y}`;
-    if (offer.type === 'free_shipping') return 'مجاني';
+    if (offer.type === 'fixed') return formatPrice(offer.value) + ` ${tx('ر.س', 'SAR')}`;
+    if (offer.type === 'buy_x_get_y') return `${tx('اشتري', 'Buy')} ${offer.buy_x} ${tx('خذ', 'get')} ${offer.get_y}`;
+    if (offer.type === 'free_shipping') return tx('مجاني', 'Free');
     return '-';
 };
 
 const formatStatus = (s) => {
     const map = {
-        'active': 'نشط',
-        'paused': 'متوقف',
-        'expired': 'منتهي',
-        'scheduled': 'مجدول'
+        'active': ['نشط', 'Active'],
+        'paused': ['متوقف', 'Paused'],
+        'expired': ['منتهي', 'Expired'],
+        'scheduled': ['مجدول', 'Scheduled']
     };
-    return map[s] || s;
+    return map[s] ? tx(...map[s]) : s;
 };
 
 const copyText = (txt) => {
@@ -653,15 +658,16 @@ const duplicateOffer = async (offer) => {
 };
 
 const handleImageUpload = (e) => {
-  const file = e.target.files[0];
+  const file = e.target.files?.[0];
   if (!file) return;
-  if (file.size > 1 * 1024 * 1024) {
-    triggerAlert('حجم الصورة يجب أن لا يتجاوز 1 ميجابايت', 'error');
+  const check = validateAdminImageFile(file, { maxSizeMB: 1 });
+  if (!check.valid) {
+    triggerAlert(check.error, 'error');
     e.target.value = '';
     return;
   }
   form.value.image = file;
-  imagePreview.value = URL.createObjectURL(file);
+  imagePreview.value = safeObjectUrl(file, imagePreview.value);
 };
 
 const validateOfferForm = (f) => {

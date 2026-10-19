@@ -244,7 +244,7 @@ const formatDate = (date) => {
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <a v-if="topic.slug" :href="'/' + topic.slug" target="_blank" class="action-btn website" title="عرض على الموقع">
+                  <a v-if="topic.slug" :href="'/' + String(topic.slug).replace(/^[\\/]+/, '')" target="_blank" rel="noopener noreferrer" class="action-btn website" title="عرض على الموقع">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                   <button class="action-btn view" title="عرض" @click="openViewModal(topic)">
@@ -325,7 +325,7 @@ const formatDate = (date) => {
                    </div>
                    <div class="info-item" v-if="currentTopic.slug">
                       <span class="info-label">رابط الصفحة</span>
-                      <a :href="'/' + currentTopic.slug" target="_blank" class="topic-link">{{ '/' + currentTopic.slug }}</a>
+                      <a :href="'/' + String(currentTopic.slug).replace(/^[\\/]+/, '')" target="_blank" rel="noopener noreferrer" class="topic-link">{{ '/' + String(currentTopic.slug).replace(/^[\\/]+/, '') }}</a>
                    </div>
                 </div>
 

@@ -424,8 +424,9 @@ const socials = reactive({
 
 const formatSocialUrl = (url, platform) => {
   if (!url || typeof url !== 'string') return '';
-  const trimmed = url.trim();
-  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '#') return '';
+  const trimmed = url.replace(/[\u0000-\u001F\u007F]+/g, '').trim();
+  const schemeProbe = trimmed.replace(/\s+/g, '');
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '#' || /^(javascript|data|vbscript|file|blob):/i.test(schemeProbe)) return '';
   
   if (platform === 'whatsapp') {
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
@@ -436,7 +437,7 @@ const formatSocialUrl = (url, platform) => {
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
-  return `https://${trimmed}`;
+  return `https://${trimmed.replace(/^[\\/]+/, '')}`;
 };
 
 const hasAnySocial = computed(() => {
@@ -600,27 +601,29 @@ const fetchData = async () => {
       const faviconVal = getVal('favicon');
       const logoVal = getVal('logo');
       const footerLogoVal = getVal('footer_logo');
-      const resolveAssetUrl = (value) => {
-        if (!value) return '';
-        if (value.startsWith('/') || value.startsWith('http')) return value;
-        return `${api.defaults.baseURL.replace('/api', '')}/storage/${value}`;
+      const resolveAssetUrl = (value, fallback) => {
+        const cleaned = String(value ?? '').replace(/[\u0000-\u001F\u007F]+/g, '').trim();
+        if (!cleaned || /^(javascript|data|vbscript|file|blob):/i.test(cleaned.replace(/\s+/g, ''))) return fallback;
+        if (/^\/(?![/\\])/.test(cleaned) || /^https?:\/\//i.test(cleaned)) return cleaned;
+        if (cleaned.startsWith('//') || cleaned.startsWith('/\\')) return fallback;
+        return `${api.defaults.baseURL.replace('/api', '')}/storage/${cleaned.replace(/^[\\/]+/, '')}`;
       };
       
       if (logoVal && !isIrisAsset(logoVal)) {
-        siteLogo.value = resolveAssetUrl(logoVal);
+        siteLogo.value = resolveAssetUrl(logoVal, '/brand/mastergas-logo.png');
       } else {
         siteLogo.value = '/brand/mastergas-logo.png';
       }
 
       if (footerLogoVal && !isIrisAsset(footerLogoVal)) {
-        footerLogo.value = resolveAssetUrl(footerLogoVal);
+        footerLogo.value = resolveAssetUrl(footerLogoVal, '/brand/mastergas-logo-white.png');
       } else {
         footerLogo.value = '/brand/mastergas-logo-white.png';
       }
 
       // Update Favicon (Mastergas favicon, ignore legacy Iris)
       const finalFavicon = (faviconVal && !isIrisAsset(faviconVal))
-        ? resolveAssetUrl(faviconVal)
+        ? resolveAssetUrl(faviconVal, '/brand/mastergas-icon.png')
         : '/brand/mastergas-icon.png';
 
       const faviconLink = document.querySelector("link[rel~='icon']");

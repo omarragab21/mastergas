@@ -405,7 +405,13 @@ const closeModal = () => {
 
 const getPostAuthRedirect = () => {
   const redirect = route.query.redirect
-  if (typeof redirect !== 'string' || !redirect.startsWith('/') || redirect.startsWith('//')) {
+  if (
+    typeof redirect !== 'string' ||
+    !redirect.startsWith('/') ||
+    redirect.startsWith('//') ||
+    redirect.startsWith('/\\') ||
+    /[\u0000-\u001F\u007F\\]/.test(redirect)
+  ) {
     return ''
   }
   return redirect

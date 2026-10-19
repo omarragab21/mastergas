@@ -78,11 +78,11 @@
                   <div class="price-box">
                     <span class="current-price">
                       <span>{{ formatPrice(item.sale_price || (item.price * (1 - (item.discount / 100 || 0)))) }}</span>
-                      <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg" aria-hidden="true" />
+                      <img :src="riyalIcon" alt="" class="currency-symbol-svg" aria-hidden="true" />
                     </span>
                     <span class="old-price" v-if="item.discount > 0">
                       <span>{{ formatPrice(item.price) }}</span>
-                      <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg is-muted" aria-hidden="true" />
+                      <img :src="riyalIcon" alt="" class="currency-symbol-svg is-muted" aria-hidden="true" />
                     </span>
                   </div>
                   
@@ -113,6 +113,7 @@ import { cartState } from '../../../store/cart';
 import { authState, authActions } from '../../../store/auth';
 import { useLocalized } from '../../../composables/useLocalized';
 import riyalIcon from '../../../assets/riyal.svg';
+import { formatPrice } from '../../../utils/price';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -132,10 +133,6 @@ const getImageUrl = (path, id) => {
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
-const formatPrice = (price) => {
-  const num = parseFloat(price) || 0;
-  return num.toLocaleString('en-US', { minimumFractionDigits: num % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 });
-};
 
 const goToProduct = (product) => {
   router.push(`/product/${product.id}`);
@@ -467,7 +464,7 @@ const handleLogout = () => {
 }
 
 .action-btns .cart-btn:hover:not(:disabled) {
-  background: #000000;
+  background: var(--color-button-hover);
   color: #fff;
 }
 
@@ -557,7 +554,7 @@ const handleLogout = () => {
 }
 
 .empty-btn-primary:hover {
-  opacity: 0.88;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

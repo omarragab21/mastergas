@@ -4,12 +4,12 @@
       <div class="failure-icon">
         <i class="fas fa-times-circle"></i>
       </div>
-      <h1>لم يتم إتمام الدفع</h1>
-      <p>تم إلغاء عملية الدفع أو لم تكتمل. سلة مشترياتك ما زالت محفوظة كما هي.</p>
+      <h1>{{ t('common.payment_failed_title') }}</h1>
+      <p>{{ t('common.payment_failed_desc') }}</p>
       <p v-if="errorMessage" class="error-detail">{{ errorMessage }}</p>
       <div class="actions">
-        <button class="retry-btn" @click="goCheckout">العودة لإتمام الطلب</button>
-        <button class="home-btn" @click="goHome">الرئيسية</button>
+        <button class="retry-btn" @click="goCheckout">{{ t('common.back_to_checkout') }}</button>
+        <button class="home-btn" @click="goHome">{{ t('common.home') }}</button>
       </div>
     </div>
   </div>
@@ -18,9 +18,11 @@
 <script setup>
 import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
 
 // IMPORTANT: This page must NEVER clear the cart.
 // The backend redirects here when payment is cancelled or fails.
@@ -100,7 +102,7 @@ const goHome = () => {
 }
 
 .retry-btn:hover {
-  background: #6d264c;
+  background: var(--color-button-hover);
 }
 
 .home-btn {
@@ -114,7 +116,9 @@ const goHome = () => {
 }
 
 .home-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-button-hover);
+  border-color: var(--color-button-hover);
+  color: #fff;
 }
 
 @media (max-width: 640px) {

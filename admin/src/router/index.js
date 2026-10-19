@@ -4,6 +4,7 @@ import AppLayout from '../components/AppLayout.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { trackPageView } from '../utils/metaPixel.js';
 import { setRouter } from '../config/axios.js';
+import { hasValidAdminSession } from '../utils/adminSecurity.js';
 
 const routes = [
   { path: '/', redirect: '/admin/dashboard' },
@@ -22,6 +23,7 @@ const routes = [
       { path: 'data-feeds', name: 'DataFeeds', component: () => import('../views/DataFeedsView.vue') },
       { path: 'orders', name: 'Orders', component: () => import('../views/OrdersView.vue') },
       { path: 'returns', name: 'Returns', component: () => import('../views/ReturnsView.vue') },
+      { path: 'returns/:id', name: 'ReturnDetail', component: () => import('../views/ReturnDetailView.vue') },
       { path: 'dynamic-pages', name: 'DynamicPages', component: () => import('../views/DynamicPagesView.vue') },
       { path: 'reviews', name: 'Reviews', component: () => import('../views/ReviewsView.vue') },
       { path: 'customers', name: 'Customers', component: () => import('../views/CustomersView.vue') },
@@ -61,13 +63,13 @@ const router = createRouter({
 });
 
 setRouter(router);
-if (typeof window !== 'undefined') window.__appRouter = router;
+if (import.meta.env?.DEV && typeof window !== 'undefined') window.__appRouter = router;
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
+  const isAdminAuthenticated = hasValidAdminSession();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  if (requiresAuth && !token) next('/admin/login');
-  else if (to.name === 'Login' && token) next('/admin/dashboard');
+  if (requiresAuth && !isAdminAuthenticated) next('/admin/login');
+  else if (to.name === 'Login' && isAdminAuthenticated) next('/admin/dashboard');
   else next();
 });
 

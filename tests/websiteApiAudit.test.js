@@ -166,13 +166,14 @@ test('Website Customer Account & Action APIs: Contract and parameter safety', as
     { name: 'Customer Register', path: '/frontend/register', method: 'POST', body: { name: 'Customer', email: 'user@example.com', password: 'secret' } },
     { name: 'Customer Logout', path: '/frontend/logout', method: 'POST' },
     { name: 'Forgot Password', path: '/frontend/forgot-password', method: 'POST', body: { email: 'user@example.com' } },
-    { name: 'Customer Profile Fetch', path: '/frontend/user', method: 'GET' },
-    { name: 'Customer Profile Update', path: '/frontend/profile', method: 'PUT', body: { name: 'Updated' } },
-    { name: 'Change Password', path: '/frontend/change-password', method: 'POST', body: { current_password: 'old', password: 'new' } },
-    { name: 'List Addresses', path: '/frontend/addresses', method: 'GET' },
-    { name: 'Create Address', path: '/frontend/addresses', method: 'POST', body: { country_id: 1, city_id: 1, address: 'Test' } },
-    { name: 'Update Address', path: '/frontend/addresses/10', method: 'PUT', body: { address: 'Updated' } },
-    { name: 'Delete Address', path: '/frontend/addresses/10', method: 'DELETE' },
+    { name: 'Customer Profile Fetch', path: '/v1/site/profile', method: 'GET' },
+    { name: 'Customer Profile Update', path: '/v1/site/profile', method: 'POST', body: { name: 'Updated' } },
+    { name: 'Change Password', path: '/v1/site/profile/password', method: 'PUT', body: { current_password: 'old', password: 'new' } },
+    { name: 'List Addresses', path: '/v1/site/addresses', method: 'GET' },
+    { name: 'Create Address', path: '/v1/site/addresses', method: 'POST', body: { name: 'Test', phone_number: '+966500000000', city: 'الرياض', address: 'Test' } },
+    { name: 'Update Address', path: '/v1/site/addresses/10', method: 'PUT', body: { address: 'Updated' } },
+    { name: 'Set Default Address', path: '/v1/site/addresses/10/set-default', method: 'PATCH' },
+    { name: 'Delete Address', path: '/v1/site/addresses/10', method: 'DELETE' },
     { name: 'Customer Wallet', path: '/frontend/wallet', method: 'GET' },
     { name: 'Customer Orders List', path: '/frontend/orders/me', method: 'GET' },
     { name: 'Direct Order Detail', path: '/frontend/orders/101', method: 'GET' },
@@ -190,8 +191,8 @@ test('Website Customer Account & Action APIs: Contract and parameter safety', as
 
   await t.test('All customer endpoints are properly structured', () => {
     for (const ep of customerEndpoints) {
-      assert.ok(ep.path.startsWith('/frontend/') || ep.path.startsWith('/v1/discount_codes'));
-      assert.ok(['GET', 'POST', 'PUT', 'DELETE'].includes(ep.method));
+      assert.ok(ep.path.startsWith('/frontend/') || ep.path.startsWith('/v1/site/') || ep.path.startsWith('/v1/discount_codes'));
+      assert.ok(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(ep.method));
     }
   });
 

@@ -3,15 +3,15 @@
     <!-- Header -->
     <div class="page-header">
       <div class="header-titles">
-        <h2 class="page-title">خصائص المنتجات</h2>
-        <p class="page-subtitle">إدارة القيم المتاحة ضمن خصائص المنتجات المعرفة مسبقاً</p>
+        <h2 class="page-title">{{ tx('خصائص المنتجات', 'Product Attributes') }}</h2>
+        <p class="page-subtitle">{{ tx('إدارة القيم المتاحة ضمن خصائص المنتجات المعرفة مسبقاً', 'Manage predefined product attributes and values') }}</p>
       </div>
       <button class="header-add-btn" type="button" @click="openAttributeModal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        إضافة خاصية
+        {{ tx('إضافة خاصية', 'Add Attribute') }}
       </button>
     </div>
 
@@ -19,14 +19,14 @@
     <div class="modal-overlay" v-if="showAttributeModal" @click.self="closeAttributeModal">
       <div class="modal-content form-modal">
         <button class="modal-close" @click="closeAttributeModal">×</button>
-        <div class="form-header"><div class="modal-heading-row"><div v-if="!editingAttributeId" class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ editingAttributeId ? 'تعديل خاصية منتج' : 'إضافة خاصية منتج' }}</h3></div><p class="modal-subtitle-main">{{ editingAttributeId ? 'عدّل الاسم أو النوع — القيم تُدار من زر إدارة القيم' : 'أضف خاصية نصية أو خاصية لون، ثم أضف قيمها لاحقاً من زر إدارة القيم' }}</p></div>
+        <div class="form-header"><div class="modal-heading-row"><div v-if="!editingAttributeId" class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ editingAttributeId ? tx('تعديل خاصية منتج', 'Edit Product Attribute') : tx('إضافة خاصية منتج', 'Add Product Attribute') }}</h3></div><p class="modal-subtitle-main">{{ editingAttributeId ? tx('عدّل الاسم أو النوع — القيم تُدار من زر إدارة القيم', 'Edit the name or type; values are managed separately') : tx('أضف خاصية نصية أو خاصية لون، ثم أضف قيمها لاحقاً من زر إدارة القيم', 'Add a text or color attribute, then manage its values') }}</p></div>
         <form class="value-form" @submit.prevent="submitAttribute">
-          <div class="form-group"><label class="form-label">الاسم بالعربي *</label><input v-model="attributeForm.name_ar" class="form-control" required placeholder="مثال: اللون" /></div>
-          <div class="form-group"><label class="form-label">الاسم بالإنجليزية *</label><input v-model="attributeForm.name_en" class="form-control" required placeholder="Example: Color" /></div>
-          <div class="form-group"><label class="form-label">نوع الخاصية *</label><select v-model="attributeForm.type" class="form-control" required><option value="" disabled>اختر نوع الخاصية (لون أو نص)</option><option value="color">لون / Color</option><option value="text">نص / Text</option></select></div>
+          <div class="form-group"><label class="form-label">{{ tx('الاسم بالعربي', 'Name (Arabic)') }} *</label><input v-model="attributeForm.name_ar" class="form-control" required :placeholder="tx('مثال: اللون', 'Example: Color')" /></div>
+          <div class="form-group"><label class="form-label">{{ tx('الاسم بالإنجليزية', 'Name (English)') }} *</label><input v-model="attributeForm.name_en" class="form-control" required placeholder="Example: Color" /></div>
+          <div class="form-group"><label class="form-label">{{ tx('نوع الخاصية', 'Attribute type') }} *</label><select v-model="attributeForm.type" class="form-control" required><option value="" disabled>{{ tx('اختر نوع الخاصية (لون أو نص)', 'Choose attribute type (color or text)') }}</option><option value="color">{{ tx('لون', 'Color') }}</option><option value="text">{{ tx('نص', 'Text') }}</option></select></div>
           <div class="form-actions">
-            <button class="btn-cancel" type="button" @click="closeAttributeModal">إلغاء</button>
-            <button class="btn-submit" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'جاري الحفظ...' : (editingAttributeId ? 'حفظ التعديلات' : 'حفظ الخاصية') }}</button>
+            <button class="btn-cancel" type="button" @click="closeAttributeModal">{{ tx('إلغاء', 'Cancel') }}</button>
+            <button class="btn-submit" type="submit" :disabled="isSubmitting">{{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (editingAttributeId ? tx('حفظ التعديلات', 'Save changes') : tx('حفظ الخاصية', 'Save attribute')) }}</button>
           </div>
         </form>
       </div>
@@ -37,18 +37,18 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name">الخاصية</th>
-            <th class="col-values">القيم المتوفرة</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name">{{ tx('الخاصية', 'Attribute') }}</th>
+            <th class="col-values">{{ tx('القيم المتوفرة', 'Available values') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading" class="state-row">
-            <td colspan="4">جاري التحميل...</td>
+            <td colspan="4">{{ tx('جاري التحميل...', 'Loading...') }}</td>
           </tr>
           <tr v-else-if="attributes.length === 0" class="state-row">
-            <td colspan="4">لا توجد خصائص مضافة مسبقاً</td>
+            <td colspan="4">{{ tx('لا توجد خصائص مضافة مسبقاً', 'No attributes added yet') }}</td>
           </tr>
           <template v-else>
             <tr v-for="attr in attributes" :key="attr.id" class="data-row">
@@ -70,30 +70,30 @@
                   <span v-if="attr.values.length > 5" class="value-chip more-chip">
                     +{{ attr.values.length - 5 }}
                   </span>
-                  <span v-if="attr.values.length === 0" class="no-values-text">لا توجد قيم يرجى الإضافة</span>
+                  <span v-if="attr.values.length === 0" class="no-values-text">{{ tx('لا توجد قيم يرجى الإضافة', 'No values; please add one') }}</span>
                 </div>
               </td>
               <td class="col-status">
                 <span class="status-badge" :class="attr.is_active ? 'active' : 'inactive'">
-                  {{ attr.is_active ? 'نشط' : 'غير نشط' }}
+                  {{ attr.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
                 </span>
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn view-btn" @click="openManageModal(attr)" title="إدارة القيم">
+                  <button class="action-btn view-btn" @click="openManageModal(attr)" :title="tx('إدارة القيم', 'Manage values')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
                     </svg>
                   </button>
-                  <button class="action-btn edit-btn" @click="openEditAttributeModal(attr)" title="تعديل الخاصية" aria-label="تعديل الخاصية">
+                  <button class="action-btn edit-btn" @click="openEditAttributeModal(attr)" :title="tx('تعديل الخاصية', 'Edit attribute')" :aria-label="tx('تعديل الخاصية', 'Edit attribute')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn add-value-btn" @click="openAddValueModal(attr)" title="إضافة قيمة جديدة" aria-label="إضافة قيمة جديدة">
+                  <button class="action-btn add-value-btn" @click="openAddValueModal(attr)" :title="tx('إضافة قيمة جديدة', 'Add value')" :aria-label="tx('إضافة قيمة جديدة', 'Add value')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                   </button>
-                  <button class="action-btn delete-btn" @click="deleteAttributeItem(attr)" title="حذف الخاصية" aria-label="حذف الخاصية">
+                  <button class="action-btn delete-btn" @click="deleteAttributeItem(attr)" :title="tx('حذف الخاصية', 'Delete attribute')" :aria-label="tx('حذف الخاصية', 'Delete attribute')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
                     </svg>
@@ -113,13 +113,13 @@
         <button class="modal-close" @click="closeValueModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="form-header"><h3 class="modal-title-main">{{ isEditingValue ? 'تعديل قيمة خاصية' : 'إضافة قيمة جديدة' }}</h3><p class="modal-subtitle-main">أدخل اسم القيمة بالعربي والإنجليزي ليتم حفظها في الـ API</p></div>
+        <div class="form-header"><h3 class="modal-title-main">{{ isEditingValue ? tx('تعديل قيمة خاصية', 'Edit Attribute Value') : tx('إضافة قيمة جديدة', 'Add New Value') }}</h3><p class="modal-subtitle-main">{{ tx('أدخل اسم القيمة بالعربي والإنجليزي ليتم حفظها في الـ API', 'Enter the Arabic and English value names to save them to the API') }}</p></div>
         
         <form @submit.prevent="submitValue" class="value-form">
           
           <!-- Binding (Readonly) -->
           <div class="form-group">
-            <label class="form-label">الارتباط <span class="req">*</span></label>
+            <label class="form-label">{{ tx('الارتباط', 'Attribute') }} <span class="req">*</span></label>
             <div class="readonly-input">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -130,40 +130,40 @@
 
           <!-- Color Code -->
           <div class="form-group" v-if="selectedAttribute?.type === 'color' || valueForm.color || hasColorType(selectedAttribute)">
-            <label class="form-label">رمز اللون</label>
+            <label class="form-label">{{ tx('رمز اللون', 'Color code') }}</label>
             <div class="color-picker-wrapper">
               <input type="text" v-model="valueForm.color" class="form-control color-text-input" placeholder="#000000 أو Red" />
               <input type="color" v-model="valueForm.color" class="color-picker-input" />
             </div>
-            <span class="help-text">اختر لوناً إذا كانت القيمة تمثل لوناً مخصصاً (كود Hex)</span>
+            <span class="help-text">{{ tx('اختر لوناً إذا كانت القيمة تمثل لوناً مخصصاً (كود Hex)', 'Choose a color when the value is a custom color (Hex code)') }}</span>
           </div>
 
           <!-- Bilingual Value Names -->
           <div class="form-group">
-            <label class="form-label">اسم القيمة بالعربي <span class="req">*</span></label>
-            <input type="text" v-model="valueForm.name_ar" class="form-control" placeholder="مثال: أسود ملكي أو 90 سم" required />
+            <label class="form-label">{{ tx('اسم القيمة بالعربي', 'Value name (Arabic)') }} <span class="req">*</span></label>
+            <input type="text" v-model="valueForm.name_ar" class="form-control" :placeholder="tx('مثال: أسود ملكي أو 90 سم', 'Example: Royal Black or 90 cm')" required />
           </div>
           <div class="form-group">
-            <label class="form-label">اسم القيمة بالإنجليزية <span class="req">*</span></label>
+            <label class="form-label">{{ tx('اسم القيمة بالإنجليزية', 'Value name (English)') }} <span class="req">*</span></label>
             <input type="text" v-model="valueForm.name_en" class="form-control" placeholder="Example: Royal Black or 90 cm" dir="ltr" required />
           </div>
 
           <!-- Status -->
           <div class="form-group">
-            <label class="form-label">الحالة</label>
+            <label class="form-label">{{ tx('الحالة', 'Status') }}</label>
             <div class="select-wrapper">
               <select v-model="valueForm.is_active" class="form-control">
-                <option :value="true">نشط</option>
-                <option :value="false">غير نشط</option>
+                <option :value="true">{{ tx('نشط', 'Active') }}</option>
+                <option :value="false">{{ tx('غير نشط', 'Inactive') }}</option>
               </select>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="select-icon"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn-cancel" @click="closeValueModal">إلغاء</button>
+            <button type="button" class="btn-cancel" @click="closeValueModal">{{ tx('إلغاء', 'Cancel') }}</button>
             <button type="submit" class="btn-submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'جاري الحفظ...' : (isEditingValue ? 'تحديث القيمة' : 'إضافة القيمة') }}
+              {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (isEditingValue ? tx('تحديث القيمة', 'Update value') : tx('إضافة القيمة', 'Add value')) }}
             </button>
           </div>
         </form>
@@ -176,12 +176,12 @@
         <button class="modal-close" @click="closeManageModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <h3 class="modal-title">القيم الخاصة بـ: {{ attributeName(selectedAttribute) }}</h3>
-        <p class="modal-subtitle">عرض القيم المتاحة ليتم تعيينها لخيارات المنتجات</p>
+        <h3 class="modal-title">{{ tx('القيم الخاصة بـ:', 'Values for:') }} {{ attributeName(selectedAttribute) }}</h3>
+        <p class="modal-subtitle">{{ tx('عرض القيم المتاحة ليتم تعيينها لخيارات المنتجات', 'Manage values available for product options') }}</p>
         
         <div class="manage-list">
           <div class="manage-list-empty" v-if="selectedAttribute?.values?.length === 0">
-            لا توجد قيم حالياً. استخدم الزر الخاص بالإضافة من الجدول.
+            {{ tx('لا توجد قيم حالياً. استخدم الزر الخاص بالإضافة من الجدول.', 'No values yet. Use the add button from the table.') }}
           </div>
           
           <div v-for="val in selectedAttribute?.values" :key="val.id" class="manage-item">
@@ -192,12 +192,12 @@
             </div>
             
             <div class="manage-item-actions">
-              <button class="manage-btn edit-val-btn" @click="editValueItem(val)" title="تعديل">
+              <button class="manage-btn edit-val-btn" @click="editValueItem(val)" :title="tx('تعديل', 'Edit')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
               </button>
-              <button class="manage-btn delete-val-btn" @click="deleteValueItem(val)" title="حذف">
+              <button class="manage-btn delete-val-btn" @click="deleteValueItem(val)" :title="tx('حذف', 'Delete')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
                 </svg>
@@ -207,7 +207,7 @@
         </div>
 
         <div class="manage-footer">
-          <button class="btn-cancel" @click="closeManageModal">إغلاق</button>
+          <button class="btn-cancel" @click="closeManageModal">{{ tx('إغلاق', 'Close') }}</button>
         </div>
       </div>
     </div>
@@ -226,9 +226,11 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAdminText } from '../composables/useAdminText';
 import productAttributeService from '../services/productAttributeService';
 
 const { locale } = useI18n();
+const { tx } = useAdminText();
 const isEnglish = computed(() => locale.value === 'en');
 
 const attributeName = (attribute) => {

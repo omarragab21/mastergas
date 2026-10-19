@@ -13,6 +13,11 @@ test('protocol-relative and www. links become https external links', () => {
   assert.deepEqual(resolveLink('www.youtube.com/watch?v=1'), { external: true, href: 'https://www.youtube.com/watch?v=1' });
 });
 
+test('generic Google destinations fall back to the product catalog', () => {
+  assert.deepEqual(resolveLink('https://www.google.com/?q=Mastergas'), { external: false, href: '/products' });
+  assert.deepEqual(resolveLink('https://google.com/search?q=Mastergas', '/offers'), { external: false, href: '/offers' });
+});
+
 test('REGRESSION: the broken "/https://…" produced by router-link is treated as external too', () => {
   assert.deepEqual(resolveLink('/https://www.youtube.com/'), { external: true, href: 'https://www.youtube.com/' });
 });

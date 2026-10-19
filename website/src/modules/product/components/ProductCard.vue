@@ -42,24 +42,7 @@
       <!-- Badges -->
       <div class="product-badges">
         <span class="badge-new" v-if="isNewProduct">{{ currentLang === 'ar' ? 'جديد' : 'NEW' }}</span>
-        <span class="badge-sale" v-if="discountPercentage > 0">-{{ Math.round(discountPercentage) }}%</span>
-      </div>
-
-      <button
-        type="button"
-        class="product-favorite-btn"
-        :class="{ active: isFavorite }"
-        :aria-label="isFavorite ? (currentLang === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (currentLang === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
-        :title="isFavorite ? (currentLang === 'ar' ? 'إزالة من المفضلة' : 'Remove from wishlist') : (currentLang === 'ar' ? 'إضافة إلى المفضلة' : 'Add to wishlist')"
-        @click.stop="toggleFavorite"
-      >
-        <i :class="isFavorite ? 'fas fa-heart' : 'far fa-heart'" aria-hidden="true"></i>
-      </button>
-
-      <!-- Multiple images indicator badge -->
-      <div v-if="hasMultipleImages" class="card-images-count">
-        <i class="fas fa-camera"></i>
-        <span>{{ totalImagesCount }}</span>
+        <span class="badge-sale" dir="ltr" v-if="discountPercentage > 0">-{{ Math.round(discountPercentage) }}%</span>
       </div>
 
       <!-- Stock Warning -->
@@ -75,40 +58,33 @@
     <div class="product-info">
       <span class="origin-tag">{{ displayOrigin }}</span>
       
-      <h3 class="product-name" :title="productName">{{ productName }}</h3>
+      <h3 class="product-name" dir="auto" :title="productName">{{ productName }}</h3>
       
-      <!-- Meta Row: Specs and SKU with space-between -->
+      <!-- Meta Row: Specs and model -->
       <div class="product-meta-row">
-        <span class="product-specs">{{ displaySpecs }}</span>
+        <span class="product-specs" dir="auto">{{ displaySpecs }}</span>
         <span class="product-sku">{{ displaySku }}</span>
       </div>
 
-      <!-- Full-width Divider Line underneath -->
       <div class="product-divider"></div>
 
-      <!-- Old Price directly under the border -->
-      <div class="old-price-row" v-if="discountPercentage > 0">
-        <span class="old-price">
+      <!-- Discount area keeps its height even when there is no discount -->
+      <div class="discount-area">
+        <div class="old-price" v-if="discountPercentage > 0" dir="ltr">
+          <img :src="oldRiyalIcon" alt="" class="old-price-riyal" aria-hidden="true" />
           <span class="old-price-val">{{ formatPrice(product.price) }}</span>
-          <svg width="10" height="12" viewBox="0 0 14 16" fill="currentColor" class="price-riyal-icon" aria-hidden="true">
-            <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
-            <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
-          </svg>
-        </span>
+        </div>
       </div>
 
-      <!-- Bottom Row: New Price and Add to Cart on the exact same row level -->
+      <!-- Price and Add to Cart -->
       <div class="product-bottom-row">
-        <div class="current-price-row">
+        <div class="current-price-row" dir="ltr">
+          <img :src="priceRiyalIcon" alt="" class="currency-symbol-svg" aria-hidden="true" />
           <span class="price-val">{{ formatPrice(currentPrice) }}</span>
-          <img :src="riyalIcon" alt="ريال" class="currency-symbol-svg" aria-hidden="true" />
         </div>
 
         <button class="add-to-cart-btn" @click.stop="$emit('add-to-cart', product)" :aria-label="currentLang === 'ar' ? 'إضافة المنتج إلى السلة' : 'Add product to cart'">
-          <svg class="cart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/>
-            <path d="M10 14a2 2 0 0 0 4 0"/>
-          </svg>
+          <span class="cart-icon-box"><span class="cart-icon-inset"><img :src="bagIcon" alt="" class="cart-icon" /></span></span>
           <span class="btn-text">{{ currentLang === 'ar' ? 'أضف للسلة' : 'Add to Cart' }}</span>
         </button>
       </div>
@@ -121,8 +97,10 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useOffers } from '../composables/useOffers';
 import { useLocalized } from '../../../composables/useLocalized';
-import { cartState } from '../../../store/cart';
-import riyalIcon from '../../../assets/riyal.svg';
+import priceRiyalIcon from '../../../assets/card-riyal.svg';
+import { formatPrice } from '../../../utils/price';
+import oldRiyalIcon from '../../../assets/card-riyal-old.svg';
+import bagIcon from '../../../assets/card-bag.svg';
 
 const props = defineProps({
   product: {
@@ -147,12 +125,6 @@ onMounted(() => {
   // A cached image can finish before Vue attaches @load.
   if (primaryImg.value?.complete && primaryImg.value.naturalWidth > 0) imageSettled.value = true;
 });
-const isFavorite = computed(() => cartState.isInWishlist(props.product?.id));
-
-const toggleFavorite = () => {
-  cartState.toggleWishlist(props.product);
-};
-
 const productName = computed(() => {
   if (!props.product) return '';
   if (currentLang.value === 'ar') {
@@ -267,15 +239,6 @@ const getImageUrl = (path, id) => {
   return `${baseUrl.replace('/api', '')}/storage/${rawPath}`;
 };
 
-const hasMultipleImages = computed(() => {
-  return Array.isArray(props.product?.images) && props.product.images.length > 1;
-});
-
-const totalImagesCount = computed(() => {
-  if (Array.isArray(props.product?.images)) return props.product.images.length;
-  return props.product?.image ? 1 : 0;
-});
-
 const secondaryImageUrl = computed(() => {
   if (Array.isArray(props.product?.images) && props.product.images.length > 1) {
     return getImageUrl(props.product.images[1], null);
@@ -283,14 +246,6 @@ const secondaryImageUrl = computed(() => {
   return null;
 });
 
-const formatPrice = (price) => {
-  const num = parseFloat(price) || 0;
-  const hasDecimals = num % 1 !== 0;
-  return num.toLocaleString('en-US', { 
-    minimumFractionDigits: hasDecimals ? 2 : 0, 
-    maximumFractionDigits: 2 
-  });
-};
 </script>
 
 <style src="../styles/product-card.css" scoped></style>

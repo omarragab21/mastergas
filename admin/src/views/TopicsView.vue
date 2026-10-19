@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import api from '../config/axios';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx, locale } = useAdminText();
 
 // State
 const topics = ref([]);
@@ -11,7 +14,7 @@ const showViewModal = ref(false);
 const isEditing = ref(false);
 const currentTopic = ref(null);
 const isSubmitting = ref(false);
-const activeLang = ref('ar');
+const activeLang = ref(locale.value);
 
 const form = ref({
     title_ar: '',
@@ -182,9 +185,9 @@ const formatDate = (date) => {
   <div class="topics-page p-6">
     <!-- Breadcrumbs -->
     <div class="breadcrumb mb-4">
-       <span>لوحة التحكم الرئيسية</span>
+       <span>{{ tx('لوحة التحكم الرئيسية', 'Dashboard') }}</span>
        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-       <span class="active">صفحات الموقع</span>
+       <span class="active">{{ tx('صفحات الموقع', 'Website Pages') }}</span>
     </div>
 
     <!-- Header -->
@@ -195,15 +198,15 @@ const formatDate = (date) => {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </div>
                 <div>
-                    <h1>صفحات الموقع</h1>
-                    <p>إدارة صفحات الموقع والمحتوى التعريفي</p>
+                    <h1>{{ tx('صفحات الموقع', 'Website Pages') }}</h1>
+                    <p>{{ tx('إدارة صفحات الموقع والمحتوى التعريفي', 'Manage website pages and informational content') }}</p>
                 </div>
             </div>
         </div>
         <div class="left-actions">
             <button class="add-btn" @click="openAddModal">
                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-               إضافة صفحة جديدة
+               {{ tx('إضافة صفحة جديدة', 'Add Page') }}
             </button>
         </div>
         
@@ -213,7 +216,7 @@ const formatDate = (date) => {
     <div class="filter-card shadow-sm mb-6">
        <div class="search-wrapper">
           <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" v-model="searchQuery" placeholder="البحث عن صفحة..." class="search-input" />
+          <input type="text" v-model="searchQuery" :placeholder="tx('البحث عن صفحة...', 'Search pages...')" class="search-input" />
        </div>
     </div>
 
@@ -222,15 +225,15 @@ const formatDate = (date) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-title text-right">العنوان</th>
-            <th class="col-views">المشاهدات</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-title text-right">{{ tx('العنوان', 'Title') }}</th>
+            <th class="col-views">{{ tx('المشاهدات', 'Views') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="4">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredTopics.length === 0" class="state-row"><td colspan="4">لا توجد صفحات حالياً</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="4">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredTopics.length === 0" class="state-row"><td colspan="4">{{ tx('لا توجد صفحات حالياً', 'No pages yet') }}</td></tr>
           <template v-else>
             <tr v-for="topic in filteredTopics" :key="topic.id" class="data-row">
               <td class="col-title text-right">
@@ -244,16 +247,16 @@ const formatDate = (date) => {
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <a v-if="topic.slug" :href="'/' + topic.slug" target="_blank" class="action-btn website" title="عرض على الموقع">
+                  <a v-if="topic.slug" :href="'/' + String(topic.slug).replace(/^[\\/]+/, '')" target="_blank" rel="noopener noreferrer" class="action-btn website" :title="tx('عرض على الموقع', 'View on Website')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
-                  <button class="action-btn view" title="عرض" @click="openViewModal(topic)">
+                  <button class="action-btn view" :title="tx('عرض', 'View')" @click="openViewModal(topic)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button class="action-btn edit" title="تعديل" @click="openEditModal(topic)">
+                  <button class="action-btn edit" :title="tx('تعديل', 'Edit')" @click="openEditModal(topic)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn delete" title="حذف" @click="confirmDelete(topic)">
+                  <button class="action-btn delete" :title="tx('حذف', 'Delete')" @click="confirmDelete(topic)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -268,8 +271,8 @@ const formatDate = (date) => {
     <div class="modal-overlay" v-if="showFormModal" @click.self="showFormModal = false">
        <div class="modal-content form-modal fade-in">
           <div class="modal-header">
-             <h2>{{ isEditing ? 'تعديل الصفحة' : 'إضافة صفحة جديدة' }}</h2>
-             <p>أدخل تفاصيل محتوى الصفحة أدناه</p>
+             <h2>{{ isEditing ? tx('تعديل الصفحة', 'Edit Page') : tx('إضافة صفحة جديدة', 'Add Page') }}</h2>
+             <p>{{ tx('أدخل تفاصيل محتوى الصفحة أدناه', 'Enter the page content details below') }}</p>
              <button class="close-btn-top" @click="showFormModal = false">×</button>
           </div>
           <form @submit.prevent="submitForm">
@@ -280,21 +283,21 @@ const formatDate = (date) => {
                 </div>
                 <div class="form-grid">
                    <div class="form-group full-width">
-                      <label>عنوان الصفحة <span class="req">*</span></label>
+                      <label>{{ tx('عنوان الصفحة', 'Page Title') }} <span class="req">*</span></label>
                       <input v-show="activeLang === 'ar'" type="text" v-model="form.title_ar" placeholder="مثال: سياسة الخصوصية" />
                       <input v-show="activeLang === 'en'" type="text" v-model="form.title_en" placeholder="Page title in English" />
                    </div>
                    <div class="form-group full-width">
-                      <label>المحتوى <span class="req">*</span></label>
+                      <label>{{ tx('المحتوى', 'Content') }} <span class="req">*</span></label>
                       <textarea v-show="activeLang === 'ar'" v-model="form.content_ar" rows="6" placeholder="أدخل محتوى الصفحة هنا..."></textarea>
                       <textarea v-show="activeLang === 'en'" v-model="form.content_en" rows="6" placeholder="Page content in English..."></textarea>
                    </div>
                 </div>
              </div>
              <div class="modal-footer">
-                <button type="button" class="btn-cancel" @click="showFormModal = false">إلغاء</button>
+                <button type="button" class="btn-cancel" @click="showFormModal = false">{{ tx('إلغاء', 'Cancel') }}</button>
                 <button type="submit" class="btn-submit" :disabled="isSubmitting">
-                   {{ isSubmitting ? 'جاري الحفظ...' : (isEditing ? 'تحديث الصفحة' : 'إضافة الصفحة') }}
+                   {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (isEditing ? tx('تحديث الصفحة', 'Update Page') : tx('إضافة الصفحة', 'Add Page')) }}
                 </button>
              </div>
           </form>
@@ -307,35 +310,35 @@ const formatDate = (date) => {
           <button class="close-btn-x" @click="showViewModal = false">×</button>
           
           <div class="view-header">
-             <h2>تفاصيل الصفحة</h2>
-             <p>معلومات كاملة عن الصفحة</p>
+             <h2>{{ tx('تفاصيل الصفحة', 'Page Details') }}</h2>
+             <p>{{ tx('معلومات كاملة عن الصفحة', 'Complete page information') }}</p>
           </div>
 
           <div class="view-body-topic">
              <div class="topic-info-grid">
                 <div class="info-item">
-                   <span class="info-label">العنوان</span>
+                   <span class="info-label">{{ tx('العنوان', 'Title') }}</span>
                    <div class="info-value large">{{ currentTopic.title_i18n?.ar || currentTopic.title }}</div>
                 </div>
                 
                 <div class="info-grid-row">
                    <div class="info-item">
-                      <span class="info-label">المشاهدات</span>
-                      <div class="info-value">{{ currentTopic.views || 0 }} مشاهدة</div>
+                   <span class="info-label">{{ tx('المشاهدات', 'Views') }}</span>
+                      <div class="info-value">{{ currentTopic.views || 0 }} {{ tx('مشاهدة', 'views') }}</div>
                    </div>
                    <div class="info-item" v-if="currentTopic.slug">
-                      <span class="info-label">رابط الصفحة</span>
-                      <a :href="'/' + currentTopic.slug" target="_blank" class="topic-link">{{ '/' + currentTopic.slug }}</a>
+                   <span class="info-label">{{ tx('رابط الصفحة', 'Page URL') }}</span>
+                      <a :href="'/' + String(currentTopic.slug).replace(/^[\\/]+/, '')" target="_blank" rel="noopener noreferrer" class="topic-link">{{ '/' + String(currentTopic.slug).replace(/^[\\/]+/, '') }}</a>
                    </div>
                 </div>
 
                 <div class="info-item full-width">
-                  <span class="info-label">المحتوى</span>
+                  <span class="info-label">{{ tx('المحتوى', 'Content') }}</span>
                   <div class="info-value content-box">{{ currentTopic.content_i18n?.ar || currentTopic.content }}</div>
                </div>
 
                 <div class="info-item">
-                   <span class="info-label">الحالة</span>
+                   <span class="info-label">{{ tx('الحالة', 'Status') }}</span>
                    <span :class="['status-pill', currentTopic.status]">
                       {{ formatStatus(currentTopic.status) }}
                    </span>
@@ -344,7 +347,7 @@ const formatDate = (date) => {
           </div>
 
           <div class="view-footer-topic">
-             <button class="btn-primary-small" @click="showViewModal = false">إغلاق</button>
+             <button class="btn-primary-small" @click="showViewModal = false">{{ tx('إغلاق', 'Close') }}</button>
           </div>
        </div>
     </div>
@@ -357,7 +360,7 @@ const formatDate = (date) => {
 </template>
 
 <style scoped>
-.topics-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.topics-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Breadcrumbs */
 .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #9ca3af; }

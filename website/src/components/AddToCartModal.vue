@@ -89,6 +89,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { cartState } from '../store/cart';
 import { useLocalized } from '../composables/useLocalized';
+import { formatPrice } from '../utils/price';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -131,7 +132,7 @@ const displayPrice = computed(() => {
   const price = Number(product.value.price) || 0;
   const discount = Number(product.value.discount) || 0;
   const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
-  return Math.round(finalPrice).toLocaleString('en-US');
+  return formatPrice(finalPrice, { fraction: 'none' });
 });
 
 const closeToast = () => {
@@ -416,7 +417,7 @@ const onMouseLeave = () => {
 }
 
 .view-cart-btn:hover {
-  background-color: #27272a;
+  background: var(--color-button-hover);
 }
 
 .view-cart-btn:active {

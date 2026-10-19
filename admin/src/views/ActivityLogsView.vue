@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import api from '../config/axios';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
 
 // State
 const logs = ref([]);
@@ -84,9 +87,9 @@ const triggerAlert = (message, type = 'success') => {
   <div class="activity-page p-6">
     <!-- Breadcrumbs -->
     <div class="breadcrumb mb-4">
-       <span>لوحة التحكم الرئيسية</span>
+       <span>{{ tx('لوحة التحكم الرئيسية', 'Dashboard') }}</span>
        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-       <span class="active">سجل الأنشطة</span>
+       <span class="active">{{ tx('سجل الأنشطة', 'Activity Log') }}</span>
     </div>
 
     <!-- Header -->
@@ -97,8 +100,8 @@ const triggerAlert = (message, type = 'success') => {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
                 </div>
                 <div>
-                    <h1>تقارير لوحة التحكم</h1>
-                    <p>سجل نشاطات المديرين والإجراءات المتخذة</p>
+                    <h1>{{ tx('تقارير لوحة التحكم', 'Dashboard Reports') }}</h1>
+                    <p>{{ tx('سجل نشاطات المديرين والإجراءات المتخذة', 'Log of administrator activity and actions') }}</p>
                 </div>
             </div>
         </div>
@@ -109,22 +112,22 @@ const triggerAlert = (message, type = 'success') => {
        <div class="flex-row gap-4">
           <div class="search-wrapper flex-1">
              <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-             <input type="text" v-model="searchQuery" @input="fetchLogs" placeholder="البحث في النشاطات..." class="search-input" />
+             <input type="text" v-model="searchQuery" @input="fetchLogs" :placeholder="tx('البحث في النشاطات...', 'Search activity...')" class="search-input" />
           </div>
           
           <div class="select-wrapper">
              <select v-model="selectedActionType" @change="fetchLogs" class="form-select">
-                <option value="">جميع النشاطات</option>
-                <option value="order">الطلبات</option>
-                <option value="product">المنتجات</option>
-                <option value="user">المستخدمين</option>
-                <option value="setting">الإعدادات</option>
+                <option value="">{{ tx('جميع النشاطات', 'All Activity') }}</option>
+                <option value="order">{{ tx('الطلبات', 'Orders') }}</option>
+                <option value="product">{{ tx('المنتجات', 'Products') }}</option>
+                <option value="user">{{ tx('المستخدمين', 'Users') }}</option>
+                <option value="setting">{{ tx('الإعدادات', 'Settings') }}</option>
              </select>
           </div>
 
           <div class="select-wrapper">
              <select v-model="selectedAdmin" @change="fetchLogs" class="form-select">
-                <option value="">جميع المديرين</option>
+                <option value="">{{ tx('جميع المديرين', 'All Admins') }}</option>
                 <option v-for="admin in admins" :key="admin.id" :value="admin.id">{{ admin.name }}</option>
              </select>
           </div>
@@ -133,8 +136,8 @@ const triggerAlert = (message, type = 'success') => {
 
     <!-- Logs List -->
     <div class="logs-list">
-       <div v-if="loading" class="text-center p-10 color-gray">جاري التحميل...</div>
-       <div v-else-if="logs.length === 0" class="text-center p-10 color-gray">لا توجد سجلات مطابقة</div>
+       <div v-if="loading" class="text-center p-10 color-gray">{{ tx('جاري التحميل...', 'Loading...') }}</div>
+       <div v-else-if="logs.length === 0" class="text-center p-10 color-gray">{{ tx('لا توجد سجلات مطابقة', 'No matching activity logs') }}</div>
        <template v-else>
           <div v-for="log in logs" :key="log.id" class="log-card fade-in mb-4">
              <!-- Trash Icon Left -->
@@ -147,7 +150,7 @@ const triggerAlert = (message, type = 'success') => {
                 <div class="admin-part">
                    <div class="admin-names">
                       <span class="a-name">{{ log.admin_name }}</span>
-                      <span class="a-role">{{ log.admin_role || 'مدير' }}</span>
+                      <span class="a-role">{{ log.admin_role || tx('مدير', 'Admin') }}</span>
                    </div>
                    <div class="admin-avatar">
                       <img :src="log.admin_avatar" v-if="log.admin_avatar" />
@@ -189,7 +192,7 @@ const triggerAlert = (message, type = 'success') => {
 </template>
 
 <style scoped>
-.activity-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.activity-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Breadcrumbs */
 .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #9ca3af; }

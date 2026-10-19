@@ -241,13 +241,20 @@ export default {
         const orders = Array.isArray(raw) ? raw : (Array.isArray(raw.data) ? raw.data : [])
         order.value = orders.find(o => o.id == orderId || o.order_number == orderId)
 
-        // If not found in /orders/me, attempt direct single order lookup
+        // If not found in /orders/me, attempt direct single order lookup only if ownership matches
         if (!order.value && orderId) {
           try {
-            const singleRes = await api.get(`/frontend/orders/${orderId}`)
+            const safeOrderId = encodeURIComponent(String(orderId).trim())
+            const singleRes = await api.get(`/frontend/orders/${safeOrderId}`)
             const singleData = singleRes.data?.data || singleRes.data
             if (singleData && typeof singleData === 'object' && !Array.isArray(singleData)) {
-              order.value = singleData
+              const rawUser = localStorage.getItem('c_user') || sessionStorage.getItem('c_user')
+              const currentUser = rawUser ? JSON.parse(rawUser) : null
+              const currentUserId = currentUser?.id ?? currentUser?.user_id
+              const orderOwnerId = singleData.user_id ?? singleData.customer_id ?? singleData.user?.id ?? singleData.customer?.id
+              if (currentUserId == null || orderOwnerId == null || String(currentUserId) === String(orderOwnerId)) {
+                order.value = singleData
+              }
             }
           } catch (_) {
             // direct single order lookup not found or guest
@@ -278,6 +285,8 @@ export default {
       const grandTotal = (order.value.total || order.value.total_amount || 0).toFixed(2);
 
       const printWindow = window.open('', '_blank')
+      if (!printWindow) return
+      printWindow.opener = null
       printWindow.document.write(`
         <!DOCTYPE html>
         <html dir="${dir}">

@@ -230,7 +230,10 @@ const formattedContent = computed(() => {
   transition: 0.3s;
 }
 
-.btn-home:hover { background: #4a1936; transform: translateY(-2px); }
+.btn-home:hover {
+  background: var(--color-button-hover);
+transform: translateY(-2px);
+}
 
 .ltr-text { direction: ltr; }
 

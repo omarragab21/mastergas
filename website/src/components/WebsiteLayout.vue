@@ -4,7 +4,7 @@
       <!-- Top Bar / Announcement Bar -->
       <div class="top-bar">
         <div class="top-bar-container">
-          <span class="announcement-text">{{ currentLang === 'ar' ? 'شحن مجاني للطلبات فوق 500 ريال | ضمان شامل على جميع المنتجات' : ($t('topbar.free_shipping') || 'Free shipping on orders over 500 SAR | Comprehensive warranty on all products') }}</span>
+          <span class="announcement-text">{{ freeShippingAnnouncement }}</span>
         </div>
       </div>
 
@@ -12,7 +12,7 @@
       <nav class="navbar" :class="{ 'navbar-scrolled': isScrolled }">
         <div class="container nav-container">
           <!-- Logo (Right in RTL) -->
-          <router-link to="/" class="logo" aria-label="Mastergas Home">
+          <router-link to="/" class="logo" :aria-label="$t('common.home_aria')">
             <div class="logo-icon">
               <img :src="siteLogo || '/brand/mastergas-logo.png'" :alt="siteName || 'Mastergas'" class="site-logo-img">
             </div>
@@ -77,7 +77,6 @@
                     <div class="user-dropdown-header">
                       <p class="user-name">{{ authState.user?.name || authState.user?.full_name || $t('auth.customer') }}</p>
                       <p class="user-phone" dir="ltr" v-if="authState.user?.email || authState.user?.phone || currentUser?.phone">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                         {{ authState.user?.email || authState.user?.phone || currentUser?.phone || '' }}
                       </p>
                     </div>
@@ -128,8 +127,7 @@
                   <div class="user-dropdown-header">
                     <p class="user-name">{{ authState.user?.name || authState.user?.full_name || $t('auth.customer') }}</p>
                     <p class="user-phone" dir="ltr" v-if="authState.user?.email || authState.user?.phone || currentUser?.phone">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                      {{ authState.user?.email || authState.user?.phone || currentUser?.phone || '' }}
+                        {{ authState.user?.email || authState.user?.phone || currentUser?.phone || '' }}
                     </p>
                   </div>
                   <div class="user-dropdown-body">
@@ -261,25 +259,20 @@
             <router-link to="/" class="footer-logo">
               <img :src="footerLogo" alt="MASTERgas" class="footer-brand-logo-img" />
             </router-link>
-            <p class="footer-desc">
-              {{ currentLang === 'ar' 
-                  ? 'الرائد الأول في توفير الأجهزة المنزلية الإيطالية الفاخرة في المملكة العربية السعودية. جودة هندسية، أمان متكامل وأداء يدوم طويلاً.' 
-                  : 'The premier provider of luxury Italian home appliances in Saudi Arabia. Engineered quality, integrated safety, and long-lasting performance.' }}
-            </p>
+            <p v-if="localizedSiteDescription" class="footer-desc">{{ localizedSiteDescription }}</p>
+
+            <div v-if="sitePhone || siteEmail || localizedSiteAddress" class="footer-contact-info">
+              <a v-if="sitePhone" :href="`tel:${sitePhone}`" class="footer-contact-link footer-phone-link" dir="ltr">{{ sitePhone }}</a>
+              <a v-if="siteEmail" :href="`mailto:${siteEmail}`" class="footer-contact-link">{{ siteEmail }}</a>
+              <span v-if="localizedSiteAddress" class="footer-contact-link">{{ localizedSiteAddress }}</span>
+            </div>
             
-            <div class="footer-social-wrap">
-              <a :href="formatSocialUrl(socials.youtube, 'youtube') || 'https://youtube.com/'" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="YouTube">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-              </a>
-              <a :href="formatSocialUrl(socials.facebook, 'facebook') || 'https://facebook.com/'" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Facebook">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+            <div v-if="visibleSocials.length" class="footer-social-wrap">
+              <a v-for="social in visibleSocials" :key="social.key" :href="social.url" target="_blank" rel="noopener noreferrer" class="social-circle-btn" :aria-label="social.label">
+                <img v-if="footerSocialIcons[social.key]" :src="footerSocialIcons[social.key]" alt="" class="social-circle-img" />
+                <i v-else :class="['fab', social.icon]" aria-hidden="true"></i>
               </a>
             </div>
-
             <div class="footer-payment-wrap">
               <p class="payment-title">{{ currentLang === 'ar' ? 'طرق الدفع' : 'Payment Methods' }}</p>
               <div class="payment-badges-row">
@@ -292,10 +285,8 @@
                 <span class="pay-card-badge pay-mc">
                   <span class="pay-text">Mastercard</span>
                 </span>
-                <span class="pay-card-badge pay-apple">
-                  <svg width="11" height="13" viewBox="0 0 170 170" fill="#000">
-                    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.66-7.79-11.89-14.24-5.35-8.15-9.61-17.58-12.78-28.29-3.17-10.7-4.77-20.98-4.77-30.82 0-14.78 3.73-26.69 11.19-35.73 7.46-9.04 16.71-13.68 27.75-13.91 5.35 0 11.15 1.41 17.41 4.22 6.26 2.81 10.02 4.31 11.29 4.5 2.05-.44 6.07-2.02 12.06-4.74 5.99-2.72 11.51-3.97 16.56-3.74 12.74.76 22.84 5.57 30.3 14.43-11.22 6.74-16.71 16.14-16.48 28.21.23 9.46 3.84 17.39 10.84 23.79 7 6.4 15.28 10.15 24.84 11.26-2.02 6.09-4.5 12.18-7.45 18.28zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.95-10.18 19.95-11.98.22 1.3.33 2.45.33 3.44 0 7.28-2.83 14.28-8.49 21.01-5.66 6.74-12.56 10.5-20.7 11.28-.44-1.09-.67-2.22-.67-3.38z"/>
-                  </svg>
+                <span class="pay-card-badge pay-apple" dir="ltr">
+                  <span class="pay-apple-icon"><span class="pay-apple-inset"><img :src="footerAppleIcon" alt="" class="pay-apple-img" /></span></span>
                   <span class="pay-text">Pay</span>
                 </span>
               </div>
@@ -307,13 +298,13 @@
 
         <!-- Bottom Bar: Copyright on Right, Developer Tag on Left -->
         <div class="footer-bottom">
-          <p class="copyright">
-            {{ currentLang === 'ar' ? 'جميع الحقوق محفوظة .Mastergas 2026 ©' : 'All rights reserved .Mastergas 2026 ©' }}
+          <p class="copyright" dir="auto">
+            {{ currentLang === 'ar' ? '© 2026 Mastergas. جميع الحقوق محفوظة' : '© 2026 Mastergas. All rights reserved' }}
           </p>
-          <div class="developer-tag">
+          <p class="developer-tag" dir="auto">
             {{ currentLang === 'ar' ? 'تم التصميم والتطوير بواسطة' : 'Designed & Developed by' }}
             <a href="https://be-kite.com/" target="_blank" rel="noopener noreferrer" class="bekite-link">bekite</a>
-          </div>
+          </p>
         </div>
       </div>
     </footer>
@@ -323,6 +314,7 @@
 
     <!-- Cookie Consent Banner & Modal -->
     <CookieConsent ref="cookieConsent" />
+    <AppDialog />
   </div>
 </template>
 
@@ -336,10 +328,15 @@ import { authState, authActions } from '../store/auth';
 import AddToCartModal from './AddToCartModal.vue';
 import AuthModal from './AuthModal.vue';
 import CookieConsent from './CookieConsent.vue';
+import AppDialog from './AppDialog.vue';
 import WebsiteSearchModal from './WebsiteSearchModal.vue';
 import { isOfferActive } from '../modules/product/composables/useOffers';
+import footerFacebookIcon from '../assets/footer-facebook.svg';
+import footerYoutubeIcon from '../assets/footer-youtube.svg';
+import footerAppleSvg from '../assets/footer-apple.svg';
 import { settingsService } from '../services/settingsService';
 import { productService } from '../modules/product/services/productService';
+import { firstSetting, settingsToObject } from '../utils/siteSettings';
 
 const { locale } = useI18n();
 const router = useRouter();
@@ -351,6 +348,8 @@ const freeDeliveryThreshold = ref(null);
 const siteName = ref('');
 const siteLogo = ref('/brand/mastergas-logo.png');
 const footerLogo = ref('/brand/mastergas-logo-white.png');
+const footerSocialIcons = { facebook: footerFacebookIcon, youtube: footerYoutubeIcon };
+const footerAppleIcon = footerAppleSvg;
 const siteDescription = ref('');
 const sitePhone = ref('');
 const siteEmail = ref('');
@@ -360,6 +359,7 @@ const socials = reactive({
   instagram: '',
   twitter: '',
   x: '',
+  x_twitter: '',
   linkedin: '',
   youtube: '',
   snapchat: '',
@@ -369,20 +369,55 @@ const socials = reactive({
 
 const formatSocialUrl = (url, platform) => {
   if (!url || typeof url !== 'string') return '';
-  const trimmed = url.trim();
-  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '#') return '';
+  const trimmed = [...url].filter((char) => {
+    const code = char.charCodeAt(0);
+    return code > 31 && code !== 127;
+  }).join('').trim();
+  const schemeProbe = trimmed.replace(/\s+/g, '');
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '#' || /^(javascript|data|vbscript|file|blob):/i.test(schemeProbe)) return '';
   
   if (platform === 'whatsapp') {
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
     const cleanPhone = trimmed.replace(/[^0-9]/g, '');
     return cleanPhone ? `https://wa.me/${cleanPhone}` : '';
   }
-  
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
-  }
-  return `https://${trimmed}`;
+
+  const absolute = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed.replace(/^[\\/]+/, '')}`;
+  return isPlaceholderSocialUrl(absolute) ? '' : absolute;
 };
+
+// Admin placeholders such as "https://x.com/..." or a bare domain are not company accounts.
+const isPlaceholderSocialUrl = (url) => {
+  try {
+    const { pathname } = new URL(url);
+    const path = pathname.replace(/\/+$/, '');
+    const segments = path.split('/').filter(Boolean).map((segment) => segment.toLowerCase());
+    return !path
+      || /^\/?[.\u2026]+$/.test(path)
+      || /[.\u2026]{3}$/.test(path)
+      || segments.some((segment) => ['test', 'example', 'your-handle', 'yourusername'].includes(segment));
+  } catch {
+    return true;
+  }
+};
+
+const socialDefinitions = [
+  { key: 'facebook', label: 'Facebook', icon: 'fa-facebook-f' },
+  { key: 'instagram', label: 'Instagram', icon: 'fa-instagram' },
+  { key: 'youtube', label: 'YouTube', icon: 'fa-youtube' },
+  { key: 'whatsapp', label: 'WhatsApp', icon: 'fa-whatsapp' },
+  { key: 'x_twitter', label: 'X', icon: 'fa-x-twitter' },
+  { key: 'linkedin', label: 'LinkedIn', icon: 'fa-linkedin-in' },
+  { key: 'snapchat', label: 'Snapchat', icon: 'fa-snapchat-ghost' },
+  { key: 'tiktok', label: 'TikTok', icon: 'fa-tiktok' },
+];
+
+const visibleSocials = computed(() => socialDefinitions
+  .map((social) => ({
+    ...social,
+    url: formatSocialUrl(socials[social.key], social.key === 'whatsapp' ? 'whatsapp' : social.key),
+  }))
+  .filter((social) => social.url));
 
 const isMobileMenuOpen = ref(false);
 const authModal = ref(null);
@@ -394,6 +429,96 @@ const currentUser = computed(() => authState.user);
 
 const cartCount = computed(() => cartState.count);
 const currentLang = computed(() => locale.value);
+
+const localizedSiteDescription = computed(() => {
+  if (!siteDescription.value) return '';
+  if (typeof siteDescription.value === 'object') {
+    return siteDescription.value[currentLang.value] || siteDescription.value.ar || siteDescription.value.en || '';
+  }
+  return siteDescription.value;
+});
+
+const localizedSiteAddress = computed(() => {
+  if (!siteAddress.value) return '';
+  if (typeof siteAddress.value === 'object') {
+    return siteAddress.value[currentLang.value] || siteAddress.value.ar || siteAddress.value.en || '';
+  }
+  return siteAddress.value;
+});
+
+const isIrisAsset = (value) => {
+  if (!value) return false;
+  const text = String(value).toLowerCase();
+  return ['iris', 't3jcwn2n2rvkxvcva', 'dobvpg934hatbpm5', 'yugdc4mk4vmsf6el'].some((token) => text.includes(token));
+};
+
+const resolveAssetUrl = (value, fallback) => {
+  const cleaned = [...String(value ?? '')].filter((char) => {
+    const code = char.charCodeAt(0);
+    return code > 31 && code !== 127;
+  }).join('').trim();
+  if (!cleaned || /^(javascript|data|vbscript|file|blob):/i.test(cleaned.replace(/\s+/g, ''))) return fallback;
+  if (/^\/(?![/\\])/.test(cleaned) || /^https?:\/\//i.test(cleaned)) return cleaned;
+  if (cleaned.startsWith('//') || cleaned.startsWith('/\\')) return fallback;
+  return `${api.defaults.baseURL.replace('/api', '')}/storage/${cleaned.replace(/^[\\/]+/, '')}`;
+};
+
+const applySiteSettings = (rawSettings) => {
+  const normalized = settingsToObject(rawSettings);
+  if (!Object.keys(normalized).length) return;
+
+  const socialSetting = normalized.social_links;
+  const socialLinks = typeof socialSetting === 'string'
+    ? (() => { try { return JSON.parse(socialSetting); } catch { return {}; } })()
+    : (socialSetting && typeof socialSetting === 'object' ? socialSetting : {});
+  const getVal = (key) => normalized[key];
+  const getSocialVal = (key) => getVal(key) || socialLinks[key] || '';
+
+  const rawSiteName = getVal('site_name') || getVal('site_title');
+  if (rawSiteName && !isIrisAsset(rawSiteName)) siteName.value = rawSiteName;
+  if (getVal('site_description')) siteDescription.value = getVal('site_description');
+  sitePhone.value = getVal('support_phone') || getVal('phone_number') || getVal('site_contact_phone') || '';
+  siteEmail.value = getVal('support_email') || getVal('email') || '';
+  siteAddress.value = {
+    ar: getVal('address_ar') || getVal('address'),
+    en: getVal('address_en') || getVal('address'),
+  };
+  freeDeliveryThreshold.value = getVal('free_delivery_threshold') || getVal('delivery_range');
+
+  socials.facebook = getSocialVal('facebook');
+  socials.instagram = getSocialVal('instagram');
+  socials.twitter = getSocialVal('twitter') || getSocialVal('x_twitter') || getSocialVal('x_link');
+  socials.x = getSocialVal('x_twitter') || getSocialVal('twitter') || getSocialVal('x_link');
+  socials.x_twitter = getSocialVal('x_twitter') || getSocialVal('twitter') || getSocialVal('x_link');
+  socials.linkedin = getSocialVal('linkedin');
+  socials.youtube = getSocialVal('youtube');
+  socials.snapchat = getSocialVal('snapchat');
+  socials.tiktok = getSocialVal('tiktok');
+  socials.whatsapp = getSocialVal('whatsapp');
+
+  const logo = getVal('logo');
+  const footerLogoSetting = getVal('footer_logo');
+  siteLogo.value = logo && !isIrisAsset(logo) ? resolveAssetUrl(logo, '/brand/mastergas-logo.png') : siteLogo.value;
+  footerLogo.value = footerLogoSetting && !isIrisAsset(footerLogoSetting)
+    ? resolveAssetUrl(footerLogoSetting, '/brand/mastergas-logo-white.png')
+    : footerLogo.value;
+
+  const favicon = getVal('favicon');
+  const faviconLink = document.querySelector("link[rel~='icon']");
+  if (faviconLink && favicon && !isIrisAsset(favicon)) {
+    faviconLink.href = resolveAssetUrl(favicon, '/brand/mastergas-icon.png');
+  }
+};
+
+const freeShippingAnnouncement = computed(() => {
+  const threshold = Number(freeDeliveryThreshold.value);
+  if (Number.isFinite(threshold) && threshold > 0) {
+    return currentLang.value === 'ar'
+      ? `شحن مجاني للطلبات فوق ${threshold} ريال | ضمان شامل على جميع المنتجات`
+      : `Free shipping on orders over ${threshold} SAR | Comprehensive warranty on all products`;
+  }
+  return currentLang.value === 'ar' ? 'ضمان شامل على جميع المنتجات' : 'Comprehensive warranty on all products';
+});
 
 const openAuthModal = () => {
   if (authModal.value && typeof authModal.value.openModal === 'function') {
@@ -421,7 +546,7 @@ const handleAuthModalClose = () => {
   router.replace({ path: route.path, query });
 };
 
-// Make openAuthModal globally accessible for wishlist and cart operations
+// Make openAuthModal globally accessible for cart operations
 window.openAuthModal = openAuthModal;
 
 watch(() => route.fullPath, () => {
@@ -449,15 +574,7 @@ const handleUserClick = (e) => {
 
 const handleCartClick = () => {
   isMobileMenuOpen.value = false;
-
-  if (isLoggedIn.value) {
-    router.push('/cart');
-    return;
-  }
-
-  // Keep the intended destination so a successful login takes the customer
-  // directly to the cart they requested.
-  router.push({ path: '/', query: { openAuth: 'true', redirect: '/cart' } });
+  router.push('/cart');
 };
 
 const handleLogout = async () => {
@@ -468,21 +585,26 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 50;
 };
 
-const topics = ref([]);
-
 const fetchData = async () => {
+  const [settingsResult, offersResult] = await Promise.allSettled([
+    settingsService.getSettings(),
+    productService.getOffers({ is_active: 1 }),
+  ]);
+
   try {
-    const [settingsRes, couponsRes, offersRes, topicsRes] = await Promise.all([
-      settingsService.getSettings(),
-      api.get('/frontend/coupons'),
-      productService.getOffers({ is_active: 1 }),
-      settingsService.getTopics({ status: 'published' })
-    ]);
+    const settingsRes = settingsResult.status === 'fulfilled' ? settingsResult.value : null;
+    const offers = offersResult.status === 'fulfilled' ? offersResult.value : [];
     
     // Get settings
     const settings = settingsRes;
+    applySiteSettings(settings);
     if (Array.isArray(settings)) {
       const getVal = (key) => settings.find(s => s.key === key)?.value;
+      const socialSetting = getVal('social_links');
+      const socialLinks = typeof socialSetting === 'string'
+        ? (() => { try { return JSON.parse(socialSetting); } catch { return {}; } })()
+        : (socialSetting && typeof socialSetting === 'object' ? socialSetting : {});
+      const getSocialVal = (key) => getVal(key) || socialLinks[key] || '';
       
       const isIrisAsset = (val) => {
         if (!val) return false;
@@ -501,87 +623,95 @@ const fetchData = async () => {
       siteName.value = (rawSiteName && !isIrisAsset(rawSiteName)) ? rawSiteName : 'Mastergas';
 
       siteDescription.value = getVal('site_description');
-      sitePhone.value = getVal('support_phone') || getVal('phone_number') || '';
+      sitePhone.value = getVal('support_phone') || getVal('phone_number') || getVal('site_contact_phone') || '';
       siteEmail.value = getVal('support_email') || getVal('email') || '';
       siteAddress.value = {
         ar: getVal('address_ar') || getVal('address'),
         en: getVal('address_en') || getVal('address')
       };
 
-      socials.facebook = getVal('facebook');
-      socials.instagram = getVal('instagram');
-      socials.twitter = getVal('twitter') || getVal('x_twitter') || getVal('x_link');
-      socials.x = getVal('x_twitter') || getVal('twitter') || getVal('x_link');
-      socials.linkedin = getVal('linkedin');
-      socials.youtube = getVal('youtube');
-      socials.snapchat = getVal('snapchat');
-      socials.tiktok = getVal('tiktok');
-      socials.whatsapp = getVal('whatsapp');
+      socials.facebook = getSocialVal('facebook');
+      socials.instagram = getSocialVal('instagram');
+      socials.twitter = getSocialVal('twitter') || getSocialVal('x_twitter') || getSocialVal('x_link');
+      socials.x = getSocialVal('x_twitter') || getSocialVal('twitter') || getSocialVal('x_link');
+      socials.x_twitter = getSocialVal('x_twitter') || getSocialVal('twitter') || getSocialVal('x_link');
+      socials.linkedin = getSocialVal('linkedin');
+      socials.youtube = getSocialVal('youtube');
+      socials.snapchat = getSocialVal('snapchat');
+      socials.tiktok = getSocialVal('tiktok');
+      socials.whatsapp = getSocialVal('whatsapp');
 
       const faviconVal = getVal('favicon');
       const logoVal = getVal('logo');
       const footerLogoVal = getVal('footer_logo');
-      const resolveAssetUrl = (value) => {
-        if (!value) return '';
-        if (value.startsWith('/') || value.startsWith('http')) return value;
-        return `${api.defaults.baseURL.replace('/api', '')}/storage/${value}`;
+      const resolveAssetUrl = (value, fallback) => {
+        const cleaned = [...String(value ?? '')].filter((char) => {
+          const code = char.charCodeAt(0);
+          return code > 31 && code !== 127;
+        }).join('').trim();
+        if (!cleaned || /^(javascript|data|vbscript|file|blob):/i.test(cleaned.replace(/\s+/g, ''))) return fallback;
+        if (/^\/(?![/\\])/.test(cleaned) || /^https?:\/\//i.test(cleaned)) return cleaned;
+        if (cleaned.startsWith('//') || cleaned.startsWith('/\\')) return fallback;
+        return `${api.defaults.baseURL.replace('/api', '')}/storage/${cleaned.replace(/^[\\/]+/, '')}`;
       };
       
       if (logoVal && !isIrisAsset(logoVal)) {
-        siteLogo.value = resolveAssetUrl(logoVal);
+        siteLogo.value = resolveAssetUrl(logoVal, '/brand/mastergas-logo.png');
       } else {
         siteLogo.value = '/brand/mastergas-logo.png';
       }
 
       if (footerLogoVal && !isIrisAsset(footerLogoVal)) {
-        footerLogo.value = resolveAssetUrl(footerLogoVal);
+        footerLogo.value = resolveAssetUrl(footerLogoVal, '/brand/mastergas-logo-white.png');
       } else {
         footerLogo.value = '/brand/mastergas-logo-white.png';
       }
 
       // Update Favicon (Mastergas favicon, ignore legacy Iris)
       const finalFavicon = (faviconVal && !isIrisAsset(faviconVal))
-        ? resolveAssetUrl(faviconVal)
+        ? resolveAssetUrl(faviconVal, '/brand/mastergas-icon.png')
         : '/brand/mastergas-icon.png';
 
       const faviconLink = document.querySelector("link[rel~='icon']");
       if (faviconLink) {
         faviconLink.href = finalFavicon;
       }
+    } else if (settings && typeof settings === 'object') {
+      // The Site API returns settings as a flat object with a nested social_links map.
+      const normalizedSettings = settingsToObject(settings);
+      const pick = (...keys) => firstSetting(normalizedSettings, ...keys) || '';
+      freeDeliveryThreshold.value = pick('free_delivery_threshold', 'delivery_range');
+      siteDescription.value = pick('site_description');
+      sitePhone.value = pick('support_phone', 'phone_number', 'site_contact_phone');
+      siteEmail.value = pick('support_email', 'email');
+      siteAddress.value = {
+        ar: pick('address_ar', 'address'),
+        en: pick('address_en', 'address'),
+      };
+      socials.facebook = pick('facebook');
+      socials.instagram = pick('instagram');
+      socials.twitter = pick('twitter', 'x_twitter', 'x_link');
+      socials.x = pick('x_twitter', 'twitter', 'x_link');
+      socials.x_twitter = pick('x_twitter', 'twitter', 'x_link');
+      socials.linkedin = pick('linkedin');
+      socials.youtube = pick('youtube');
+      socials.snapchat = pick('snapchat');
+      socials.tiktok = pick('tiktok');
+      socials.whatsapp = pick('whatsapp', 'site_contact_phone', 'support_phone');
     }
 
-    // Get latest active & valid promo (from offers or coupons)
-    const coupons = couponsRes?.data?.data || couponsRes?.data || [];
-    const offers = offersRes || [];
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const todayStr = `${year}-${month}-${day}`;
-
-    const validCoupons = (Array.isArray(coupons) ? coupons : []).filter(c => {
-      if (c.is_valid === false || c.is_active === false || c.is_public === false) return false;
-      if (c.end_date && todayStr > String(c.end_date).split('T')[0].trim()) return false;
-      if (c.start_date && todayStr < String(c.start_date).split('T')[0].trim()) return false;
-      return true;
-    });
-
+    // Get the latest active offer from the supported Site API.
     const validOffers = (Array.isArray(offers) ? offers : []).filter(isOfferActive);
 
-    const allPromos = [...validOffers, ...validCoupons];
-    latestCoupon.value = allPromos.length > 0 ? allPromos[0] : null;
-
-    // Topics
-    topics.value = topicsRes || [];
+    latestCoupon.value = validOffers.length > 0 ? validOffers[0] : null;
   } catch (error) {
-    console.warn('Top bar promo data unavailable from API, using clean default state:', error.message);
+    console.warn('Top bar promo data unavailable from API, using clean default state:', error?.message);
   }
 };
 
 const fetchCategories = async () => {
   try {
-    const list = await productService.getCategories();
+    const list = await productService.getCategories({ is_active: 1 });
     categories.value = Array.isArray(list) ? list : [];
   } catch (err) {
     console.error('Failed to fetch categories from API:', err);
@@ -599,6 +729,7 @@ const toggleLanguage = () => {
 };
 
 onMounted(() => {
+  fetchData();
   fetchCategories();
   cartState.syncWithToken();
   authActions.init();
@@ -1388,7 +1519,7 @@ onUnmounted(() => {
 }
 
 .search-submit-btn:hover {
-  background: #4a1936;
+  background: var(--color-button-hover);
 }
 
 .search-results {
@@ -1528,13 +1659,12 @@ html[dir="rtl"] .whatsapp-float {
   flex: 1;
 }
 
-/* Main Footer Styles - Exact Mockup Replica */
+/* Main Footer Styles - Figma footer (node 2:473) */
 .main-footer {
   background: #000000;
   color: #ffffff;
-  padding: 42px 0 28px;
+  padding: 40px 0;
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-family: 'IBM Plex Sans Arabic', sans-serif;
 }
 
@@ -1545,6 +1675,9 @@ html[dir="rtl"] .whatsapp-float {
   padding-right: 64px !important;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 .footer-grid {
@@ -1553,11 +1686,14 @@ html[dir="rtl"] .whatsapp-float {
   align-items: flex-start;
   width: 100%;
   gap: 32px;
-  margin-bottom: 28px;
 }
 
 .footer-col {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
 }
 
 .lang-ar .footer-grid,
@@ -1575,11 +1711,12 @@ html[dir="rtl"] .whatsapp-float {
 /* Col 1, 2, 3: Store, Account, Support */
 .footer-title {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 18px 0;
-  line-height: 1.2;
+  margin: 0;
+  line-height: normal;
+  white-space: nowrap;
 }
 
 .footer-title::after {
@@ -1592,6 +1729,7 @@ html[dir="rtl"] .whatsapp-float {
   margin: 0;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 12px;
 }
 
@@ -1602,70 +1740,98 @@ html[dir="rtl"] .whatsapp-float {
 
 .footer-links a {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  color: #8f94a0;
+  color: #ffffff;
+  opacity: 0.7;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
-  transition: color 0.2s ease;
-  display: inline-block;
-  line-height: 1.4;
+  transition: opacity 0.2s ease;
+  display: block;
+  line-height: normal;
+  white-space: nowrap;
 }
 
 .footer-links a:hover {
   color: #ffffff;
+  opacity: 1;
 }
 
-/* Col 4: Brand Column (Left in RTL, Right in LTR) */
+/* Col 4: Brand Column */
 .footer-col-brand {
-  display: flex;
-  flex-direction: column;
+  width: 320px;
+  max-width: 100%;
   align-items: flex-start;
-  text-align: right;
-}
-
-[dir="rtl"] .footer-col-brand,
-.lang-ar .footer-col-brand {
-  align-items: flex-start;
-  text-align: right;
+  text-align: start;
 }
 
 .footer-logo {
-  display: inline-block;
-  margin-bottom: 14px;
+  display: block;
+  width: 140px;
+  height: 35px;
   text-decoration: none;
 }
 
 .footer-brand-logo-img {
-  height: 22px;
-  max-width: 130px;
-  width: auto;
+  width: 140px;
+  height: 35px;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 
 .footer-desc {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  color: #8f94a0;
-  line-height: 1.65;
-  font-size: 12px;
+  color: #ffffff;
+  opacity: 0.7;
+  line-height: normal;
+  font-size: 14px;
   font-weight: 400;
-  margin: 0 0 16px 0;
-  max-width: 290px;
+  margin: 0;
+  width: 100%;
+  text-align: start;
 }
 
-/* Social icons: circular dark buttons */
+.footer-contact-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.footer-contact-link {
+  color: #ffffff;
+  opacity: 0.7;
+  font-size: 14px;
+  line-height: normal;
+  text-decoration: none;
+}
+
+/* Phone keeps its "+" in front of the digits and sits on the start side (right in Arabic) */
+.footer-phone-link {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+a.footer-contact-link:hover {
+  opacity: 1;
+}
+
+/* Social icons: 40px glass circles */
 .footer-social-wrap {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .social-circle-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #141517;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1675,61 +1841,97 @@ html[dir="rtl"] .whatsapp-float {
 }
 
 .social-circle-btn:hover {
-  background: #252830;
+  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+}
+
+.social-circle-img {
+  display: block;
+  width: 20px;
+  height: 16px;
 }
 
 /* Payment Methods */
 .footer-payment-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 20px;
 }
 
 .payment-title {
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: #8f94a0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #ffffff;
   margin: 0;
-  text-align: right;
+  line-height: normal;
+  text-align: start;
+  white-space: nowrap;
 }
 
 .payment-badges-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
+  gap: 12px;
   flex-wrap: wrap;
+  overflow: hidden;
 }
 
 .pay-card-badge {
   background: #ffffff;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 3.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  gap: 2px;
+  box-sizing: border-box;
+}
+
+.pay-card-badge.pay-apple {
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
 }
 
 .pay-card-badge .pay-text {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
   color: #000000;
-  letter-spacing: -0.2px;
-  line-height: 1;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.pay-apple-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.pay-apple-inset {
+  position: absolute;
+  inset: 5.21% 13.54% 5.2% 13.54%;
+}
+
+/* The exported Apple glyph is stored vertically flipped; the design flips it back */
+.pay-apple-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  transform: scaleY(-1);
 }
 
 /* Divider Line */
 .footer-divider {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.07);
-  margin: 28px 0 20px 0;
+  background: rgba(255, 255, 255, 0.0784314);
+  margin: 0;
+  flex-shrink: 0;
 }
 
 /* Bottom Bar */
@@ -1738,36 +1940,38 @@ html[dir="rtl"] .whatsapp-float {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  width: 100%;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 11.5px;
-  color: #64748b;
+  color: #ffffff;
   padding: 0;
   border-top: none;
+  line-height: normal;
+  white-space: nowrap;
 }
 
 .copyright {
   margin: 0;
-  color: #64748b;
+  color: #ffffff;
+  opacity: 0.5;
+  font-size: 14px;
   font-weight: 400;
 }
 
 .developer-tag {
-  color: #64748b;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  margin: 0;
+  color: #ffffff;
+  opacity: 0.5;
+  font-size: 12px;
   font-weight: 400;
 }
 
 .bekite-link {
-  color: #8f94a0;
+  color: inherit;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
 }
 
 .bekite-link:hover {
-  color: #ffffff;
+  text-decoration: underline;
 }
 
 @media (max-width: 960px) {

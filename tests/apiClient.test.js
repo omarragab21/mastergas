@@ -59,6 +59,39 @@ test('getCached deduplicates concurrent requests and respects TTL', async () => 
   }
 });
 
+test('getCached serves stale public data while refreshing in the background', async () => {
+  apiClient.clearApiCache();
+  let calls = 0;
+  const originalGet = api.get;
+  api.get = async () => {
+    calls += 1;
+    if (calls === 1) return { data: { data: [{ id: 1 }] } };
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    return { data: { data: [{ id: 2 }] } };
+  };
+
+  try {
+    const first = await apiClient.getCached('/v1/site/settings', {}, { ttl: 20, retries: 0 });
+    assert.equal(apiClient.parseCollectionResponse(first).items[0].id, 1);
+
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    const stale = await apiClient.getCached('/v1/site/settings', {}, {
+      ttl: 20,
+      retries: 0,
+      staleWhileRevalidate: true,
+    });
+    assert.equal(apiClient.parseCollectionResponse(stale).items[0].id, 1);
+    assert.equal(calls, 2);
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const refreshed = await apiClient.getCached('/v1/site/settings', {}, { ttl: 20, retries: 0 });
+    assert.equal(apiClient.parseCollectionResponse(refreshed).items[0].id, 2);
+  } finally {
+    api.get = originalGet;
+    apiClient.clearApiCache();
+  }
+});
+
 test('getCached retries GET 5xx once with bounded retry policy', async () => {
   apiClient.clearApiCache();
   let calls = 0;
@@ -123,5 +156,161 @@ test('Axios Request Interceptor: storefront requests use the customer token, not
     assert.equal(config.headers.Authorization, 'Bearer customer-token');
   } finally {
     globalThis.localStorage = previous;
+  }
+});
+
+const installStorage = () => {
+  const data = new Map();
+  globalThis.localStorage = {
+    get length() { return data.size; },
+    key: (index) => [...data.keys()][index] ?? null,
+    getItem: (key) => (data.has(key) ? data.get(key) : null),
+    setItem: (key, value) => { data.set(key, String(value)); },
+    removeItem: (key) => { data.delete(key); },
+    clear: () => data.clear(),
+  };
+  return data;
+};
+
+const stubApi = (handler) => {
+  const originalGet = api.get;
+  api.get = async (...args) => handler(...args);
+  return () => { api.get = originalGet; };
+};
+
+test('persistent cache: a reload renders from the stored copy without waiting for the network', async () => {
+  const storage = installStorage();
+  apiClient.clearApiCache();
+  let calls = 0;
+  const restore = stubApi(async () => { calls += 1; return { data: { data: [{ id: calls }] } }; });
+  try {
+    await apiClient.getCached('/v1/site/categories', {}, { ttl: 20, retries: 0, staleWhileRevalidate: true });
+    await new Promise((resolve) => setTimeout(resolve, 10)); // let the deferred write run
+    assert.ok([...storage.keys()].some((key) => key.startsWith('mg:api:v1:/v1/site/categories')));
+
+    apiClient.clearMemoryCache(); // simulate a page reload
+    await new Promise((resolve) => setTimeout(resolve, 30)); // the stored copy is now past its TTL
+    const result = await apiClient.getCached('/v1/site/categories', {}, { ttl: 20, retries: 0, staleWhileRevalidate: true });
+    assert.deepEqual(result, { data: [{ id: 1 }] }, 'stale copy is returned immediately');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(calls, 2, 'and refreshed in the background');
+  } finally {
+    restore();
+    apiClient.clearApiCache();
+  }
+});
+
+test('persistent cache: customer endpoints are never written to storage', async () => {
+  const storage = installStorage();
+  apiClient.clearApiCache();
+  const restore = stubApi(async () => ({ data: { data: [{ secret: true }] } }));
+  try {
+    await apiClient.getCached('/v1/site/orders', {}, { ttl: 1000, retries: 0 });
+    await apiClient.getCached('/v1/site/returns', {}, { ttl: 1000, retries: 0 });
+    await apiClient.getCached('/frontend/wallet', {}, { ttl: 1000, retries: 0 });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(storage.size, 0);
+  } finally {
+    restore();
+    apiClient.clearApiCache();
+  }
+});
+
+test('cache keys include the language so switching language never serves the other one', async () => {
+  const storage = installStorage();
+  apiClient.clearApiCache();
+  const restore = stubApi(async () => ({ data: { data: [{ name: localStorage.getItem('lang') }] } }));
+  try {
+    storage.set('lang', 'ar');
+    const ar = await apiClient.getCached('/v1/site/categories', {}, { ttl: 60000, retries: 0 });
+    storage.set('lang', 'en');
+    const en = await apiClient.getCached('/v1/site/categories', {}, { ttl: 60000, retries: 0 });
+    assert.equal(ar.data[0].name, 'ar');
+    assert.equal(en.data[0].name, 'en');
+    storage.set('lang', 'ar');
+    assert.equal((await apiClient.getCached('/v1/site/categories', {}, { ttl: 60000, retries: 0 })).data[0].name, 'ar');
+    await new Promise((resolve) => setTimeout(resolve, 10)); // flush deferred writes
+  } finally {
+    restore();
+    apiClient.clearApiCache();
+  }
+});
+
+test('stale-if-error: an expired copy is served when the API is down, and old/corrupt storage is ignored', async () => {
+  const storage = installStorage();
+  apiClient.clearApiCache();
+  let fail = false;
+  const restore = stubApi(async () => {
+    if (fail) { const error = new Error('down'); error.response = { status: 503 }; throw error; }
+    return { data: { data: ['ok'] } };
+  });
+  try {
+    await apiClient.getCached('/v1/site/settings', {}, { ttl: 5, retries: 0 });
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    fail = true;
+    const result = await apiClient.getCached('/v1/site/settings', {}, { ttl: 5, retries: 0 });
+    assert.deepEqual(result, { data: ['ok'] });
+
+    apiClient.clearMemoryCache();
+    const key = [...storage.keys()].find((name) => name.startsWith('mg:api:v1:/v1/site/settings'));
+    storage.set(key, '{not json');
+    await assert.rejects(apiClient.getCached('/v1/site/settings', {}, { ttl: 5, retries: 0 }));
+    assert.ok(!storage.has(key) || storage.get(key) !== '{not json', 'corrupt entry is discarded');
+  } finally {
+    restore();
+    apiClient.clearApiCache();
+  }
+});
+
+test('persistent cache stays inside its storage budget', async () => {
+  const storage = installStorage();
+  apiClient.clearApiCache();
+  const big = 'x'.repeat(500 * 1000);
+  const restore = stubApi(async () => ({ data: { data: [big] } }));
+  try {
+    for (let page = 1; page <= 8; page += 1) {
+      await apiClient.getCached('/v1/site/offers', { page }, { ttl: 1000, retries: 0 });
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+    const total = [...storage.entries()].filter(([key]) => key.startsWith('mg:api:v1:')).reduce((sum, [, value]) => sum + value.length, 0);
+    assert.ok(total <= 3 * 1000 * 1000 + 600 * 1000, `stored ${total} chars`);
+  } finally {
+    restore();
+    apiClient.clearApiCache();
+  }
+});
+
+test('refresh interval: one shared setting drives every data group (default 30 minutes)', async () => {
+  const cache = await viteServer.ssrLoadModule('/src/config/cache.js');
+  assert.equal(cache.REFRESH_MINUTES, 30);
+  assert.equal(cache.REFRESH_INTERVAL_MS, 30 * 60 * 1000);
+  for (const [group, ttl] of Object.entries(cache.API_TTL)) {
+    assert.equal(ttl, 30 * 60 * 1000, `${group} follows the shared interval`);
+  }
+  assert.strictEqual(apiClient.API_TTL, cache.API_TTL);
+});
+
+test('refresh interval: data is fetched once, reused inside the interval, fetched again after it', async () => {
+  installStorage();
+  apiClient.clearApiCache();
+  let calls = 0;
+  const restore = stubApi(async () => { calls += 1; return { data: { data: [calls] } }; });
+  try {
+    const options = { ttl: 40, retries: 0, staleWhileRevalidate: true };
+    await apiClient.getCached('/v1/site/products/featured', {}, options);
+    apiClient.clearMemoryCache(); // new visit inside the interval
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await apiClient.getCached('/v1/site/products/featured', {}, options);
+    assert.equal(calls, 1, 'no request while the stored copy is still fresh');
+
+    await new Promise((resolve) => setTimeout(resolve, 50)); // interval passes
+    apiClient.clearMemoryCache(); // next visit
+    const shown = await apiClient.getCached('/v1/site/products/featured', {}, options);
+    assert.deepEqual(shown, { data: [1] }, 'old copy is shown instantly');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(calls, 2, 'and a new request refreshes it');
+  } finally {
+    restore();
+    apiClient.clearApiCache();
   }
 });

@@ -78,11 +78,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <button type="button" class="eye-btn" @click="showLoginPassword = !showLoginPassword" :aria-label="showLoginPassword ? t('auth.hide_password') || 'Hide password' : t('auth.show_password') || 'Show password'">
                 <transition name="eye-anim" mode="out-in">
-                  <svg v-if="showLoginPassword" key="open" width="20" height="20" viewBox="0 0 20 20" fill="none" class="eye-svg eye-open-svg" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="eye-contour" />
-                    <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" class="eye-iris" />
-                    <circle cx="10" cy="10" r="1.3" fill="currentColor" class="eye-pupil" />
-                  </svg>
+                  <PasswordEyeIcon v-if="showLoginPassword" key="open" class="eye-svg eye-open-svg" />
                   <svg v-else key="closed" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="eye-svg eye-closed-svg" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                   </svg>
@@ -140,36 +136,13 @@
 
           <div class="form-group">
             <label>{{ t('auth.phone') }}</label>
-            <div class="phone-input-wrapper">
-              <!-- Country Dropdown Selector Box -->
-              <div class="country-selector-box">
-                <span class="country-dial-badge">{{ activeCountryObj.dialCode }}</span>
-                <span class="country-flag-badge">{{ activeCountryObj.flag }}</span>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-                <select v-model="selectedCountry" class="native-country-select" :dir="currentDir" :aria-label="t('auth.country')">
-                  <option 
-                    v-for="c in countries"
-                    :key="c.code" 
-                    :value="c.code"
-                  >
-                    {{ c.dialCode }} {{ c.flag }} - {{ isRtl ? c.nameAr : c.nameEn }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- Phone Number Input -->
-              <input 
-                type="tel" 
-                v-model="registerForm.phone" 
-                class="phone-field"
-                :placeholder="activeCountryObj.placeholder" 
-                :maxlength="activeCountryObj.maxLength" 
-                :aria-invalid="Boolean(errors.phone)"
-                dir="ltr" 
-              />
-            </div>
+            <PhoneCountryInput
+              v-model="registerForm.phone"
+              v-model:country="selectedCountry"
+              :error="Boolean(errors.phone)"
+              :dir="currentDir"
+              :country-label="t('auth.country')"
+            />
             <span v-if="errors.phone" class="inline-error-msg">{{ errors.phone }}</span>
           </div>
 
@@ -180,11 +153,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <button type="button" class="eye-btn" @click="showRegisterPassword = !showRegisterPassword" :aria-label="showRegisterPassword ? t('auth.hide_password') || 'Hide password' : t('auth.show_password') || 'Show password'">
                 <transition name="eye-anim" mode="out-in">
-                  <svg v-if="showRegisterPassword" key="open" width="20" height="20" viewBox="0 0 20 20" fill="none" class="eye-svg eye-open-svg" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="eye-contour" />
-                    <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" class="eye-iris" />
-                    <circle cx="10" cy="10" r="1.3" fill="currentColor" class="eye-pupil" />
-                  </svg>
+                  <PasswordEyeIcon v-if="showRegisterPassword" key="open" class="eye-svg eye-open-svg" />
                   <svg v-else key="closed" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="eye-svg eye-closed-svg" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                   </svg>
@@ -238,9 +207,11 @@
 import { ref, reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import PasswordEyeIcon from './PasswordEyeIcon.vue'
+import PhoneCountryInput from './PhoneCountryInput.vue'
 import { authActions, authState } from '../store/auth'
 import api from '../config/axios'
-import { countries, findCountryByCode, validatePhoneByCountry } from '../data/countries'
+import { validatePhoneByCountry } from '../data/countries'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -266,9 +237,6 @@ const rememberMe = ref(typeof localStorage !== 'undefined' && localStorage.getIt
 
 const selectedCountry = ref('JO')
 
-const activeCountryObj = computed(() => {
-  return findCountryByCode(selectedCountry.value)
-})
 
 const loginForm = reactive({
   email: '',
@@ -405,7 +373,16 @@ const closeModal = () => {
 
 const getPostAuthRedirect = () => {
   const redirect = route.query.redirect
-  if (typeof redirect !== 'string' || !redirect.startsWith('/') || redirect.startsWith('//')) {
+  if (
+    typeof redirect !== 'string' ||
+    !redirect.startsWith('/') ||
+    redirect.startsWith('//') ||
+    redirect.startsWith('/\\') ||
+    [...redirect].some((char) => {
+      const code = char.charCodeAt(0);
+      return code <= 31 || code === 127 || char === '\\';
+    })
+  ) {
     return ''
   }
   return redirect
@@ -614,7 +591,7 @@ defineExpose({
 }
 
 .reset-success-btn:hover {
-  background: #161616;
+  background: var(--color-button-hover);
 }
 
 .modal-header {
@@ -770,8 +747,7 @@ defineExpose({
 }
 
 .input-wrapper input:focus,
-.country-search-input:focus,
-.phone-input-wrapper:focus-within {
+.country-search-input:focus {
   border-color: #000000;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
 }
@@ -793,7 +769,7 @@ defineExpose({
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #6b7280;
+  color: #161616;
   cursor: pointer;
   padding: 0;
   display: inline-flex;
@@ -801,12 +777,12 @@ defineExpose({
   justify-content: center;
   width: 24px;
   height: 24px;
-  transition: color 0.2s, transform 0.15s ease;
+  transition: opacity 0.2s, transform 0.15s ease;
   z-index: 2;
 }
 
 .eye-btn:hover {
-  color: #111827;
+  opacity: 0.7;
 }
 
 .eye-btn:active {
@@ -825,14 +801,15 @@ defineExpose({
   animation: eye-open-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-.eye-open-svg .eye-contour {
-  transform-origin: 10px 10px;
+/* Inner paths belong to PasswordEyeIcon; their origin is the eye's center in the icon's own coordinates */
+.eye-open-svg :deep(.eye-contour) {
+  transform-origin: 8.9583px 8.125px;
   animation: eye-lid-open 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-.eye-open-svg .eye-iris,
-.eye-open-svg .eye-pupil {
-  transform-origin: 10px 10px;
+.eye-open-svg :deep(.eye-iris),
+.eye-open-svg :deep(.eye-pupil) {
+  transform-origin: 8.9583px 8.125px;
   animation: eye-pupil-reveal 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
@@ -915,107 +892,6 @@ defineExpose({
   opacity: 0;
 }
 
-.phone-input-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 48px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background: #ffffff;
-  overflow: hidden;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-
-.phone-input-wrapper:focus-within {
-  border-color: #000000;
-}
-
-.country-selector-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 100%;
-  padding: 0 10px;
-  background: #f9fafb;
-  border-left: 1px solid #e5e7eb;
-  position: relative;
-  flex-shrink: 0;
-  cursor: pointer;
-  user-select: none;
-  box-sizing: border-box;
-}
-
-
-.country-dial-badge {
-  font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: #1f2937;
-  direction: ltr;
-  line-height: 1;
-}
-
-.country-flag-badge {
-  font-size: 16px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
-
-.chevron-icon {
-  color: #6b7280;
-  margin-right: 2px;
-  flex-shrink: 0;
-}
-
-.native-country-select {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  border: none;
-  margin: 0;
-  padding: 0;
-  appearance: none;
-  -webkit-appearance: none;
-  z-index: 10;
-}
-
-.native-country-select option {
-  opacity: 1;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 10px;
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 14px;
-  direction: rtl;
-  text-align: right;
-}
-
-.phone-field {
-  flex: 1;
-  height: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 0 14px;
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
-  text-align: right;
-  box-sizing: border-box;
-}
-
-.phone-field::placeholder {
-  color: #9ca3af;
-}
 
 .inline-error-msg {
   color: #dc2626;
@@ -1034,23 +910,6 @@ defineExpose({
   line-height: 1.5;
 }
 
-.phone-input-wrapper input {
-  flex: 1;
-  padding: 14px 16px;
-  border: none;
-  font-size: 14px;
-  outline: none;
-}
-
-.phone-input-wrapper .input-icon {
-  position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  pointer-events: none;
-  z-index: 1;
-}
 
 .forgot-password {
   text-align: right;
@@ -1109,7 +968,7 @@ defineExpose({
 }
 
 .submit-btn:hover {
-  background: #4a1936;
+  background: var(--color-button-hover);
 }
 
 .submit-btn:disabled {
@@ -1184,14 +1043,6 @@ defineExpose({
   text-align: left;
 }
 
-.auth-modal-content[dir="ltr"] .phone-field {
-  text-align: left;
-}
-
-.auth-modal-content[dir="ltr"] .country-selector-box {
-  border-left: none;
-  border-right: 1px solid #e5e7eb;
-}
 
 .auth-modal-content[dir="ltr"] .forgot-password {
   text-align: left;

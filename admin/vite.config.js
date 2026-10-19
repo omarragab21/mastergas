@@ -7,6 +7,12 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [vue()],
+  define: {
+    // vue-i18n compiles messages with new Function() by default, which the
+    // admin's CSP (script-src 'self', no 'unsafe-eval') blocks. JIT mode
+    // interprets the message AST instead, so no eval is needed.
+    __INTLIFY_JIT_COMPILATION__: true,
+  },
   server: {
     port: 5174,
     cors: true,

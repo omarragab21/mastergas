@@ -426,7 +426,7 @@ const processPaytabsOrder = async () => {
       orderError.value = '';
       startOfflineWatcher();
     } else {
-      orderError.value = 'تعذر إرسال بيانات الطلب إلى السيرفر. يرجى إعادة المحاولة.';
+      orderError.value = tr('checkout.err_server_submit', 'تعذر إرسال بيانات الطلب إلى السيرفر. يرجى إعادة المحاولة.');
     }
   } finally {
     try {

@@ -1,6 +1,7 @@
 import { onUnmounted, ref, watch } from 'vue';
 import { isCancelledRequest } from '../../../config/axios';
 import { productService } from '../services/productService';
+import { API_TTL } from '../../../config/cache';
 
 export function useProductSearch() {
   const query = ref('');
@@ -32,7 +33,7 @@ export function useProductSearch() {
     try {
       const result = await productService.getProducts(
         { search: normalizedQuery, per_page: 8, is_active: 1 },
-        { signal: currentController.signal, ttl: 45 * 1000 }
+        { signal: currentController.signal, ttl: API_TTL.products }
       );
       if (currentSequence === sequence && !currentController.signal.aborted) {
         results.value = result.items;

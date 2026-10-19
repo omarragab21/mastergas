@@ -26,6 +26,59 @@
   --table-hover: #f9fafb;
 }
 
+/* Mastergas Tijara — Color System (Figma: mastergas-color-system) */
+:root {
+  /* Brand */
+  --color-brand-primary: #000000;
+  --color-brand-contrast: #ffffff;
+
+  /* Text */
+  --color-text-primary: #000000;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #666666;
+  --color-text-muted: #94a3b8;
+  --color-text-disabled: #c0c7d1;
+  --color-text-inverse: #ffffff;
+  --color-text-error: #e53333;
+  --color-text-success: #10b981;
+
+  /* Background */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+
+  /* Surface */
+  --color-surface-primary: #ffffff;
+  --color-surface-dark: #000000;
+  --color-surface-dark-elevated: #111827;
+
+  /* Border */
+  --color-border-default: #e2e8f0;
+  --color-border-strong: #000000;
+  --color-border-subtle: #f1f5f9;
+
+  /* Interactive */
+  --color-interactive-primary: #000000;
+  --color-interactive-primary-contrast: #ffffff;
+  --color-interactive-hover: #1a1a1a;
+  --color-interactive-disabled: #94a3b8;
+
+  /* Status */
+  --color-status-error: #e53333;
+  --color-status-success: #10b981;
+  --color-status-warning: #f59e1f;
+  --color-status-info: #64748b;
+
+  /* E-Commerce */
+  --color-product-discount: #e53333;
+  --color-product-available: #10b981;
+  --color-product-rating: #f59e1f;
+  --color-product-whatsapp: #25d366;
+
+  /* Button hover (text/secondary) */
+  --color-button-hover: var(--color-text-secondary);
+}
+
 .dark {
   --bg-main: #0f172a;
   --bg-card: #1e293b;
@@ -100,6 +153,22 @@ html, body {
 
 .ltr-text {
   direction: ltr !important;
+}
+
+/* Prices: digits/sign/separators stay one LTR run inside RTL text; the page direction is untouched. */
+.price-num {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.price-text {
+  white-space: nowrap;
+}
+
+.price-text .price-currency {
+  margin-inline-start: 0.25em;
 }
 
 /* Global Theme Overrides for Scoped/Common Components */

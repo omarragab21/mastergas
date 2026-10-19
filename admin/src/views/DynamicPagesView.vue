@@ -8,14 +8,17 @@
           <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
       </div>
-      <h2 class="disabled-title">الصفحات الديناميكية</h2>
-      <p class="disabled-msg">هذه الميزة معطّلة حالياً</p>
-      <span class="disabled-badge">غير متاح</span>
+      <h2 class="disabled-title">{{ tx('الصفحات الديناميكية', 'Dynamic Pages') }}</h2>
+      <p class="disabled-msg">{{ tx('هذه الميزة معطّلة حالياً', 'This feature is currently unavailable') }}</p>
+      <span class="disabled-badge">{{ tx('غير متاح', 'Unavailable') }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
 </script>
 
 <style scoped>

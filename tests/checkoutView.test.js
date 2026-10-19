@@ -48,6 +48,8 @@ globalThis.window = {
   removeEventListener() {},
   dispatchEvent() {},
   scrollTo() {},
+  // vue-i18n times message lookups with window.performance in dev builds.
+  performance: globalThis.performance,
   location: { origin: 'https://shop.example.test', href: '' },
 };
 Object.defineProperty(globalThis, 'navigator', {
@@ -102,6 +104,8 @@ let api;
 let authState;
 let cartState;
 let CheckoutView;
+let dialogState;
+let closeDialog;
 
 before(async () => {
   storage.setItem('c_token', 'test-token');
@@ -119,6 +123,7 @@ before(async () => {
   ({ authState } = await viteServer.ssrLoadModule('/src/store/auth.js'));
   ({ cartState } = await viteServer.ssrLoadModule('/src/store/cart.js'));
   CheckoutView = (await viteServer.ssrLoadModule('/src/modules/checkout/views/CheckoutView.vue')).default;
+  ({ dialogState, closeDialog } = await viteServer.ssrLoadModule('/src/composables/useDialog.js'));
 });
 
 after(async () => {
@@ -134,6 +139,7 @@ const waitFor = async (condition) => {
 
 const mountCheckout = async (post) => {
   alerts.length = 0;
+  if (dialogState?.open) closeDialog();
   storage.clear();
   storage.setItem('c_token', 'test-token');
   storage.setItem('cart_test-token', JSON.stringify(originalCart));
@@ -175,7 +181,7 @@ const mountCheckout = async (post) => {
   app.use(createI18n({
     legacy: false,
     locale: 'ar',
-    messages: { ar: { checkout: { order_error: 'order error' } } },
+    messages: { ar: { checkout: { order_error: 'order error', order_error_title: 'order error title', required_fields: 'required fields' } } },
   }));
   app.provide(Symbol.for('v-scx'), { modules: new Set() });
   app.config.warnHandler = () => {};
@@ -250,7 +256,10 @@ test('CheckoutView order submission safety scenarios', async (t) => {
       assert.equal(checkout.state.confirmedOrder, null);
       assert.deepEqual(snapshot(cartState.items), originalCart);
       assert.deepEqual(snapshot(cartState.wishlist), originalWishlist);
-      assert.equal(alerts.length, 1);
+      // Failures are shown in the in-app dialog, never a native alert().
+      assert.equal(alerts.length, 0);
+      assert.equal(dialogState.open, true);
+      assert.equal(dialogState.type, 'error');
       checkout.app.unmount();
     } finally {
       console.error = originalConsoleError;

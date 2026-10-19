@@ -7,6 +7,7 @@ export {
   clearApiCache,
   createRequestKey,
   getCached,
+  prefetch,
   getCacheState,
   getStaleCached,
   invalidateCache,

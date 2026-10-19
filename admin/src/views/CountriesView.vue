@@ -1,19 +1,19 @@
 <template>
   <div class="countries-view">
     <div class="page-header">
-      <h1 class="page-title">إدارة الدول</h1>
+      <h1 class="page-title">{{ tx('إدارة الدول', 'Country Management') }}</h1>
       <div class="header-actions">
         <button class="btn-seed" @click="seedJordan" :disabled="seedingJordan">
           <svg v-if="!seedingJordan" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
           <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spinning"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-          {{ seedingJordan ? 'جاري التحميل...' : 'تحميل الأردن ومحافظاته 🇯🇴' }}
+          {{ seedingJordan ? tx('جاري التحميل...', 'Loading...') : tx('تحميل الأردن ومحافظاته 🇯🇴', 'Load Jordan and governorates 🇯🇴') }}
         </button>
         <button class="add-btn" @click="showModal = true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          إضافة دولة
+          {{ tx('إضافة دولة', 'Add Country') }}
         </button>
       </div>
     </div>
@@ -27,33 +27,33 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>العلم</th>
-            <th>الاسم</th>
-            <th>الكود</th>
-            <th>المدن</th>
-            <th>الحالة</th>
-            <th>الإجراءات</th>
+            <th>{{ tx('العلم', 'Flag') }}</th>
+            <th>{{ tx('الاسم', 'Name') }}</th>
+            <th>{{ tx('الكود', 'Code') }}</th>
+            <th>{{ tx('المدن', 'Cities') }}</th>
+            <th>{{ tx('الحالة', 'Status') }}</th>
+            <th>{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="country in countries" :key="country.id">
             <td>{{ country.flag || '-' }}</td>
-            <td>{{ country.name }}</td>
+            <td>{{ localizedName(country) }}</td>
             <td>{{ country.code }}</td>
             <td>{{ country.cities?.length || 0 }}</td>
             <td>
               <span class="status-badge" :class="country.is_active ? 'active' : 'inactive'">
-                {{ country.is_active ? 'نشط' : 'غير نشط' }}
+                {{ country.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
               </span>
             </td>
             <td class="actions">
-              <button class="btn-icon" @click="editCountry(country)" title="تعديل">
+              <button class="btn-icon" @click="editCountry(country)" :title="tx('تعديل', 'Edit')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
               </button>
-              <button class="btn-icon delete" @click="deleteCountry(country.id)" title="حذف">
+              <button class="btn-icon delete" @click="deleteCountry(country.id)" :title="tx('حذف', 'Delete')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -68,37 +68,37 @@
     <!-- Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-content">
-        <h2>{{ isEdit ? 'تعديل دولة' : 'إضافة دولة' }}</h2>
+        <h2>{{ isEdit ? tx('تعديل دولة', 'Edit Country') : tx('إضافة دولة', 'Add Country') }}</h2>
         <form @submit.prevent="handleSubmit">
           <div class="form-group">
-            <label>الاسم *</label>
+            <label>{{ tx('الاسم', 'Name') }} *</label>
             <input v-model="form.name" type="text" required />
           </div>
           <div class="form-group">
-            <label>الاسم بالإنجليزي</label>
+            <label>{{ tx('الاسم بالإنجليزي', 'English Name') }}</label>
             <input v-model="form.name_en" type="text" />
           </div>
           <div class="form-group">
-            <label>الكود *</label>
+            <label>{{ tx('الكود', 'Code') }} *</label>
             <input v-model="form.code" type="text" required maxlength="5" />
           </div>
           <div class="form-group">
-            <label>العلم (Emoji)</label>
+            <label>{{ tx('العلم (Emoji)', 'Flag (Emoji)') }}</label>
             <input v-model="form.flag" type="text" />
           </div>
           <div class="form-group">
-            <label>الترتيب</label>
+            <label>{{ tx('الترتيب', 'Sort Order') }}</label>
             <input v-model="form.sort_order" type="number" />
           </div>
           <div class="form-group checkbox">
             <label>
               <input v-model="form.is_active" type="checkbox" />
-              نشط
+              {{ tx('نشط', 'Active') }}
             </label>
           </div>
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" @click="showModal = false">إلغاء</button>
-            <button type="submit" class="btn-primary">حفظ</button>
+            <button type="button" class="btn-secondary" @click="showModal = false">{{ tx('إلغاء', 'Cancel') }}</button>
+            <button type="submit" class="btn-primary">{{ tx('حفظ', 'Save') }}</button>
           </div>
         </form>
       </div>
@@ -109,6 +109,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../config/axios';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx, locale } = useAdminText();
+const localizedName = (item) => item?.name_i18n?.[locale.value] || (locale.value === 'en' ? item?.name_en || item?.name : item?.name || item?.name_en);
 
 const countries = ref([]);
 const showModal = ref(false);

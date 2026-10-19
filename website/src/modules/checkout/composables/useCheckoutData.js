@@ -1,4 +1,7 @@
 import { computed, onUnmounted } from 'vue';
+import settingsService from '../../../services/settingsService';
+import { booleanSetting, firstSetting, numericSetting, settingsToObject, vatPercentage } from '../../../utils/siteSettings';
+import { profileService } from '../../profile/services/profileService';
 
 export function useCheckoutData({
   state,
@@ -90,20 +93,38 @@ export function useCheckoutData({
     customerInfo.value.email = user.email || '';
     customerInfo.value.country = 'SA';
     customerInfo.value.country_id = null;
-    savedAddresses.value = [];
     selectedAddressId.value = null;
     addressTab.value = 'other';
+
+    try {
+      // Checkout must use the same persisted customer addresses as the profile
+      // page instead of silently falling back to an empty address list.
+      savedAddresses.value = await profileService.getAddresses();
+    } catch (error) {
+      savedAddresses.value = [];
+      console.warn('Checkout saved addresses unavailable; using manual address entry', error?.message);
+    }
   };
 
   const fetchSettings = async () => {
-    // The Site collection has no settings endpoint. Keep only the rules
-    // required to build the Site order payload.
-    settings.value.enable_city_shipping = false;
-    settings.value.use_city_specific_rates = false;
-    settings.value.default_city_shipping_rate = 0;
-    freeDeliveryThreshold.value = 500;
-    shippingCost.value = 15;
-    taxRate.value = 0;
+    try {
+      const response = await settingsService.getSettings({ ttl: 300000, retries: 1 });
+      const siteSettings = settingsToObject(response);
+      const threshold = firstSetting(siteSettings, 'free_delivery_threshold', 'delivery_range');
+      const shipping = firstSetting(siteSettings, 'default_shipping_cost', 'shipping_cost');
+      const vat = firstSetting(siteSettings, 'vat_percentage', 'tax_rate');
+      const defaultCityRate = firstSetting(siteSettings, 'default_city_shipping_rate');
+
+      settings.value.enable_city_shipping = booleanSetting(firstSetting(siteSettings, 'enable_city_shipping'));
+      settings.value.use_city_specific_rates = booleanSetting(firstSetting(siteSettings, 'use_city_specific_rates'));
+      settings.value.default_city_shipping_rate = numericSetting(defaultCityRate, 0);
+      if (threshold !== undefined) freeDeliveryThreshold.value = numericSetting(threshold, freeDeliveryThreshold.value);
+      if (shipping !== undefined) shippingCost.value = numericSetting(shipping, shippingCost.value);
+      if (vat !== undefined) taxRate.value = vatPercentage(vat, taxRate.value);
+    } catch (error) {
+      // Keep the store defaults when the public settings endpoint is unavailable.
+      console.warn('Checkout settings unavailable; using checkout defaults', error?.message);
+    }
   };
 
   const fetchWalletBalance = async () => {

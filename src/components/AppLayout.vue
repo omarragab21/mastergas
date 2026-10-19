@@ -350,7 +350,7 @@ const closeUserMenu = (e) => {
 
 const handleLogout = async () => {
   try {
-    await api.post('/logout');
+    await api.post('/v1/logout');
   } catch (err) {
     console.error(err);
   } finally {

@@ -1,3 +1,6 @@
+import { sanitizeAssetUrl } from '../utils/adminSecurity';
+import { sanitizeUrl } from '../utils/sanitize';
+
 const firstText = (...values) => values.find((value) => value !== undefined && value !== null && String(value).trim() !== '') ?? '';
 
 const localized = (translations, field, fallback = '') => ({
@@ -7,7 +10,7 @@ const localized = (translations, field, fallback = '') => ({
 
 const imageUrl = (value) => {
   if (!value) return '';
-  if (typeof value === 'string') return value.replace(/^(https?:\/\/[^/]+)\/storage\//i, '$1/public/storage/');
+  if (typeof value === 'string') return sanitizeAssetUrl(value, '');
   return imageUrl(value.image_url || value.url || value.image || value.path);
 };
 
@@ -61,7 +64,7 @@ export const toAdminSlider = (raw = {}) => {
     title: firstText(raw.title, titleI18n.ar, titleI18n.en),
     description: firstText(raw.description, descriptionI18n.ar, descriptionI18n.en),
     image: imageUrl(raw.image_url || raw.image),
-    link: raw.link || '',
+    link: raw.link ? sanitizeUrl(raw.link, '') : '',
     status,
     order: Number(raw.order ?? raw.sort_order ?? 0),
   };
@@ -72,7 +75,7 @@ export const toAdminSliderPayload = (form = {}) => ({
   title_ar: String(form.title_ar || '').trim(),
   description_en: String(form.description_en || '').trim(),
   description_ar: String(form.description_ar || '').trim(),
-  link: String(form.link || '').trim(),
+  link: form.link ? sanitizeUrl(String(form.link).trim(), '') : '',
   status: form.status === 'active' || form.status === true ? 1 : 0,
   order: Number(form.order) || 0,
 });

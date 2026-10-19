@@ -37,7 +37,7 @@
 
 /* Portrait cards (categories 236x340, offers 280x420) */
 .sk-portrait-card { border-radius: 16px; flex: 0 0 auto; }
-.sk-portrait-category { width: 236px; height: 340px; flex-basis: 236px; }
+.sk-portrait-category { width: 280px; height: 420px; flex-basis: 280px; }
 .sk-portrait-offer { width: 280px; height: 420px; flex-basis: 280px; }
 
 /* Product detail page */
@@ -64,7 +64,7 @@
 @media (max-width: 768px) {
   .sk-product-card { padding: 12px; border-radius: 14px; }
   .sk-product-card .sk-image { height: 180px; }
-  .sk-portrait-category { height: 290px; }
+  .sk-portrait-category { width: 240px; height: 360px; flex-basis: 240px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sk-shimmer { animation: none; }

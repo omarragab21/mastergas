@@ -212,7 +212,7 @@
                 <span v-else class="no-img">بدون صورة</span>
               </td>
               <td class="link-cell">
-                <a :href="`${storeUrl}/product/${item.id}`" target="_blank" class="prod-link">
+                <a :href="`${storeUrl}/product/${encodeURIComponent(item.id)}`" target="_blank" rel="noopener noreferrer" class="prod-link">
                   {{ storeUrl }}/product/{{ item.id }}
                 </a>
               </td>

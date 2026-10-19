@@ -1427,7 +1427,7 @@
     {
       "id": 39,
       "key": "currency_ar",
-      "value": "د.أ",
+      "value": "ر.س",
       "type": "string",
       "created_at": "2026-05-04 18:33:48",
       "updated_at": "2026-05-04 18:33:48"
@@ -1435,7 +1435,7 @@
     {
       "id": 40,
       "key": "currency_en",
-      "value": "JOD",
+      "value": "SAR",
       "type": "string",
       "created_at": "2026-05-04 18:33:48",
       "updated_at": "2026-05-04 18:33:48"
@@ -1967,7 +1967,7 @@
       "name_ar": "الأردن",
       "code": "JO",
       "phone_code": "962",
-      "currency": "JOD",
+      "currency": "SAR",
       "is_active": 1
     }
   ],

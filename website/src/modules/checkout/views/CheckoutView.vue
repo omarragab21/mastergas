@@ -34,7 +34,7 @@
                     :class="addressTab === 'other' ? 'btn-primary-tab' : 'btn-secondary-tab'"
                     @click="switchToOtherRecipient"
                   >
-                    <span>مستلم آخر</span>
+                    <span>{{ t('checkout.other_recipient') }}</span>
                   </button>
 
                   <!-- عنواني -->
@@ -44,7 +44,7 @@
                     :class="addressTab === 'saved' ? 'btn-primary-tab' : 'btn-secondary-tab'"
                     @click="switchToSavedAddresses"
                   >
-                    <span>عنواني</span>
+                    <span>{{ t('checkout.my_address') }}</span>
                   </button>
                 </div>
 
@@ -56,14 +56,14 @@
                     :class="addressTab === 'new' ? 'btn-primary-tab' : 'btn-secondary-tab'"
                     @click="switchToNewAddress"
                   >
-                    <span>إضافة عنوان جديد</span>
+                    <span>{{ t('checkout.add_new_address') }}</span>
                   </button>
                 </div>
               </div>
 
               <!-- State 1: عنواني (Saved Addresses) -->
               <div v-if="addressTab === 'saved'" class="saved-addresses-view">
-                <div class="registered-addresses-title">العناوين المسجلة</div>
+                <div class="registered-addresses-title">{{ t('checkout.registered_addresses') }}</div>
 
                 <div class="addresses-grid">
                   <div 
@@ -82,7 +82,7 @@
 
                     <div class="address-details">
                       <div class="detail-line" v-if="addr.phone">
-                        <span>رقم الهاتف: {{ addr.phone }}</span>
+                        <span>{{ t('checkout.phone_label') }}: <span class="phone-ltr" dir="ltr">{{ addr.phone }}</span></span>
                       </div>
                       <div class="detail-line" v-if="addr.city || addr.district">
                         <span>{{ addr.city }}{{ addr.district ? ' - ' + addr.district : '' }}</span>
@@ -99,29 +99,30 @@
               <form v-else class="form-fields" @submit.prevent="handleAddressSubmit">
                 <!-- field-name -->
                 <div class="field-group field-name">
-                  <label class="field-label">اسم المستلم</label>
+                  <label class="field-label">{{ t('checkout.recipient_name') }}</label>
                   <input 
                     type="text" 
                     v-model="customerInfo.name" 
                     class="form-input" 
-                    placeholder="أدخل اسم المستلم" 
+                    :placeholder="t('checkout.recipient_name_enter')" 
                     required 
                   />
                 </div>
 
                 <!-- field-phone -->
                 <div class="field-group field-phone">
-                  <label class="field-label">رقم الجوال</label>
-                  <div class="phone-input-wrapper">
+                  <label class="field-label">{{ t('checkout.mobile_number') }}</label>
+                  <div class="phone-input-wrapper" dir="ltr">
+                    <span class="phone-country-code">+966</span>
+                    <div class="phone-line-divider"></div>
                     <input 
                       type="tel" 
                       v-model="customerInfo.phone" 
                       class="phone-input-field" 
                       placeholder="5XXXXXXXX" 
+                      dir="ltr"
                       required 
                     />
-                    <div class="phone-line-divider"></div>
-                    <span class="phone-country-code">+966</span>
                   </div>
                 </div>
 
@@ -129,16 +130,16 @@
                 <div class="frame-12-dual-row">
                   <!-- Region (المنطقة) - Left column in RTL -->
                   <div class="field-group field-type">
-                    <label class="field-label">المنطقة</label>
+                    <label class="field-label">{{ t('checkout.region') }}</label>
                     <div class="select-wrapper">
                       <select 
                         v-model="customerInfo.region" 
                         class="form-select-custom select-bg-slate"
                         :class="{ 'is-placeholder': !customerInfo.region }"
                       >
-                        <option value="" disabled selected>اختر المنطقة</option>
+                        <option value="" disabled selected>{{ t('checkout.choose_region') }}</option>
                         <option v-for="reg in regionsList" :key="reg" :value="reg">
-                          {{ reg }}
+                          {{ placeLabelFor(reg, currentLocale) }}
                         </option>
                       </select>
                       <div class="select-arrow-icon arrow-slate">
@@ -151,12 +152,12 @@
 
                   <!-- City (المدينة) - Right column in RTL -->
                   <div class="field-group field-type">
-                    <label class="field-label">المدينة</label>
+                    <label class="field-label">{{ t('checkout.city') }}</label>
                     <input
                       v-model="customerInfo.city"
                       type="text"
                       class="form-input"
-                      placeholder="اكتب المدينة"
+                      :placeholder="t('checkout.city_enter')"
                       required
                     />
                   </div>
@@ -164,11 +165,11 @@
 
                 <!-- field-message: العنوان بالتفصيل -->
                 <div class="field-group field-message">
-                  <label class="field-label">العنوان بالتفصيل (الشارع، رقم المبنى، الشقة)</label>
+                  <label class="field-label">{{ t('checkout.address_details_label') }}</label>
                   <textarea 
                     v-model="customerInfo.address" 
                     class="form-textarea" 
-                    placeholder="اكتب تفاصيل عنوانك هنا لتسهيل التوصيل..." 
+                    :placeholder="t('checkout.address_details_placeholder')" 
                     rows="4"
                     required
                   ></textarea>
@@ -176,18 +177,18 @@
 
                 <!-- field-message: ملاحظات التوصيل (اختياري) -->
                 <div class="field-group field-message">
-                  <label class="field-label">ملاحظات التوصيل (اختياري)</label>
+                  <label class="field-label">{{ t('checkout.delivery_notes_optional') }}</label>
                   <textarea 
                     v-model="customerInfo.notes" 
                     class="form-textarea" 
-                    placeholder="مثال: يرجى الاتصال قبل الوصول" 
+                    :placeholder="t('checkout.delivery_notes_placeholder')" 
                     rows="4"
                   ></textarea>
                 </div>
 
                 <!-- primary-button: متابعة -->
                 <button type="submit" class="submit-continue-btn">
-                  متابعة
+                  {{ t('checkout.continue') }}
                 </button>
               </form>
             </div>
@@ -207,7 +208,7 @@
                     <div class="radio-btn" :class="{ selected: useWallet }">
                       <div v-if="useWallet" class="radio-inner-dot"></div>
                     </div>
-                    <span class="method-title">استخدام رصيد المحفظة</span>
+                    <span class="method-title">{{ t('checkout.use_wallet_balance') }}</span>
                   </div>
                   <div class="method-icon-container">
                     <svg width="24" height="24" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -217,7 +218,7 @@
                 </div>
                 <div class="card-content">
                   <div class="wallet-info-row">
-                    <span class="wallet-desc-text">الرصيد المتاح: {{ walletBalance > 0 ? formatPrice(walletBalance) : '500.00' }}</span>
+                    <span class="wallet-desc-text">{{ t('checkout.available_balance') }}: <bdi class="price-num" dir="ltr">{{ walletBalance > 0 ? formatPrice(walletBalance) : '500.00' }}</bdi></span>
                     <span class="riyal-icon-wrapper">
                       <svg width="11" height="12" viewBox="0 0 14 16" fill="#64748B" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
@@ -239,7 +240,7 @@
                     <div class="radio-btn" :class="{ selected: selectedPayment === 'cod' }">
                       <div v-if="selectedPayment === 'cod'" class="radio-inner-dot"></div>
                     </div>
-                    <span class="method-title">الدفع عند الاستلام</span>
+                    <span class="method-title">{{ t('checkout.payment_methods.cash_on_delivery') }}</span>
                   </div>
                   <div class="method-icon-container">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-truck">
@@ -249,7 +250,7 @@
                 </div>
                 <div class="card-content">
                   <div class="method-desc-row">
-                    <span class="method-desc-text">يتم دفع الإجمالي نقداً أو عبر مدى عند استلام الطلب.</span>
+                    <span class="method-desc-text">{{ t('checkout.cod_desc') }}</span>
                   </div>
                 </div>
               </div>
@@ -265,7 +266,7 @@
                     <div class="radio-btn" :class="{ selected: selectedPayment === 'card' }">
                       <div v-if="selectedPayment === 'card'" class="radio-inner-dot"></div>
                     </div>
-                    <span class="method-title">بطاقة ائتمانية</span>
+                    <span class="method-title">{{ t('checkout.card') }}</span>
                   </div>
                   <div class="method-icon-container">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -275,7 +276,7 @@
                 </div>
                 <div class="card-content">
                   <div class="method-desc-row">
-                    <span class="method-desc-text">دفع فوري وآمن ببطاقات مدى، فيزا، وماستركارد</span>
+                    <span class="method-desc-text">{{ t('checkout.card_pay_desc') }}</span>
                   </div>
                 </div>
               </div>
@@ -284,15 +285,15 @@
               <div v-if="useWallet" class="wallet-active-summary">
                 <div class="wallet-active-row">
                   <span>{{ t('checkout.order_total') }}:</span>
-                  <span>{{ formatPrice(grandTotal) }} {{ currency }}</span>
+                  <PriceText :value="grandTotal" :currency="currency" />
                 </div>
                 <div class="wallet-active-row">
                   <span>{{ t('checkout.from_wallet') }}:</span>
-                  <span class="val-green">-{{ formatPrice(walletPayment) }} {{ currency }}</span>
+                  <span class="val-green"><PriceText :value="walletPayment" :currency="currency" negative /></span>
                 </div>
                 <div class="wallet-active-row is-remaining">
                   <span>{{ t('checkout.remaining_to_pay') }}:</span>
-                  <span>{{ formatPrice(remainingAmount) }} {{ currency }}</span>
+                  <PriceText :value="remainingAmount" :currency="currency" />
                 </div>
                 <div v-if="remainingAmount === 0" class="wallet-fully-paid">
                   <i class="fas fa-check-circle"></i>
@@ -308,9 +309,9 @@
               <!-- Card 1: ReviewProducts -->
               <div class="review-card-box">
                 <div class="review-section-header">
-                  <span class="section-title">المنتجات</span>
+                  <span class="section-title">{{ t('checkout.products') }}</span>
                   <button type="button" class="edit-link-btn" @click="router.push('/cart')">
-                    تعديل
+                    {{ t('checkout.edit') }}
                   </button>
                 </div>
                 
@@ -337,7 +338,7 @@
 
                         <!-- Quantity display box -->
                         <div class="review-qty-display">
-                          <span class="review-qty-text">الكمية: {{ prod.quantity }}</span>
+                          <span class="review-qty-text">{{ t('checkout.quantity_label') }}: {{ prod.quantity }}</span>
                         </div>
 
                         <!-- Price display (far left in RTL) -->
@@ -362,9 +363,9 @@
               <!-- Card 2: ReviewSectionCard (Delivery Address) -->
               <div class="review-card-box">
                 <div class="review-section-header">
-                  <span class="section-title">التوصيل إلى</span>
+                  <span class="section-title">{{ t('checkout.deliver_to') }}</span>
                   <button type="button" class="edit-link-btn" @click="currentStep = 2">
-                    تعديل
+                    {{ t('checkout.edit') }}
                   </button>
                 </div>
 
@@ -381,9 +382,9 @@
               <!-- Card 3: ReviewSectionCard (Payment Method) -->
               <div class="review-card-box">
                 <div class="review-section-header">
-                  <span class="section-title">طريقة الدفع</span>
+                  <span class="section-title">{{ t('checkout.payment_method') }}</span>
                   <button type="button" class="edit-link-btn" @click="currentStep = 3">
-                    تعديل
+                    {{ t('checkout.edit') }}
                   </button>
                 </div>
 
@@ -441,7 +442,7 @@
 
               <!-- تفاصيل الطلب -->
               <div class="receipt-section-title">
-                {{ currentLocale === 'ar' ? 'تفاصيل الطلب' : (t('checkout.order_details') || 'Order Details') }}
+                {{ t('checkout.order_details') }}
               </div>
 
               <!-- Line -->
@@ -458,7 +459,7 @@
                     <span class="price-val">{{ formatPrice(item.price * (item.quantity || 1)) }}</span>
                   </div>
                   <div class="receipt-product-name-qty">
-                    {{ item.name }} ×{{ item.quantity || 1 }}
+                    {{ item.name }} <bdi class="price-num" dir="ltr">×{{ item.quantity || 1 }}</bdi>
                   </div>
                 </div>
               </div>
@@ -597,7 +598,7 @@
               <input 
                 type="text" 
                 v-model="couponCode" 
-                :placeholder="t('checkout.coupon_code') || 'رمز الكوبون'" 
+                :placeholder="t('checkout.coupon_code')" 
                 @keyup.enter="applyCoupon"
               />
               <button type="button" class="summary-coupon-apply" @click="applyCoupon" :disabled="!couponCode">
@@ -665,11 +666,13 @@ import { cartState } from '../../../store/cart';
 import { authState } from '../../../store/auth';
 import { useOffers } from '../../product/composables/useOffers';
 import { useLocalized } from '../../../composables/useLocalized';
+import { useDialog } from '../../../composables/useDialog';
 import { useSettings } from '../../../composables/useSettings';
 import { useCheckoutPricing } from '../../../composables/useCheckoutPricing';
 import CheckoutProgress from '../components/CheckoutProgress.vue';
 import { useCheckoutStore } from '../store/checkoutStore';
 import { regionsList } from '../store/checkoutDefaults';
+import { placeLabel as placeLabelFor } from '../../../utils/placeLabels';
 import checkoutService from '../services/checkoutService';
 import { useCheckoutCoupons } from '../composables/useCheckoutCoupons';
 import { useCheckoutTotals } from '../composables/useCheckoutTotals';
@@ -683,10 +686,13 @@ import {
   savePendingPayment,
 } from '../../../utils/checkoutSafety';
 import { trackPurchase } from '../../../utils/metaPixel';
+import { formatPrice as formatPriceBase, formatPriceWithCurrency } from '../../../utils/price';
+import PriceText from '../../../components/PriceText.vue';
 import { logPayment } from '../../../utils/terminalLogger.js';
 
 const router = useRouter();
 const { t, locale } = useI18n();
+const dialog = useDialog();
 const checkoutStore = useCheckoutStore();
 const {
   currentStep,
@@ -722,6 +728,7 @@ const {
   lastPurchasedTotal,
   lastPurchasedDate,
 } = storeToRefs(checkoutStore);
+const L = (ar, en) => (currentLocale.value === 'ar' ? ar : en);
 const currentLocale = computed(() => {
   try {
     return locale?.value || localStorage.getItem('lang') || 'ar';
@@ -739,7 +746,7 @@ const checkoutUnavailableName = computed(() => {
     || item.name_ar
     || item.name_en
     || item.name
-    || (currentLocale.value === 'ar' ? 'هذا المنتج' : 'This product');
+    || t('checkout.this_product');
 });
 const { getActiveOfferForProduct, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { currency } = useSettings();
@@ -785,7 +792,7 @@ const {
 
 const handleAddressSubmit = async () => {
   if (!customerInfo.value.name || !customerInfo.value.phone || !customerInfo.value.address || !customerInfo.value.city) {
-    alert(t('checkout.required_fields'));
+    dialog.alert(t('checkout.required_fields'), { type: 'warning' });
     return;
   }
   await nextStep();
@@ -880,14 +887,14 @@ const getReviewItemSpecs = (item) => {
     const list = String(item.specs).split('•').map(s => s.trim()).filter(Boolean);
     return list.slice(0, 2).join(' • ');
   }
-  return item.short_description || 'أمان إيطالي';
+  return item.short_description || L('أمان إيطالي', 'Italian safety');
 };
 
 const displayReviewItems = computed(() => {
   if (cartState.items && cartState.items.length > 0) {
     return cartState.items.map(item => ({
       id: item.cart_item_key || item.id,
-      name: localized(item, 'name') || item.name_ar || item.name || 'منتج',
+      name: localized(item, 'name') || item.name_ar || item.name || t('checkout.unknown_product'),
       sku: item.sku || item.model || 'O604S',
       specs: getReviewItemSpecs(item),
       quantity: item.quantity || 1,
@@ -898,27 +905,27 @@ const displayReviewItems = computed(() => {
   return [
     {
       id: 1,
-      name: 'فرن غاز بلت-إن 60 سم',
+      name: L('فرن غاز بلت-إن 60 سم', '60 cm Built-in Gas Oven'),
       sku: 'O604S',
-      specs: 'شواية دوارة، أمان إيطالي',
+      specs: L('شواية دوارة، أمان إيطالي', 'Rotating grill, Italian safety'),
       quantity: 1,
       price: 2499,
       image: '/images/products/oven.png'
     },
     {
       id: 2,
-      name: 'موقد غاز 5 عيون 90 سم',
+      name: L('موقد غاز 5 عيون 90 سم', '90 cm 5-Burner Gas Hob'),
       sku: 'H95GLCX',
-      specs: 'حوامل زهر، أمان كامل',
+      specs: L('حوامل زهر، أمان كامل', 'Cast iron grates, full safety'),
       quantity: 1,
       price: 1899,
       image: '/images/products/cooktop.png'
     },
     {
       id: 3,
-      name: 'شفاط مدمج 90 سم',
+      name: L('شفاط مدمج 90 سم', '90 cm Built-in Hood'),
       sku: 'HO90GL',
-      specs: 'قوة شفط فائقة، هادئ',
+      specs: L('قوة شفط فائقة، هادئ', 'Powerful and quiet extraction'),
       quantity: 1,
       price: 1299,
       image: '/images/products/hood.png'
@@ -926,34 +933,34 @@ const displayReviewItems = computed(() => {
   ];
 });
 
-const reviewCustomerName = computed(() => customerInfo.value.name || 'أحمد الحربي');
+const reviewCustomerName = computed(() => customerInfo.value.name || L('أحمد الحربي', 'Ahmed Al-Harbi'));
 const reviewCustomerPhone = computed(() => customerInfo.value.phone || '0557654321');
 const reviewCustomerCity = computed(() => {
   const cityName = customerInfo.value.city || (cities.value.find(c => String(c.id) === String(customerInfo.value.city_id))?.name);
   if (cityName && customerInfo.value.district) return `${cityName} - ${customerInfo.value.district}`;
-  if (cityName) return `${cityName} - النعيم`;
-  return 'جدة - النعيم';
+  if (cityName) return `${cityName} - ${L('النعيم', 'Al-Naeem')}`;
+  return L('جدة - النعيم', 'Jeddah - Al-Naeem');
 });
-const reviewCustomerAddress = computed(() => customerInfo.value.address || 'شارع حراء قرية 15');
+const reviewCustomerAddress = computed(() => customerInfo.value.address || L('شارع حراء قرية 15', 'Hira Street, Village 15'));
 
 const reviewPaymentMethod = computed(() => {
   if (selectedPayment.value === 'card') {
     return {
       type: 'card',
-      title: 'بطاقة ائتمانية',
+      title: t('checkout.card'),
       sub: '•••• 4321'
     };
   } else if (selectedPayment.value === 'cod') {
     return {
       type: 'cod',
-      title: 'الدفع عند الاستلام',
-      sub: 'نقداً أو عبر مدى عند الاستلام'
+      title: t('checkout.payment_methods.cash_on_delivery'),
+      sub: t('checkout.cod_sub')
     };
   } else {
     return {
       type: 'wallet',
-      title: 'استخدام رصيد المحفظة',
-      sub: `${formatPrice(walletPayment.value || walletBalance.value)} ${currency.value}`
+      title: t('checkout.use_wallet_balance'),
+      sub: formatPriceWithCurrency(walletPayment.value || walletBalance.value, currency.value)
     };
   }
 });
@@ -978,7 +985,7 @@ const receiptProducts = computed(() => {
   if (orderObj?.items && Array.isArray(orderObj.items) && orderObj.items.length > 0) {
     return orderObj.items.map(it => ({
       id: it.id || it.product_id,
-      name: it.product?.name || it.name || 'منتج',
+      name: it.product?.name || it.name || t('checkout.unknown_product'),
       quantity: it.quantity || 1,
       price: it.price || it.unit_price || 0
     }));
@@ -986,15 +993,15 @@ const receiptProducts = computed(() => {
   if (cartState.items && cartState.items.length > 0) {
     return cartState.items.map(item => ({
       id: item.cart_item_key || item.id,
-      name: localized(item, 'name') || item.name_ar || item.name || 'منتج',
+      name: localized(item, 'name') || item.name_ar || item.name || t('checkout.unknown_product'),
       quantity: item.quantity || 1,
       price: getItemPriceWithDiscount(item, cartState.items) || item.price || 0
     }));
   }
   return [
-    { id: 1, name: 'فرن غاز بلت-إن 60 سم', quantity: 1, price: 2499 },
-    { id: 2, name: 'موقد غاز 5 عيون 90 سم', quantity: 1, price: 1899 },
-    { id: 3, name: 'شفاط مدمج 90 سم', quantity: 1, price: 1299 }
+    { id: 1, name: L('فرن غاز بلت-إن 60 سم', '60 cm Built-in Gas Oven'), quantity: 1, price: 2499 },
+    { id: 2, name: L('موقد غاز 5 عيون 90 سم', '90 cm 5-Burner Gas Hob'), quantity: 1, price: 1899 },
+    { id: 3, name: L('شفاط مدمج 90 سم', '90 cm Built-in Hood'), quantity: 1, price: 1299 }
   ];
 });
 
@@ -1021,46 +1028,46 @@ const receiptOrderDate = computed(() => {
   });
 });
 
-const receiptCustomerName = computed(() => customerInfo.value.name || 'أحمد الحربي');
+const receiptCustomerName = computed(() => customerInfo.value.name || L('أحمد الحربي', 'Ahmed Al-Harbi'));
 const receiptCustomerAddress = computed(() => {
-  const city = customerInfo.value.city || 'جدة - النعيم';
-  const addr = customerInfo.value.address || 'شارع حراء';
-  return `${city}، ${addr}`;
+  const city = customerInfo.value.city || L('جدة - النعيم', 'Jeddah - Al-Naeem');
+  const addr = customerInfo.value.address || L('شارع حراء', 'Hira Street');
+  return currentLocale.value === 'ar' ? `${city}، ${addr}` : `${city}, ${addr}`;
 });
 const receiptPaymentMethodText = computed(() => {
   if (selectedPayment.value === 'card') {
-    return 'بطاقة ائتمانية (•••• 4321)';
+    return `${t('checkout.card')} (•••• 4321)`;
   } else if (selectedPayment.value === 'cod') {
-    return 'الدفع عند الاستلام';
+    return t('checkout.payment_methods.cash_on_delivery');
   } else {
-    return 'استخدام رصيد المحفظة';
+    return t('checkout.use_wallet_balance');
   }
 });
 
 const summaryPrimaryButtonText = computed(() => {
   if (currentStep.value === 2) {
-    return currentLocale.value === 'ar' ? 'متابعة للدفع' : (t('checkout.proceed_to_payment') || 'Proceed to Payment');
+    return t('checkout.proceed_to_payment');
   }
   if (currentStep.value === 3) {
-    return currentLocale.value === 'ar' ? 'متابعة للمراجعة' : (t('checkout.proceed_to_review') || 'Proceed to Review');
+    return t('checkout.proceed_to_review');
   }
   if (currentStep.value === 4) {
-    return currentLocale.value === 'ar' ? 'تأكيد الطلب' : (t('checkout.confirm_order') || 'Confirm Order');
+    return t('checkout.confirm_order');
   }
-  return currentLocale.value === 'ar' ? 'متابعة' : 'Continue';
+  return t('checkout.continue');
 });
 
 const summarySecondaryButtonText = computed(() => {
   if (currentStep.value === 2) {
-    return currentLocale.value === 'ar' ? 'العودة للسلة' : (t('checkout.back_to_cart') || 'Back to Cart');
+    return t('checkout.back_to_cart');
   }
   if (currentStep.value === 3) {
-    return currentLocale.value === 'ar' ? 'العودة للعنوان' : (t('checkout.back_to_address') || 'Back to Address');
+    return t('checkout.back_to_address');
   }
   if (currentStep.value === 4) {
-    return currentLocale.value === 'ar' ? 'العودة للدفع' : (t('checkout.back_to_payment') || 'Back to Payment');
+    return t('checkout.back_to_payment');
   }
-  return currentLocale.value === 'ar' ? 'رجوع' : 'Back';
+  return t('checkout.back');
 });
 
 const handleSummaryPrimaryAction = async () => {
@@ -1095,7 +1102,7 @@ const nextStep = async () => {
       !customerInfo.value.address ||
       !customerInfo.value.city
     ) {
-      alert(t('checkout.required_fields'));
+      dialog.alert(t('checkout.required_fields'), { type: 'warning' });
       return;
     }
     if (settings.value.enable_city_shipping && customerInfo.value.city_id) {
@@ -1314,7 +1321,7 @@ const confirmOrder = async () => {
       orderId: createdOrder.order?.order_number || createdOrder.order?.number || createdOrder.order?.id || createdOrder.order_number || createdOrder.number || createdOrder.id,
       totalValue: createdOrder.order?.total_amount || createdOrder.order?.total || createdOrder.total_amount || createdOrder.total || orderData.total_amount || 0,
       items: orderData.items || [],
-    }, currency.value || 'JOD');
+    }, currency.value || 'SAR');
     if (useWallet.value) await fetchWalletBalance();
     let cartCleanupSucceeded = false;
     try {
@@ -1356,7 +1363,7 @@ const confirmOrder = async () => {
       return;
     }
     const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message;
-    alert(errorMsg || t('checkout.order_error'));
+    dialog.alert(errorMsg || t('checkout.order_error'), { type: 'error', title: t('checkout.order_error_title') });
   } finally {
     orderSubmitting.value = false;
   }
@@ -1387,10 +1394,7 @@ const onImageError = (event, item) => {
   target.src = '/brand/mastergas-icon.png';
 };
 
-const formatPrice = (price) => {
-  const val = parseFloat(price);
-  return isNaN(val) ? '0.00' : val.toLocaleString('en-US', { minimumFractionDigits: 2 });
-};
+const formatPrice = (price) => formatPriceBase(price, { fraction: 'fixed' });
 
 </script>
 

@@ -105,12 +105,11 @@ const localDateTime = (iso) => {
   };
 };
 
+import { sanitizeAssetUrl } from '../../utils/adminSecurity';
+
 // The orders endpoint returns /storage/… (HTTP 403) while the same file is
 // served at /public/storage/… (the form the products endpoint already uses).
-export const normalizeImageUrl = (url) => {
-  const value = String(url ?? '').trim();
-  return value.replace(/^(https?:\/\/[^/]+)\/storage\//i, '$1/public/storage/');
-};
+export const normalizeImageUrl = (url) => sanitizeAssetUrl(url, '');
 
 const productImage = (product = {}) => {
   const images = Array.isArray(product.images) ? product.images : [];

@@ -1,7 +1,5 @@
-import api from '../../../config/axios';
 import { getSiteOrder, listSiteOrders } from './siteOrdersApi';
-
-const unwrap = (response) => response?.data?.data || response?.data || response;
+import settingsService from '../../../services/settingsService';
 
 const normalizeSettings = (value) => {
   if (Array.isArray(value)) return value;
@@ -10,8 +8,7 @@ const normalizeSettings = (value) => {
 
 export const invoiceService = {
   async getSettings() {
-    const response = await api.get('/frontend/settings');
-    return normalizeSettings(unwrap(response));
+    return normalizeSettings(await settingsService.getSettings());
   },
 
   async getOrder(orderId) {

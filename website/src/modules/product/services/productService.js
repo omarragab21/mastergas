@@ -11,6 +11,7 @@ import {
   normalizeSiteReview,
 } from '../../../services/siteDataMappers';
 import api from '../../../config/axios';
+import { isTestProduct, visibleCategories, visibleProducts } from '../../../utils/catalogVisibility.js';
 
 const cleanParams = (params = {}) => Object.fromEntries(
   Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -64,14 +65,22 @@ const fetchProductsEndpoint = async (endpoint, params = {}, options = {}) => {
     signal: options.signal,
     retries: options.retries ?? 2,
     timeout: options.timeout ?? 6000,
+    staleWhileRevalidate: options.staleWhileRevalidate ?? true,
   });
-  return listFromBody(body, normalizeSiteProduct);
+  return visibleProducts(listFromBody(body, normalizeSiteProduct));
 };
 
 export const productService = {
   async getProducts(params = {}, options = {}) {
     const clean = cleanParams(params);
-    const products = await fetchProductsEndpoint('/v1/site/products/all_products', clean, options);
+    // The site API returns the catalog collection; filtering and pagination
+    // are already normalized client-side below. Reuse the canonical active
+    // catalog request so the products page can consume the response warmed
+    // by the home/category sections instead of issuing a second slow query
+    // for every sort or filter combination.
+    const products = await fetchProductsEndpoint('/v1/site/products/all_products', {
+      is_active: clean.is_active ?? 1,
+    }, options);
     const filtered = products.filter((product) => {
       if (clean.category_id && String(product.category_id) !== String(clean.category_id)) return false;
       if (clean.is_active !== undefined && Boolean(product.is_active) !== Boolean(Number(clean.is_active))) return false;
@@ -96,8 +105,10 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     const product = parseDataResponse(body);
+    if (isTestProduct(product)) return null;
     return product && typeof product === 'object' && !Array.isArray(product)
       ? normalizeSiteProduct(product)
       : null;
@@ -109,8 +120,9 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
-    return listFromBody(body, normalizeSiteCategory);
+    return visibleCategories(listFromBody(body, normalizeSiteCategory));
   },
 
   async getCategoryProductCounts(categories = [], options = {}) {
@@ -119,6 +131,7 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     };
 
     try {
@@ -164,6 +177,7 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     return Number(parseCollectionResponse(body).total) || 0;
   },
@@ -183,6 +197,7 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     return listFromBody(body, normalizeSiteOffer);
   },
@@ -193,6 +208,7 @@ export const productService = {
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
+      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     const product = parseDataResponse(body);
     return Array.isArray(product?.reviews) ? product.reviews.map(normalizeSiteReview) : [];

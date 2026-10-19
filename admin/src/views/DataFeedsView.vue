@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="page-header">
       <div class="header-titles">
-        <h2 class="page-title">تغذية الكتالوج والإعلانات (Product Data Feeds)</h2>
-        <p class="page-subtitle">ربط منتجات المتجر تلقائياً أو تنزيل ملفات الكتالوج لـ Meta (Facebook) و Google Shopping و TikTok Ads</p>
+        <h2 class="page-title">{{ tx('تغذية الكتالوج والإعلانات (Product Data Feeds)', 'Catalog and Ad Feeds') }}</h2>
+        <p class="page-subtitle">{{ tx('ربط منتجات المتجر تلقائياً أو تنزيل ملفات الكتالوج لـ Meta (Facebook) و Google Shopping و TikTok Ads', 'Connect store products automatically or download catalog files for Meta, Google Shopping, and TikTok Ads') }}</p>
       </div>
     </div>
 
@@ -18,15 +18,15 @@
         </svg>
       </div>
       <div class="banner-content">
-        <h4 class="banner-title">طريقتان لتغذية الإعلانات بالمنتجات (Catalog Campaigns):</h4>
+        <h4 class="banner-title">{{ tx('طريقتان لتغذية الإعلانات بالمنتجات (Catalog Campaigns):', 'Two ways to provide products for catalog campaigns:') }}</h4>
         <div class="banner-methods">
           <div class="method-item">
-            <span class="method-badge">1. رابط التغذية المباشر (Live Feed Link)</span>
-            <p>تضع الرابط في منصة الإعلانات (Meta Commerce Manager / Google Merchant) ويتم سحب وتحديث المنتجات تلقائياً يومياً بدون تدخل يدوي.</p>
+            <span class="method-badge">{{ tx('1. رابط التغذية المباشر (Live Feed Link)', '1. Live Feed Link') }}</span>
+            <p>{{ tx('تضع الرابط في منصة الإعلانات (Meta Commerce Manager / Google Merchant) ويتم سحب وتحديث المنتجات تلقائياً يومياً بدون تدخل يدوي.', 'Add the link to your ad platform and products will be fetched and updated automatically every day.') }}</p>
           </div>
           <div class="method-item">
-            <span class="method-badge">2. تنزيل الملف ورفعه يدوياً (Direct File Upload)</span>
-            <p>يمكنك تحميل ملف الـ CSV أو XML مباشرة على جهازك ثم رفعه يدويًا فوراً في منصة الإعلانات.</p>
+            <span class="method-badge">{{ tx('2. تنزيل الملف ورفعه يدوياً (Direct File Upload)', '2. Direct File Upload') }}</span>
+            <p>{{ tx('يمكنك تحميل ملف الـ CSV أو XML مباشرة على جهازك ثم رفعه يدويًا فوراً في منصة الإعلانات.', 'Download the CSV or XML file and upload it manually to your ad platform.') }}</p>
           </div>
         </div>
       </div>
@@ -34,34 +34,34 @@
 
     <!-- Configuration & Filters -->
     <div class="config-card">
-      <h3 class="section-title">إعدادات وتصفية الكتالوج</h3>
+      <h3 class="section-title">{{ tx('إعدادات وتصفية الكتالوج', 'Catalog Settings and Filters') }}</h3>
       <div class="config-grid">
         <div class="form-group">
-          <label class="form-label">رابط الموقع الإلكتروني (Store Domain URL)</label>
+          <label class="form-label">{{ tx('رابط الموقع الإلكتروني (Store Domain URL)', 'Store Domain URL') }}</label>
           <input type="text" v-model="storeUrl" placeholder="https://yourstore.com" class="form-input" />
         </div>
         <div class="form-group">
-          <label class="form-label">العملة (Currency)</label>
+          <label class="form-label">{{ tx('العملة (Currency)', 'Currency') }}</label>
           <select v-model="currency" class="form-select">
-            <option value="JOD">JOD (دينار أردني)</option>
-            <option value="USD">USD (دولار أمريكي)</option>
-            <option value="SAR">SAR (ريال سعودي)</option>
-            <option value="AED">AED (درهم إماراتي)</option>
-            <option value="EGP">EGP (جنيه مصري)</option>
+            <option value="JOD">JOD (Jordanian Dinar)</option>
+            <option value="USD">USD (US Dollar)</option>
+            <option value="SAR">SAR (Saudi Riyal)</option>
+            <option value="AED">AED (UAE Dirham)</option>
+            <option value="EGP">EGP (Egyptian Pound)</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">تصفية حسب القسم (Category)</label>
+          <label class="form-label">{{ tx('تصفية حسب القسم (Category)', 'Filter by Category') }}</label>
           <select v-model="selectedCategory" class="form-select">
-            <option value="">جميع الأقسام</option>
+            <option value="">{{ tx('جميع الأقسام', 'All Categories') }}</option>
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">حالة التوفر (Stock Filter)</label>
+          <label class="form-label">{{ tx('حالة التوفر (Stock Filter)', 'Stock Filter') }}</label>
           <select v-model="stockFilter" class="form-select">
-            <option value="all">جميع المنتجات</option>
-            <option value="in_stock">المنتجات المتوفرة فقط (In Stock)</option>
+            <option value="all">{{ tx('جميع المنتجات', 'All Products') }}</option>
+            <option value="in_stock">{{ tx('المنتجات المتوفرة فقط (In Stock)', 'In-stock products only') }}</option>
           </select>
         </div>
       </div>
@@ -76,16 +76,16 @@
             <span class="platform-icon meta-icon">f</span>
             <div>
               <h4 class="platform-title">Meta / Facebook Catalog Feed</h4>
-              <span class="platform-subtitle">صيغة CSV القياسية لإعلانات فيسبوك وانستغرام</span>
+              <span class="platform-subtitle">{{ tx('صيغة CSV القياسية لإعلانات فيسبوك وانستغرام', 'Standard CSV format for Facebook and Instagram ads') }}</span>
             </div>
           </div>
           <span class="format-badge">CSV</span>
         </div>
-        <p class="feed-desc">مناسب لـ Meta Commerce Manager و Instagram Shopping وإعلانات Dynamic Product Ads.</p>
+        <p class="feed-desc">{{ tx('مناسب لـ Meta Commerce Manager و Instagram Shopping وإعلانات Dynamic Product Ads.', 'Suitable for Meta Commerce Manager, Instagram Shopping, and Dynamic Product Ads.') }}</p>
         <div class="feed-url-box">
           <input type="text" readonly :value="metaFeedUrl" class="feed-url-input" />
           <button class="copy-btn" @click="copyToClipboard(metaFeedUrl, 'meta')">
-            {{ copiedFeed === 'meta' ? 'تم النسخ ✓' : 'نسخ الرابط' }}
+            {{ copiedFeed === 'meta' ? tx('تم النسخ ✓', 'Copied ✓') : tx('نسخ الرابط', 'Copy Link') }}
           </button>
         </div>
         <div class="feed-actions">
@@ -93,7 +93,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            تحميل ملف Meta CSV
+            {{ tx('تحميل ملف Meta CSV', 'Download Meta CSV') }}
           </button>
         </div>
       </div>
@@ -105,16 +105,16 @@
             <span class="platform-icon google-icon">G</span>
             <div>
               <h4 class="platform-title">Google Merchant Center Feed</h4>
-              <span class="platform-subtitle">صيغة XML RSS 2.0 القياسية لـ Google Shopping</span>
+              <span class="platform-subtitle">{{ tx('صيغة XML RSS 2.0 القياسية لـ Google Shopping', 'Standard XML RSS 2.0 format for Google Shopping') }}</span>
             </div>
           </div>
           <span class="format-badge xml">XML</span>
         </div>
-        <p class="feed-desc">مناسب لـ Google Merchant Center و Performance Max Campaigns وإعلانات شبكة البحث.</p>
+        <p class="feed-desc">{{ tx('مناسب لـ Google Merchant Center و Performance Max Campaigns وإعلانات شبكة البحث.', 'Suitable for Google Merchant Center, Performance Max campaigns, and search ads.') }}</p>
         <div class="feed-url-box">
           <input type="text" readonly :value="googleFeedUrl" class="feed-url-input" />
           <button class="copy-btn" @click="copyToClipboard(googleFeedUrl, 'google')">
-            {{ copiedFeed === 'google' ? 'تم النسخ ✓' : 'نسخ الرابط' }}
+            {{ copiedFeed === 'google' ? tx('تم النسخ ✓', 'Copied ✓') : tx('نسخ الرابط', 'Copy Link') }}
           </button>
         </div>
         <div class="feed-actions">
@@ -122,7 +122,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            تحميل ملف Google XML
+            {{ tx('تحميل ملف Google XML', 'Download Google XML') }}
           </button>
         </div>
       </div>
@@ -134,16 +134,16 @@
             <span class="platform-icon json-icon">{}</span>
             <div>
               <h4 class="platform-title">JSON Product Feed</h4>
-              <span class="platform-subtitle">تغذية برمجية المطورين و TikTok Catalog</span>
+              <span class="platform-subtitle">{{ tx('تغذية برمجية المطورين و TikTok Catalog', 'Developer API feed and TikTok Catalog') }}</span>
             </div>
           </div>
           <span class="format-badge json">JSON</span>
         </div>
-        <p class="feed-desc">مناسب لربط الأنظمة الخارجية، تطبيقات الهاتف، وحملات TikTok Catalog.</p>
+        <p class="feed-desc">{{ tx('مناسب لربط الأنظمة الخارجية، تطبيقات الهاتف، وحملات TikTok Catalog.', 'Suitable for external systems, mobile apps, and TikTok Catalog campaigns.') }}</p>
         <div class="feed-url-box">
           <input type="text" readonly :value="jsonFeedUrl" class="feed-url-input" />
           <button class="copy-btn" @click="copyToClipboard(jsonFeedUrl, 'json')">
-            {{ copiedFeed === 'json' ? 'تم النسخ ✓' : 'نسخ الرابط' }}
+            {{ copiedFeed === 'json' ? tx('تم النسخ ✓', 'Copied ✓') : tx('نسخ الرابط', 'Copy Link') }}
           </button>
         </div>
         <div class="feed-actions">
@@ -151,7 +151,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            تحميل ملف JSON Feed
+            {{ tx('تحميل ملف JSON Feed', 'Download JSON Feed') }}
           </button>
         </div>
       </div>
@@ -160,19 +160,19 @@
     <!-- Health Check Stats -->
     <div class="stats-section">
       <div class="stat-box">
-        <span class="stat-title">إجمالي منتجات التغذية</span>
+        <span class="stat-title">{{ tx('إجمالي منتجات التغذية', 'Total Feed Products') }}</span>
         <span class="stat-number">{{ filteredProducts.length }}</span>
       </div>
       <div class="stat-box active-box">
-        <span class="stat-title">المنتجات المتوفرة (In Stock)</span>
+        <span class="stat-title">{{ tx('المنتجات المتوفرة (In Stock)', 'In-stock Products') }}</span>
         <span class="stat-number">{{ inStockCount }}</span>
       </div>
       <div class="stat-box warning-box">
-        <span class="stat-title">منتجات بدون صور رئيسية</span>
+        <span class="stat-title">{{ tx('منتجات بدون صور رئيسية', 'Products Missing Main Images') }}</span>
         <span class="stat-number">{{ missingImagesCount }}</span>
       </div>
       <div class="stat-box info-box">
-        <span class="stat-title">جاهزية التغذية</span>
+        <span class="stat-title">{{ tx('جاهزية التغذية', 'Feed Readiness') }}</span>
         <span class="stat-number">{{ feedReadinessScore }}%</span>
       </div>
     </div>
@@ -180,21 +180,21 @@
     <!-- Preview Table -->
     <div class="table-card">
       <div class="table-header">
-        <h3 class="table-title">معاينة المنتجات في الـ Catalog Feed</h3>
-        <span class="table-count">عرض {{ filteredProducts.slice(0, 10).length }} من {{ filteredProducts.length }} منتج</span>
+        <h3 class="table-title">{{ tx('معاينة المنتجات في الـ Catalog Feed', 'Catalog Feed Preview') }}</h3>
+        <span class="table-count">{{ tx('عرض', 'Showing') }} {{ filteredProducts.slice(0, 10).length }} {{ tx('من', 'of') }} {{ filteredProducts.length }} {{ tx('منتج', 'products') }}</span>
       </div>
-      <div v-if="loading" class="loading-state">جاري تحميل بيانات المنتجات...</div>
-      <div v-else-if="filteredProducts.length === 0" class="empty-state">لا توجد منتجات مطابقة لشروط التصفية.</div>
+      <div v-if="loading" class="loading-state">{{ tx('جاري تحميل بيانات المنتجات...', 'Loading product data...') }}</div>
+      <div v-else-if="filteredProducts.length === 0" class="empty-state">{{ tx('لا توجد منتجات مطابقة لشروط التصفية.', 'No products match the selected filters.') }}</div>
       <div v-else class="table-responsive">
         <table class="feed-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>المنتج</th>
-              <th>السعر</th>
-              <th>الحالة (Availability)</th>
-              <th>الصورة</th>
-              <th>رابط المنتج</th>
+              <th>{{ tx('المنتج', 'Product') }}</th>
+              <th>{{ tx('السعر', 'Price') }}</th>
+              <th>{{ tx('الحالة (Availability)', 'Availability') }}</th>
+              <th>{{ tx('الصورة', 'Image') }}</th>
+              <th>{{ tx('رابط المنتج', 'Product URL') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -209,10 +209,10 @@
               </td>
               <td>
                 <img v-if="getProductImage(item)" :src="getProductImage(item)" alt="product" class="preview-thumb" />
-                <span v-else class="no-img">بدون صورة</span>
+                <span v-else class="no-img">{{ tx('بدون صورة', 'No image') }}</span>
               </td>
               <td class="link-cell">
-                <a :href="`${storeUrl}/product/${item.id}`" target="_blank" class="prod-link">
+                <a :href="`${storeUrl}/product/${encodeURIComponent(item.id)}`" target="_blank" rel="noopener noreferrer" class="prod-link">
                   {{ storeUrl }}/product/{{ item.id }}
                 </a>
               </td>
@@ -228,9 +228,12 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '../config/axios';
 import { generateMetaCSV, generateGoogleXML, generateJSONFeed, downloadFile } from '../utils/dataFeedExporter';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
 
 const storeUrl = ref('https://mastergas.sa');
-const currency = ref('JOD');
+const currency = ref('SAR');
 const selectedCategory = ref('');
 const stockFilter = ref('all');
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getCustomerToken } from '../utils/customerSession.js';
+import { clearCustomerToken, getCustomerToken } from '../utils/customerSession.js';
 
 const serverUrl = 'https://backend-tijara.be-kite.com/api';
 const envUrl = import.meta.env.VITE_API_BASE_URL;
@@ -28,7 +28,7 @@ const getRequestPath = (config = {}) => {
 
 const sanitizeParameters = (parameters = {}) => Object.fromEntries(
   Object.entries(parameters || {}).map(([key, value]) => {
-    const sensitive = /token|password|secret|authorization|email|phone/i.test(key);
+    const sensitive = /token|password|secret|authorization|email|phone|address|card|cvv|iban/i.test(key);
     return [key, sensitive ? '[redacted]' : value];
   })
 );
@@ -91,10 +91,11 @@ api.interceptors.request.use(config => {
   const requestId = config.headers['X-Request-ID'] || `mg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   config.headers['X-Request-ID'] = requestId;
   config.timeout = config.timeout ?? getRequestTimeout(config.url);
+  const cleanPath = getRequestPath(config);
   config.__mastergasRequest = {
     requestId,
     startedAt: performanceNow(),
-    endpoint: getRequestPath(config),
+    endpoint: cleanPath,
     retryCount: config.__retryCount || 0,
   };
   if (!globalThis.__mastergasFirstApiRequest) {
@@ -103,7 +104,8 @@ api.interceptors.request.use(config => {
   }
   performanceMark(`mastergas:api:start:${requestId}`);
 
-  const token = getCustomerToken();
+  const isAdminOnlyPath = cleanPath.startsWith('/dashboard') || cleanPath.startsWith('/admin') || cleanPath.startsWith('/v1/admin');
+  const token = isAdminOnlyPath ? null : getCustomerToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -155,6 +157,19 @@ api.interceptors.response.use(
       aborted: isCancelledRequest(error),
       errorType: classifyApiError(error),
     });
+    const isUnauthenticated = error.response?.status === 401
+      || (error.response?.status === 500 && error.response?.data?.message === 'Unauthenticated.');
+    if (isUnauthenticated) {
+      const cleanPath = getRequestPath(error.config);
+      const isAuthCheckPath = /^\/(v1\/site\/(orders|returns|reviews|profile|addresses)|v1\/user|frontend\/(user|profile|orders|returns|addresses|wallet))(\/|$)/.test(cleanPath);
+      if (isAuthCheckPath) {
+        clearCustomerToken();
+        getStorage()?.removeItem('c_user');
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('c_user');
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );

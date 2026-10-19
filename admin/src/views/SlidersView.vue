@@ -1,6 +1,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import adminManagementService from '../application/adminManagementService';
+import { useAdminText } from '../composables/useAdminText';
+import { validateAdminImageFile, safeObjectUrl, sanitizeAssetUrl } from '../utils/adminSecurity';
+import { sanitizeUrl } from '../utils/sanitize';
+
+const { tx, locale } = useAdminText();
 
 // State
 const sliders = ref([]);
@@ -15,7 +20,7 @@ const deleteTarget = ref(null);
 const isDeleting = ref(false);
 const previewImage = ref(null);
 const imageFile = ref(null);
-const activeLang = ref('ar');
+const activeLang = ref(locale.value);
 
 const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tijara.be-kite.com/api')
     .replace(/\/api\/?$/, '');
@@ -23,11 +28,12 @@ const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tij
 const normalizeSliderImage = (value) => {
     if (!value) return value;
     const raw = String(value);
-    if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
-    if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
-        return raw.replace('/storage/', '/public/storage/');
-    }
-    return raw;
+    const resolved = raw.startsWith('/storage/')
+        ? `${backendOrigin}/public${raw}`
+        : (raw.includes('/storage/') && !raw.includes('/public/storage/')
+            ? raw.replace('/storage/', '/public/storage/')
+            : raw);
+    return sanitizeAssetUrl(resolved, '');
 };
 
 const form = ref({
@@ -100,15 +106,16 @@ const openViewModal = (slider) => {
 };
 
 const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
-        if (file.size > 1 * 1024 * 1024) {
-            triggerAlert('حجم الصورة يجب أن لا يتجاوز 1 ميجابايت', 'error');
+        const check = validateAdminImageFile(file, { maxSizeMB: 1 });
+        if (!check.valid) {
+            triggerAlert(check.error, 'error');
             e.target.value = '';
             return;
         }
         imageFile.value = file;
-        previewImage.value = URL.createObjectURL(file);
+        previewImage.value = safeObjectUrl(file, previewImage.value);
     }
 };
 
@@ -122,6 +129,11 @@ const submitForm = async () => {
     if (!String(form.value.title_en || '').trim()) {
         activeLang.value = 'en';
         triggerAlert('عنوان الشريحة بالإنجليزية مطلوب', 'error');
+        return;
+    }
+    const rawLink = String(form.value.link || '').trim();
+    if (rawLink && !sanitizeUrl(rawLink, '')) {
+        triggerAlert('رابط الشريحة غير آمن أو غير صالح. يرجى استخدام رابط يبدأ بـ / أو https://', 'error');
         return;
     }
 
@@ -242,15 +254,15 @@ const copyLink = (text) => {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
              </div>
              <div>
-                <h1>إعلانات السلايدر</h1>
-                <p>إدارة شرائح العرض في الصفحة الرئيسية</p>
+                <h1>{{ tx('إعلانات السلايدر', 'Homepage Sliders') }}</h1>
+                <p>{{ tx('إدارة شرائح العرض في الصفحة الرئيسية', 'Manage homepage promotional sliders') }}</p>
              </div>
           </div>
 
        <div class="page-title-area">
           <button class="add-btn" @click="openAddModal">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            إضافة شريحة جديدة
+            {{ tx('إضافة شريحة جديدة', 'Add Slider') }}
           </button>
        </div>
     </div>
@@ -259,7 +271,7 @@ const copyLink = (text) => {
     <div class="filters-card mb-6">
         <div class="search-box">
             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" v-model="searchQuery" @input="fetchSliders" placeholder="البحث عن شريحة..." />
+            <input type="text" v-model="searchQuery" @input="fetchSliders" :placeholder="tx('البحث عن شريحة...', 'Search sliders...')" />
         </div>
     </div>
 
@@ -268,17 +280,17 @@ const copyLink = (text) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-order">الترتيب</th>
-            <th class="col-info text-right">الصورة والعنوان</th>
-            <th class="col-desc">الوصف</th>
-            <th class="col-link">الرابط</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-order">{{ tx('الترتيب', 'Order') }}</th>
+            <th class="col-info text-right">{{ tx('الصورة والعنوان', 'Image and Title') }}</th>
+            <th class="col-desc">{{ tx('الوصف', 'Description') }}</th>
+            <th class="col-link">{{ tx('الرابط', 'Link') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="6">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredSliders.length === 0" class="state-row"><td colspan="6">لا توجد شرائح متوفرة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="6">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredSliders.length === 0" class="state-row"><td colspan="6">{{ tx('لا توجد شرائح متوفرة', 'No sliders available') }}</td></tr>
           <template v-else>
             <tr v-for="slider in filteredSliders" :key="slider.id" class="data-row">
               <td class="col-order">
@@ -316,13 +328,13 @@ const copyLink = (text) => {
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn view" title="عرض" @click="openViewModal(slider)">
+                  <button class="action-btn view" :title="tx('عرض', 'View')" @click="openViewModal(slider)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button class="action-btn edit" title="تعديل" @click="openEditModal(slider)">
+                  <button class="action-btn edit" :title="tx('تعديل', 'Edit')" @click="openEditModal(slider)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn delete" title="حذف" @click="confirmDelete(slider)">
+                  <button class="action-btn delete" :title="tx('حذف', 'Delete')" @click="confirmDelete(slider)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -338,8 +350,8 @@ const copyLink = (text) => {
       <div class="modal-content side-modal">
         <div class="modal-header">
            <button class="close-btn" @click="showFormModal = false">×</button>
-           <h2>{{ isEditing ? 'تعديل الشريحة' : 'إضافة شريحة جديدة' }}</h2>
-           <p>{{ isEditing ? 'تعديل معلومات الشريحة المحددة' : 'إضافة شريحة عرض جديدة للسلايدر' }}</p>
+           <h2>{{ isEditing ? tx('تعديل الشريحة', 'Edit Slider') : tx('إضافة شريحة جديدة', 'Add Slider') }}</h2>
+           <p>{{ isEditing ? tx('تعديل معلومات الشريحة المحددة', 'Update the selected slider') : tx('إضافة شريحة عرض جديدة للسلايدر', 'Add a new homepage slider') }}</p>
         </div>
         
         <div class="modal-body">
@@ -349,32 +361,32 @@ const copyLink = (text) => {
            </div>
 
            <div class="upload-area mb-6">
-              <label class="upload-label">صورة الشريحة</label>
+              <label class="upload-label">{{ tx('صورة الشريحة', 'Slider Image') }}</label>
               <div class="image-preview-box" @click="$refs.imageInput.click()">
                  <img v-if="previewImage" :src="previewImage" />
                  <div class="upload-placeholder" v-else>
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <span>اسحب الصورة هنا أو اضغط للاختيار</span>
-                    <small>يفضل مقاس كبير (مثلاً 1920x800) - الحد الأقصى 1 ميجابايت</small>
+                    <span>{{ tx('اسحب الصورة هنا أو اضغط للاختيار', 'Drag an image here or click to choose') }}</span>
+                    <small>{{ tx('يفضل مقاس كبير (مثلاً 1920x800) - الحد الأقصى 1 ميجابايت', 'Large size recommended (e.g. 1920x800) - maximum 1MB') }}</small>
                  </div>
               </div>
               <input type="file" ref="imageInput" @change="handleImageChange" hidden accept="image/*" />
            </div>
 
            <div class="form-group mb-4">
-              <label class="form-label">العنوان <span class="req">*</span></label>
+              <label class="form-label">{{ tx('العنوان', 'Title') }} <span class="req">*</span></label>
               <input v-show="activeLang === 'ar'" type="text" v-model="form.title_ar" class="form-control" placeholder="عنوان الشريحة بالعربي..." />
               <input v-show="activeLang === 'en'" type="text" v-model="form.title_en" class="form-control" placeholder="Slider title in English..." />
            </div>
 
            <div class="form-group mb-4">
-              <label class="form-label">الوصف</label>
+              <label class="form-label">{{ tx('الوصف', 'Description') }}</label>
               <textarea v-show="activeLang === 'ar'" v-model="form.description_ar" class="form-control" rows="3" placeholder="وصف قصير للعرض بالعربي..."></textarea>
               <textarea v-show="activeLang === 'en'" v-model="form.description_en" class="form-control" rows="3" placeholder="Short slider description in English..."></textarea>
            </div>
 
            <div class="form-group mb-4">
-              <label class="form-label">الرابط (اختياري)</label>
+              <label class="form-label">{{ tx('الرابط (اختياري)', 'Link (Optional)') }}</label>
               <div class="link-input">
                  <input type="text" v-model="form.link" class="form-control ltr-text" placeholder="https://example.com/product" />
                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -383,22 +395,22 @@ const copyLink = (text) => {
 
            <div class="form-row mb-4">
               <div class="form-group flex-1">
-                 <label class="form-label">الترتيب</label>
+                 <label class="form-label">{{ tx('الترتيب', 'Order') }}</label>
                  <input type="number" v-model="form.order" class="form-control" min="0" />
               </div>
               <div class="form-group flex-1">
-                 <label class="form-label">الحالة</label>
+                 <label class="form-label">{{ tx('الحالة', 'Status') }}</label>
                  <select v-model="form.status" class="form-control">
-                    <option value="active">نشط</option>
-                    <option value="inactive">غير نشط</option>
-                    <option value="scheduled">مجدول</option>
+                    <option value="active">{{ tx('نشط', 'Active') }}</option>
+                    <option value="inactive">{{ tx('غير نشط', 'Inactive') }}</option>
+                    <option value="scheduled">{{ tx('مجدول', 'Scheduled') }}</option>
                  </select>
               </div>
            </div>
         </div>
 
         <div class="modal-footer">
-           <button class="btn-cancel" @click="showFormModal = false">إلغاء</button>
+           <button class="btn-cancel" @click="showFormModal = false">{{ tx('إلغاء', 'Cancel') }}</button>
            <button class="btn-save" :disabled="isSubmitting" @click="submitForm">
               {{ isSubmitting ? 'جاري الحفظ...' : 'حفظ الشريحة' }}
            </button>
@@ -411,8 +423,8 @@ const copyLink = (text) => {
       <div class="modal-content info-modal">
         <div class="modal-header">
            <button class="close-btn" @click="showViewModal = false">×</button>
-           <h2>تفاصيل الشريحة</h2>
-           <p>معلومات كاملة عن شريحة السلايدر</p>
+           <h2>{{ tx('تفاصيل الشريحة', 'Slider Details') }}</h2>
+           <p>{{ tx('معلومات كاملة عن شريحة السلايدر', 'Complete slider information') }}</p>
         </div>
         <div class="modal-body p-0">
            <div class="view-image-full" v-if="currentSlider.image">
@@ -420,31 +432,31 @@ const copyLink = (text) => {
            </div>
            <div class="modal-body p-8">
               <div class="info-row">
-                 <label>العنوان:</label>
+                    <label>{{ tx('العنوان', 'Title') }}:</label>
                  <span class="font-bold">{{ currentSlider.title_i18n?.ar || currentSlider.title }}</span>
               </div>
               <div class="info-row">
-                 <label>الوصف:</label>
+                    <label>{{ tx('الوصف', 'Description') }}:</label>
                  <span>{{ currentSlider.description_i18n?.ar || currentSlider.description || '-' }}</span>
               </div>
               <div class="info-row">
-                 <label>الرابط:</label>
+                    <label>{{ tx('الرابط', 'Link') }}:</label>
                  <span class="ltr-text text-blue">{{ currentSlider.link || '-' }}</span>
               </div>
               <div class="info-row-flex mt-4">
                  <div class="info-item">
-                    <label>الحالة:</label>
+                    <label>{{ tx('الحالة', 'Status') }}:</label>
                     <span :class="['status-badge-table', currentSlider.status]">{{ formatStatus(currentSlider.status) }}</span>
                  </div>
                  <div class="info-item">
-                    <label>الترتيب:</label>
+                    <label>{{ tx('الترتيب', 'Order') }}:</label>
                     <span class="order-badge">#{{ currentSlider.order }}</span>
                  </div>
               </div>
            </div>
         </div>
         <div class="modal-footer">
-           <button class="btn-save-alt" @click="showViewModal = false">إغلاق</button>
+           <button class="btn-save-alt" @click="showViewModal = false">{{ tx('إغلاق', 'Close') }}</button>
         </div>
       </div>
     </div>
@@ -458,11 +470,11 @@ const copyLink = (text) => {
           </svg>
         </div>
         <div class="delete-copy">
-          <h2 id="delete-title">تأكيد حذف الشريحة</h2>
-          <p>هل أنت متأكد من حذف شريحة «{{ deleteTarget.title_i18n?.ar || deleteTarget.title }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+          <h2 id="delete-title">{{ tx('تأكيد حذف الشريحة', 'Confirm Slider Deletion') }}</h2>
+          <p>{{ tx('هل أنت متأكد من حذف هذه الشريحة؟ لا يمكن التراجع عن هذا الإجراء.', 'Are you sure you want to delete this slider? This action cannot be undone.') }}</p>
         </div>
         <div class="modal-footer delete-footer">
-          <button class="btn-cancel" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-cancel" type="button" :disabled="isDeleting" @click="cancelDelete">{{ tx('إلغاء', 'Cancel') }}</button>
           <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
             <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
             {{ isDeleting ? 'جاري الحذف...' : 'حذف الشريحة' }}
@@ -479,7 +491,7 @@ const copyLink = (text) => {
 </template>
 
 <style scoped>
-.sliders-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.sliders-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Header */
 .header-action { display: flex; justify-content: space-between; align-items: center; }

@@ -9,8 +9,8 @@
               <span class="banner-badge-pill">
                 {{ currentOffer.badgeText || (currentOffer.type === 'bundle'
                   ? (currentLang === 'ar'
-                    ? `باقة بسعر ${Number(currentOffer.bundle_price || currentOffer.value || 0).toLocaleString('en-US')}`
-                    : `Bundle ${Number(currentOffer.bundle_price || currentOffer.value || 0).toLocaleString('en-US')}`)
+                    ? `باقة بسعر ${bundlePriceText}`
+                    : `Bundle ${bundlePriceText}`)
                   : (currentOffer.value
                     ? (currentLang === 'ar' ? `خصم ${Math.round(currentOffer.value)}%` : `${Math.round(currentOffer.value)}% OFF`)
                     : (currentLang === 'ar' ? 'عرض خاص' : 'Special Offer'))) }}
@@ -80,9 +80,11 @@
         </main>
 </template>
 <script setup>
+import { computed } from 'vue';
 import ProductCard from '../../product/components/ProductCard.vue';
+import { formatPrice, isolateLtr } from '../../../utils/price';
 
-defineProps({
+const props = defineProps({
   currentLang: { type: String, required: true },
   localized: { type: Function, required: true },
   currentOffer: { type: Object, default: null },
@@ -93,4 +95,6 @@ defineProps({
   totalPages: { type: Number, default: 1 },
 });
 const emit = defineEmits(['open-product', 'add-to-cart', 'change-page']);
+
+const bundlePriceText = computed(() => isolateLtr(formatPrice(props.currentOffer?.bundle_price || props.currentOffer?.value || 0)));
 </script>

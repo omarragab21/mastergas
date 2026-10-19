@@ -185,6 +185,45 @@ test('WIRE profile getOrders reads every page of /v1/site/orders and maps them',
   assert.equal(orders[0].total_amount, 1733.52);
 });
 
+test('WIRE profile endpoints use the Postman site contract and map address fields', async () => {
+  stub();
+  respond = (config) => {
+    if (config.url === '/v1/site/profile') return { data: { id: 7, name: 'QA User', phone_number: '+966500000000', email: 'qa@example.test' } };
+    if (config.url === '/v1/site/addresses') return { data: [{ id: 10, name: 'QA User', phone_number: '+966500000000', area: 'الرياض', is_default: true }] };
+    return { data: { id: 10, name: 'QA User', phone_number: '+966500000000', area: 'الرياض', is_default: true } };
+  };
+
+  const user = await profileService.getUser();
+  const addresses = await profileService.getAddresses();
+  await profileService.updateProfile({ name: 'QA User Updated', phone: '+966511111111', email: 'qa@example.test' });
+  await profileService.changePassword({ current_password: 'old-password', password: 'new-password', password_confirmation: 'new-password' });
+  await profileService.createAddress({ full_name: 'QA User', phone: '+966511111111', city: 'الرياض', region: 'منطقة الرياض', address: 'QA Street', is_default: true });
+  await profileService.updateAddress(10, { name: 'QA User Updated', phone: '+966522222222', city: 'جدة', area: 'منطقة مكة', address: 'QA Street 2', is_default: false });
+  await profileService.setDefaultAddress(10);
+  await profileService.deleteAddress(10);
+
+  assert.equal(user.phone_number, '+966500000000');
+  assert.equal(addresses[0].phone, '+966500000000');
+  assert.equal(addresses[0].region, 'الرياض');
+  assert.deepEqual(calls.map((call) => `${call.method} ${call.url}`), [
+    'get /v1/site/profile',
+    'get /v1/site/addresses',
+    'post /v1/site/profile',
+    'put /v1/site/profile/password',
+    'post /v1/site/addresses',
+    'put /v1/site/addresses/10',
+    'patch /v1/site/addresses/10/set-default',
+    'delete /v1/site/addresses/10',
+  ]);
+
+  const profileBody = JSON.parse(calls[2].data);
+  assert.deepEqual(profileBody, { name: 'QA User Updated', phone_number: '+966511111111', email: 'qa@example.test' });
+  const addressBody = JSON.parse(calls[4].data);
+  assert.deepEqual(addressBody, {
+    name: 'QA User', phone_number: '+966511111111', city: 'الرياض', area: 'منطقة الرياض', address: 'QA Street', is_default: true,
+  });
+});
+
 test('WIRE invoice getOrder reads /v1/site/orders/{id}', async () => {
   stub();
   respond = () => ({ data: rawOrder() });

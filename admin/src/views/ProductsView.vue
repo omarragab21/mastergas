@@ -3,15 +3,15 @@
     <!-- Header -->
     <div class="page-header">
       <div class="header-titles">
-        <h2 class="page-title">إدارة المنتجات</h2>
-        <p class="page-subtitle">إضافة وتعديل وإدارة المنتجات</p>
+        <h2 class="page-title">{{ tx('إدارة المنتجات', 'Product Management') }}</h2>
+        <p class="page-subtitle">{{ tx('إضافة وتعديل وإدارة المنتجات', 'Add, edit and manage products') }}</p>
       </div>
       <button class="add-btn" @click="openAddModal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        إضافة منتج جديد
+        {{ tx('إضافة منتج جديد', 'Add Product') }}
       </button>
     </div>
 
@@ -24,7 +24,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي المنتجات</span>
+          <span class="stat-label">{{ tx('إجمالي المنتجات', 'Total Products') }}</span>
           <span class="stat-value">{{ totalProducts }}</span>
         </div>
       </div>
@@ -35,7 +35,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">منتجات نشطة</span>
+          <span class="stat-label">{{ tx('منتجات نشطة', 'Active Products') }}</span>
           <span class="stat-value">{{ activeProductsCount }}</span>
         </div>
       </div>
@@ -46,7 +46,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">منتجات غير نشطة</span>
+          <span class="stat-label">{{ tx('منتجات غير نشطة', 'Inactive Products') }}</span>
           <span class="stat-value">{{ inactiveProductsCount }}</span>
         </div>
       </div>
@@ -57,7 +57,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي المبيعات</span>
+          <span class="stat-label">{{ tx('إجمالي المبيعات', 'Total Sales') }}</span>
           <span class="stat-value">{{ totalSales }}</span>
         </div>
       </div>
@@ -69,19 +69,19 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="البحث عن منتج..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('البحث عن منتج...', 'Search products...')" class="search-input" />
       </div>
       <div class="filter-select">
         <select v-model="statusFilter" class="form-select">
-          <option value="">جميع الحالات</option>
-          <option value="active">نشط</option>
-          <option value="inactive">غير نشط</option>
+          <option value="">{{ tx('جميع الحالات', 'All statuses') }}</option>
+          <option value="active">{{ tx('نشط', 'Active') }}</option>
+          <option value="inactive">{{ tx('غير نشط', 'Inactive') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="filter-select">
         <select v-model="catFilter" class="form-select">
-          <option value="">جميع الأقسام</option>
+          <option value="">{{ tx('جميع الأقسام', 'All categories') }}</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -93,36 +93,35 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name">المنتج</th>
-            <th class="col-price">السعر</th>
-            <th class="col-stock">المخزون</th>
-            <th class="col-sales">المبيعات</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name">{{ tx('المنتج', 'Product') }}</th>
+            <th class="col-price">{{ tx('السعر', 'Price') }}</th>
+            <th class="col-stock">{{ tx('المخزون', 'Stock') }}</th>
+            <th class="col-sales">{{ tx('المبيعات', 'Sales') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="6">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredProducts.length === 0" class="state-row"><td colspan="6">لا توجد منتجات مطابقة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="6">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredProducts.length === 0" class="state-row"><td colspan="6">{{ tx('لا توجد منتجات مطابقة', 'No matching products found') }}</td></tr>
           <template v-else>
             <tr v-for="prod in filteredProducts" :key="prod.id" class="data-row">
               <td class="col-name">
                 <div class="prod-name-cell">
                   <div class="prod-image">
-                    <img v-if="prod.images?.length" :src="prod.images[0]" :alt="prod.name_i18n?.ar || prod.name" />
-                    <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <img :src="productImage(prod)" :alt="localizedName(prod, prod.name)" @error="handleImageError" />
                     <span v-if="prod.images?.length > 1" class="multi-img-badge" :title="`${prod.images.length} صور للمنتج`">+{{ prod.images.length }}</span>
                   </div>
                   <div class="prod-details">
-                    <span class="prod-title">{{ prod.name_i18n?.ar || prod.name }}</span>
-                    <span class="prod-cat-badge">{{ productCategoryName(prod, categories) || 'غير محدد' }}</span>
+                    <span class="prod-title">{{ localizedName(prod, prod.name) }}</span>
+                    <span class="prod-cat-badge">{{ productCategoryName(prod, categories) || tx('غير محدد', 'Uncategorized') }}</span>
                   </div>
                 </div>
               </td>
               <td class="col-price">
                 <div class="price-cell">
-                  <span class="current-price">{{ formatPrice(prod.price * (1 - (getDiscountPercent(prod) / 100))) }} د.أ</span>
-                  <span v-if="getDiscountPercent(prod) > 0" class="old-price">{{ formatPrice(prod.price) }} د.أ</span>
+                  <span class="current-price">{{ formatPrice(prod.price * (1 - (getDiscountPercent(prod) / 100))) }} {{ tx('ر.س', 'SAR') }}</span>
+                  <span v-if="getDiscountPercent(prod) > 0" class="old-price">{{ formatPrice(prod.price) }} {{ tx('ر.س', 'SAR') }}</span>
                 </div>
               </td>
               <td class="col-stock">
@@ -135,18 +134,18 @@
               </td>
               <td class="col-status">
                 <span class="status-badge" :class="prod.status === 'active' ? 'active' : 'inactive'">
-                  {{ prod.status === 'active' ? 'نشط' : 'غير نشط' }}
+                  {{ prod.status === 'active' ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
                 </span>
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn delete-btn" @click="confirmDelete(prod)" title="حذف">
+                  <button class="action-btn delete-btn" @click="confirmDelete(prod)" :title="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
-                  <button class="action-btn edit-btn" @click="openEditModal(prod)" title="تعديل">
+                  <button class="action-btn edit-btn" @click="openEditModal(prod)" :title="tx('تعديل', 'Edit')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openViewModal(prod)" title="عرض">
+                  <button class="action-btn view-btn" @click="openViewModal(prod)" :title="tx('عرض', 'View')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                 </div>
@@ -160,10 +159,10 @@
     <!-- Pagination -->
     <div class="pagination-container" v-if="totalProductsCount > 0">
       <div class="pagination-info">
-        <span>إظهار {{ totalProductsCount > 0 ? (currentPage - 1) * perPage + 1 : 0 }} - {{ Math.min(currentPage * perPage, totalProductsCount) }} من أصل {{ totalProductsCount }} منتج</span>
+        <span>{{ tx('إظهار', 'Showing') }} {{ totalProductsCount > 0 ? (currentPage - 1) * perPage + 1 : 0 }} - {{ Math.min(currentPage * perPage, totalProductsCount) }} {{ tx('من أصل', 'of') }} {{ totalProductsCount }} {{ tx('منتج', 'products') }}</span>
       </div>
       <div class="pagination-controls" v-if="totalPages > 1">
-        <button class="pagination-btn" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" title="السابق" aria-label="السابق">
+        <button class="pagination-btn" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" :title="tx('السابق', 'Previous')" :aria-label="tx('السابق', 'Previous')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <div class="pagination-pages">
@@ -171,7 +170,7 @@
             {{ page }}
           </button>
         </div>
-        <button class="pagination-btn" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" title="التالي" aria-label="التالي">
+        <button class="pagination-btn" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" :title="tx('التالي', 'Next')" :aria-label="tx('التالي', 'Next')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </div>
@@ -183,7 +182,7 @@
         <button class="modal-close" @click="closeModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="form-header"><div class="modal-heading-row"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? 'تعديل المنتج' : 'إضافة منتج جديدة' }}</h3></div><p class="modal-subtitle-main">أدخل معلومات السلعة للجدول</p></div>
+        <div class="form-header"><div class="modal-heading-row"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? tx('تعديل المنتج', 'Edit Product') : tx('إضافة منتج جديد', 'Add New Product') }}</h3></div><p class="modal-subtitle-main">{{ tx('أدخل معلومات السلعة للجدول', 'Enter product information') }}</p></div>
 
         <div class="i18n-toggle" role="tablist" aria-label="Language">
           <button type="button" class="i18n-btn" :class="{ active: activeLang === 'en' }" @click="activeLang = 'en'">English</button>
@@ -192,8 +191,8 @@
 
         <!-- Tabs -->
         <div class="modal-tabs">
-          <button class="tab-btn" :class="{ active: currentTab === 'info' }" @click.prevent="currentTab = 'info'">معلومات المنتج</button>
-          <button class="tab-btn" :class="{ active: currentTab === 'attributes' }" @click.prevent="currentTab = 'attributes'">خصائص المنتج</button>
+          <button class="tab-btn" :class="{ active: currentTab === 'info' }" @click.prevent="currentTab = 'info'">{{ tx('معلومات المنتج', 'Product Information') }}</button>
+          <button class="tab-btn" :class="{ active: currentTab === 'attributes' }" @click.prevent="currentTab = 'attributes'">{{ tx('خصائص المنتج', 'Product Attributes') }}</button>
         </div>
         
         <form @submit.prevent="submitForm" class="prod-form">
@@ -201,9 +200,9 @@
             <!-- Images Upload -->
             <div class="form-group">
               <div class="image-label-row">
-                <label class="form-label mb-0" style="text-align: right;">صور المنتج <span class="req">*</span></label>
+                <label class="form-label mb-0" style="text-align: right;">{{ tx('صور المنتج', 'Product Images') }} <span class="req">*</span></label>
                 <span class="images-count-badge">
-                  {{ form.existing_images.length + form.new_images.length }} / {{ maxImages }} صور
+                  {{ form.existing_images.length + form.new_images.length }} / {{ maxImages }} {{ tx('صور', 'images') }}
                 </span>
               </div>
               <div class="image-uploader">
@@ -211,31 +210,31 @@
                 <div class="upload-box" @click="triggerFileInput" v-if="(form.existing_images.length + form.new_images.length) < maxImages">
                   <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" multiple class="hidden-input" />
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  <p>اضغط أو اسحب لرفع صور متعددة للمنتج<br><span>(JPG, PNG, WebP | بحد أقصى {{ maxImages }} صورة)</span></p>
+                  <p>{{ tx('اضغط أو اسحب لرفع صور متعددة للمنتج', 'Click or drag to upload multiple product images') }}<br><span>(JPG, PNG, WebP | {{ tx('بحد أقصى', 'up to') }} {{ maxImages }} {{ tx('صورة', 'images') }})</span></p>
                 </div>
                 <div class="upload-box disabled" v-else>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                  <p>تم بلوغ الحد الأقصى ({{ maxImages }} صورة)</p>
+                  <p>{{ tx('تم بلوغ الحد الأقصى', 'Maximum reached') }} ({{ maxImages }} {{ tx('صورة', 'images') }})</p>
                 </div>
                 <!-- Images Preview -->
                 <div class="preview-grid" v-if="imagePreviews.length > 0 || form.existing_images.length > 0">
                   <!-- Existing Images -->
                   <div class="preview-item" v-for="(img, idx) in form.existing_images" :key="'e'+idx">
                     <img :src="img" />
-                    <span v-if="idx === 0" class="primary-tag-badge">الرئيسية</span>
-                    <button v-else type="button" class="set-primary-btn" @click.prevent="setPrimaryExistingImage(idx)" title="تعيين كصورة رئيسية للمنتج">
-                      ★ تعيين كرئيسية
+                    <span v-if="idx === 0" class="primary-tag-badge">{{ tx('الرئيسية', 'Primary') }}</span>
+                    <button v-else type="button" class="set-primary-btn" @click.prevent="setPrimaryExistingImage(idx)" :title="tx('تعيين كصورة رئيسية للمنتج', 'Set as primary product image')">
+                      ★ {{ tx('تعيين كرئيسية', 'Set primary') }}
                     </button>
-                    <button type="button" class="remove-img-btn" @click.prevent="removeExistingImage(idx)" title="حذف الصورة">✕</button>
+                    <button type="button" class="remove-img-btn" @click.prevent="removeExistingImage(idx)" :title="tx('حذف الصورة', 'Delete image')">✕</button>
                   </div>
                   <!-- New Staged Images -->
                   <div class="preview-item new-preview-item" v-for="(file, idx) in imagePreviews" :key="'p'+idx">
                     <img :src="file.preview" />
-                    <span v-if="form.existing_images.length === 0 && idx === 0" class="primary-tag-badge">الرئيسية</span>
-                    <button v-else type="button" class="set-primary-btn" @click.prevent="setPrimaryNewImage(idx)" title="تعيين كصورة رئيسية للمنتج">
-                      ★ تعيين كرئيسية
+                    <span v-if="form.existing_images.length === 0 && idx === 0" class="primary-tag-badge">{{ tx('الرئيسية', 'Primary') }}</span>
+                    <button v-else type="button" class="set-primary-btn" @click.prevent="setPrimaryNewImage(idx)" :title="tx('تعيين كصورة رئيسية للمنتج', 'Set as primary product image')">
+                      ★ {{ tx('تعيين كرئيسية', 'Set primary') }}
                     </button>
-                    <button type="button" class="remove-img-btn" @click.prevent="removeNewImage(idx)" title="إلغاء الصورة">✕</button>
+                    <button type="button" class="remove-img-btn" @click.prevent="removeNewImage(idx)" :title="tx('إلغاء الصورة', 'Remove image')">✕</button>
                   </div>
                 </div>
               </div>
@@ -243,31 +242,31 @@
 
             <!-- Long Text Fields with simple fake toolbar -->
             <div class="form-group" v-show="activeLang === 'ar'">
-              <label class="form-label">اسم المنتج (عربي) <span class="req">*</span></label>
+              <label class="form-label">{{ tx('اسم المنتج (عربي)', 'Product name (Arabic)') }} <span class="req">*</span></label>
               <input type="text" v-model="form.name_ar" class="form-control" placeholder="أدخل اسم المنتج بالعربي (Enter product name in Arabic)" />
             </div>
 
             <div class="form-group" v-show="activeLang === 'en'">
-              <label class="form-label">اسم المنتج (English) <span class="req">*</span></label>
+              <label class="form-label">{{ tx('اسم المنتج (English)', 'Product name (English)') }} <span class="req">*</span></label>
               <input type="text" v-model="form.name_en" class="form-control" placeholder="Product name in English (اسم المنتج بالإنجليزية)" />
             </div>
 
             <div class="form-row">
               <div class="form-group half-width">
-                <label class="form-label">القسم الرئيسي <span class="req">*</span></label>
+                <label class="form-label">{{ tx('القسم الرئيسي', 'Main category') }} <span class="req">*</span></label>
                 <div class="select-wrapper">
                   <select v-model="form.category_id" class="form-control" required @change="updateSubcats">
-                    <option value="" disabled selected>اختر القسم الرئيسي هنا (Select Main Category)</option>
+                    <option value="" disabled selected>{{ tx('اختر القسم الرئيسي هنا', 'Select main category') }}</option>
                     <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
                   </select>
                   <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
               </div>
               <div class="form-group half-width">
-                <label class="form-label">القسم الفرعي</label>
+                <label class="form-label">{{ tx('القسم الفرعي', 'Subcategory') }}</label>
                 <div class="select-wrapper">
                   <select v-model="form.subcategory_id" class="form-control" :disabled="!subCategories.length">
-                    <option value="">لا يوجد (None)</option>
+                    <option value="">{{ tx('لا يوجد', 'None') }}</option>
                     <option v-for="sc in subCategories" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
                   </select>
                   <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -277,27 +276,27 @@
 
             <div class="form-row">
               <div class="form-group half-width">
-                <label class="form-label">السعر (د.أ) <span class="req">*</span></label>
-                <input type="number" step="0.01" min="0" v-model="form.price" class="form-control no-rtl-issue" placeholder="0.00 (Price in JOD)" required />
+                <label class="form-label">{{ tx('السعر (ر.س)', 'Price (SAR)') }} <span class="req">*</span></label>
+                <input type="number" step="0.01" min="0" v-model="form.price" class="form-control no-rtl-issue" placeholder="0.00 (Price in SAR)" required />
               </div>
               <div class="form-group half-width">
-                <label class="form-label">الخصم (%)</label>
+                <label class="form-label">{{ tx('الخصم (%)', 'Discount (%)') }}</label>
                 <input type="number" step="0.1" min="1" max="99" v-model="form.discount" class="form-control no-rtl-issue" placeholder="1–99% (Discount)" />
-                <span class="field-hint">الحد الأدنى المقبول من النظام 1% — يُطبَّق تلقائياً عند ترك الحقل فارغاً.</span>
+                <span class="field-hint">{{ tx('الحد الأدنى المقبول من النظام 1% — يُطبَّق تلقائياً عند ترك الحقل فارغاً.', 'The minimum accepted value is 1% and is applied when left blank.') }}</span>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group half-width">
-                <label class="form-label">المخزون <span class="req">*</span></label>
+                <label class="form-label">{{ tx('المخزون', 'Stock') }} <span class="req">*</span></label>
                 <input type="number" min="0" v-model="form.quantity" class="form-control no-rtl-issue" placeholder="0 (Stock)" required />
               </div>
               <div class="form-group half-width">
-                <label class="form-label">الحالة</label>
+                <label class="form-label">{{ tx('الحالة', 'Status') }}</label>
                 <div class="select-wrapper">
                   <select v-model="form.is_active" class="form-control">
-                    <option :value="true">نشط (Active)</option>
-                    <option :value="false">غير نشط (Inactive)</option>
+                    <option :value="true">{{ tx('نشط', 'Active') }}</option>
+                    <option :value="false">{{ tx('غير نشط', 'Inactive') }}</option>
                   </select>
                   <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
@@ -306,7 +305,7 @@
 
             <!-- Long Text Fields with simple fake toolbar -->
             <div class="form-group" v-show="activeLang === 'ar'">
-              <label class="form-label">وصف المنتج (عربي) <span class="req">*</span></label>
+              <label class="form-label">{{ tx('وصف المنتج (عربي)', 'Product description (Arabic)') }} <span class="req">*</span></label>
               <div class="rich-textarea-mock">
                 <div class="rt-toolbar"><span class="rt-icon">B</span><span class="rt-icon">I</span><span class="rt-icon">U</span></div>
                 <textarea v-model="form.description_ar" class="form-control rt-body" placeholder="أدخل تفاصيل ووصف المنتج بالعربي هنا... (Enter product description in Arabic...)"></textarea>
@@ -314,7 +313,7 @@
             </div>
 
             <div class="form-group" v-show="activeLang === 'en'">
-              <label class="form-label">وصف المنتج (English)</label>
+              <label class="form-label">{{ tx('وصف المنتج (English)', 'Product description (English)') }}</label>
               <div class="rich-textarea-mock">
                 <div class="rt-toolbar"><span class="rt-icon">B</span><span class="rt-icon">I</span><span class="rt-icon">U</span></div>
                 <textarea v-model="form.description_en" class="form-control rt-body" placeholder="Product description in English (وصف المنتج بالإنجليزية)..."></textarea>
@@ -322,7 +321,7 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">المميزات ونظرة عامة (Features & Overview)</label>
+                <label class="form-label">{{ tx('المميزات ونظرة عامة (Features & Overview)', 'Features & Overview') }}</label>
               <div class="rich-textarea-mock">
                 <div class="rt-toolbar"><span class="rt-icon">B</span><span class="rt-icon">I</span><span class="rt-icon">U</span></div>
                 <textarea v-show="activeLang === 'ar'" v-model="form.features_ar" class="form-control rt-body" placeholder="أدخل المزايا الرئيسية للمنتج (تغذي تبويب نظرة عامة بالمتجر - ميزة في كل سطر)..."></textarea>
@@ -331,7 +330,7 @@
             </div>
             
             <div class="form-group">
-              <label class="form-label">دليل التركيب وإرشادات الاستخدام (Installation Guide & Tips)</label>
+              <label class="form-label">{{ tx('دليل التركيب وإرشادات الاستخدام (Installation Guide & Tips)', 'Installation Guide & Tips') }}</label>
               <div class="rich-textarea-mock">
                 <div class="rt-toolbar"><span class="rt-icon">B</span><span class="rt-icon">I</span><span class="rt-icon">U</span></div>
                 <textarea v-show="activeLang === 'ar'" v-model="form.tips_ar" class="form-control rt-body" placeholder="أدخل متطلبات التركيب وخطوات التركيب وإرشادات الأمان (تغذي تبويب التركيب بالمتجر)..."></textarea>
@@ -340,7 +339,7 @@
             </div>
             
             <div class="form-group">
-              <label class="form-label">الشحن والإرجاع والضمان (Shipping, Returns & Warranty)</label>
+              <label class="form-label">{{ tx('الشحن والإرجاع والضمان (Shipping, Returns & Warranty)', 'Shipping, Returns & Warranty') }}</label>
               <div class="rich-textarea-mock">
                 <div class="rt-toolbar"><span class="rt-icon">B</span><span class="rt-icon">I</span><span class="rt-icon">U</span></div>
                 <textarea v-show="activeLang === 'ar'" v-model="form.shipping_info_ar" class="form-control rt-body" placeholder="تفاصيل الشحن، شروط الاستبدال والإرجاع، ومدة وسياسة الضمان (تغذي تبويب الشحن والإرجاع بالمتجر)..."></textarea>
@@ -491,11 +490,11 @@
             </div>
 
             <div v-if="attributesLoading" class="attributes-state-card">
-              جاري تحميل خصائص المنتجات من API...
+              {{ tx('جاري تحميل خصائص المنتجات من API...', 'Loading product attributes from API...') }}
             </div>
             <div v-else-if="attributesLoadError" class="attributes-state-card error">
-              تعذر تحميل خصائص المنتجات. اضغط لإعادة المحاولة.
-              <button type="button" class="attributes-retry-btn" @click.prevent="fetchDependencies">إعادة المحاولة</button>
+              {{ tx('تعذر تحميل خصائص المنتجات. اضغط لإعادة المحاولة.', 'Unable to load product attributes. Retry to try again.') }}
+              <button type="button" class="attributes-retry-btn" @click.prevent="fetchDependencies">{{ tx('إعادة المحاولة', 'Retry') }}</button>
             </div>
 
             <!-- Product attributes -->
@@ -518,7 +517,7 @@
                       </button>
                   </div>
                   <div v-else class="attr-no-vals">
-                    <span class="text-muted-xs">لا توجد قيم مسجلة لهذه الخاصية.</span>
+                    <span class="text-muted-xs">{{ tx('لا توجد قيم مسجلة لهذه الخاصية.', 'No values are registered for this attribute.') }}</span>
                   </div>
                 </div>
               </div>
@@ -601,9 +600,9 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn-cancel" @click="closeModal">إلغاء</button>
+            <button type="button" class="btn-cancel" @click="closeModal">{{ tx('إلغاء', 'Cancel') }}</button>
             <button type="submit" class="btn-submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'جاري الحفظ...' : (isEdit ? 'تعديل' : 'إضافة المنتج') }}
+              {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (isEdit ? tx('تعديل', 'Update') : tx('إضافة المنتج', 'Add Product')) }}
             </button>
           </div>
         </form>
@@ -618,53 +617,52 @@
         </button>
 
         <div class="view-image-slider">
-          <img v-if="viewProduct?.images?.length" :src="viewProduct.images[currentImageIdx]" class="view-main-image" />
-          <div v-else class="view-main-image-placeholder">لا توجد صورة</div>
+          <img :src="productImage(viewProduct, currentImageIdx)" class="view-main-image" @error="handleImageError" />
           <button v-if="viewProduct?.images?.length > 1" class="slider-btn prev-btn" @click.prevent="prevImage">&#10095;</button>
           <button v-if="viewProduct?.images?.length > 1" class="slider-btn next-btn" @click.prevent="nextImage">&#10094;</button>
           <div v-if="viewProduct?.images?.length > 1" class="image-indicator">{{currentImageIdx + 1}} / {{viewProduct.images.length}}</div>
         </div>
         <div class="view-thumbnails" v-if="viewProduct?.images?.length > 1">
-          <img v-for="(img, idx) in viewProduct.images" :key="idx" :src="img" class="thumb-img" :class="{active: currentImageIdx === idx}" @click="currentImageIdx = idx" />
+          <img v-for="(img, idx) in viewProduct.images" :key="idx" :src="img" class="thumb-img" :class="{active: currentImageIdx === idx}" @click="currentImageIdx = idx" @error="handleImageError" />
         </div>
 
         <div class="view-body-wrapper">
           <div class="view-title-row">
             <div>
-              <h3 class="view-title">{{ viewProduct?.name }}</h3>
-              <p class="view-subtitle">{{ productCategoryName(viewProduct, categories) || 'غير محدد' }} <span v-if="viewProduct?.subcategory">/ {{ viewProduct?.subcategory }}</span></p>
+              <h3 class="view-title">{{ localizedName(viewProduct, viewProduct?.name) }}</h3>
+              <p class="view-subtitle">{{ productCategoryName(viewProduct, categories) || tx('غير محدد', 'Uncategorized') }} <span v-if="viewProduct?.subcategory">/ {{ viewProduct?.subcategory }}</span></p>
             </div>
             <div class="view-status-badge" :class="viewProduct?.status === 'active' ? 'active' : 'inactive'">
-              {{ viewProduct?.status === 'active' ? 'نشط' : 'غير نشط' }}
+              {{ viewProduct?.status === 'active' ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
             </div>
           </div>
 
           <div class="view-stats-grid">
             <div class="v-stat-box">
-              <span class="v-stat-label">السعر</span>
-              <span class="v-stat-value green-text">{{ formatPrice(viewProduct?.price * (1 - ((viewProduct?.discount||0)/100))) }} <span style="font-size: 0.75rem">د.أ</span></span>
+              <span class="v-stat-label">{{ tx('السعر', 'Price') }}</span>
+              <span class="v-stat-value green-text">{{ formatPrice(viewProduct?.price * (1 - ((viewProduct?.discount||0)/100))) }} <span style="font-size: 0.75rem">ر.س</span></span>
             </div>
             <div class="v-stat-box">
-              <span class="v-stat-label">الخصم</span>
+              <span class="v-stat-label">{{ tx('الخصم', 'Discount') }}</span>
               <span class="v-stat-value">{{ viewProduct?.discount || 0 }}%</span>
             </div>
             <div class="v-stat-box">
-              <span class="v-stat-label">المتبقي</span>
+              <span class="v-stat-label">{{ tx('المتبقي', 'Remaining') }}</span>
               <span class="v-stat-value px-badge">{{ viewProduct?.stock }}</span>
             </div>
             <div class="v-stat-box">
-              <span class="v-stat-label">المبيعات</span>
-              <span class="v-stat-value">{{ viewProduct?.sales }} مرة</span>
+              <span class="v-stat-label">{{ tx('المبيعات', 'Sales') }}</span>
+              <span class="v-stat-value">{{ viewProduct?.sales }} {{ tx('مرة', 'times') }}</span>
             </div>
           </div>
 
           <div class="view-sections">
             <div class="v-section" v-if="viewProduct?.description">
-              <h4 class="v-section-title">نبذة عن المنتج</h4>
+              <h4 class="v-section-title">{{ tx('نبذة عن المنتج', 'About the product') }}</h4>
               <div class="v-section-content" style="white-space: pre-wrap;">{{ toLines(viewProduct?.description).join('\n') }}</div>
             </div>
             <div class="v-section" v-if="viewProduct?.features">
-              <h4 class="v-section-title">المميزات الرئيسية</h4>
+              <h4 class="v-section-title">{{ tx('المميزات الرئيسية', 'Key features') }}</h4>
               <div class="v-section-content">
                 <ul class="v-feature-list">
                   <li v-for="(feature, idx) in toLines(viewProduct.features)" :key="idx" v-show="feature.trim() !== ''">
@@ -674,7 +672,7 @@
               </div>
             </div>
             <div class="v-section" v-if="viewProduct?.tips">
-              <h4 class="v-section-title">نصائح</h4>
+              <h4 class="v-section-title">{{ tx('نصائح', 'Tips') }}</h4>
               <div class="v-section-content">
                 <ul class="v-feature-list">
                   <li v-for="(tip, idx) in toLines(viewProduct.tips)" :key="idx" v-show="tip.trim() !== ''">
@@ -684,11 +682,11 @@
               </div>
             </div>
             <div class="v-section" v-if="viewProduct?.shipping_info">
-              <h4 class="v-section-title">الشحن والضمان</h4>
+              <h4 class="v-section-title">{{ tx('الشحن والضمان', 'Shipping and warranty') }}</h4>
               <div class="v-section-content" style="white-space: pre-wrap;">{{ toLines(viewProduct.shipping_info).join('\n') }}</div>
             </div>
             <div class="v-section" v-if="Object.keys(viewProduct?.attributes || {}).length > 0">
-              <h4 class="v-section-title">خصائص المنتج</h4>
+              <h4 class="v-section-title">{{ tx('خصائص المنتج', 'Product attributes') }}</h4>
               <div class="v-section-content">
                 <div class="v-attr-row" v-for="(vals, key) in viewProduct.attributes" :key="key">
                   <span class="v-attr-key">{{ key }}:</span> 
@@ -704,10 +702,10 @@
           </div>
 
           <div class="view-footer-actions">
-            <button class="btn-cancel" @click="showViewModal = false;">إغلاق</button>
+            <button class="btn-cancel" @click="showViewModal = false;">{{ tx('إغلاق', 'Close') }}</button>
             <button class="btn-outline-edit" @click="showViewModal=false; openEditModal(viewProduct); ">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>  
-              تعديل المنتج
+              {{ tx('تعديل المنتج', 'Edit product') }}
             </button>
           </div>
         </div>
@@ -727,9 +725,19 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 import adminCatalogService from '../application/adminCatalogService';
 import { productCategoryName, toLines, toProductPayload } from '../domain/catalog/adminCatalog';
 import { dedupeColorOptions, isColorAttribute, normalizeProductAttributes } from '../utils/productAttributes';
+import { isTestProduct, visibleCategories, visibleProducts } from '../utils/catalogVisibility';
+import { validateAdminImageFile, safeObjectUrl } from '../utils/adminSecurity';
+
+const { tx, locale } = useAdminText();
+const localizedName = (item, fallback = '') => {
+  if (!item || typeof item !== 'object') return fallback || item || '';
+  const language = localStorage.getItem('lang') === 'en' ? 'en' : 'ar';
+  return item.name_i18n?.[language] || item.name_i18n?.ar || item.name_i18n?.en || item.name || fallback;
+};
 
 // States
 const products = ref([]);
@@ -974,7 +982,7 @@ const currentImageIdx = ref(0);
 
 const fileInput = ref(null);
 const imagePreviews = ref([]); // new uploads
-const activeLang = ref('ar');
+const activeLang = ref(locale.value);
 
 const form = ref({
   name_ar: '',
@@ -1045,7 +1053,7 @@ const totalPages = computed(() => Math.ceil(totalProductsCount.value / perPage.v
 // Filtering
 const filteredProducts = computed(() => {
   const q = (searchQuery.value || '').toLowerCase();
-  return products.value.filter(p => {
+  return products.value.filter(p => !isTestProduct(p)).filter(p => {
     const nameAr = (p.name_i18n?.ar || p.name || '').toString().toLowerCase();
     const nameEn = (p.name_i18n?.en || '').toString().toLowerCase();
     const sku = (p.sku || '').toString().toLowerCase();
@@ -1078,6 +1086,18 @@ const triggerAlert = (msg, type = 'success') => {
 
 // Utils
 const formatPrice = (p) => Number(p).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const productImage = (product, index = 0) => {
+  const rawImage = Array.isArray(product?.images) ? product.images[index] : product?.images;
+  const image = rawImage && typeof rawImage === 'object'
+    ? (rawImage.image_url || rawImage.url || rawImage.image || rawImage.path)
+    : rawImage;
+  return image || '/brand/mastergas-icon.png';
+};
+const handleImageError = (event) => {
+  if (event?.target?.getAttribute('src') !== '/brand/mastergas-icon.png') {
+    event.target.src = '/brand/mastergas-icon.png';
+  }
+};
 
 // The dashboard API returns discount as an amount, while the product form
 // edits it as a percentage. Normalize both shapes before rendering/submitting.
@@ -1126,8 +1146,10 @@ const fetchProducts = async () => {
     }
 
     const res = await adminCatalogService.listProducts(params);
-    products.value = res.data || res.items || [];
-    totalProductsCount.value = Number(res.meta?.total ?? res.total ?? products.value.length);
+    const apiProducts = res.data || res.items || [];
+    products.value = visibleProducts(apiProducts);
+    const apiTotal = Number(res.meta?.total ?? res.total ?? products.value.length);
+    totalProductsCount.value = Math.max(0, apiTotal - apiProducts.filter(isTestProduct).length);
   } catch {
     triggerAlert('فشل استيراد المنتجات', 'error');
   } finally {
@@ -1138,10 +1160,11 @@ const fetchProducts = async () => {
 const fetchStats = async () => {
   try {
     const allList = await adminCatalogService.listAllProducts({ include_inactive: 1, show_all: 1 });
-    const totalCount = allList.length;
-    const activeCount = allList.filter(p => p.status === 'active').length;
-    const inactiveCount = allList.filter(p => p.status !== 'active').length;
-    const salesSum = allList.reduce((sum, p) => sum + Number(p.sales || p.sales_count || p.total_sold || 0), 0);
+    const visibleList = visibleProducts(allList);
+    const totalCount = visibleList.length;
+    const activeCount = visibleList.filter(p => p.status === 'active').length;
+    const inactiveCount = visibleList.filter(p => p.status !== 'active').length;
+    const salesSum = visibleList.reduce((sum, p) => sum + Number(p.sales || p.sales_count || p.total_sold || 0), 0);
     overallStats.value = { total: totalCount, active: activeCount, inactive: inactiveCount, totalSales: salesSum, isLoaded: true };
     totalProductsCount.value = totalCount;
   } catch (err) {
@@ -1157,8 +1180,9 @@ const fetchDependencies = async () => {
       adminCatalogService.listCategories(),
       adminCatalogService.listAttributes(),
     ]);
-    categories.value = allCategories.filter(c => !c.parent_id);
-    const allC = allCategories;
+    const visibleCategoryList = visibleCategories(allCategories);
+    categories.value = visibleCategoryList.filter(c => !c.parent_id);
+    const allC = visibleCategoryList;
     categories.value.forEach(c => {
       c.subchildren = allC.filter(sc => Number(sc.parent_id) === Number(c.id));
     });
@@ -1413,24 +1437,34 @@ const triggerFileInput = () => {
 };
 
 const handleFileChange = (e) => {
-  const files = Array.from(e.target.files);
-  const currentTotal = form.value.existing_images.length + form.value.new_images.length;
-  
-  if (currentTotal + files.length > maxImages) {
-    triggerAlert(`يُسمح بـ ${maxImages} صورة كحد أقصى للمنتج الواحد`, 'error');
-    const allowedCount = maxImages - currentTotal;
-    if (allowedCount > 0) {
-      files.slice(0, allowedCount).forEach(file => {
-        form.value.new_images.push(file);
-        imagePreviews.value.push({ file, preview: URL.createObjectURL(file) });
-      });
+  const rawFiles = Array.from(e.target.files || []);
+  const validFiles = [];
+  for (const file of rawFiles) {
+    const check = validateAdminImageFile(file, { maxSizeMB: 5 });
+    if (!check.valid) {
+      triggerAlert(check.error, 'error');
+      continue;
     }
-  } else {
-    files.forEach(file => {
-      form.value.new_images.push(file);
-      imagePreviews.value.push({ file, preview: URL.createObjectURL(file) });
-    });
+    validFiles.push(file);
   }
+  if (!validFiles.length) {
+    e.target.value = null;
+    return;
+  }
+
+  const currentTotal = form.value.existing_images.length + form.value.new_images.length;
+  const filesToAdd = currentTotal + validFiles.length > maxImages
+    ? validFiles.slice(0, Math.max(0, maxImages - currentTotal))
+    : validFiles;
+
+  if (currentTotal + validFiles.length > maxImages) {
+    triggerAlert(`يُسمح بـ ${maxImages} صورة كحد أقصى للمنتج الواحد`, 'error');
+  }
+
+  filesToAdd.forEach(file => {
+    form.value.new_images.push(file);
+    imagePreviews.value.push({ file, preview: safeObjectUrl(file) });
+  });
   e.target.value = null; // reset
 };
 
@@ -1438,8 +1472,9 @@ const removeExistingImage = (idx) => {
   form.value.existing_images.splice(idx, 1);
 };
 const removeNewImage = (idx) => {
+  const removed = imagePreviews.value.splice(idx, 1)[0];
+  if (removed?.preview) safeObjectUrl(null, removed.preview);
   form.value.new_images.splice(idx, 1);
-  imagePreviews.value.splice(idx, 1);
 };
 
 const setPrimaryExistingImage = (idx) => {

@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="page-header">
       <div class="header-titles">
-        <h2 class="page-title">إدارة الطلبات</h2>
-        <p class="page-subtitle">متابعة وإدارة جميع الطلبات</p>
+        <h2 class="page-title">{{ tx('إدارة الطلبات', 'Order Management') }}</h2>
+        <p class="page-subtitle">{{ tx('متابعة وإدارة جميع الطلبات', 'Track and manage all orders') }}</p>
       </div>
     </div>
 
@@ -13,7 +13,7 @@
       <div class="stat-card total-orders">
         <div class="stat-content">
           <span class="stat-value">{{ totalOrders }}</span>
-          <span class="stat-label">إجمالي الطلبات</span>
+          <span class="stat-label">{{ tx('إجمالي الطلبات', 'Total Orders') }}</span>
         </div>
         <div class="stat-icon-wrapper total-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -24,7 +24,7 @@
       <div class="stat-card stat-pending">
         <div class="stat-content">
           <span class="stat-value">{{ pendingOrders }}</span>
-          <span class="stat-label">قيد الانتظار</span>
+          <span class="stat-label">{{ tx('قيد الانتظار', 'Pending') }}</span>
         </div>
         <div class="stat-icon-wrapper pending-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -35,7 +35,7 @@
       <div class="stat-card stat-processing">
         <div class="stat-content">
           <span class="stat-value">{{ processingOrders }}</span>
-          <span class="stat-label">قيد المعالجة</span>
+          <span class="stat-label">{{ tx('قيد المعالجة', 'Processing') }}</span>
         </div>
         <div class="stat-icon-wrapper processing-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -46,7 +46,7 @@
       <div class="stat-card stat-delivered">
         <div class="stat-content">
           <span class="stat-value">{{ deliveredOrders }}</span>
-          <span class="stat-label">تم التوصيل</span>
+          <span class="stat-label">{{ tx('تم التوصيل', 'Delivered') }}</span>
         </div>
         <div class="stat-icon-wrapper success-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,7 +62,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="بحث برقم الطلب أو اسم العميل..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('بحث برقم الطلب أو اسم العميل...', 'Search by order number or customer name...')" class="search-input" />
       </div>
       <div class="filter-group">
         <div class="date-filter">
@@ -72,7 +72,7 @@
         </div>
         <div class="filter-select">
           <select v-model="statusFilter" class="form-select">
-            <option value="">جميع الحالات</option>
+            <option value="">{{ tx('جميع الحالات', 'All statuses') }}</option>
             <option v-for="status in ORDER_STATUSES" :key="status" :value="status">{{ statusText(status) }}</option>
           </select>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -85,18 +85,18 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-order-num">رقم الطلب</th>
-            <th class="col-customer">العميل</th>
-            <th class="col-products">المنتجات</th>
-            <th class="col-total">المبلغ</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-date">التاريخ</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-order-num">{{ tx('رقم الطلب', 'Order number') }}</th>
+            <th class="col-customer">{{ tx('العميل', 'Customer') }}</th>
+            <th class="col-products">{{ tx('المنتجات', 'Products') }}</th>
+            <th class="col-total">{{ tx('المبلغ', 'Amount') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-date">{{ tx('التاريخ', 'Date') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="7">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredOrders.length === 0" class="state-row"><td colspan="7">لا توجد طلبات مطابقة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="7">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredOrders.length === 0" class="state-row"><td colspan="7">{{ tx('لا توجد طلبات مطابقة', 'No matching orders found') }}</td></tr>
           <template v-else>
             <tr v-for="order in filteredOrders" :key="order.id" class="data-row">
               <td class="col-order-num">
@@ -105,7 +105,7 @@
               </td>
               <td class="col-customer">
                 <div class="customer-cell">
-                  <span class="font-bold">{{ order.customerName || 'عميل محذوف' }}</span>
+                  <span class="font-bold">{{ order.customerName || tx('عميل محذوف', 'Deleted customer') }}</span>
                 </div>
               </td>
               <td class="col-products">
@@ -121,11 +121,11 @@
                       +{{ order.products.length - 3 }}
                     </div>
                   </div>
-                  <span class="products-count">{{ order.products?.length || 0 }} منتج</span>
+                <span class="products-count">{{ order.products?.length || 0 }} {{ tx('منتج', 'products') }}</span>
                 </div>
               </td>
               <td class="col-total">
-                <span class="total-amount">{{ formatPrice(order.total) }} د.أ</span>
+                <span class="total-amount">{{ formatPrice(order.total) }} {{ tx('ر.س', 'SAR') }}</span>
               </td>
               <td class="col-status">
                 <span class="status-badge" :class="order.status">
@@ -137,10 +137,10 @@
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn delete-btn" @click="confirmDelete(order)" title="حذف">
+                  <button class="action-btn delete-btn" @click="confirmDelete(order)" :title="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openViewModal(order)" title="عرض التفاصيل">
+                  <button class="action-btn view-btn" @click="openViewModal(order)" :title="tx('عرض التفاصيل', 'View details')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                 </div>
@@ -156,14 +156,14 @@
       <div class="modal-content view-content-large">
         <div class="view-header-bar">
           <div class="right-col">
-            <h3 class="view-title">تفاصيل الطلب #{{ viewOrder?.orderNumber }}</h3>
+            <h3 class="view-title">{{ tx('تفاصيل الطلب', 'Order details') }} #{{ viewOrder?.orderNumber }}</h3>
             <span class="view-time">{{ viewOrder?.date }} - {{ viewOrder?.time }}</span>
-            <span class="status-badge" :class="viewOrder?.status">{{ trackingStatusLabel(viewOrder?.status) }}</span>
+            <span class="status-badge" :class="viewOrder?.status">{{ trackingStatusText(viewOrder?.status) }}</span>
           </div>
           <div class="left-col">
             <button v-if="allowedStatuses.length" class="btn-outline" @click="openStatusModal">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-2.36"/></svg>
-              تحديث الحالة
+              {{ tx('تحديث الحالة', 'Update status') }}
             </button>
             <button class="modal-close" @click="showViewModal = false;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -186,7 +186,7 @@
                     :aria-label="step.label"
                   ></i>
                 </div>
-                <span>{{ step.label }}</span>
+                <span>{{ trackingStepText(step) }}</span>
                 <small class="step-time">{{ getTrackingStepTime(step.rank) }}</small>
               </div>
               <div
@@ -203,14 +203,14 @@
               <div class="card-section">
                 <h4 class="section-heading">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                  منتجات الطلب
+                  {{ tx('منتجات الطلب', 'Order products') }}
                 </h4>
                 <table class="products-table">
                   <thead>
                     <tr>
-                      <th class="text-right">المنتج</th>
-                      <th>الكمية</th>
-                      <th>الإجمالي</th>
+                      <th class="text-right">{{ tx('المنتج', 'Product') }}</th>
+                      <th>{{ tx('الكمية', 'Quantity') }}</th>
+                      <th>{{ tx('الإجمالي', 'Total') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -230,40 +230,40 @@
                         </div>
                       </td>
                       <td class="text-center font-bold">{{ prod.quantity }}</td>
-                      <td class="text-center">{{ formatPrice(prod.price * prod.quantity) }} د.أ</td>
+                      <td class="text-center">{{ formatPrice(prod.price * prod.quantity) }} {{ tx('ر.س', 'SAR') }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <div class="card-section">
-                <h4 class="section-heading">معلومات العميل</h4>
+                <h4 class="section-heading">{{ tx('معلومات العميل', 'Customer information') }}</h4>
                 <div class="customer-info-grid">
                   <div class="info-item">
-                    <span class="info-label">الاسم</span>
+                    <span class="info-label">{{ tx('الاسم', 'Name') }}</span>
                     <span class="info-val font-bold">{{ viewOrder?.customerName }}</span>
                   </div>
                   <div class="info-item">
-                    <span class="info-label">الهاتف</span>
-                    <span class="info-val ltr flex-end" style="direction:ltr; text-align:right; width: 100%">{{ viewOrder?.customerPhone || 'لا يوجد' }}</span>
+                    <span class="info-label">{{ tx('الهاتف', 'Phone') }}</span>
+                    <span class="info-val ltr flex-end" style="direction:ltr; text-align:right; width: 100%">{{ viewOrder?.customerPhone || tx('لا يوجد', 'Not available') }}</span>
                   </div>
                   <div class="info-item">
-                    <span class="info-label">البريد الإلكتروني</span>
-                    <span class="info-val">{{ viewOrder?.customerEmail || 'لا يوجد' }}</span>
+                    <span class="info-label">{{ tx('البريد الإلكتروني', 'Email') }}</span>
+                    <span class="info-val">{{ viewOrder?.customerEmail || tx('لا يوجد', 'Not available') }}</span>
                   </div>
                   <div class="info-item">
-                    <span class="info-label">العنوان</span>
-                    <span class="info-val">{{ viewOrder?.customerAddress || 'لا يوجد' }}</span>
+                    <span class="info-label">{{ tx('العنوان', 'Address') }}</span>
+                    <span class="info-val">{{ viewOrder?.customerAddress || tx('لا يوجد', 'Not available') }}</span>
                   </div>
                   <div class="info-item" v-if="viewOrder?.notes">
-                    <span class="info-label">ملاحظات العميل</span>
+                    <span class="info-label">{{ tx('ملاحظات العميل', 'Customer notes') }}</span>
                     <span class="info-val">{{ viewOrder.notes }}</span>
                   </div>
                 </div>
               </div>
 
               <div class="card-section" v-if="viewOrder?.activityLog && viewOrder.activityLog.length">
-                <h4 class="section-heading">سجل النشاط</h4>
+                <h4 class="section-heading">{{ tx('سجل النشاط', 'Activity log') }}</h4>
                 <div class="activity-timeline">
                   <div class="timeline-item" v-for="(log, idx) in viewOrder.activityLog" :key="idx">
                     <div class="ti-date">{{ log.date }}<br>{{ log.time }}</div>
@@ -280,32 +280,32 @@
             <!-- Left side (Summary) -->
             <div class="content-side">
               <div class="card-section">
-                <h4 class="section-heading">ملخص الطلب</h4>
+                <h4 class="section-heading">{{ tx('ملخص الطلب', 'Order summary') }}</h4>
                 <div class="summary-rows">
                   <div class="s-row">
-                    <span>المجموع الفرعي</span>
-                    <span>{{ formatPrice(viewOrder?.subtotal) }} د.أ</span>
+                    <span>{{ tx('المجموع الفرعي', 'Subtotal') }}</span>
+                    <span>{{ formatPrice(viewOrder?.subtotal) }} {{ tx('ر.س', 'SAR') }}</span>
                   </div>
                   <div class="s-row">
-                    <span>الشحن</span>
-                    <span>{{ formatPrice(viewOrder?.shipping) }} د.أ</span>
+                    <span>{{ tx('الشحن', 'Shipping') }}</span>
+                    <span>{{ formatPrice(viewOrder?.shipping) }} {{ tx('ر.س', 'SAR') }}</span>
                   </div>
                   <div class="s-row" v-if="viewOrder?.discount > 0">
-                    <span>الخصم</span>
-                    <span class="green-text">-{{ formatPrice(viewOrder?.discount) }} د.أ<template v-if="viewOrder?.couponCode"> ({{ viewOrder.couponCode }})</template></span>
+                    <span>{{ tx('الخصم', 'Discount') }}</span>
+                    <span class="green-text">-{{ formatPrice(viewOrder?.discount) }} {{ tx('ر.س', 'SAR') }}<template v-if="viewOrder?.couponCode"> ({{ viewOrder.couponCode }})</template></span>
                   </div>
                   <div class="s-row">
-                    <span>الضريبة</span>
-                    <span>{{ formatPrice(viewOrder?.tax) }} د.أ</span>
+                    <span>{{ tx('الضريبة', 'Tax') }}</span>
+                    <span>{{ formatPrice(viewOrder?.tax) }} {{ tx('ر.س', 'SAR') }}</span>
                   </div>
                   <div class="s-row total">
-                    <span>الإجمالي</span>
-                    <span>{{ formatPrice(viewOrder?.total) }} د.أ</span>
+                    <span>{{ tx('الإجمالي', 'Total') }}</span>
+                    <span>{{ formatPrice(viewOrder?.total) }} {{ tx('ر.س', 'SAR') }}</span>
                   </div>
                   <div class="s-row flex-start mt-1">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    <span class="text-gray">{{ paymentMethodLabel(viewOrder?.paymentMethod) }}</span>
-                    <span class="payment-badge" :class="viewOrder?.paymentStatus">{{ paymentStatusLabel(viewOrder?.paymentStatus) }}</span>
+                    <span class="text-gray">{{ paymentMethodText(viewOrder?.paymentMethod) }}</span>
+                    <span class="payment-badge" :class="viewOrder?.paymentStatus">{{ paymentStatusText(viewOrder?.paymentStatus) }}</span>
                   </div>
                 </div>
               </div>
@@ -314,11 +314,11 @@
               <div class="card-section gift-admin-section" v-if="viewOrder?.isGift">
                 <h4 class="section-heading">
                   <i class="fas fa-gift"></i>
-                  طلب هدية
+                  {{ tx('طلب هدية', 'Gift order') }}
                 </h4>
                 <div class="gift-msg-admin">
-                  <span class="info-label">رسالة الإهداء:</span>
-                  <p class="gift-text-admin">{{ viewOrder?.giftMessage || 'بدون رسالة' }}</p>
+                  <span class="info-label">{{ tx('رسالة الإهداء:', 'Gift message:') }}</span>
+                  <p class="gift-text-admin">{{ viewOrder?.giftMessage || tx('بدون رسالة', 'No message') }}</p>
                 </div>
               </div>
             </div>
@@ -337,27 +337,27 @@
           <div class="icon-circle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-2.36"/></svg>
           </div>
-          <h3 class="modal-title">تحديث حالة الطلب</h3>
-          <p class="modal-subtitle">اختر الحالة الجديدة للطلب رقم #{{ viewOrder?.orderNumber }}</p>
+          <h3 class="modal-title">{{ tx('تحديث حالة الطلب', 'Update Order Status') }}</h3>
+          <p class="modal-subtitle">{{ tx('اختر الحالة الجديدة للطلب رقم', 'Choose the new status for order') }} #{{ viewOrder?.orderNumber }}</p>
         </div>
 
         <form @submit.prevent="requestStatusUpdate" class="status-form">
           <div class="form-group">
-            <label class="form-label">الحالة الحالية: <span class="status-badge" :class="viewOrder?.status">{{ trackingStatusLabel(viewOrder?.status) }}</span></label>
+            <label class="form-label">{{ tx('الحالة الحالية:', 'Current status:') }} <span class="status-badge" :class="viewOrder?.status">{{ trackingStatusText(viewOrder?.status) }}</span></label>
           </div>
           <div class="form-group">
-            <label class="form-label">الحالة الجديدة <span class="req">*</span></label>
+            <label class="form-label">{{ tx('الحالة الجديدة', 'New status') }} <span class="req">*</span></label>
             <div class="select-wrapper">
               <select v-model="statusForm.status" class="form-control" required>
-                <option v-for="status in allowedStatuses" :key="status" :value="status">{{ trackingStatusLabel(status) }}</option>
+                <option v-for="status in allowedStatuses" :key="status" :value="status">{{ trackingStatusText(status) }}</option>
               </select>
               <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
           </div>
           <div class="form-actions">
-            <button type="button" class="btn-cancel" @click="showStatusModal = false;">إلغاء</button>
+            <button type="button" class="btn-cancel" @click="showStatusModal = false;">{{ tx('إلغاء', 'Cancel') }}</button>
             <button type="submit" class="btn-submit" :disabled="isSubmittingStatus">
-              متابعة للتأكيد
+              {{ tx('متابعة للتأكيد', 'Continue to confirm') }}
             </button>
           </div>
         </form>
@@ -367,7 +367,7 @@
     <!-- Separate confirmation for entering delivery and confirming receipt. -->
     <div class="modal-overlay" v-if="showStatusConfirm" @click.self="cancelStatusConfirmation">
       <div class="modal-content status-content status-confirm-content" role="dialog" aria-modal="true" aria-labelledby="status-confirm-title">
-        <button class="modal-close" @click="cancelStatusConfirmation" aria-label="إغلاق">
+        <button class="modal-close" @click="cancelStatusConfirmation" :aria-label="tx('إغلاق', 'Close')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <div class="status-header">
@@ -378,14 +378,14 @@
           <p class="modal-subtitle">{{ statusConfirmationMessage }}</p>
         </div>
         <div class="status-transition-summary">
-          <span>{{ trackingStatusLabel(viewOrder?.status) }}</span>
+          <span>{{ trackingStatusText(viewOrder?.status) }}</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-          <strong>{{ trackingStatusLabel(pendingStatus) }}</strong>
+          <strong>{{ trackingStatusText(pendingStatus) }}</strong>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-cancel" @click="cancelStatusConfirmation">إلغاء</button>
+          <button type="button" class="btn-cancel" @click="cancelStatusConfirmation">{{ tx('إلغاء', 'Cancel') }}</button>
           <button type="button" class="btn-submit" :disabled="isSubmittingStatus" @click="confirmStatusUpdate">
-            {{ isSubmittingStatus ? 'جاري التحديث...' : 'تأكيد التحديث' }}
+            {{ isSubmittingStatus ? tx('جاري التحديث...', 'Updating...') : tx('تأكيد التحديث', 'Confirm update') }}
           </button>
         </div>
       </div>
@@ -404,6 +404,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 import adminOrderService from '../application/adminOrderService';
 import {
   ORDER_STATUSES,
@@ -415,8 +416,9 @@ import {
   trackingRank,
   trackingStepIcon,
   trackingStepState,
-  trackingStatusLabel,
 } from '../domain/orders/adminOrder';
+
+const { tx } = useAdminText();
 
 const orders = ref([]);
 const loading = ref(false);
@@ -435,17 +437,44 @@ const isSubmittingStatus = ref(false);
 const statusForm = ref({ status: '' });
 const pendingStatus = ref('');
 
-const statusText = statusLabel;
+const statusText = (status) => {
+  const english = {
+    pending: 'Pending', processing: 'Processing', confirmed: 'Confirmed', paid_confirmed: 'Payment Confirmed', shipped: 'Shipped',
+    delivered: 'Delivered', completed: 'Completed', cancelled: 'Cancelled', returned: 'Returned',
+    refunded: 'Refunded', pending_review: 'Pending review', approved: 'Approved', rejected: 'Rejected',
+  };
+  return tx(statusLabel(status), english[status] || statusLabel(status));
+};
+const trackingStatusText = (status) => statusText(status);
+const paymentMethodText = (method) => {
+  const english = {
+    cash_on_delivery: 'Cash on delivery', cash: 'Cash on delivery', card: 'Card', wallet: 'Wallet',
+  };
+  return tx(paymentMethodLabel(method), english[method] || paymentMethodLabel(method));
+};
+const paymentStatusText = (status) => {
+  const english = {
+    pending: 'Pending', paid: 'Paid', paid_confirmed: 'Payment Confirmed', refunded: 'Refunded', failed: 'Failed',
+  };
+  return tx(paymentStatusLabel(status), english[status] || paymentStatusLabel(status));
+};
+const trackingStepText = (step) => {
+  const labels = {
+    pending: 'Pending', confirmed: 'Confirmed', processing: 'Processing', shipped: 'Shipped',
+    delivered: 'Delivered', completed: 'Completed', cancelled: 'Cancelled',
+  };
+  return tx(step?.label || '', labels[step?.key] || step?.label || '');
+};
 const allowedStatuses = computed(() => nextStatuses(viewOrder.value?.status));
 const statusConfirmationTitle = computed(() => {
-  if (pendingStatus.value === 'shipped') return 'تأكيد أن الطلب في الطريق';
-  if (pendingStatus.value === 'delivered') return 'تأكيد استلام العميل';
-  return 'تأكيد تحديث حالة الطلب';
+  if (pendingStatus.value === 'shipped') return tx('تأكيد أن الطلب في الطريق', 'Confirm shipment in transit');
+  if (pendingStatus.value === 'delivered') return tx('تأكيد استلام العميل', 'Confirm customer receipt');
+  return tx('تأكيد تحديث حالة الطلب', 'Confirm order status update');
 });
 const statusConfirmationMessage = computed(() => {
-  if (pendingStatus.value === 'shipped') return 'سيصبح الطلب في الطريق فقط. لن يتم اعتباره مستلماً حتى تؤكد خطوة منفصلة.';
-  if (pendingStatus.value === 'delivered') return 'أكد فقط بعد التحقق من أن العميل استلم الطلب فعلاً.';
-  return 'راجع الحالة الجديدة قبل إرسالها إلى النظام.';
+  if (pendingStatus.value === 'shipped') return tx('سيصبح الطلب في الطريق فقط. لن يتم اعتباره مستلماً حتى تؤكد خطوة منفصلة.', 'The order will be in transit and will not be marked received until a separate confirmation.');
+  if (pendingStatus.value === 'delivered') return tx('أكد فقط بعد التحقق من أن العميل استلم الطلب فعلاً.', 'Confirm only after verifying that the customer received the order.');
+  return tx('راجع الحالة الجديدة قبل إرسالها إلى النظام.', 'Review the new status before sending it to the system.');
 });
 
 // Stats

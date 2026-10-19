@@ -4,14 +4,14 @@
     <div class="page-header">
       <div class="header-titles">
         <div class="title-with-icon">
-          <h2 class="page-title">تقييمات المنتجات</h2>
+          <h2 class="page-title">{{ tx('تقييمات المنتجات', 'Product Reviews') }}</h2>
           <div class="tag-icon-wrapper">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
           </div>
         </div>
-        <p class="page-subtitle">إدارة ومراجعة تقييمات العملاء للمنتجات</p>
+        <p class="page-subtitle">{{ tx('إدارة ومراجعة تقييمات العملاء للمنتجات', 'Manage and review customer product ratings') }}</p>
       </div>
     </div>
 
@@ -24,7 +24,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي التقييمات</span>
+          <span class="stat-label">{{ tx('إجمالي التقييمات', 'Total Reviews') }}</span>
           <h3 class="stat-value">{{ reviews.length }}</h3>
         </div>
       </div>
@@ -36,7 +36,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">بانتظار المراجعة</span>
+          <span class="stat-label">{{ tx('بانتظار المراجعة', 'Pending Review') }}</span>
           <h3 class="stat-value">{{ pendingReviewsCount }}</h3>
         </div>
       </div>
@@ -48,7 +48,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">تقييمات منشورة</span>
+          <span class="stat-label">{{ tx('تقييمات منشورة', 'Published Reviews') }}</span>
           <h3 class="stat-value">{{ approvedReviewsCount }}</h3>
         </div>
       </div>
@@ -60,7 +60,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">متوسط التقييم</span>
+          <span class="stat-label">{{ tx('متوسط التقييم', 'Average Rating') }}</span>
           <h3 class="stat-value">{{ averageRating }}<small>/5</small></h3>
         </div>
       </div>
@@ -72,22 +72,22 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="بحث باسم العميل أو المنتج أو التعليق..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('بحث باسم العميل أو المنتج أو التعليق...', 'Search by customer, product, or comment...')" class="search-input" />
       </div>
 
       <div class="filter-select">
         <select v-model="statusFilter" class="form-select">
-          <option value="">كل الحالات</option>
-          <option value="pending">بانتظار المراجعة</option>
-          <option value="approved">منشور</option>
+          <option value="">{{ tx('كل الحالات', 'All Statuses') }}</option>
+          <option value="pending">{{ tx('بانتظار المراجعة', 'Pending Review') }}</option>
+          <option value="approved">{{ tx('منشور', 'Published') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
 
       <div class="filter-select">
         <select v-model="ratingFilter" class="form-select">
-          <option value="">كل التقييمات</option>
-          <option v-for="n in [5, 4, 3, 2, 1]" :key="n" :value="String(n)">{{ n }} {{ n === 1 ? 'نجمة' : 'نجوم' }}</option>
+          <option value="">{{ tx('كل التقييمات', 'All Ratings') }}</option>
+          <option v-for="n in [5, 4, 3, 2, 1]" :key="n" :value="String(n)">{{ n }} {{ n === 1 ? tx('نجمة', 'star') : tx('نجوم', 'stars') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
@@ -98,18 +98,18 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name text-right">المنتج</th>
-            <th class="col-customer">العميل</th>
-            <th class="col-rating">التقييم</th>
-            <th class="col-comment text-right">التعليق</th>
-            <th class="col-date">التاريخ</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name text-right">{{ tx('المنتج', 'Product') }}</th>
+            <th class="col-customer">{{ tx('العميل', 'Customer') }}</th>
+            <th class="col-rating">{{ tx('التقييم', 'Rating') }}</th>
+            <th class="col-comment text-right">{{ tx('التعليق', 'Comment') }}</th>
+            <th class="col-date">{{ tx('التاريخ', 'Date') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="7">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredReviews.length === 0" class="state-row"><td colspan="7">لا توجد تقييمات مطابقة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="7">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredReviews.length === 0" class="state-row"><td colspan="7">{{ tx('لا توجد تقييمات مطابقة', 'No matching reviews') }}</td></tr>
           <template v-else>
             <tr v-for="review in filteredReviews" :key="review.id" class="data-row">
               <td class="col-name text-right">
@@ -129,18 +129,18 @@
               <td class="col-date">{{ formatDate(review.created_at) }}</td>
               <td class="col-status">
                 <span :class="['status-badge-table', review.is_approved ? 'active' : 'scheduled']">
-                  {{ review.is_approved ? 'منشور' : 'بانتظار المراجعة' }}
+                  {{ review.is_approved ? tx('منشور', 'Published') : tx('بانتظار المراجعة', 'Pending Review') }}
                 </span>
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button v-if="!review.is_approved" class="action-btn approve-btn" @click="approveReview(review)" title="موافقة ونشر" aria-label="موافقة ونشر">
+                  <button v-if="!review.is_approved" class="action-btn approve-btn" @click="approveReview(review)" :title="tx('موافقة ونشر', 'Approve and Publish')" :aria-label="tx('موافقة ونشر', 'Approve and Publish')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openView(review)" title="عرض" aria-label="عرض">
+                  <button class="action-btn view-btn" @click="openView(review)" :title="tx('عرض', 'View')" :aria-label="tx('عرض', 'View')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button class="action-btn delete-btn" @click="confirmDelete(review)" title="حذف" aria-label="حذف">
+                  <button class="action-btn delete-btn" @click="confirmDelete(review)" :title="tx('حذف', 'Delete')" :aria-label="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -154,28 +154,28 @@
     <!-- View Modal -->
     <div class="modal-overlay" v-if="viewedReview" @click.self="closeView">
       <div class="modal-content form-content">
-        <button class="modal-close" @click="closeView" aria-label="إغلاق">
+        <button class="modal-close" @click="closeView" :aria-label="tx('إغلاق', 'Close')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <div class="form-header">
           <div class="header-icon-main">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
-          <h3 class="modal-title-main">تفاصيل التقييم</h3>
-          <p class="modal-subtitle-main">عرض البيانات فقط</p>
+          <h3 class="modal-title-main">{{ tx('تفاصيل التقييم', 'Review Details') }}</h3>
+          <p class="modal-subtitle-main">{{ tx('عرض البيانات فقط', 'View-only details') }}</p>
         </div>
 
         <div class="review-details">
           <div class="detail-row">
-            <span class="detail-label">المنتج</span>
+            <span class="detail-label">{{ tx('المنتج', 'Product') }}</span>
             <span class="detail-value">{{ productName(viewedReview) }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">العميل</span>
+            <span class="detail-label">{{ tx('العميل', 'Customer') }}</span>
             <span class="detail-value">{{ customerName(viewedReview) }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">التقييم</span>
+            <span class="detail-label">{{ tx('التقييم', 'Rating') }}</span>
             <div class="rating-stars">
               <svg v-for="i in 5" :key="i" width="18" height="18" viewBox="0 0 24 24" :class="{ filled: i <= Number(viewedReview.rating) }" stroke="currentColor" stroke-width="1.6">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -184,25 +184,25 @@
             </div>
           </div>
           <div class="detail-row">
-            <span class="detail-label">التاريخ</span>
+            <span class="detail-label">{{ tx('التاريخ', 'Date') }}</span>
             <span class="detail-value">{{ formatDate(viewedReview.created_at) || '—' }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">الحالة</span>
+            <span class="detail-label">{{ tx('الحالة', 'Status') }}</span>
             <span :class="['status-badge-table', viewedReview.is_approved ? 'active' : 'scheduled']">
-              {{ viewedReview.is_approved ? 'منشور' : 'بانتظار المراجعة' }}
+              {{ viewedReview.is_approved ? tx('منشور', 'Published') : tx('بانتظار المراجعة', 'Pending Review') }}
             </span>
           </div>
           <div class="detail-block">
-            <span class="detail-label">التعليق</span>
-            <p class="comment-full">{{ viewedReview.comment || 'لا يوجد تعليق' }}</p>
+            <span class="detail-label">{{ tx('التعليق', 'Comment') }}</span>
+            <p class="comment-full">{{ viewedReview.comment || tx('لا يوجد تعليق', 'No comment') }}</p>
           </div>
         </div>
 
         <div class="form-footer-btns view-footer">
-          <button type="button" class="btn-cancel-form" @click="closeView">إغلاق</button>
+          <button type="button" class="btn-cancel-form" @click="closeView">{{ tx('إغلاق', 'Close') }}</button>
           <button v-if="!viewedReview.is_approved" type="button" class="btn-submit-form" :disabled="isApproving" @click="approveReview(viewedReview)">
-            {{ isApproving ? 'جاري النشر...' : 'موافقة ونشر' }}
+            {{ isApproving ? tx('جاري النشر...', 'Publishing...') : tx('موافقة ونشر', 'Approve and Publish') }}
           </button>
         </div>
       </div>
@@ -217,14 +217,14 @@
           </svg>
         </div>
         <div class="delete-copy">
-          <h2 id="delete-review-title">تأكيد حذف التقييم</h2>
-          <p>هل أنت متأكد من حذف تقييم «{{ customerName(deleteTarget) }}» على «{{ productName(deleteTarget) }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+          <h2 id="delete-review-title">{{ tx('تأكيد حذف التقييم', 'Confirm Review Deletion') }}</h2>
+          <p>{{ tx('هل أنت متأكد من حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء.', 'Are you sure you want to delete this review? This action cannot be undone.') }}</p>
         </div>
         <div class="delete-footer">
-          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">{{ tx('إلغاء', 'Cancel') }}</button>
           <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
             <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
-            {{ isDeleting ? 'جاري الحذف...' : 'حذف التقييم' }}
+            {{ isDeleting ? tx('جاري الحذف...', 'Deleting...') : tx('حذف التقييم', 'Delete Review') }}
           </button>
         </div>
       </div>
@@ -244,6 +244,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import adminManagementService from '../application/adminManagementService';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
 
 const reviews = ref([]);
 const loading = ref(true);
@@ -348,7 +351,7 @@ onMounted(fetchReviews);
 
 <style scoped>
 .reviews-page {
-  display: flex; flex-direction: column; gap: 1.5rem; direction: rtl; font-family: 'IBM Plex Sans Arabic', sans-serif; padding-bottom: 3rem;
+  display: flex; flex-direction: column; gap: 1.5rem; direction: inherit; font-family: 'IBM Plex Sans Arabic', sans-serif; padding-bottom: 3rem;
 }
 
 /* Page Header */

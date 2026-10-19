@@ -15,35 +15,41 @@
         <div class="orbit-item time">⏰</div>
       </div>
 
-      <h1 class="title">إدارة التوصيل</h1>
-      <p class="subtitle">نحن نعمل على بناء نظام ذكي لإدارة أسطول التوصيل وتتبع الشحنات بدقة فائقة</p>
+      <h1 class="title">{{ tx('إدارة التوصيل', 'Delivery Management') }}</h1>
+      <p class="subtitle">{{ tx('نحن نعمل على بناء نظام ذكي لإدارة أسطول التوصيل وتتبع الشحنات بدقة فائقة', 'We are building a smart system to manage the delivery fleet and track shipments accurately') }}</p>
       
       <div class="status-badge">
         <span class="pulse-dot"></span>
-        تحت التجهيز
+        {{ tx('تحت التجهيز', 'In preparation') }}
       </div>
 
       <div class="features-preview">
         <div class="feature-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          تتبع السائقين في الوقت الفعلي (Live Tracking)
+          {{ tx('تتبع السائقين في الوقت الفعلي (Live Tracking)', 'Real-time driver tracking') }}
         </div>
         <div class="feature-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          تخصيص الطلبات وتوزيع المهام الذكي
+          {{ tx('تخصيص الطلبات وتوزيع المهام الذكي', 'Smart order assignment and task distribution') }}
         </div>
         <div class="feature-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          تقارير كفاءة التوصيل وتحديد المسارات
+          {{ tx('تقارير كفاءة التوصيل وتحديد المسارات', 'Delivery efficiency reports and route planning') }}
         </div>
       </div>
 
       <div class="footer-note">
-        سيتم إطلاق نظام التوصيل المطور قريباً...
+        {{ tx('سيتم إطلاق نظام التوصيل المطور قريباً...', 'The upgraded delivery system will launch soon...') }}
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
+</script>
 
 <style scoped>
 .coming-soon-container {
@@ -52,7 +58,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  direction: rtl;
+  direction: inherit;
   padding: 2rem;
 }
 

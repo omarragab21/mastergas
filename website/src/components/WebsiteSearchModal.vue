@@ -31,12 +31,12 @@
           class="search-result-item"
           @click="goToProduct(product.id)"
         >
-          <div v-if="product.image" class="search-result-image">
-            <img :src="product.image" :alt="localized(product, 'name')" />
+          <div class="search-result-image">
+            <img :src="product.image || FALLBACK_IMAGE" :alt="localized(product, 'name')" @error="onImageError" />
           </div>
           <div class="search-result-info">
             <h4>{{ localized(product, 'name') }}</h4>
-            <p class="search-result-price">{{ formatPrice(product.price * (1 - (product.discount / 100 || 0))) }}</p>
+            <p class="search-result-price"><PriceText :value="product.price * (1 - (product.discount / 100 || 0))" :currency="currency" /></p>
           </div>
         </div>
       </div>
@@ -54,6 +54,8 @@
 <script setup>
 import { nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useSettings } from '../composables/useSettings';
+import PriceText from './PriceText.vue';
 import { useLocalized } from '../composables/useLocalized';
 import { useProductSearch } from '../modules/product/composables/useProductSearch';
 
@@ -80,11 +82,12 @@ const goToProduct = (productId) => {
   router.push(`/product/${productId}`);
 };
 
-const formatPrice = (price) => new Intl.NumberFormat('ar-JO', {
-  style: 'currency',
-  currency: 'JOD',
-  minimumFractionDigits: 2,
-}).format(price);
+const FALLBACK_IMAGE = '/brand/mastergas-icon.png';
+const onImageError = (event) => {
+  if (!String(event.target.src).endsWith(FALLBACK_IMAGE)) event.target.src = FALLBACK_IMAGE;
+};
+
+const { currency } = useSettings();
 
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
@@ -106,6 +109,10 @@ watch(() => props.modelValue, (isOpen) => {
 .search-input-wrapper input { flex: 1; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 1rem; }
 .search-input-wrapper input:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(135, 50, 96, 0.1); }
 .search-submit-btn { width: 48px; border: none; border-radius: 10px; background: #000; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+.search-submit-btn:hover:not(:disabled) {
+  background: var(--color-button-hover);
+}
 .search-results { padding: 1rem; max-height: 400px; overflow-y: auto; }
 .search-result-item { display: flex; gap: 1rem; padding: 1rem; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
 .search-result-item:hover { background: #f9fafb; border-color: #f3f4f6; }

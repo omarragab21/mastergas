@@ -706,7 +706,7 @@
 }
 
 .btn-add-review-cta:hover {
-  background: #1E293B;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

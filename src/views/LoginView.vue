@@ -231,9 +231,26 @@ const handleLogin = async () => {
       password: form.value.password,
     });
 
+    const rawToken = String(response.data?.token ?? response.data?.access_token ?? '').trim();
+    const user = response.data?.user || response.data?.admin || response.data?.customer || {};
+    const userRole = String(user?.role || '').trim().toLowerCase();
+    const isExplicitCustomer = ['customer', 'user', 'client', 'guest'].includes(userRole) && !user?.is_super_admin && !user?.is_admin;
+
+    if (!rawToken || rawToken === 'undefined' || rawToken === 'null') {
+      error.value = 'تعذر التحقق من جلسة الدخول، يرجى المحاولة مرة أخرى';
+      return;
+    }
+
+    if (isExplicitCustomer) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('admin');
+      error.value = 'غير مصرح لهذا الحساب بالدخول إلى لوحة الإدارة';
+      return;
+    }
+
     // حفظ الـ token والمعلومات
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('admin', JSON.stringify(response.data.user || response.data.admin || {}));
+    localStorage.setItem('token', rawToken);
+    localStorage.setItem('admin', JSON.stringify(user));
 
     if (form.value.remember) {
       localStorage.setItem('remembered_email', form.value.email);

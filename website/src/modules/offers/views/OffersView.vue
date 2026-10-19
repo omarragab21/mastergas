@@ -3,7 +3,7 @@
     <!-- 1. Top Section: Breadcrumbs & Title (Container) -->
     <div class="container">
       <!-- Breadcrumbs -->
-      <nav class="breadcrumb-flow" aria-label="breadcrumb">
+      <nav class="breadcrumb-flow" :aria-label="$t('common.breadcrumb')">
         <router-link to="/" class="crumb-link">{{ currentLang === 'ar' ? 'الرئيسية' : 'Home' }}</router-link>
         <span class="crumb-separator" aria-hidden="true">
           <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">

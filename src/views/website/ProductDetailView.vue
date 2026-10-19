@@ -851,31 +851,29 @@
     <Teleport to="body">
       <transition name="fade">
         <div v-if="showShareModal" class="share-modal-overlay" @click.self="showShareModal = false">
-          <div class="share-modal-content">
-            <div class="share-header">
-              <button class="share-close" @click="showShareModal = false"><i class="fas fa-times"></i></button>
-              <h3 class="share-title">{{ t('product.share_product') }}</h3>
+          <div class="share-card" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
+            <div class="share-card-header">
+              <h3 class="share-card-title">{{ t('product.share_product') }}</h3>
+              <button class="share-card-close" type="button" @click="showShareModal = false">
+                <img :src="shareCloseIcon" alt="" />
+              </button>
             </div>
-            <div class="share-options">
-              <button class="share-option-btn" @click="shareTo('whatsapp')">
-                <div class="share-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
-                <span class="share-text">WhatsApp</span>
+            <div class="share-card-options">
+              <button class="share-card-option" type="button" @click="shareTo('whatsapp')">
+                <span class="share-card-circle whatsapp"><img class="flip" :src="shareWhatsappIcon" alt="" /></span>
+                <span class="share-card-label">{{ t('product.share_whatsapp') }}</span>
               </button>
-              <button class="share-option-btn" @click="shareTo('facebook')">
-                <div class="share-icon facebook"><i class="fab fa-facebook-f"></i></div>
-                <span class="share-text">Facebook</span>
+              <button class="share-card-option" type="button" @click="shareTo('facebook')">
+                <span class="share-card-circle facebook"><img class="flip" :src="shareFacebookIcon" alt="" /></span>
+                <span class="share-card-label">{{ t('product.share_facebook') }}</span>
               </button>
-              <button class="share-option-btn" @click="shareTo('twitter')">
-                <div class="share-icon twitter">
-                  <svg width="14" height="14" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" fill="white"/>
-                  </svg>
-                </div>
-                <span class="share-text">X</span>
-              </button>
-              <button class="share-option-btn" @click="copyLink">
-                <div class="share-icon copy"><i class="far fa-copy"></i></div>
-                <span class="share-text">{{ t('product.copy_link') }}</span>
+              <a class="share-card-option" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+                <span class="share-card-circle instagram"><img class="flip" :src="shareInstagramIcon" alt="" /></span>
+                <span class="share-card-label">{{ t('product.share_instagram') }}</span>
+              </a>
+              <button class="share-card-option" type="button" @click="copyLink">
+                <span class="share-card-circle copy"><img :src="shareCopyLinkIcon" alt="" /></span>
+                <span class="share-card-label">{{ t('product.copy_link') }}</span>
               </button>
             </div>
             <div class="copy-feedback" v-if="linkCopied">{{ t('product.link_copied') }}</div>
@@ -949,6 +947,11 @@ import ProductCard from '../../components/ProductCard.vue';
 import { productService } from '../../services/productService';
 import { getProductById, products as fallbackProducts } from '../../data/catalogData';
 import riyalIcon from '../../../assets/riyal.svg';
+import shareCloseIcon from '../../../assets/share-close.svg';
+import shareCopyLinkIcon from '../../../assets/share-copy-link.svg';
+import shareInstagramIcon from '../../../assets/share-instagram.svg';
+import shareFacebookIcon from '../../../assets/share-facebook.svg';
+import shareWhatsappIcon from '../../../assets/share-whatsapp.svg';
 
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { t, locale } = useI18n();
@@ -1081,11 +1084,9 @@ const shareTo = (platform) => {
   const title = encodeURIComponent(product.value?.name || '');
   
   if (platform === 'whatsapp') {
-    window.open(`https://api.whatsapp.com/send?text=${title} - ${url}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${title} - ${url}`, '_blank', 'noopener,noreferrer');
   } else if (platform === 'facebook') {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-  } else if (platform === 'twitter') {
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'noopener,noreferrer');
   }
 };
 
@@ -3538,21 +3539,112 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.share-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+.share-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.12);
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.share-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.share-card-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  text-align: start;
+}
+
+.share-card-close {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border: none;
+  border-radius: 9999px;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #ffffff;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-.share-icon.whatsapp { background: #25d366; }
-.share-icon.facebook { background: #1877f2; }
-.share-icon.twitter { background: #000000; }
-.share-icon.copy { background: #6b7280; }
+.share-card-options {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.share-card-option {
+  width: 84px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.share-card-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.share-card-circle img {
+  display: block;
+}
+
+/* Exported brand icons are stored vertically flipped; the design flips them back */
+.share-card-circle img.flip {
+  transform: scaleY(-1);
+}
+
+.share-card-circle.whatsapp { background: #25d366; }
+.share-card-circle.facebook { background: #1877f2; }
+.share-card-circle.instagram { background: #e1306c; }
+.share-card-circle.copy { background: #f8fafc; border: 1px solid #e2e8f0; }
+
+.share-card-label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .share-card {
+    padding: 24px;
+  }
+
+  .share-card-option {
+    width: 64px;
+  }
+}
 
 .copy-feedback {
   text-align: center;

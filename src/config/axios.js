@@ -18,6 +18,26 @@ const REMOTE_AUTH_PATHS = new Set([
   '/frontend/login', '/frontend/register', '/frontend/logout', '/frontend/user',
   '/frontend/profile', '/frontend/change-password', '/frontend/forgot-password',
 ]);
+const LIVE_ADMIN_PATH_PREFIXES = [
+  '/v1/admins',
+  '/v1/users',
+  '/v1/categories',
+  '/v1/discount_codes',
+  '/v1/offers',
+  '/v1/products',
+  '/v1/attributes',
+  '/v1/orders',
+  '/v1/sliders',
+  '/v1/reviews',
+  '/v1/contacts',
+  '/v1/returns',
+  '/v1/settings',
+  '/v1/reports',
+];
+
+const isLiveAdminEndpoint = (cleanPath) =>
+  LIVE_ADMIN_PATH_PREFIXES.some((prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
+
 const normalizePath = (url = '') => String(url).split('?')[0].replace(/^\/api/, '') || '/';
 
 const api = axios.create({
@@ -40,7 +60,7 @@ const getRequestPath = (config = {}) => {
 
 const sanitizeParameters = (parameters = {}) => Object.fromEntries(
   Object.entries(parameters || {}).map(([key, value]) => {
-    const sensitive = /token|password|secret|authorization|email|phone/i.test(key);
+    const sensitive = /token|password|secret|authorization|email|phone|address|card|cvv|iban/i.test(key);
     return [key, sensitive ? '[redacted]' : value];
   })
 );
@@ -117,16 +137,18 @@ api.interceptors.request.use(config => {
 
   const requestUrl = config.url || '';
   const cleanPath = normalizePath(requestUrl);
-  const isFrontendRequest = cleanPath.startsWith('/frontend');
+  const isFrontendRequest = cleanPath.startsWith('/frontend') || cleanPath.startsWith('/v1/site');
   const isAdminRequest = !isFrontendRequest && (
     cleanPath.startsWith('/dashboard') || 
     cleanPath.startsWith('/v1/admins') || 
-    cleanPath.startsWith('/admin')
+    cleanPath.startsWith('/admin') ||
+    isLiveAdminEndpoint(cleanPath)
   );
   let token;
 
   if (isAdminRequest) {
-    token = storage?.getItem('token');
+    const rawToken = String(storage?.getItem('token') ?? '').trim();
+    token = rawToken && rawToken !== 'undefined' && rawToken !== 'null' ? rawToken : null;
   } else {
     // For all customer and website routes, use strictly the customer token (never fallback to admin token)
     token = getCustomerToken();
@@ -206,14 +228,17 @@ api.interceptors.response.use(
       aborted: isCancelledRequest(error),
       errorType: classifyApiError(error),
     });
-    if (error.response && error.response.status === 401) {
+    const isUnauthenticated = error.response?.status === 401
+      || (error.response?.status === 500 && error.response?.data?.message === 'Unauthenticated.');
+    if (error.response && isUnauthenticated) {
       const url = error.config?.url || '';
       const cleanPath = url.split('?')[0].replace(/^\/api/, '');
-      const isFrontendReq = cleanPath.startsWith('/frontend');
+      const isFrontendReq = cleanPath.startsWith('/frontend') || cleanPath.startsWith('/v1/site');
       const isAdminReq = !isFrontendReq && (
         cleanPath.startsWith('/dashboard') || 
         cleanPath.startsWith('/v1/admins') || 
-        cleanPath.startsWith('/admin')
+        cleanPath.startsWith('/admin') ||
+        isLiveAdminEndpoint(cleanPath)
       );
       const isAdminPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
 

@@ -14,6 +14,7 @@ import { normalizeSiteReview } from '../../../services/siteDataMappers';
 import { useProductContent } from './useProductContent';
 import { useProductVisuals } from './useProductVisuals';
 import riyalIcon from '../../../assets/riyal.svg';
+import { formatPrice } from '../../../utils/price';
 export function useProductDetail() {
 const { getActiveOfferForProduct, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { t, locale } = useI18n();
@@ -44,14 +45,17 @@ const linkCopied = ref(false);
 
 const shareTo = (platform) => {
   const url = encodeURIComponent(window.location.href);
-  const title = encodeURIComponent(product.value?.name || '');
+  const fallbackName = locale.value === 'en'
+    ? (product.value?.name_en || product.value?.name_ar)
+    : (product.value?.name_ar || product.value?.name_en);
+  const title = encodeURIComponent(
+    localized(product.value, 'name') || fallbackName || product.value?.name || ''
+  );
   
   if (platform === 'whatsapp') {
-    window.open(`https://api.whatsapp.com/send?text=${title} - ${url}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?text=${title} - ${url}`, '_blank', 'noopener,noreferrer');
   } else if (platform === 'facebook') {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-  } else if (platform === 'twitter') {
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'noopener,noreferrer');
   }
 };
 
@@ -140,7 +144,7 @@ const allImages = computed(() => {
     images.push(getImageUrl(product.value.image, pId));
   }
 
-  return images;
+  return images.length ? images : ['/brand/mastergas-icon.png'];
 });
 
 const getImageUrl = (path, id) => {
@@ -148,7 +152,7 @@ const getImageUrl = (path, id) => {
     path = path.image_url || path.url || path.image || path.path || '';
   }
   if (!path) {
-    return '';
+    return '/brand/mastergas-icon.png';
   }
   if (typeof path === 'string' && (path.startsWith('http') || path.startsWith('/'))) return path;
   const baseUrl = api.defaults.baseURL || 'https://backend-tijara.be-kite.com/api';
@@ -156,13 +160,12 @@ const getImageUrl = (path, id) => {
 };
 
 const handleImageError = (event) => {
-  event.target.removeAttribute('src');
+  const fallback = '/brand/mastergas-icon.png';
+  if (event?.target?.getAttribute('src') !== fallback) {
+    event.target.src = fallback;
+  }
 };
 
-const formatPrice = (val) => {
-  const num = parseFloat(val);
-  return isNaN(num) ? '2,499' : num.toLocaleString('en-US');
-};
 
 // Stock Status logic
 const isProductInStock = computed(() => {
@@ -252,14 +255,6 @@ const {
 });
 
 const { isLightColor, isColorSpec, getSpecColorsList } = useProductVisuals(colorOptions);
-const isFavorite = computed(() => cartState.isInWishlist(product.value?.id));
-
-const toggleFavorite = () => {
-  if (product.value) {
-    cartState.toggleWishlist(product.value);
-  }
-};
-
 const handleAddToCart = () => {
   const payload = {
     ...product.value,
@@ -291,8 +286,8 @@ const fetchProduct = async (id) => {
 
       useSEO({
         title: localized(product.value, 'name'),
-        description: localized(product.value, 'description') || `اشتري ${localized(product.value, 'name')} الإيطالي الفاخر من ماسترجاز.`,
-        keywords: `${localized(product.value, 'name')}, ماسترجاز, أجهزة غاز إيطالية, Mastergas`,
+        description: localized(product.value, 'description') || (locale.value === 'ar' ? `اشتري ${localized(product.value, 'name')} الإيطالي الفاخر من ماسترجاز.` : `Buy the premium Italian ${localized(product.value, 'name')} from Mastergas.`),
+        keywords: locale.value === 'ar' ? `${localized(product.value, 'name')}, ماسترجاز, أجهزة غاز إيطالية, Mastergas` : `${localized(product.value, 'name')}, Mastergas, Italian gas appliances`,
         image: getImageUrl(product.value.image, product.value.id)
       });
 
@@ -398,6 +393,6 @@ onUnmounted(() => {
 });
   const addToCart = (productToAdd) => cartState.addToCart(productToAdd);
   return {
-    t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, isFavorite, toggleFavorite, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
+    t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
   };
 }

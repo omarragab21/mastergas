@@ -2,7 +2,7 @@
   <div class="profile-page" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
     <div class="container main-container">
       <!-- Breadcrumbs -->
-      <nav class="breadcrumb-flow" aria-label="breadcrumb">
+      <nav class="breadcrumb-flow" :aria-label="$t('common.breadcrumb')">
         <router-link to="/" class="crumb-link">{{ locale === 'ar' ? 'الرئيسية' : 'Home' }}</router-link>
         <span class="crumb-separator" aria-hidden="true">
           <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,14 +46,6 @@
             </svg>
             <span>{{ t('profile.addresses') || 'العناوين' }}</span>
           </router-link>
-          <router-link to="/profile?tab=wallet" class="mobile-tab-btn" :class="{ active: currentTab === 'wallet' }">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="3"></rect>
-              <path d="M2 10h20"></path>
-              <circle cx="17" cy="14" r="1.5" fill="currentColor"></circle>
-            </svg>
-            <span>{{ t('profile.wallet') || 'المحفظة' }}</span>
-          </router-link>
           <router-link to="/profile?tab=notifications" class="mobile-tab-btn" :class="{ active: currentTab === 'notifications' }">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -65,11 +57,6 @@
           <router-link to="/profile?tab=returns" class="mobile-tab-btn" :class="{ active: currentTab === 'returns' }">
             <i class="fas fa-rotate-left" aria-hidden="true"></i>
             <span>{{ t('profile.returns') || 'المرتجعات' }}</span>
-          </router-link>
-          <router-link to="/profile?tab=wishlist" class="mobile-tab-btn" :class="{ active: currentTab === 'wishlist' }">
-            <i class="far fa-heart" aria-hidden="true"></i>
-            <span>{{ t('profile.wishlist') || 'المفضلة' }}</span>
-            <span class="mobile-tab-badge" v-if="wishlistCount > 0">{{ wishlistCount }}</span>
           </router-link>
           <router-link to="/profile?tab=info" class="mobile-tab-btn" :class="{ active: currentTab === 'info' }">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -116,16 +103,6 @@
               <span class="menu-text">{{ t('profile.addresses') || 'العناوين' }}</span>
             </router-link>
 
-            <!-- User request: "وغير الكارت دي، حاسس ان المحفظة دي كبيرة عليهم" -->
-            <router-link to="/profile?tab=wallet" class="menu-item menu-item-wallet" :class="{ active: currentTab === 'wallet' }">
-              <div class="menu-icon-frame">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 9.99972H22.0016M4.00016 4.99915H20.0014C21.1061 4.99915 22.0016 5.89468 22.0016 6.99937V17.0005C22.0016 18.1052 21.1061 19.0007 20.0014 19.0007H4.00016C2.8955 19.0007 2 18.1052 2 17.0005V6.99937C2 5.89468 2.8955 4.99915 4.00016 4.99915Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <span class="menu-text">{{ t('profile.wallet') || 'المحفظة' }}</span>
-            </router-link>
-
             <router-link to="/profile?tab=notifications" class="menu-item menu-item-notifications" :class="{ active: currentTab === 'notifications' }">
               <div class="menu-icon-frame">
                 <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -154,16 +131,6 @@
                 <img src="/assets/return-request.svg" alt="" class="profile-menu-asset-icon" aria-hidden="true" />
               </div>
               <span class="menu-text">{{ t('profile.returns') || 'المرتجعات' }}</span>
-            </router-link>
-
-            <router-link to="/profile?tab=wishlist" class="menu-item menu-item-wishlist" :class="{ active: currentTab === 'wishlist' }">
-              <div class="menu-icon-frame">
-                <i class="far fa-heart profile-menu-fa-icon" aria-hidden="true"></i>
-              </div>
-              <span class="menu-text">
-                {{ t('profile.wishlist') || 'المفضلة' }}
-                <span class="sidebar-badge wishlist-menu-badge" v-if="wishlistCount > 0">{{ wishlistCount }}</span>
-              </span>
             </router-link>
 
             <div class="sidebar-divider"></div>
@@ -203,7 +170,7 @@
               <!-- stat-card 2: العناوين (on left in RTL) -->
               <div class="stat-card" @click="router.push('/profile?tab=addresses')" style="cursor: pointer;">
                 <div class="stat-txt">
-                  <span class="stat-label">العناوين</span>
+                  <span class="stat-label">{{ t('profile.addresses') }}</span>
                   <span class="stat-val">{{ addressesCountText }}</span>
                 </div>
                 <div class="icon-container">
@@ -219,9 +186,9 @@
             <!-- recent-orders-block -->
             <div class="recent-orders-block">
               <div class="recent-orders-header">
-                <h3 class="recent-orders-title">آخر الطلبات</h3>
+                <h3 class="recent-orders-title">{{ t('profile.recent_orders') }}</h3>
                 <router-link to="/profile?tab=orders" class="view-all-link">
-                  <span>عرض جميع الطلبات</span>
+                  <span>{{ t('profile.view_all_orders') }}</span>
                   <svg class="chevron-left" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                   </svg>
@@ -239,7 +206,7 @@
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                       </svg>
-                      <span class="price-val">{{ order.total }}</span>
+                      <span class="price-val price-num">{{ order.total }}</span>
                     </div>
                     <span class="status-badge" :class="order.statusType">
                       {{ order.statusLabel }}
@@ -249,7 +216,7 @@
                   <!-- actions: عرض التفاصيل button on the left -->
                   <div class="order-actions">
                     <button type="button" class="order-btn" @click="viewOrderDetails(order)">
-                      عرض التفاصيل
+                      {{ t('profile.view_details') }}
                     </button>
                   </div>
                 </div>
@@ -262,13 +229,13 @@
             <!-- View Mode (Exact Figma Mockup) -->
             <div v-if="!isEditingProfile && !showPasswordForm" class="section-personal-info">
               <!-- معلوماتك الشخصية -->
-              <h2 class="personal-info-title">معلوماتك الشخصية</h2>
+              <h2 class="personal-info-title">{{ t('profile.personal_info_title') }}</h2>
 
               <!-- info-rows -->
               <div class="info-rows">
                 <!-- row-full-name -->
                 <div class="info-row">
-                  <span class="info-label">الاسم الكامل</span>
+                  <span class="info-label">{{ t('profile.full_name') }}</span>
                   <span class="info-value">{{ displayUserName }}</span>
                 </div>
 
@@ -277,7 +244,7 @@
 
                 <!-- row-email -->
                 <div class="info-row">
-                  <span class="info-label">البريد الإلكتروني</span>
+                  <span class="info-label">{{ t('profile.email') }}</span>
                   <span class="info-value">{{ displayUserEmail }}</span>
                 </div>
 
@@ -286,54 +253,62 @@
 
                 <!-- row-phone -->
                 <div class="info-row">
-                  <span class="info-label">رقم الجوال</span>
-                  <span class="info-value">{{ displayUserPhone }}</span>
+                  <span class="info-label">{{ t('profile.mobile') }}</span>
+                  <span class="info-value phone-ltr" dir="ltr">{{ displayUserPhone }}</span>
                 </div>
               </div>
 
               <!-- edit-actions (Aligned to Right in RTL) -->
               <div class="edit-actions">
                 <button type="button" class="btn-save" @click="startEditingProfile">
-                  تعديل البيانات
+                  {{ t('profile.edit_profile') }}
                 </button>
                 <button type="button" class="btn-cancel" @click="openChangePasswordModal">
-                  تغيير كلمة المرور
+                  {{ t('profile.change_password') }}
                 </button>
               </div>
             </div>
 
             <!-- Edit Profile Mode -->
             <div v-else-if="isEditingProfile" class="section-personal-info edit-mode">
-              <h2 class="personal-info-title">تعديل البيانات الشخصية</h2>
+              <h2 class="personal-info-title">{{ t('profile.edit_personal_info') }}</h2>
 
               <form @submit.prevent="handleUpdateProfile" class="personal-info-edit-form">
                 <div class="info-rows">
                   <div class="info-row-edit">
-                    <label class="info-label">الاسم الكامل</label>
+                    <label class="info-label">{{ t('profile.full_name') }}</label>
                     <input type="text" v-model="form.name" class="personal-info-input" required />
                   </div>
 
                   <div class="info-divider"></div>
 
                   <div class="info-row-edit">
-                    <label class="info-label">البريد الإلكتروني</label>
+                    <label class="info-label">{{ t('profile.email') }}</label>
                     <input type="email" v-model="form.email" class="personal-info-input" dir="ltr" required />
                   </div>
 
                   <div class="info-divider"></div>
 
                   <div class="info-row-edit">
-                    <label class="info-label">رقم الجوال</label>
-                    <input type="text" v-model="form.phone" class="personal-info-input" dir="ltr" required />
+                    <label class="info-label">{{ t('profile.mobile') }}</label>
+                    <PhoneCountryInput
+                      v-model="phoneLocal"
+                      v-model:country="phoneCountry"
+                      :error="Boolean(phoneError)"
+                      dir="rtl"
+                      :country-label="t('profile.country')"
+                      class="profile-phone-input"
+                    />
+                    <span v-if="phoneError" class="personal-info-error">{{ phoneError }}</span>
                   </div>
                 </div>
 
                 <div class="edit-actions">
                   <button type="submit" class="btn-save" :disabled="loadingData">
-                    {{ loadingData ? 'جاري الحفظ...' : 'حفظ التعديلات' }}
+                    {{ loadingData ? t('profile.saving') : t('profile.save_changes') }}
                   </button>
                   <button type="button" class="btn-cancel" @click="cancelEditingProfile">
-                    إلغاء
+                    {{ t('common.cancel') }}
                   </button>
                 </div>
               </form>
@@ -345,9 +320,9 @@
             <!-- Add address row -->
             <div class="add-address-row">
               <button class="primary-add-button" @click="openAddAddress">
-                <span>إضافة عنوان جديد</span>
+                <span>{{ t('profile.add_new_address') }}</span>
               </button>
-              <h2 class="addresses-main-title">العناوين المحفوظة</h2>
+              <h2 class="addresses-main-title">{{ t('profile.saved_addresses') }}</h2>
             </div>
 
             <!-- Addresses Grid -->
@@ -361,7 +336,7 @@
               >
                 <!-- Card Header -->
                 <div class="card-header-v2" :class="{ 'has-default': addr.is_default }">
-                  <span v-if="addr.is_default" class="default-address-tag">العنوان الافتراضي</span>
+                  <span v-if="addr.is_default" class="default-address-tag">{{ t('profile.default_address') }}</span>
                   <div class="card-user-info-v2">
                     <span class="user-display-name">{{ addr.name || addr.full_name }}</span>
                     <div class="selection-indicator-v2" :class="{ selected: addr.is_default }">
@@ -373,7 +348,7 @@
                 <!-- Address Details -->
                 <div class="address-details-v2">
                   <div class="detail-line-item" v-if="addr.phone">
-                    <span>رقم الهاتف: {{ addr.phone }}</span>
+                    <span>{{ t('profile.phone_number') }}: <span class="phone-ltr" dir="ltr">{{ addr.phone }}</span></span>
                   </div>
                   <div class="detail-line-item" v-if="addr.city">
                     <span>{{ addr.city }}</span>
@@ -386,7 +361,7 @@
                 <!-- Card Actions -->
                 <div class="card-actions-v2" @click.stop>
                   <button type="button" class="card-action-btn delete-action-btn" @click="deleteAddress(addr.id)">
-                    <span class="action-btn-text">حذف</span>
+                    <span class="action-btn-text">{{ t('common.delete') }}</span>
                     <span class="action-icon-wrap delete-icon-wrap">
                       <svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M6.54414 3.83385e-07H6.50145C6.1646 -8.90362e-06 5.87885 -1.67812e-05 5.64172 0.0215703C5.39009 0.0444782 5.1557 0.0940931 4.92905 0.214611C4.83959 0.262175 4.75424 0.317072 4.67386 0.378739C4.47018 0.534988 4.32782 0.727689 4.20261 0.947154C4.08461 1.15397 3.9661 1.41397 3.82639 1.72049L3.54704 2.33333H0.5C0.223858 2.33333 0 2.55719 0 2.83333C0 3.10948 0.223858 3.33333 0.5 3.33333H1.02925L1.40553 9.57241C1.45583 10.4064 1.49573 11.068 1.57875 11.5966C1.66387 12.1386 1.80074 12.5899 2.07526 12.9848C2.32643 13.346 2.65004 13.651 3.0255 13.8802C3.59536 14.2281 4.26856 14.3084 5.15267 14.3331C5.42871 14.3409 5.65874 14.1234 5.66647 13.8473C5.6742 13.5713 5.4567 13.3413 5.18066 13.3335C4.30621 13.309 3.87176 13.2253 3.54657 13.0267C3.2897 12.8699 3.06824 12.6612 2.89632 12.4139C2.74297 12.1934 2.64009 11.9091 2.56663 11.4414C2.49192 10.9658 2.45437 10.3519 2.40217 9.48641L2.03106 3.33333H10.9682L10.7331 7.14001C10.7161 7.41563 10.9257 7.65286 11.2013 7.66988C11.4769 7.6869 11.7142 7.47727 11.7312 7.20165L11.9701 3.33333H12.5C12.7761 3.33333 13 3.10948 13 2.83333C13 2.55719 12.7761 2.33333 12.5 2.33333H9.51709L9.18942 1.65739C9.04612 1.36176 8.92446 1.11077 8.8047 0.911255C8.67757 0.699449 8.53464 0.51383 8.33341 0.363739C8.25388 0.304427 8.16967 0.251666 8.08161 0.205977C7.85877 0.0903652 7.62939 0.042721 7.38335 0.0207142C7.15157 -1.62721e-05 6.87267 -8.62543e-06 6.54414 3.83385e-07ZM8.40579 2.33333H4.64603L4.72737 2.15489C4.87843 1.82349 4.9784 1.60532 5.07118 1.44271C5.15925 1.28835 5.22244 1.21826 5.28254 1.17215C5.31907 1.14413 5.35787 1.11917 5.39853 1.09755C5.46541 1.06199 5.5554 1.03356 5.73239 1.01745C5.91883 1.00048 6.1588 1 6.52302 1C6.87835 1 7.11228 1.00046 7.29426 1.01674C7.46693 1.03218 7.55519 1.05944 7.62109 1.09363C7.66112 1.11439 7.69939 1.13838 7.73555 1.16534C7.79505 1.20972 7.85808 1.27726 7.9473 1.42589C8.04132 1.58255 8.14378 1.79284 8.29878 2.11259L8.40579 2.33333Z" fill="#E53333"/>
@@ -395,7 +370,7 @@
                     </span>
                   </button>
                   <button type="button" class="card-action-btn edit-action-btn" @click="editAddress(addr)">
-                    <span class="action-btn-text">تعديل</span>
+                    <span class="action-btn-text">{{ t('common.edit') }}</span>
                     <span class="action-icon-wrap edit-icon-wrap">
                       <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6.5 1.69008e-07H6.46204C5.08001 -9.19404e-06 3.99179 -1.66694e-05 3.14156 0.114294C2.26918 0.231583 1.57285 0.477402 1.02513 1.02513C0.477402 1.57285 0.231583 2.26918 0.114294 3.14156C-1.66694e-05 3.99179 -9.19404e-06 5.08001 1.6901e-07 6.46204V6.53797C-9.19404e-06 7.91999 -1.66694e-05 9.00821 0.114294 9.85844C0.231583 10.7308 0.477402 11.4271 1.02513 11.9749C1.57285 12.5226 2.26918 12.7684 3.14156 12.8857C3.99179 13 5.08001 13 6.46204 13H6.53796C7.91999 13 9.00821 13 9.85844 12.8857C10.7308 12.7684 11.4271 12.5226 11.9749 11.9749C12.5226 11.4271 12.7684 10.7308 12.8857 9.85844C13 9.00821 13 7.91999 13 6.53796V6.5C13 6.22386 12.7761 6 12.5 6C12.2239 6 12 6.22386 12 6.5C12 7.92835 11.9989 8.94931 11.8946 9.72519C11.7922 10.4867 11.5987 10.9368 11.2678 11.2678C10.9368 11.5987 10.4867 11.7922 9.72519 11.8946C8.94931 11.9989 7.92835 12 6.5 12C5.07165 12 4.05069 11.9989 3.27481 11.8946C2.51331 11.7922 2.06319 11.5987 1.73223 11.2678C1.40128 10.9368 1.20776 10.4867 1.10538 9.72519C1.00106 8.94931 1 7.92835 1 6.5C1 5.07165 1.00106 4.05069 1.10538 3.27481C1.20776 2.51331 1.40128 2.06319 1.73223 1.73223C2.06319 1.40128 2.51331 1.20776 3.27481 1.10538C4.05069 1.00106 5.07165 1 6.5 1C6.77614 1 7 0.776143 7 0.5C7 0.223858 6.77614 1.69008e-07 6.5 1.69008e-07Z" fill="black"/>
@@ -424,7 +399,7 @@
                     :class="{ active: orderStatusFilter === 'all' }"
                     @click="orderStatusFilter = 'all'; orderCurrentPage = 1"
                   >
-                    الكل
+                    {{ t('profile.all') }}
                   </button>
                   <button
                     type="button"
@@ -432,7 +407,7 @@
                     :class="{ active: orderStatusFilter === 'processing' }"
                     @click="orderStatusFilter = 'processing'; orderCurrentPage = 1"
                   >
-                    قيد التنفيذ
+                    {{ t('profile.in_progress') }}
                   </button>
                   <button
                     type="button"
@@ -440,7 +415,7 @@
                     :class="{ active: orderStatusFilter === 'completed' }"
                     @click="orderStatusFilter = 'completed'; orderCurrentPage = 1"
                   >
-                    مكتملة
+                    {{ t('profile.completed') }}
                   </button>
                   <button
                     type="button"
@@ -448,7 +423,7 @@
                     :class="{ active: orderStatusFilter === 'cancelled' }"
                     @click="orderStatusFilter = 'cancelled'; orderCurrentPage = 1"
                   >
-                    ملغاة
+                    {{ t('profile.cancelled') }}
                   </button>
                 </div>
 
@@ -463,7 +438,7 @@
                     type="text"
                     v-model="orderSearchQuery"
                     class="search-input"
-                    placeholder="ابحث برقم الطلب..."
+                    :placeholder="t('profile.search_order_placeholder')"
                   />
                 </div>
               </div>
@@ -481,14 +456,14 @@
                     <!-- main-meta (Right in RTL) -->
                     <div class="main-meta">
                       <div class="meta-col">
-                        <span class="meta-label">رقم الطلب</span>
+                        <span class="meta-label">{{ t('profile.order_number') }}</span>
                         <span class="meta-val"><bdi dir="ltr">{{ order.orderNumber }}</bdi></span>
                       </div>
 
                       <div class="meta-divider"></div>
 
                       <div class="meta-col">
-                        <span class="meta-label">تاريخ الطلب</span>
+                        <span class="meta-label">{{ t('profile.order_date') }}</span>
                         <span class="meta-val">{{ order.date }}</span>
                       </div>
                     </div>
@@ -522,19 +497,19 @@
 
                       <div class="prod-text-frame">
                         <span class="prod-count">{{ order.productsCountText }}</span>
-                        <span class="prod-subtitle">{{ order.subtitle || 'شامل جميع رسوم الشحن والضمان' }}</span>
+                        <span class="prod-subtitle">{{ order.subtitle || t('profile.shipping_warranty_included') }}</span>
                       </div>
                     </div>
 
                     <!-- price-actions (Left in RTL) -->
                     <div class="price-actions">
-                      <span class="price-label">إجمالي المبلغ</span>
+                      <span class="price-label">{{ t('profile.total_amount') }}</span>
                       <div class="price-unit">
                         <svg class="riyal-symbol" width="13.69" height="15.3" viewBox="0 0 14 16" fill="currentColor">
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span class="price-amount">{{ order.total }}</span>
+                        <span class="price-amount price-num">{{ order.total }}</span>
                       </div>
                     </div>
                   </div>
@@ -546,8 +521,8 @@
                   <div class="card-bottom-actions">
                     <!-- help-prompt (Right in RTL) -->
                     <div class="help-prompt">
-                      <span class="help-question">تواجه مشكلة في هذا الطلب؟</span>
-                      <router-link to="/contact" class="help-link">الدعم الفني والضمان</router-link>
+                      <span class="help-question">{{ t('profile.order_problem') }}</span>
+                      <router-link to="/contact" class="help-link">{{ t('profile.support_warranty') }}</router-link>
                     </div>
 
                     <!-- actions-left (Left in RTL) -->
@@ -560,7 +535,7 @@
                         <svg class="action-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M8.5 3.5L5 7L8.5 10.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span>عرض التفاصيل والفاتورة</span>
+                        <span>{{ t('profile.view_details_invoice') }}</span>
                       </button>
 
                       <button
@@ -572,7 +547,7 @@
                         <svg class="action-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M8.5 3.5L5 7L8.5 10.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span>تتبع الطلب</span>
+                        <span>{{ t('profile.order_tracking') }}</span>
                       </button>
                     </div>
                   </div>
@@ -581,7 +556,7 @@
                 <!-- Empty state -->
                 <div v-if="filteredOrders.length === 0" class="empty-orders-card">
                   <i class="fas fa-box-open empty-icon"></i>
-                  <p>لا توجد طلبات تطابق بحثك</p>
+                  <p>{{ t('profile.no_matching_orders') }}</p>
                 </div>
               </div>
 
@@ -638,14 +613,14 @@
                   <!-- Meta on Right in RTL -->
                   <div class="order-info-meta">
                     <div class="info-meta-col">
-                      <span class="info-meta-label">رقم الطلب</span>
+                      <span class="info-meta-label">{{ t('profile.order_number') }}</span>
                       <span class="info-meta-val"><bdi dir="ltr">{{ selectedOrderDetails.orderNumber || '—' }}</bdi></span>
                     </div>
 
                     <div class="info-meta-divider"></div>
 
                     <div class="info-meta-col">
-                      <span class="info-meta-label">تاريخ الطلب</span>
+                      <span class="info-meta-label">{{ t('profile.order_date') }}</span>
                       <span class="info-meta-val">{{ selectedOrderDetails.date || '—' }}</span>
                     </div>
                   </div>
@@ -659,7 +634,7 @@
 
               <!-- 2) order-tracking-card -->
               <div class="order-tracking-card">
-                <h3 class="tracking-title">تتبع الطلب</h3>
+                <h3 class="tracking-title">{{ t('profile.order_tracking') }}</h3>
                 <div class="card-divider-line"></div>
 
                 <!-- Timeline Stepper -->
@@ -687,14 +662,14 @@
 
               <!-- 3) products-card -->
               <div class="products-card">
-                <h3 class="products-card-title">المنتجات المطلوبة</h3>
+                <h3 class="products-card-title">{{ t('profile.ordered_products') }}</h3>
 
                 <!-- Table Header (RTL: Product, Price, Qty, Total) -->
                 <div class="products-table-header">
-                  <div class="th-product">المنتج</div>
-                  <div class="th-unit-price">السعر</div>
-                  <div class="th-qty">الكمية</div>
-                  <div class="th-total">الإجمالي</div>
+                  <div class="th-product">{{ t('profile.product') }}</div>
+                  <div class="th-unit-price">{{ t('profile.price') }}</div>
+                  <div class="th-qty">{{ t('profile.quantity') }}</div>
+                  <div class="th-total">{{ t('profile.total') }}</div>
                 </div>
 
                 <!-- Product Rows -->
@@ -718,7 +693,7 @@
 
                   <!-- Unit Price (Second column) -->
                   <div class="col-unit-price-cell">
-                    <span>{{ item.unitPrice || item.price }}</span>
+                    <span class="price-num">{{ item.unitPrice || item.price }}</span>
                     <svg class="riyal-icon-muted" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                       <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                       <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -732,7 +707,7 @@
 
                   <!-- Total (Fourth column) -->
                   <div class="col-total-cell">
-                    <span>{{ item.totalPrice || item.price }}</span>
+                    <span class="price-num">{{ item.totalPrice || item.price }}</span>
                     <svg class="riyal-icon-dark" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                       <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                       <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -743,15 +718,15 @@
 
               <!-- 4) summary-card -->
               <div class="summary-card">
-                <h3 class="summary-card-title">ملخص الطلب</h3>
+                <h3 class="summary-card-title">{{ t('profile.order_summary') }}</h3>
                 <div class="card-divider-line"></div>
 
                 <div class="summary-rows-wrap">
                   <!-- Row 1: Subtotal -->
                   <div class="summary-item-row">
-                    <span class="summary-item-label">إجمالي المنتجات</span>
+                    <span class="summary-item-label">{{ t('profile.products_total') }}</span>
                     <div class="summary-item-val">
-                      <span>{{ selectedOrderDetails.subtotal || '0.00' }}</span>
+                      <span class="price-num">{{ selectedOrderDetails.subtotal || '0.00' }}</span>
                       <svg class="riyal-icon-dark" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -761,15 +736,15 @@
 
                   <!-- Row 2: Shipping -->
                   <div class="summary-item-row">
-                    <span class="summary-item-label">رسوم الشحن</span>
-                  <span class="summary-item-val free">{{ selectedOrderDetails.shipping || '0.00' }}</span>
+                    <span class="summary-item-label">{{ t('profile.shipping_fees') }}</span>
+                  <span class="summary-item-val free"><bdi class="price-num" dir="ltr">{{ selectedOrderDetails.shipping || '0.00' }}</bdi></span>
                   </div>
 
                   <!-- Row 3: Discount -->
                   <div class="summary-item-row">
-                    <span class="summary-item-label">الخصم</span>
+                    <span class="summary-item-label">{{ t('profile.discount') }}</span>
                     <div class="summary-item-val discount">
-                      <span>{{ selectedOrderDetails.discount || '0.00' }}</span>
+                      <span class="price-num">{{ selectedOrderDetails.discount || '0.00' }}</span>
                       <svg class="riyal-icon-red" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -782,9 +757,9 @@
 
                 <!-- Row 4: Grand Total -->
                 <div class="summary-total-row">
-                  <span class="summary-total-label">الإجمالي النهائي</span>
+                  <span class="summary-total-label">{{ t('profile.final_total') }}</span>
                   <div class="summary-total-val">
-                    <span>{{ selectedOrderDetails.total || '0.00' }}</span>
+                    <span class="price-num">{{ selectedOrderDetails.total || '0.00' }}</span>
                     <svg class="riyal-icon-dark" width="16" height="16" viewBox="0 0 14 16" fill="currentColor">
                       <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                       <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
@@ -797,23 +772,23 @@
               <div class="address-payment-split">
                 <!-- Delivery Address (Right in RTL) -->
                 <div class="delivery-card">
-                  <h4 class="card-heading-md">عنوان التوصيل</h4>
+                  <h4 class="card-heading-md">{{ t('profile.delivery_address') }}</h4>
                   <div class="card-divider-line"></div>
                   <div class="delivery-info-list">
                     <span class="delivery-name">{{ selectedOrderDetails.recipientName || '—' }}</span>
-                    <span class="delivery-detail">هاتف: {{ selectedOrderDetails.phone || '—' }}</span>
+                    <span class="delivery-detail">{{ t('profile.phone_short') }}: <span class="phone-ltr" dir="ltr">{{ selectedOrderDetails.phone || '—' }}</span></span>
                     <span class="delivery-detail">{{ selectedOrderDetails.address || '—' }}</span>
-                    <span class="delivery-detail">الرمز البريدي: {{ selectedOrderDetails.postalCode || '—' }}</span>
+                    <span class="delivery-detail">{{ t('profile.postal_code') }}: {{ selectedOrderDetails.postalCode || '—' }}</span>
                   </div>
                 </div>
 
                 <!-- Payment Method (Left in RTL) -->
                 <div class="payment-card">
-                  <h4 class="card-heading-md">طريقة الدفع</h4>
+                  <h4 class="card-heading-md">{{ t('profile.payment_method') }}</h4>
                   <div class="card-divider-line"></div>
                   <div class="payment-method-row">
-                    <span class="mada-badge">{{ selectedOrderDetails.paymentMethod === 'الدفع عند الاستلام' ? 'COD' : 'MADA' }}</span>
-                    <span class="payment-method-text">{{ selectedOrderDetails.paymentMethod || 'مدى (mada) **** 4532' }}</span>
+                    <span class="mada-badge">{{ (selectedOrderDetails.raw?.payment_method === 'cash_on_delivery' || selectedOrderDetails.paymentMethod === t('invoice.payment_cod')) ? 'COD' : 'MADA' }}</span>
+                    <span class="payment-method-text">{{ selectedOrderDetails.paymentMethod || t('profile.default_payment_display') }}</span>
                   </div>
                 </div>
               </div>
@@ -822,8 +797,8 @@
               <div class="bottom-action-buttons">
                 <!-- Help Prompt (Right in RTL) -->
                 <div class="help-prompt-col">
-                  <span class="help-q-text">تواجه مشكلة في هذا الطلب؟</span>
-                  <router-link to="/contact" class="help-link-bold">الدعم الفني والضمان</router-link>
+                  <span class="help-q-text">{{ t('profile.order_problem') }}</span>
+                  <router-link to="/contact" class="help-link-bold">{{ t('profile.support_warranty') }}</router-link>
                 </div>
 
                 <!-- Action Buttons (Left in RTL) -->
@@ -833,14 +808,14 @@
                     class="btn-primary-invoice"
                     @click="openInvoiceFromDetails"
                   >
-                    عرض الفاتورة
+                    {{ t('profile.view_invoice') }}
                   </button>
                   <button
                     type="button"
                     class="btn-secondary-back"
                     @click="returnToOrdersList"
                   >
-                    العودة إلى الطلبات
+                    {{ t('profile.back_to_orders') }}
                   </button>
                 </div>
               </div>
@@ -858,7 +833,7 @@
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M7 15L12 10L7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <span>العودة لتفاصيل الطلب</span>
+                  <span>{{ t('profile.back_to_order_details') }}</span>
                 </button>
 
                 <button
@@ -866,7 +841,7 @@
                   class="btn-back-to-orders-list"
                   @click="returnToOrdersList"
                 >
-                  <span>قائمة الطلبات</span>
+                  <span>{{ t('profile.orders_list') }}</span>
                 </button>
               </div>
 
@@ -876,11 +851,11 @@
                 <div class="invoice-header-frame">
                   <!-- Right in RTL: Tax Invoice Meta -->
                   <div class="invoice-meta-block">
-                    <h2 class="invoice-type-title">فاتورة ضريبية</h2>
-                    <span class="invoice-meta-row">رقم الفاتورة: {{ getInvoiceNumber(activeModalOrder || selectedOrderDetails) || '—' }}</span>
-                    <span class="invoice-meta-row">رقم الطلب: {{ (activeModalOrder || selectedOrderDetails)?.orderNumber || '—' }}</span>
-                    <span class="invoice-meta-row">التاريخ: {{ (activeModalOrder || selectedOrderDetails)?.date || '—' }}</span>
-                    <span class="invoice-meta-row">حالة الطلب: {{ (activeModalOrder || selectedOrderDetails)?.statusLabel || '—' }}</span>
+                    <h2 class="invoice-type-title">{{ t('profile.tax_invoice') }}</h2>
+                    <span class="invoice-meta-row">{{ t('profile.invoice_number') }}: {{ getInvoiceNumber(activeModalOrder || selectedOrderDetails) || '—' }}</span>
+                    <span class="invoice-meta-row">{{ t('profile.order_number') }}: {{ (activeModalOrder || selectedOrderDetails)?.orderNumber || '—' }}</span>
+                    <span class="invoice-meta-row">{{ t('profile.date') }}: {{ (activeModalOrder || selectedOrderDetails)?.date || '—' }}</span>
+                    <span class="invoice-meta-row">{{ t('profile.order_status') }}: {{ (activeModalOrder || selectedOrderDetails)?.statusLabel || '—' }}</span>
                   </div>
 
                   <!-- Left in RTL: Logo & Legal info -->
@@ -888,8 +863,8 @@
                     <div class="invoice-logo-wrapper">
                       <img src="/brand/mastergas-logo.png" alt="MASTERgas" class="invoice-logo-img" />
                     </div>
-                    <span class="invoice-company-name">شركة ماستر غاز المحدودة</span>
-                    <span class="invoice-vat-number">الرقم الضريبي: ٣٠١٢٠٤٥٦٧٨٠٠٠٠٣</span>
+                    <span class="invoice-company-name">{{ t('profile.company_name') }}</span>
+                    <span class="invoice-vat-number">{{ t('profile.tax_number') }}: 301204567800003</span>
                   </div>
                 </div>
 
@@ -900,15 +875,15 @@
                 <div class="invoice-parties-frame">
                   <!-- Right in RTL: Customer Info -->
                   <div class="invoice-party-col">
-                    <h3 class="invoice-party-title">معلومات العميل</h3>
-                    <div class="invoice-party-item">الاسم: {{ getCustomerName(activeModalOrder || selectedOrderDetails) }}</div>
-                    <div class="invoice-party-item">الهاتف: {{ getCustomerPhone(activeModalOrder || selectedOrderDetails) }}</div>
-                    <div class="invoice-party-item">البريد الإلكتروني: {{ getCustomerEmail(activeModalOrder || selectedOrderDetails) }}</div>
+                    <h3 class="invoice-party-title">{{ t('profile.customer_info') }}</h3>
+                    <div class="invoice-party-item">{{ t('profile.name') }}: {{ getCustomerName(activeModalOrder || selectedOrderDetails) }}</div>
+                    <div class="invoice-party-item">{{ t('profile.phone') }}: {{ getCustomerPhone(activeModalOrder || selectedOrderDetails) }}</div>
+                    <div class="invoice-party-item">{{ t('profile.email') }}: {{ getCustomerEmail(activeModalOrder || selectedOrderDetails) }}</div>
                   </div>
 
                   <!-- Left in RTL: Delivery Address -->
                   <div class="invoice-party-col">
-                    <h3 class="invoice-party-title">عنوان التوصيل</h3>
+                    <h3 class="invoice-party-title">{{ t('profile.delivery_address') }}</h3>
                     <div class="invoice-party-item">{{ getCustomerName(activeModalOrder || selectedOrderDetails) }}</div>
                     <div class="invoice-party-item">{{ getDeliveryStreet(activeModalOrder || selectedOrderDetails) }}</div>
                     <div class="invoice-party-item">{{ getDeliveryCountry(activeModalOrder || selectedOrderDetails) }}</div>
@@ -919,10 +894,10 @@
                 <div class="invoice-table-frame">
                   <!-- invoice-table-header -->
                   <div class="invoice-table-header">
-                    <div class="col-product">المنتج</div>
-                    <div class="col-price">سعر الوحدة</div>
-                    <div class="col-qty">الكمية</div>
-                    <div class="col-total">الإجمالي</div>
+                    <div class="col-product">{{ t('profile.product') }}</div>
+                    <div class="col-price">{{ t('profile.unit_price') }}</div>
+                    <div class="col-qty">{{ t('profile.quantity') }}</div>
+                    <div class="col-total">{{ t('profile.total') }}</div>
                   </div>
 
                   <!-- invoice-product-row -->
@@ -939,7 +914,7 @@
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                       </svg>
-                      <span>{{ item.unitPrice }}</span>
+                      <span class="price-num">{{ item.unitPrice }}</span>
                     </div>
                     <div class="col-qty col-qty-val">
                       {{ item.quantity }}
@@ -949,7 +924,7 @@
                         <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                         <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                       </svg>
-                      <span>{{ item.totalPrice }}</span>
+                      <span class="price-num">{{ item.totalPrice }}</span>
                     </div>
                   </div>
                 </div>
@@ -958,18 +933,18 @@
                 <div class="invoice-summary-frame">
                   <div class="invoice-summary-card">
                     <div class="summary-breakdown-row">
-                      <span class="breakdown-label">المجموع الفرعي</span>
+                      <span class="breakdown-label">{{ t('profile.subtotal') }}</span>
                       <div class="breakdown-val">
                         <svg class="riyal-icon-dark" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.subtotal || '0.00' }}</span>
+                        <span class="price-num">{{ (activeModalOrder || selectedOrderDetails)?.subtotal || '0.00' }}</span>
                       </div>
                     </div>
 
                     <div class="summary-breakdown-row">
-                      <span class="breakdown-label">الضريبة (15%)</span>
+                      <span class="breakdown-label">{{ t('profile.vat_15') }}</span>
                       <div class="breakdown-val">
                         <svg class="riyal-icon-dark" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
@@ -980,31 +955,31 @@
                     </div>
 
                     <div class="summary-breakdown-row">
-                      <span class="breakdown-label">الخصم</span>
+                      <span class="breakdown-label">{{ t('profile.discount') }}</span>
                       <div class="breakdown-val discount-val">
                         <svg class="riyal-icon-red" width="12" height="12" viewBox="0 0 14 16" fill="currentColor">
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.discount || '0.00' }}</span>
+                        <span class="price-num">{{ (activeModalOrder || selectedOrderDetails)?.discount || '0.00' }}</span>
                       </div>
                     </div>
 
                     <div class="summary-breakdown-row">
-                      <span class="breakdown-label">الشحن التوصيل</span>
-                      <span class="breakdown-val free-val">{{ (activeModalOrder || selectedOrderDetails)?.shipping || '0.00' }}</span>
+                      <span class="breakdown-label">{{ t('profile.shipping_delivery') }}</span>
+                      <span class="breakdown-val free-val"><bdi class="price-num" dir="ltr">{{ (activeModalOrder || selectedOrderDetails)?.shipping || '0.00' }}</bdi></span>
                     </div>
 
                     <div class="summary-box-line"></div>
 
                     <div class="summary-final-row">
-                      <span class="final-total-label">الإجمالي الصافي</span>
+                      <span class="final-total-label">{{ t('profile.net_total') }}</span>
                       <div class="final-total-val">
                         <svg class="riyal-icon-dark" width="16" height="16" viewBox="0 0 14 16" fill="currentColor">
                           <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                           <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                         </svg>
-                        <span>{{ (activeModalOrder || selectedOrderDetails)?.total || '0.00' }}</span>
+                        <span class="price-num">{{ (activeModalOrder || selectedOrderDetails)?.total || '0.00' }}</span>
                       </div>
                     </div>
                   </div>
@@ -1015,8 +990,8 @@
 
                 <!-- 7. Bottom Footer Bar -->
                 <div class="invoice-footer-frame">
-                  <span class="invoice-thanks-note">نشكركم لثقتكم واختياركم أجهزة ماستر غاز</span>
-                  <span class="invoice-payment-method">طريقة الدفع: {{ ((activeModalOrder || selectedOrderDetails)?.paymentMethod || 'غير محدد').replace('مدى (mada)', 'بطاقة ائتمان') }}</span>
+                  <span class="invoice-thanks-note">{{ t('profile.invoice_thanks') }}</span>
+                  <span class="invoice-payment-method">{{ t('profile.payment_method') }}: {{ ((activeModalOrder || selectedOrderDetails)?.paymentMethod || t('invoice.not_specified')).replace('مدى (mada)', t('profile.credit_card')) }}</span>
                 </div>
               </div>
 
@@ -1024,21 +999,21 @@
               <div class="invoice-action-controls">
                 <!-- Help Prompt (Right in RTL) -->
                 <div class="help-prompt-col">
-                  <span class="help-q-text">تواجه مشكلة في هذا الطلب؟</span>
-                  <router-link to="/contact" class="help-link-bold">الدعم الفني والضمان</router-link>
+                  <span class="help-q-text">{{ t('profile.order_problem') }}</span>
+                  <router-link to="/contact" class="help-link-bold">{{ t('profile.support_warranty') }}</router-link>
                 </div>
 
                 <!-- Action Buttons (Left in RTL) -->
                 <div class="invoice-buttons-wrap">
                   <button type="button" class="primary-download-button" @click="downloadInvoicePdf">
-                    <span>تحميل الفاتورة</span>
+                    <span>{{ t('profile.download_invoice') }}</span>
                     <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M8 2.5V10.5M8 10.5L5 7.5M8 10.5L11 7.5M3 13.5H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
 
                   <button type="button" class="secondary-print-button" @click="printInvoiceCard">
-                    <span>طباعة الفاتورة</span>
+                    <span>{{ t('profile.print_invoice') }}</span>
                     <svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M4 6V2.5H12V6M4 12H3C2.44772 12 2 11.5523 2 11V7.5C2 6.94772 2.44772 6.5 3 6.5H13C13.5523 6.5 14 6.94772 14 7.5V11C14 11.5523 13.5523 12 13 12H12M4 9.5H12V13.5H4V9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -1065,7 +1040,7 @@
                   <!-- Step 1: Select Order -->
                   <div class="form-group" v-if="returnStep === 1">
                     <label>{{ t('profile.choose_order') }}</label>
-                    <select v-model="selectedOrderForReturn" class="custom-select-v2">
+                    <select v-model="selectedOrderForReturn" class="custom-select-v2" @change="resetReturnItemSelection">
                       <option :value="null">--- {{ t('profile.choose_delivered_order') }} ---</option>
                       <option v-for="o in ordersList.filter(o => ['delivered', 'completed'].includes(o.status))" :key="o.id" :value="o">
                         {{ o.orderNumber || o.order_number }} - {{ o.date || formatDate(o.created_at) }}
@@ -1080,22 +1055,67 @@
                   <!-- Step 2: Select Product -->
                   <div class="form-group" v-if="returnStep === 2">
                     <label>{{ t('profile.choose_product_to_return') }}</label>
+                    <p class="return-help-text">{{ t('profile.return_select_hint') }}</p>
+                    <div class="return-selection-summary" v-if="selectedReturnItems.length">
+                      {{ t('profile.return_selected_summary', { products: selectedReturnItems.length, quantity: selectedReturnTotalQuantity }) }}
+                    </div>
                     <div class="product-selection-list">
-                      <div v-for="item in (selectedOrderForReturn.items || selectedOrderForReturn.products)" 
-                           :key="item.id" 
+                      <div v-for="item in (selectedOrderForReturn.items || selectedOrderForReturn.products || [])"
+                           :key="getReturnItemKey(item)"
                            class="product-select-item"
-                           :class="{ selected: selectedItemForReturn?.id === item.id }"
-                           @click="selectedItemForReturn = item">
-                        <img :src="getImageUrl(item.image)" class="p-mini-img" />
-                        <div class="p-mini-info">
-                          <span class="p-mini-name">{{ item.name }}</span>
-                          <span class="p-mini-price">{{ item.unit_price || item.price }} {{ currency }}</span>
+                           :class="{ selected: isReturnItemSelected(item), disabled: getReturnMaxQuantity(item) < 1 }"
+                           :data-return-item-key="getReturnItemKey(item)"
+                           @click="toggleReturnItem(item)">
+                        <div class="return-item-main">
+                          <input
+                            type="checkbox"
+                            class="return-item-checkbox"
+                            :checked="isReturnItemSelected(item)"
+                            :disabled="getReturnMaxQuantity(item) < 1"
+                            :aria-label="t('profile.return_select_item', { name: item.name || '' })"
+                            @click.stop
+                            @change="toggleReturnItem(item)"
+                          />
+                          <img :src="getImageUrl(item.image)" class="p-mini-img" alt="" @error="$event.target.src = '/brand/mastergas-icon.png'" />
+                          <div class="p-mini-info">
+                            <span class="p-mini-name">{{ item.name || '—' }}</span>
+                            <span class="p-mini-price"><PriceText :value="item.unit_price || item.price || 0" :currency="currency" /></span>
+                            <span v-if="getReturnMaxQuantity(item) < 1" class="p-mini-max is-empty">{{ t('profile.return_fully_requested') }}</span>
+                            <span v-else class="p-mini-max">{{ t('profile.return_max_quantity', { max: getReturnMaxQuantity(item) }) }}</span>
+                          </div>
                         </div>
-                        <div class="p-check"><i class="fas fa-check-circle"></i></div>
+                        <div v-if="getSelectedReturnLine(item)" class="return-item-controls" @click.stop>
+                          <div class="return-control-field">
+                            <label :for="`return-qty-${getReturnItemKey(item)}`">{{ t('profile.return_quantity') }}</label>
+                            <input
+                              :id="`return-qty-${getReturnItemKey(item)}`"
+                              class="return-quantity-input"
+                              type="number"
+                              min="1"
+                              :max="getReturnMaxQuantity(item)"
+                              :value="getSelectedReturnLine(item).quantity"
+                              @input="updateReturnQuantity(item, $event)"
+                            />
+                            <small>{{ t('profile.return_qty_range', { max: getReturnMaxQuantity(item) }) }}</small>
+                          </div>
+                          <div class="return-control-field">
+                            <label :for="`return-cond-${getReturnItemKey(item)}`">{{ t('profile.return_condition') }}</label>
+                            <select
+                              :id="`return-cond-${getReturnItemKey(item)}`"
+                              class="return-condition-select"
+                              :value="getSelectedReturnLine(item).condition"
+                              @change="updateReturnCondition(item, $event.target.value)"
+                            >
+                              <option value="unopened">{{ t('profile.condition_unopened') }}</option>
+                              <option value="opened">{{ t('profile.condition_opened') }}</option>
+                              <option value="damaged">{{ t('profile.condition_damaged') }}</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="form-actions mt-4">
-                      <button class="save-btn" :disabled="!selectedItemForReturn" @click="returnStep = 3">{{ t('common.next') }}</button>
+                      <button class="save-btn" :disabled="!selectedReturnItems.length" @click="returnStep = 3">{{ t('common.next') }}</button>
                       <button class="cancel-btn" @click="returnStep = 1">{{ t('common.back') }}</button>
                     </div>
                   </div>
@@ -1127,12 +1147,17 @@
                     <div class="ret-info">
                       <div class="ret-pname">{{ ret.productName }}</div>
                       <div class="ret-order">{{ t('profile.original_order') }}: {{ ret.orderNumber || ret.orderId || '—' }}</div>
+                      <div v-if="ret.items?.length" class="ret-items-summary">
+                        <span v-for="item in ret.items" :key="`${ret.id}-${item.orderItemId || item.id}`">
+                          {{ item.productName }} × {{ item.quantity }} · {{ formatReturnCondition(item.condition) }}
+                        </span>
+                      </div>
                       <div class="ret-reason"><strong>{{ t('profile.reason') }}:</strong> {{ ret.reason }}</div>
                       <div class="ret-notes" v-if="ret.adminNotes"><strong>{{ t('profile.admin_note') }}:</strong> {{ ret.adminNotes }}</div>
                     </div>
                     <div class="ret-refund">
                       <span class="refund-label">{{ t('profile.amount') }}:</span>
-                      <span class="refund-val">{{ ret.refundAmount }} {{ currency }}</span>
+                      <span class="refund-val"><PriceText :value="ret.refundAmount" :currency="currency" /></span>
                     </div>
                   </div>
                   <div class="ret-footer">
@@ -1143,130 +1168,13 @@
              </div>
           </div>
 
-          <!-- Wishlist Tab -->
-          <div v-else-if="currentTab === 'wishlist'" class="content-view">
-             <header class="view-header">
-               <h2 class="view-title">{{ t('profile.wishlist') }} <span class="count">({{ wishlistCount }})</span></h2>
-             </header>
-
-             <div v-if="wishlistCount === 0" class="empty-view">
-                <div class="empty-icon wishlist-empty-icon"><i class="far fa-heart" aria-hidden="true"></i></div>
-                <p>{{ t('profile.wishlist_empty') }}</p>
-                <router-link to="/products" class="go-shop-btn">{{ t('home.shop_now') }}</router-link>
-             </div>
-
-             <div class="wishlist-grid" v-else>
-                <div v-for="product in wishlistItems" :key="product.id" class="wish-card">
-                   <img :src="getImageUrl(product.image || product.images?.[0])" @click="$router.push('/product/'+product.id)" @error="$event.target.src = '/brand/mastergas-icon.png'" />
-                   <div class="wish-body">
-                      <h4 @click="$router.push('/product/'+product.id)">{{ (locale === 'ar' ? product.name_ar : product.name_en) || product.name }}</h4>
-                      <div class="wish-price">
-                        <span>{{ formatPrice(product.sale_price || product.price) }}</span>
-                        <img :src="riyalIcon" alt="ريال" class="wish-riyal" aria-hidden="true" />
-                      </div>
-                      <div class="wish-card-actions">
-                        <button class="wish-add-cart" @click="cartState.addToCart(product)">
-                          <i class="fas fa-shopping-cart"></i> {{ t('cart.title') }}
-                        </button>
-                        <button class="wish-remove" @click="removeFromWishlist(product)">
-                          <i class="far fa-trash-alt"></i>
-                        </button>
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </div>
-
-          <!-- Wallet Tab -->
-          <div v-else-if="currentTab === 'wallet'" class="content-view wallet-view">
-             <div v-if="loadingWallet" class="loading-state">
-               <div class="spinner"></div>
-               <p>{{ t('common.loading') }}</p>
-             </div>
-
-             <div v-else class="wallet-container">
-               <!-- Main Balance Card -->
-               <div class="wallet-balance-card">
-                 <div class="balance-content">
-                   <span class="balance-title">{{ t('profile.available_balance') }}</span>
-                   <span class="balance-value">{{ formatPrice(walletData.balance) }} {{ currency }}</span>
-                   <span class="balance-subtitle">{{ t('profile.balance_subtitle') }}</span>
-                 </div>
-                 <div class="balance-icon">
-                   <i class="fas fa-wallet"></i>
-                 </div>
-               </div>
-
-               <!-- Stats Cards -->
-               <div class="stats-cards">
-                 <div class="stat-card refund-card">
-                   <div class="stat-header">
-                     <i class="fas fa-sync-alt stat-icon"></i>
-                   </div>
-                   <span class="stat-title">{{ t('profile.total_refunds') }}</span>
-                   <span class="stat-value">{{ formatPrice(totalRefunds) }} {{ currency }}</span>
-                   <span class="stat-count">{{ t('profile.transactions_count', { count: refundCount }) }}</span>
-                 </div>
-                 <div class="stat-card purchase-card">
-                   <div class="stat-header">
-                     <i class="fas fa-arrow-up stat-icon"></i>
-                   </div>
-                   <span class="stat-title">{{ t('profile.total_purchases') }}</span>
-                   <span class="stat-value">{{ formatPrice(totalPurchases) }} {{ currency }}</span>
-                   <span class="stat-count">{{ t('profile.transactions_count', { count: purchaseCount }) }}</span>
-                 </div>
-               </div>
-
-               <!-- Transactions Section -->
-               <div class="wallet-transactions">
-                 <div class="transactions-header">
-                   <h3 class="transactions-title">{{ t('profile.transactions_history') }}</h3>
-                   <div class="transaction-filters">
-                     <button 
-                       v-for="filter in filters" 
-                       :key="filter.value"
-                       class="filter-btn"
-                       :class="{ active: activeFilter === filter.value }"
-                       @click="activeFilter = filter.value"
-                     >
-                       {{ filter.label }}
-                     </button>
-                   </div>
-                 </div>
-
-                 <div v-if="filteredTransactions.length === 0" class="empty-state">
-                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5">
-                     <rect x="2" y="5" width="20" height="14" rx="2" />
-                     <line x1="2" y1="10" x2="22" y2="10" />
-                   </svg>
-                   <p>{{ t('profile.no_transactions') }}</p>
-                 </div>
-
-                 <div v-else class="transactions-list">
-                   <div v-for="transaction in filteredTransactions" :key="transaction.id" class="transaction-item">
-                     <div class="transaction-icon" :class="transaction.type === 'deposit' ? 'deposit' : 'purchase'">
-                       <i :class="transaction.type === 'deposit' ? 'fas fa-sync-alt' : 'fas fa-arrow-up'"></i>
-                     </div>
-                     <div class="transaction-info">
-                       <span class="transaction-desc">{{ transaction.type === 'deposit' ? t('profile.refund') : t('profile.purchase') }} - {{ transaction.description }}</span>
-                       <span class="transaction-subtext">{{ transaction.reference_id ? '#' + transaction.reference_id : '' }} • {{ formatDate(transaction.date) }}</span>
-                     </div>
-                     <span class="transaction-amount" :class="transaction.type === 'deposit' ? 'deposit' : 'purchase'">
-                       {{ transaction.type === 'deposit' ? '+' : '-'}}{{ t('currency') }} {{ formatPrice(transaction.amount) }}
-                     </span>
-                   </div>
-                 </div>
-               </div>
-             </div>
-          </div>
-
           <!-- Notifications Tab (Figma left-content-area: exact pixel-perfect design) -->
           <div v-else-if="currentTab === 'notifications'" class="notifications-view-container">
             <div class="notifications-card">
               <!-- header -->
               <div class="notifications-header">
                 <!-- الإشعارات on Right in RTL -->
-                <h2 class="notifications-title">الإشعارات</h2>
+                <h2 class="notifications-title">{{ t('profile.notifications') }}</h2>
 
                 <!-- تحديد الكل كمقروء on Left in RTL -->
                 <button
@@ -1274,7 +1182,7 @@
                   class="btn-mark-all-read"
                   @click="markAllAsRead"
                 >
-                  تحديد الكل كمقروء
+                  {{ t('profile.mark_all_read') }}
                 </button>
               </div>
 
@@ -1305,7 +1213,7 @@
               <!-- Empty State -->
               <div v-else class="notifications-empty">
                 <i class="fas fa-bell-slash empty-icon"></i>
-                <p>لا توجد إشعارات حالياً</p>
+                <p>{{ t('profile.no_notifications') }}</p>
               </div>
             </div>
           </div>
@@ -1321,10 +1229,10 @@
         <!-- modal-header -->
         <div class="modal-security-header">
           <!-- تغيير كلمة المرور on Right in RTL -->
-          <h3 class="modal-security-title">تغيير كلمة المرور</h3>
+          <h3 class="modal-security-title">{{ t('profile.change_password') }}</h3>
 
           <!-- close-btn on Left in RTL -->
-          <button type="button" class="modal-security-close-btn" @click="closeChangePasswordModal" aria-label="إغلاق">
+          <button type="button" class="modal-security-close-btn" @click="closeChangePasswordModal" :aria-label="t('common.close')">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#161616" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="2" y1="2" x2="12" y2="12"></line>
               <line x1="12" y1="2" x2="2" y2="12"></line>
@@ -1336,7 +1244,7 @@
         <form @submit.prevent="handleSavePassword" class="modal-security-form">
           <!-- field-كلمة المرور الحالية -->
           <div class="modal-field">
-            <label class="modal-field-label" :class="{ 'has-error': passErrors.current }">كلمة المرور الحالية</label>
+            <label class="modal-field-label" :class="{ 'has-error': passErrors.current }">{{ t('profile.current_password') }}</label>
             <div class="modal-input-wrapper" :class="{ 'has-error': passErrors.current }">
               <input
                 :type="showCurrentPassword ? 'text' : 'password'"
@@ -1345,12 +1253,8 @@
                 class="modal-input"
                 required
               />
-              <button type="button" class="modal-eye-btn" @click="showCurrentPassword = !showCurrentPassword" aria-label="إظهار أو إخفاء كلمة المرور">
-                <svg v-if="showCurrentPassword" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                  <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" />
-                  <circle cx="10" cy="10" r="1.3" fill="currentColor" />
-                </svg>
+              <button type="button" class="modal-eye-btn" @click="showCurrentPassword = !showCurrentPassword" :aria-label="t('profile.toggle_password')">
+                <PasswordEyeIcon v-if="showCurrentPassword" />
                 <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                 </svg>
@@ -1361,7 +1265,7 @@
 
           <!-- field-كلمة المرور الجديدة -->
           <div class="modal-field">
-            <label class="modal-field-label" :class="{ 'has-error': passErrors.new || (passForm.password && passForm.password.length < 8) }">كلمة المرور الجديدة</label>
+            <label class="modal-field-label" :class="{ 'has-error': passErrors.new || (passForm.password && passForm.password.length < 8) }">{{ t('profile.new_password') }}</label>
             <div class="modal-input-wrapper" :class="{ 'has-error': passErrors.new || (passForm.password && passForm.password.length < 8) }">
               <input
                 :type="showNewPassword ? 'text' : 'password'"
@@ -1370,25 +1274,21 @@
                 class="modal-input"
                 required
               />
-              <button type="button" class="modal-eye-btn" @click="showNewPassword = !showNewPassword" aria-label="إظهار أو إخفاء كلمة المرور">
-                <svg v-if="showNewPassword" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                  <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" />
-                  <circle cx="10" cy="10" r="1.3" fill="currentColor" />
-                </svg>
+              <button type="button" class="modal-eye-btn" @click="showNewPassword = !showNewPassword" :aria-label="t('profile.toggle_password')">
+                <PasswordEyeIcon v-if="showNewPassword" />
                 <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                 </svg>
               </button>
             </div>
             <span v-if="passErrors.new || (passForm.password && passForm.password.length < 8)" class="modal-field-error">
-              {{ passErrors.new || 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' }}
+              {{ passErrors.new }}
             </span>
           </div>
 
           <!-- field-تأكيد كلمة المرور -->
           <div class="modal-field">
-            <label class="modal-field-label" :class="{ 'has-error': passErrors.confirm || (passForm.password_confirmation && passForm.password_confirmation !== passForm.password) }">تأكيد كلمة المرور</label>
+            <label class="modal-field-label" :class="{ 'has-error': passErrors.confirm || (passForm.password_confirmation && passForm.password_confirmation !== passForm.password) }">{{ t('profile.confirm_password') }}</label>
             <div class="modal-input-wrapper" :class="{ 'has-error': passErrors.confirm || (passForm.password_confirmation && passForm.password_confirmation !== passForm.password) }">
               <input
                 :type="showConfirmPassword ? 'text' : 'password'"
@@ -1397,25 +1297,21 @@
                 class="modal-input"
                 required
               />
-              <button type="button" class="modal-eye-btn" @click="showConfirmPassword = !showConfirmPassword" aria-label="إظهار أو إخفاء كلمة المرور">
-                <svg v-if="showConfirmPassword" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 10C3.5 5.5 6.5 3.5 10 3.5C13.5 3.5 16.5 5.5 18 10C16.5 14.5 13.5 16.5 10 16.5C6.5 16.5 3.5 14.5 2 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                  <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" />
-                  <circle cx="10" cy="10" r="1.3" fill="currentColor" />
-                </svg>
+              <button type="button" class="modal-eye-btn" @click="showConfirmPassword = !showConfirmPassword" :aria-label="t('profile.toggle_password')">
+                <PasswordEyeIcon v-if="showConfirmPassword" />
                 <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                 </svg>
               </button>
             </div>
             <span v-if="passErrors.confirm || (passForm.password_confirmation && passForm.password_confirmation !== passForm.password)" class="modal-field-error">
-              {{ passErrors.confirm || 'كلمة المرور غير متطابقة' }}
+              {{ passErrors.confirm }}
             </span>
           </div>
 
           <!-- btn-save-password -->
           <button type="submit" class="btn-save-password" :disabled="loadingData">
-            {{ loadingData ? 'جاري الحفظ...' : 'حفظ كلمة المرور' }}
+            {{ loadingData ? t('profile.saving') : t('profile.save_password') }}
           </button>
         </form>
       </div>
@@ -1427,10 +1323,10 @@
         <!-- modal-header -->
         <div class="add-address-modal-header">
           <!-- Title on Right in RTL -->
-          <h3 class="add-address-modal-title">{{ isEditAddress ? 'تعديل العنوان' : 'إضافة عنوان جديد' }}</h3>
+          <h3 class="add-address-modal-title">{{ isEditAddress ? t('profile.edit_address') : t('profile.add_new_address') }}</h3>
 
           <!-- close-btn on Left in RTL -->
-          <button type="button" class="add-address-close-btn" @click="closeAddressModal" aria-label="إغلاق">
+          <button type="button" class="add-address-close-btn" @click="closeAddressModal" :aria-label="t('common.close')">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#161616" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="2" y1="2" x2="12" y2="12"></line>
               <line x1="12" y1="2" x2="2" y2="12"></line>
@@ -1442,19 +1338,19 @@
         <form @submit.prevent="saveAddress" class="add-address-form">
           <!-- field-name: اسم المستلم -->
           <div class="add-address-field">
-            <label class="add-address-label">اسم المستلم</label>
+            <label class="add-address-label">{{ t('checkout.recipient_name') }}</label>
             <input 
               type="text" 
               v-model="addressForm.full_name" 
               class="add-address-input" 
-              placeholder="أدخل اسم المستلم" 
+              :placeholder="t('checkout.recipient_name_enter')" 
               required 
             />
           </div>
 
           <!-- field-phone: رقم الجوال -->
           <div class="add-address-field">
-            <label class="add-address-label">رقم الجوال</label>
+            <label class="add-address-label">{{ t('profile.mobile') }}</label>
             <div class="phone-input-container">
               <div class="phone-country-code">
                 <span class="phone-prefix" dir="ltr">&lrm;+966</span>
@@ -1475,11 +1371,11 @@
           <div class="address-two-cols-row">
             <!-- field-type: المدينة -->
             <div class="add-address-field half-field">
-              <label class="add-address-label">المدينة</label>
+              <label class="add-address-label">{{ t('checkout.city') }}</label>
               <div class="select-wrapper">
                 <select v-model="addressForm.city" class="add-address-select city-select" required>
-                  <option value="" disabled selected>اختر المدينة</option>
-                  <option v-for="c in cityOptions" :key="c" :value="c">{{ c }}</option>
+                  <option value="" disabled selected>{{ t('checkout.choose_city') }}</option>
+                  <option v-for="c in cityOptions" :key="c" :value="c">{{ placeLabel(c) }}</option>
                 </select>
                 <div class="select-arrow">
                   <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1491,11 +1387,11 @@
 
             <!-- field-type: المنطقة -->
             <div class="add-address-field half-field">
-              <label class="add-address-label">المنطقة</label>
+              <label class="add-address-label">{{ t('checkout.region') }}</label>
               <div class="select-wrapper">
                 <select v-model="addressForm.region" class="add-address-select region-select">
-                  <option value="" disabled selected>اختر المنطقة</option>
-                  <option v-for="r in regionOptions" :key="r" :value="r">{{ r }}</option>
+                  <option value="" disabled selected>{{ t('checkout.choose_region') }}</option>
+                  <option v-for="r in regionOptions" :key="r" :value="r">{{ placeLabel(r) }}</option>
                 </select>
                 <div class="select-arrow">
                   <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1508,11 +1404,11 @@
 
           <!-- field-message: العنوان بالتفصيل (الشارع، رقم المبنى، الشقة) -->
           <div class="add-address-field">
-            <label class="add-address-label">العنوان بالتفصيل (الشارع، رقم المبنى، الشقة)</label>
+            <label class="add-address-label">{{ t('checkout.address_details_label') }}</label>
             <textarea 
               v-model="addressForm.address" 
               class="add-address-textarea" 
-              placeholder="اكتب تفاصيل عنوانك هنا لتسهيل التوصيل..."
+              :placeholder="t('checkout.address_details_placeholder')"
               rows="3"
               required
             ></textarea>
@@ -1520,11 +1416,11 @@
 
           <!-- field-message: ملاحظات التوصيل (اختياري) -->
           <div class="add-address-field">
-            <label class="add-address-label">ملاحظات التوصيل (اختياري)</label>
+            <label class="add-address-label">{{ t('checkout.delivery_notes_optional') }}</label>
             <textarea 
               v-model="addressForm.notes" 
               class="add-address-textarea" 
-              placeholder="مثال: يرجى الاتصال قبل الوصول"
+              :placeholder="t('checkout.delivery_notes_placeholder')"
               rows="3"
             ></textarea>
           </div>
@@ -1536,12 +1432,12 @@
                 <path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <span class="default-checkbox-text">اجعل هذا العنوان افتراضيًا</span>
+            <span class="default-checkbox-text">{{ t('profile.make_default_address') }}</span>
           </div>
 
           <!-- btn-save-address: حفظ العنوان -->
           <button type="submit" class="btn-save-address" :disabled="loadingData">
-            {{ loadingData ? 'جاري الحفظ...' : 'حفظ العنوان' }}
+            {{ loadingData ? t('profile.saving') : t('checkout.save_address') }}
           </button>
         </form>
       </div>
@@ -1552,7 +1448,7 @@
       <div class="order-details-modal">
         <div class="modal-header-row">
           <div class="modal-order-title">
-            <h3>تتبع مسار الطلب</h3>
+            <h3>{{ t('profile.track_order_path') }}</h3>
             <span class="modal-order-num">{{ activeModalOrder.orderNumber }}</span>
           </div>
           <button class="close-modal" @click="showOrderTrackingModal = false">&times;</button>
@@ -1563,36 +1459,36 @@
             <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 2) }">
               <div class="step-dot"><i class="fas fa-check"></i></div>
               <div class="step-details">
-                <span class="step-title">تم تأكيد الطلب</span>
+                <span class="step-title">{{ t('profile.order_confirmed_step') }}</span>
                 <span class="step-time">{{ activeModalOrder.date || '—' }}</span>
               </div>
             </div>
             <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 3) }">
               <div class="step-dot"><i class="fas fa-check"></i></div>
               <div class="step-details">
-                <span class="step-title">جاري التجهيز والتعبئة</span>
+                <span class="step-title">{{ t('profile.preparing_packing') }}</span>
                 <span class="step-time">{{ activeModalOrder.date || '—' }}</span>
               </div>
             </div>
             <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 5) }">
               <div class="step-dot"><i class="fas fa-truck"></i></div>
               <div class="step-details">
-                <span class="step-title">خرج مع المندوب للتوصيل</span>
-                <span class="step-time">الطلب في الطريق إلى عنوانك</span>
+                <span class="step-title">{{ t('profile.out_with_courier') }}</span>
+                <span class="step-time">{{ t('profile.on_the_way_to_you') }}</span>
               </div>
             </div>
             <div class="track-step" :class="{ active: isTrackingStepActive(activeModalOrder, 6) }">
               <div class="step-dot"><i class="fas fa-home"></i></div>
               <div class="step-details">
-                <span class="step-title">تم التسليم بنجاح</span>
-                <span class="step-time">الموقع المحدد</span>
+                <span class="step-title">{{ t('profile.delivered_successfully') }}</span>
+                <span class="step-time">{{ t('profile.selected_location') }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="modal-footer-row">
-          <button class="close-btn-secondary" @click="showOrderTrackingModal = false">إغلاق</button>
+          <button class="close-btn-secondary" @click="showOrderTrackingModal = false">{{ t('common.close') }}</button>
         </div>
       </div>
     </div>
@@ -1638,16 +1534,22 @@
 <script setup>
 import { ref, onMounted, reactive, computed, watch } from 'vue'
 import riyalIcon from '../../../assets/riyal.svg'
+import { formatPrice as formatPriceBase, formatPriceHtml } from '../../../utils/price'
+import PriceText from '../../../components/PriceText.vue'
+import PasswordEyeIcon from '../../../components/PasswordEyeIcon.vue'
+import PhoneCountryInput from '../../../components/PhoneCountryInput.vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { placeLabel as placeLabelFor } from '../../../utils/placeLabels'
 import { useRoute, useRouter } from 'vue-router'
-import { cartState } from '../../../store/cart'
 import { authState, authActions } from '../../../store/auth'
 import { useOffers } from '../../product/composables/useOffers'
 import { useLocalized } from '../../../composables/useLocalized'
 import { useSettings } from '../../../composables/useSettings'
-import { findCountryByCode } from '../../../data/countries'
-import { escapeHtml } from '../../../utils/sanitize'
+import { useDialog } from '../../../composables/useDialog'
+import { countries as phoneCountries, findCountryByCode, validatePhoneByCountry } from '../../../data/countries'
+import { escapeHtml, sanitizeUrl } from '../../../utils/sanitize'
+import { getCustomerToken } from '../../../utils/customerSession'
 import { useProfileStore } from '../store/profileStore'
 
 const route = useRoute()
@@ -1661,16 +1563,16 @@ const {
   ordersList,
   notificationsList,
   returnsList,
-  walletData,
-  loadingWallet,
   countries,
   cities,
 } = storeToRefs(profileStore)
 const { getActiveOfferForProduct, calculateDiscountFromOffer, calculatePriceWithOffer, fetchOffers } = useOffers()
 const { currency, fetchSettings } = useSettings()
+const dialog = useDialog()
 
 // Tabs Handling
-const currentTab = computed(() => route.query.tab || 'overview')
+const PROFILE_TABS = ['overview', 'orders', 'addresses', 'notifications', 'info', 'returns']
+const currentTab = computed(() => (PROFILE_TABS.includes(route.query.tab) ? route.query.tab : 'overview'))
 const currentTabBreadcrumbTitle = computed(() => {
   const isAr = locale.value === 'ar'
   switch (currentTab.value) {
@@ -1678,63 +1580,57 @@ const currentTabBreadcrumbTitle = computed(() => {
       return isAr ? 'طلباتي' : 'My Orders'
     case 'addresses':
       return isAr ? 'العناوين' : 'Addresses'
-    case 'wallet':
-      return isAr ? 'المحفظة' : 'Wallet'
     case 'notifications':
       return isAr ? 'الإشعارات' : 'Notifications'
     case 'info':
       return isAr ? 'معلوماتك الشخصية' : 'Personal Info'
     case 'returns':
       return isAr ? 'المرتجعات' : 'Returns'
-    case 'wishlist':
-      return isAr ? 'المفضلة' : 'Wishlist'
     default:
       return ''
   }
 })
-const wishlistCount = computed(() => wishlistItems.value.length)
 const ordersTotalCount = computed(() => ordersList.value.length)
 const notifCount = ref(0) // Default to 0, no longer hardcoded
 
 const ORDER_STATUS_META = {
-  pending: { label: 'قيد المراجعة', color: '#64748B', canTrack: true, rank: 1 },
-  confirmed: { label: 'تم تأكيد الطلب', color: '#2563EB', canTrack: true, rank: 2 },
-  paid_confirmed: { label: 'تم تأكيد الدفع', color: '#2563EB', canTrack: true, rank: 2 },
-  processing: { label: 'قيد التجهيز', color: '#F59E0B', canTrack: true, rank: 3 },
+  pending: { get label() { return t('profile.os_pending') }, color: '#64748B', canTrack: true, rank: 1 },
+  confirmed: { get label() { return t('profile.os_confirmed') }, color: '#2563EB', canTrack: true, rank: 2 },
+  paid_confirmed: { get label() { return t('profile.os_paid_confirmed') }, color: '#2563EB', canTrack: true, rank: 2 },
+  processing: { get label() { return t('profile.os_processing') }, color: '#F59E0B', canTrack: true, rank: 3 },
   // `shipped` is the API state for the parcel being out for delivery.
   // `delivered` remains a separate state and is the only completed state.
-  shipped: { label: 'الطلب في الطريق', color: '#F59E0B', canTrack: true, rank: 5 },
-  shipping: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
-  delivering: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
-  in_delivery: { label: 'قيد التوصيل', color: '#F59E0B', canTrack: true, rank: 5 },
-  delivered: { label: 'مكتملة', color: '#10B981', canTrack: false, rank: 6 },
-  completed: { label: 'مكتملة', color: '#10B981', canTrack: false, rank: 6 },
-  cancelled: { label: 'ملغاة', color: '#EF4444', canTrack: false, rank: 0 },
-  failed: { label: 'فشل الطلب', color: '#EF4444', canTrack: false, rank: 0 },
-  returned: { label: 'مرتجع', color: '#8B5CF6', canTrack: false, rank: 0 },
-  refunded: { label: 'مسترد', color: '#8B5CF6', canTrack: false, rank: 0 },
+  shipped: { get label() { return t('profile.os_shipped') }, color: '#F59E0B', canTrack: true, rank: 5 },
+  shipping: { get label() { return t('profile.os_shipping') }, color: '#F59E0B', canTrack: true, rank: 5 },
+  delivering: { get label() { return t('profile.os_shipping') }, color: '#F59E0B', canTrack: true, rank: 5 },
+  in_delivery: { get label() { return t('profile.os_shipping') }, color: '#F59E0B', canTrack: true, rank: 5 },
+  delivered: { get label() { return t('profile.os_completed') }, color: '#10B981', canTrack: false, rank: 6 },
+  completed: { get label() { return t('profile.os_completed') }, color: '#10B981', canTrack: false, rank: 6 },
+  cancelled: { get label() { return t('profile.os_cancelled') }, color: '#EF4444', canTrack: false, rank: 0 },
+  failed: { get label() { return t('profile.os_failed') }, color: '#EF4444', canTrack: false, rank: 0 },
+  returned: { get label() { return t('profile.os_returned') }, color: '#8B5CF6', canTrack: false, rank: 0 },
+  refunded: { get label() { return t('profile.os_refunded') }, color: '#8B5CF6', canTrack: false, rank: 0 },
 }
 
 const DEFAULT_ORDER_STATUS = ORDER_STATUS_META.pending
 
 const totalOrdersCountText = computed(() => {
   const count = ordersTotalCount.value
-  if (locale.value === 'en') return `${count} ${count === 1 ? 'order' : 'orders'}`
-  return `${count} ${count === 1 ? 'طلب' : 'طلبات'}`
+  return `${count} ${count === 1 ? t('profile.orders_count_one') : t('profile.orders_count_many')}`
 })
 
 const addressesCountText = computed(() => {
   if (addressesList.value.length > 0) {
-    return addressesList.value.length === 1 ? '1 عنوان' : `${addressesList.value.length} عنوان`
+    return addressesList.value.length === 1 ? t('profile.addresses_count_one') : t('profile.addresses_count_many', { n: addressesList.value.length })
   }
-  return '0 عنوان'
+  return t('profile.addresses_count_none')
 })
 
 const formatDateArabic = (date) => {
   if (!date) return ''
   const d = new Date(date)
   if (isNaN(d.getTime())) return date
-  return d.toLocaleDateString('ar-SA', { day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString(locale.value === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const formatStatusLabel = (s) => {
@@ -1770,7 +1666,7 @@ const viewOrderDetails = (order) => {
 }
 
 // Form State
-const form = reactive({ name: '', email: '', phone: '', country: 'JO', rawCountryCode: 'JO' })
+const form = reactive({ name: '', email: '', phone: '', country: 'SA', rawCountryCode: 'SA' })
 const showPasswordForm = ref(false)
 const showChangePasswordModal = ref(false)
 const isEditingProfile = ref(false)
@@ -1782,12 +1678,53 @@ const showConfirmPassword = ref(false)
 
 const displayUserName = computed(() => form.name || authState.user?.name || authState.user?.full_name || '')
 const displayUserEmail = computed(() => form.email || authState.user?.email || '')
-const displayUserPhone = computed(() => form.phone || authState.user?.phone || '0501234567')
+const displayUserPhone = computed(() => form.phone || authState.user?.phone || authState.user?.phone_number || '')
+
+// Phone edit state: country selector (flag + dial code) and the national number
+const phoneCountry = ref('JO')
+const phoneLocal = ref('')
+const phoneError = ref('')
+
+// Split a stored phone ("+9665…", "009665…", "05…") into a country code and the national number
+const splitPhone = (phone, fallbackCountry) => {
+  const fallback = findCountryByCode(fallbackCountry)
+  const raw = String(phone || '').trim()
+  let digits = raw.replace(/\D/g, '')
+  if (!digits) return { country: fallback.code, national: '' }
+
+  const isInternational = raw.startsWith('+') || digits.startsWith('00')
+  if (digits.startsWith('00')) digits = digits.slice(2)
+
+  const dialDigits = (c) => c.dialCode.replace('+', '')
+  const matches = (c) => digits.startsWith(dialDigits(c)) && digits.length > dialDigits(c).length
+  // Without a leading "+" / "00" only trust a dial-code prefix when the number is clearly too long to be local
+  const looksInternational = isInternational || (matches(fallback) && digits.length >= dialDigits(fallback).length + 7)
+  if (!looksInternational) return { country: fallback.code, national: digits }
+
+  // Prefer the user's own country (+1 is shared by several), then the longest matching dial code
+  const candidates = phoneCountries.filter(matches).sort((a, b) => dialDigits(b).length - dialDigits(a).length)
+  const match = (matches(fallback) ? fallback : candidates[0]) || fallback
+  return { country: match.code, national: digits.slice(dialDigits(match).length) }
+}
+
+// "+<dial code><national number>" with any leading trunk zero removed
+const joinPhone = (countryCode, national) => {
+  const country = findCountryByCode(countryCode)
+  const dial = country.dialCode.replace('+', '')
+  let digits = String(national || '').replace(/\D/g, '')
+  if (digits.startsWith('00' + dial)) digits = digits.slice(2 + dial.length)
+  else if (digits.startsWith(dial) && digits.length > dial.length + 6) digits = digits.slice(dial.length)
+  return country.dialCode + digits.replace(/^0+/, '')
+}
 
 const startEditingProfile = () => {
   if (!form.name) form.name = displayUserName.value
   if (!form.email) form.email = displayUserEmail.value
   if (!form.phone) form.phone = displayUserPhone.value
+  const parts = splitPhone(form.phone, form.rawCountryCode)
+  phoneCountry.value = parts.country
+  phoneLocal.value = parts.national
+  phoneError.value = ''
   showPasswordForm.value = false
   isEditingProfile.value = true
 }
@@ -1817,13 +1754,13 @@ const handleSavePassword = async () => {
   passErrors.confirm = ''
 
   if (!passForm.current_password) {
-    passErrors.current = 'يرجى إدخال كلمة المرور الحالية'
+    passErrors.current = t('profile.pw_current_required')
   }
   if (!passForm.password || passForm.password.length < 8) {
-    passErrors.new = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'
+    passErrors.new = t('profile.pw_min_length')
   }
   if (!passForm.password_confirmation || passForm.password_confirmation !== passForm.password) {
-    passErrors.confirm = 'كلمة المرور غير متطابقة'
+    passErrors.confirm = t('profile.pw_mismatch')
   }
 
   if (passErrors.current || passErrors.new || passErrors.confirm) {
@@ -1837,10 +1774,10 @@ const handleSavePassword = async () => {
       password: passForm.password,
       password_confirmation: passForm.password_confirmation
     })
-    alert('تم حفظ كلمة المرور بنجاح')
+    dialog.alert(t('profile.pw_saved'), { type: 'success', title: t('profile.change_password') })
     closeChangePasswordModal()
   } catch (err) {
-    const msg = err.response?.data?.message || err.message || 'فشل حفظ كلمة المرور'
+    const msg = err.response?.data?.message || err.message || t('profile.pw_save_failed')
     if (msg.toLowerCase().includes('current') || msg.includes('حالية')) {
       passErrors.current = msg
     } else {
@@ -1852,6 +1789,9 @@ const handleSavePassword = async () => {
 }
 
 const handleUpdateProfile = async () => {
+  phoneError.value = validatePhoneByCountry(phoneLocal.value, phoneCountry.value, 'ar') || ''
+  if (phoneError.value) return
+  form.phone = joinPhone(phoneCountry.value, phoneLocal.value)
   await updateProfile()
   isEditingProfile.value = false
 }
@@ -1869,32 +1809,18 @@ const localizedCountryName = computed(() => {
   return form.country || (locale.value === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia');
 });
 
-// Data lists come from the Site APIs. Empty lists are rendered as empty states.
-addressesList.value = []
-
-const wishlistItems = computed(() => cartState.wishlist)
-watch(currentTab, (tab) => { if (tab === 'wishlist') cartState.hydrateWishlist() })
-
-const removeFromWishlist = (product) => {
-  cartState.toggleWishlist(product)
-}
-
 const selectDefaultAddress = async (addr) => {
   addressesList.value.forEach(a => {
     a.is_default = (a.id === addr.id)
   })
   try {
     if (authState.token) {
-      await profileStore.updateAddress(addr.id, {
-        ...addr,
-        is_default: true
-      })
+      await profileStore.setDefaultAddress(addr.id)
     }
   } catch (e) {
     console.error('Failed to update default address:', e)
   }
 }
-notificationsList.value = []
 const orderTab = ref('current')
 const expandedOrders = ref([])
 
@@ -1908,54 +1834,78 @@ const markNotificationAsRead = async (notif) => {
   notifCount.value = profileStore.notificationCount
 }
 
-returnsList.value = []
 const showReturnForm = ref(false)
 const returnStep = ref(1)
 const selectedOrderForReturn = ref(null)
-const selectedItemForReturn = ref(null)
+const selectedReturnItems = ref([])
 const returnReason = ref('')
 
-// Wallet State
-const activeFilter = ref('all')
+const getReturnItemKey = (item) => String(item?.order_item_id || item?.orderItemId || item?.id || '')
 
-const filters = [
-  { label: t('profile.all'), value: 'all' },
-  { label: t('profile.purchases'), value: 'purchase' },
-  { label: t('profile.refunds'), value: 'deposit' }
-]
+// Quantity of this order line already covered by a pending/approved/refunded return,
+// read from the customer's returns so the same units cannot be returned twice.
+const getReturnedQuantity = (item) => {
+  const key = getReturnItemKey(item)
+  const orderId = String(selectedOrderForReturn.value?.id ?? '')
+  if (!key || !orderId) return 0
+  return (returnsList.value || [])
+    .filter((ret) => String(ret.orderId ?? '') === orderId && ret.status !== 'rejected')
+    .flatMap((ret) => ret.items || [])
+    .filter((line) => String(line.orderItemId ?? line.id ?? '') === key)
+    .reduce((total, line) => total + (Number(line.quantity) || 0), 0)
+}
 
-const totalRefunds = computed(() => {
-  return walletData.value.transactions
-    .filter(t => t.type === 'deposit')
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0)
-})
+const getReturnMaxQuantity = (item) => {
+  const explicit = Number(item?.returnable_quantity ?? item?.available_quantity)
+  if (Number.isFinite(explicit)) return Math.max(0, explicit)
+  return Math.max(0, (Number(item?.quantity) || 0) - getReturnedQuantity(item))
+}
 
-const totalPurchases = computed(() => {
-  return walletData.value.transactions
-    .filter(t => t.type !== 'deposit')
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0)
-})
+const getSelectedReturnLine = (item) => selectedReturnItems.value.find(
+  (line) => line.key === getReturnItemKey(item),
+)
 
-const refundCount = computed(() => {
-  return walletData.value.transactions.filter(t => t.type === 'deposit').length
-})
+const isReturnItemSelected = (item) => Boolean(getSelectedReturnLine(item))
 
-const purchaseCount = computed(() => {
-  return walletData.value.transactions.filter(t => t.type !== 'deposit').length
-})
+const selectedReturnTotalQuantity = computed(() => selectedReturnItems.value.reduce(
+  (total, line) => total + Number(line.quantity || 0),
+  0,
+))
 
-const filteredTransactions = computed(() => {
-  if (activeFilter.value === 'all') {
-    return walletData.value.transactions
+const toggleReturnItem = (item) => {
+  const key = getReturnItemKey(item)
+  if (!key || getReturnMaxQuantity(item) < 1) return
+  const existingIndex = selectedReturnItems.value.findIndex((line) => line.key === key)
+  if (existingIndex >= 0) {
+    selectedReturnItems.value.splice(existingIndex, 1)
+    return
   }
-  if (activeFilter.value === 'deposit') {
-    return walletData.value.transactions.filter(t => t.type === 'deposit')
-  }
-  if (activeFilter.value === 'purchase') {
-    return walletData.value.transactions.filter(t => t.type !== 'deposit')
-  }
-  return walletData.value.transactions
-})
+  selectedReturnItems.value.push({
+    key,
+    item,
+    quantity: 1,
+    condition: 'opened',
+  })
+}
+
+const updateReturnQuantity = (item, eventOrValue) => {
+  const line = getSelectedReturnLine(item)
+  if (!line) return
+  const max = Math.max(1, getReturnMaxQuantity(item))
+  const value = eventOrValue?.target ? eventOrValue.target.value : eventOrValue
+  const next = Math.floor(Number(value) || 1)
+  line.quantity = Math.min(max, Math.max(1, next))
+  if (eventOrValue?.target) eventOrValue.target.value = String(line.quantity)
+}
+
+const updateReturnCondition = (item, value) => {
+  const line = getSelectedReturnLine(item)
+  if (line) line.condition = value || 'opened'
+}
+
+const resetReturnItemSelection = () => {
+  selectedReturnItems.value = []
+}
 
 // Addresses Logic
 const showAddAddress = ref(false)
@@ -1973,7 +1923,9 @@ const addressForm = reactive({
   is_default: false
 })
 
-const cityOptions = [
+const placeLabel = (name) => placeLabelFor(name, locale.value)
+
+const defaultCityOptions = [
   'الرياض',
   'جدة',
   'مكة المكرمة',
@@ -1987,7 +1939,7 @@ const cityOptions = [
   'الطائف'
 ]
 
-const regionOptions = [
+const defaultRegionOptions = [
   'منطقة الرياض',
   'منطقة مكة المكرمة',
   'المنطقة الشرقية',
@@ -1996,6 +1948,30 @@ const regionOptions = [
   'منطقة عسير',
   'منطقة تبوك'
 ]
+
+// Keep existing customer data editable even when it comes from a different
+// country/city catalog than the storefront defaults (for example Alexandria).
+// Native required selects reject an existing value unless it has a matching
+// option, so merge persisted address values into the choices while editing.
+const cityOptions = computed(() => {
+  const persistedCities = addressesList.value
+    .map((address) => String(address?.city || '').split('،')[0].trim())
+    .filter(Boolean)
+  const currentCity = String(addressForm.city || '').trim()
+  return [...new Set([...defaultCityOptions, ...persistedCities, currentCity].filter(Boolean))]
+})
+
+const regionOptions = computed(() => {
+  const persistedRegions = addressesList.value
+    .flatMap((address) => {
+      const parts = String(address?.city || '').split('،').map((part) => part.trim()).filter(Boolean)
+      return [address?.region, address?.area, parts[1]]
+    })
+    .map((region) => String(region || '').trim())
+    .filter(Boolean)
+  const currentRegion = String(addressForm.region || '').trim()
+  return [...new Set([...defaultRegionOptions, ...persistedRegions, currentRegion].filter(Boolean))]
+})
 
 // Countries and Cities
 
@@ -2049,12 +2025,12 @@ const isTrackingStepActive = (order, step) => {
 }
 
 const trackingSteps = [
-  { key: 'received', rank: 1, label: 'تم استلام الطلب', icon: 'fas fa-inbox', dateField: 'created_at' },
-  { key: 'confirmed', rank: 2, label: 'تم تأكيد الطلب', icon: 'fas fa-clipboard-check', dateField: 'paymentTime' },
-  { key: 'processing', rank: 3, label: 'تم تجهيز الطلب', icon: 'fas fa-box-open', dateField: 'updatedAt' },
-  { key: 'shipped', rank: 4, label: 'تم الشحن', icon: 'fas fa-box', dateField: 'shippedAt' },
-  { key: 'transit', rank: 5, label: 'الطلب في الطريق', icon: 'fas fa-truck', dateField: 'shippedAt', note: 'طلبك في طريقه إليك' },
-  { key: 'delivered', rank: 6, label: 'تم الاستلام', icon: 'fas fa-house', dateField: 'deliveredAt' },
+  { key: 'received', rank: 1, get label() { return t('profile.ts_received') }, icon: 'fas fa-inbox', dateField: 'created_at' },
+  { key: 'confirmed', rank: 2, get label() { return t('profile.os_confirmed') }, icon: 'fas fa-clipboard-check', dateField: 'paymentTime' },
+  { key: 'processing', rank: 3, get label() { return t('profile.ts_processing') }, icon: 'fas fa-box-open', dateField: 'updatedAt' },
+  { key: 'shipped', rank: 4, get label() { return t('profile.ts_shipped') }, icon: 'fas fa-box', dateField: 'shippedAt' },
+  { key: 'transit', rank: 5, get label() { return t('profile.os_shipped') }, icon: 'fas fa-truck', dateField: 'shippedAt', get note() { return t('profile.ts_transit_note') } },
+  { key: 'delivered', rank: 6, get label() { return t('profile.ts_delivered') }, icon: 'fas fa-house', dateField: 'deliveredAt' },
 ]
 
 const getTrackingStepState = (order, step) => {
@@ -2076,7 +2052,7 @@ const getTrackingRank = (order) => {
 
 const getTrackingStepTime = (order, step) => {
   const definition = trackingSteps.find((item) => item.rank === step)
-  if (!definition || getTrackingStepState(order, step) === 'pending') return 'لم تبدأ بعد'
+  if (!definition || getTrackingStepState(order, step) === 'pending') return t('profile.ts_not_started')
 
   const rank = getTrackingRank(order)
   const rawDate = order?.[definition.dateField]
@@ -2086,10 +2062,10 @@ const getTrackingStepTime = (order, step) => {
 }
 
 const formatProductsCount = (count) => {
-  if (count === 1) return '1 منتج'
-  if (count === 2) return '2 منتجات'
-  if (count >= 3 && count <= 10) return `${count} منتجات`
-  return `${count} منتج`
+  if (count === 1) return t('profile.items_count_one')
+  if (count === 2) return t('profile.items_count_two')
+  if (count >= 3 && count <= 10) return t('profile.items_count_few', { n: count })
+  return t('profile.items_count_many', { n: count })
 }
 
 const allOrdersMapped = computed(() => {
@@ -2100,7 +2076,7 @@ const allOrdersMapped = computed(() => {
       const count = items.length || 1
       const mappedItems = items.map(item => ({
         ...item,
-        name: item.name || item.product?.name || 'منتج',
+        name: item.name || item.product?.name || t('profile.product_fallback'),
         unitPrice: formatPrice(item.price || item.unit_price || 0),
         totalPrice: formatPrice(item.total || item.total_price || (Number(item.price || item.unit_price || 0) * (item.quantity || 1))),
       }))
@@ -2113,7 +2089,7 @@ const allOrdersMapped = computed(() => {
         statusColor: meta.color,
         productsCount: count,
         productsCountText: formatProductsCount(count),
-        subtitle: 'شامل جميع رسوم الشحن والضمان',
+        subtitle: t('profile.shipping_warranty_included'),
         total: formatPrice(o.total_amount || o.total || 0),
         canTrack: meta.canTrack,
         items: mappedItems,
@@ -2121,7 +2097,7 @@ const allOrdersMapped = computed(() => {
         phone: authState.user?.phone_number || authState.user?.phone || '',
         address: o.shipping_address || '',
         paymentMethod: o.payment_method === 'cash_on_delivery'
-          ? 'الدفع عند الاستلام'
+          ? t('invoice.payment_cod')
           : (o.payment_method || ''),
         paymentTime: o.payment_time,
         shippedAt: o.shipped_at,
@@ -2255,7 +2231,7 @@ const getDeliveryCountry = (order) => {
   if (!order) return ''
   if (order.shippingAddress && order.shippingAddress.country) {
     const c = order.shippingAddress.country
-    return (c === 'SA' || c === 'SAUDI ARABIA') ? 'المملكة العربية السعودية' : c
+    return (c === 'SA' || c === 'SAUDI ARABIA') ? t('profile.country_saudi') : c
   }
   return ''
 }
@@ -2265,7 +2241,7 @@ const getInvoiceProducts = (order) => {
   const items = order.items || (order.raw && (order.raw.items || order.raw.products)) || []
   if (items.length > 0) {
     return items.map(item => ({
-      name: item.name || item.product?.name || 'منتج ماستر غاز',
+      name: item.name || item.product?.name || t('profile.product_fallback_brand'),
       quantity: item.quantity || 1,
       unitPrice: item.unitPrice || (Number(item.price || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       totalPrice: item.totalPrice || ((Number(item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
@@ -2358,12 +2334,12 @@ watch(() => authState.user, (u) => {
     form.country = (countryMap[rawCountry.toUpperCase()] || rawCountry).toUpperCase()
     
     // Format phone with country code prefix
-    form.phone = formatPhoneWithCountryCode(u.phone || '', rawCountry)
+    form.phone = formatPhoneWithCountryCode(u.phone || u.phone_number || '', rawCountry)
   }
 }, { immediate: true })
 
 const fetchData = async () => {
-  if (!authState.token && !route.query.mockAuth) return router.push('/')
+  if (!authState.token && !getCustomerToken()) return router.push('/')
   const user = await profileStore.load({
     localized,
     formatDate,
@@ -2372,20 +2348,12 @@ const fetchData = async () => {
   notifCount.value = profileStore.notificationCount
 }
 
-const fetchWallet = () => profileStore.fetchWallet()
-
 onMounted(async () => {
-  if (!authState.token && !route.query.mockAuth) {
+  if (!authState.token && !getCustomerToken()) {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
   fetchSettings()
-  if (currentTab.value === 'wishlist') {
-    cartState.hydrateWishlist()
-  }
-  if (currentTab.value === 'wallet') {
-    fetchWallet()
-  }
   await fetchData()
   fetchOffers()
   if (currentTab.value === 'orders' && (route.query.details === 'true' || route.query.orderId)) {
@@ -2413,7 +2381,7 @@ onMounted(async () => {
 
 // RE-FETCH ON TAB CHANGE OR URL CHANGE
 watch(() => route.query.tab, (newTab) => {
-  if (!authState.token && !route.query.mockAuth) {
+  if (!authState.token && !getCustomerToken()) {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
@@ -2423,9 +2391,6 @@ watch(() => route.query.tab, (newTab) => {
   } else if (route.query.details === 'true') {
     const firstOrder = allOrdersMapped.value[0]
     if (firstOrder) openOrderDetails(firstOrder)
-  }
-  if (newTab === 'wallet') {
-    fetchWallet()
   }
   fetchData()
 })
@@ -2447,9 +2412,9 @@ const updateProfile = async () => {
     
     const updatedUser = await profileStore.updateProfile(payload)
     authState.user = updatedUser
-    alert(t('profile.update_success'))
+    dialog.alert(t('profile.update_success'), { type: 'success', title: t('profile.personal_info') })
   } catch (err) {
-    alert(err.response?.data?.message || t('profile.update_failed'))
+    dialog.alert(err.response?.data?.message || t('profile.update_failed'), { type: 'error', title: t('profile.personal_info') })
   } finally {
     loadingData.value = false
   }
@@ -2459,11 +2424,11 @@ const changePassword = async () => {
   loadingData.value = true
   try {
     await profileStore.changePassword(passForm)
-    alert(t('profile.password_changed'))
+    dialog.alert(t('profile.password_changed'), { type: 'success', title: t('profile.change_password') })
     showPasswordForm.value = false
     Object.assign(passForm, { password: '', password_confirmation: '' })
   } catch (err) {
-    alert(err.response?.data?.message || t('profile.password_change_failed'))
+    dialog.alert(err.response?.data?.message || t('profile.password_change_failed'), { type: 'error', title: t('profile.change_password') })
   } finally {
     loadingData.value = false
   }
@@ -2576,14 +2541,14 @@ const saveAddress = async () => {
 
     showAddressModal.value = false
   } catch (err) {
-    alert(err.response?.data?.message || 'فشل حفظ العنوان')
+    dialog.alert(err.response?.data?.message || t('profile.address_save_failed'), { type: 'error', title: t('profile.addresses') })
   } finally {
     loadingData.value = false
   }
 }
 
 const deleteAddress = async (id) => {
-  if (!confirm(t('profile.delete_address_confirm') || 'هل أنت متأكد من حذف هذا العنوان؟')) return
+  if (!confirm(t('profile.delete_address_confirm'))) return
   try {
     if (authState.token) await profileStore.deleteAddress(id)
   } catch (err) {
@@ -2600,7 +2565,7 @@ const toggleOrder = (id) => {
 
 const handleLogout = () => authActions.logout()
 const formatDate = (date) => new Date(date).toLocaleDateString(locale.value === 'ar' ? 'ar-JO' : 'en-US')
-const formatPrice = (price) => parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const formatPrice = (price) => formatPriceBase(price, { fraction: 'fixed' })
 const formatStatus = (s) => ({
   pending: t('profile.status_pending'),
   processing: t('profile.status_processing'),
@@ -2621,44 +2586,54 @@ const getPaymentLabel = (method) => {
 
 const formatReturnStatus = (s) => ({
   pending: t('profile.return_status_pending'),
-  processing: 'قيد المراجعة',
+  processing: t('profile.return_status_processing'),
   approved: t('profile.return_status_approved'),
   rejected: t('profile.return_status_rejected'),
-  refunded: 'تم رد المبلغ'
+  refunded: t('profile.return_status_refunded')
 }[s] || s)
+
+const formatReturnCondition = (condition) => ({
+  unopened: t('profile.condition_unopened'),
+  opened: t('profile.condition_opened'),
+  damaged: t('profile.condition_damaged'),
+}[String(condition || '').toLowerCase()] || condition || '—')
 
 const openReturnForm = () => {
   showReturnForm.value = true
   returnStep.value = 1
   selectedOrderForReturn.value = null
-  selectedItemForReturn.value = null
+  resetReturnItemSelection()
   returnReason.value = ''
 }
 
 const submitReturnRequest = async () => {
+  if (!selectedOrderForReturn.value || !selectedReturnItems.value.length) return
   loadingData.value = true
   try {
-    // Debug: log the data being sent
-    console.log('Submitting return request:', {
-      order_id: selectedOrderForReturn.value.id,
-      order_item_id: selectedItemForReturn.value.id,
-      reason: returnReason.value,
-      selectedOrderForReturn: selectedOrderForReturn.value,
-      selectedItemForReturn: selectedItemForReturn.value
-    })
-
     const res = await profileStore.createReturn({
       order_id: selectedOrderForReturn.value.id,
-      order_item_id: selectedItemForReturn.value.id,
-      reason: returnReason.value.trim()
+      reason: returnReason.value.trim(),
+      items: selectedReturnItems.value.map(({ item, quantity, condition }) => ({
+        order_item_id: item.order_item_id || item.orderItemId || item.id,
+        quantity: Math.min(Math.max(1, getReturnMaxQuantity(item)), Math.max(1, Math.floor(Number(quantity) || 1))),
+        condition: condition || 'opened',
+        reason: returnReason.value.trim(),
+      })),
     })
-    alert(res.data.message)
     showReturnForm.value = false
+    resetReturnItemSelection()
     fetchData()
+    dialog.alert(res?.data?.message || res?.message || t('profile.return_request_submitted'), {
+      type: 'success',
+      title: t('profile.return_request'),
+    })
   } catch (err) {
     console.error('Return request error:', err)
     console.error('Error response:', err.response?.data)
-    alert(err.response?.data?.message || err.message || t('profile.send_request_failed'))
+    dialog.alert(err.response?.data?.message || err.message || t('profile.send_request_failed'), {
+      type: 'error',
+      title: t('profile.return_request'),
+    })
   } finally {
     loadingData.value = false
   }
@@ -2740,7 +2715,7 @@ const printInvoice = async (order) => {
     const safeCurrency = escapeHtml(t('currency'))
     const safeDate = escapeHtml(order.date || '')
     const safeSiteName = escapeHtml(siteName)
-    const safeSiteLogo = escapeHtml(siteLogo)
+    const safeSiteLogo = sanitizeUrl(siteLogo, '/brand/mastergas-logo.png')
     const safeCustomerName = escapeHtml(order.customerName || order.customer?.name || '')
     const safeCustomerPhone = escapeHtml(order.customerPhone || order.customer?.phone || '')
     const safeCustomerEmail = escapeHtml(order.customerEmail || order.customer?.email || '')
@@ -2748,6 +2723,8 @@ const printInvoice = async (order) => {
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+    printWindow.opener = null
     printWindow.document.write(`
       <!DOCTYPE html>
       <html dir="${dir}">
@@ -2791,7 +2768,7 @@ const printInvoice = async (order) => {
         <div class="invoice-customer">
           <h4 class="section-title">${safeCustomerInfoLabel}</h4>
           <p class="customer-info"><strong>${safeNameLabel}:</strong> ${safeCustomerName}</p>
-          <p class="customer-info"><strong>${safePhoneLabel}:</strong> ${safeCustomerPhone}</p>
+          <p class="customer-info"><strong>${safePhoneLabel}:</strong> <span class="phone-ltr" dir="ltr">${safeCustomerPhone}</span></p>
           <p class="customer-info"><strong>${safeEmailLabel}:</strong> ${safeCustomerEmail}</p>
           <p class="customer-info"><strong>${safeShippingAddressLabel}:</strong> ${safeCustomerAddress}</p>
         </div>
@@ -2809,8 +2786,8 @@ const printInvoice = async (order) => {
               <tr>
                 <td>${escapeHtml(localized(item.product || item, 'name'))}</td>
                 <td>${escapeHtml(item.quantity)}</td>
-                <td>${(item.price || item.unit_price).toFixed(2)} ${safeCurrency}</td>
-                <td>${((item.price || item.unit_price) * item.quantity).toFixed(2)} ${safeCurrency}</td>
+                <td>${formatPriceHtml(item.price || item.unit_price, safeCurrency)}</td>
+                <td>${formatPriceHtml((item.price || item.unit_price) * item.quantity, safeCurrency)}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -2818,21 +2795,21 @@ const printInvoice = async (order) => {
         <div class="invoice-totals">
           <div class="total-row">
             <span>${safeSubtotalLabel}:</span>
-            <strong>${(order.subtotal || 0).toFixed(2)} ${safeCurrency}</strong>
+            <strong>${formatPriceHtml(order.subtotal || 0, safeCurrency)}</strong>
           </div>
           <div class="total-row">
             <span>${safeShippingLabel}:</span>
-            <strong>${(order.shipping || 0).toFixed(2)} ${safeCurrency}</strong>
+            <strong>${formatPriceHtml(order.shipping || 0, safeCurrency)}</strong>
           </div>
           ${(order.discount > 0 ? `
           <div class="total-row">
             <span>${safeDiscountLabel}:</span>
-            <strong>-${(order.discount || 0).toFixed(2)} ${safeCurrency}</strong>
+            <strong>${formatPriceHtml(order.discount || 0, safeCurrency, { fraction: 'fixed', negative: true })}</strong>
           </div>
           ` : '')}
           <div class="total-row grand-total">
             <span>${safeCheckoutTotalLabel}:</span>
-            <strong>${(order.total || order.total_amount).toFixed(2)} ${safeCurrency}</strong>
+            <strong>${formatPriceHtml(order.total || order.total_amount, safeCurrency)}</strong>
           </div>
         </div>
         <div class="invoice-footer">
@@ -2851,7 +2828,7 @@ const printInvoice = async (order) => {
 const copyOrderID = (order) => {
   const id = order.orderNumber || order.order_number || order.id
   navigator.clipboard.writeText(id)
-  alert(`${t('profile.order_number_copied')}: ${id}`)
+  dialog.alert(`${t('profile.order_number_copied')}: ${id}`, { type: 'success' })
 }
 
 const initiateReturn = (order) => {
@@ -2859,7 +2836,7 @@ const initiateReturn = (order) => {
   showReturnForm.value = true
   returnStep.value = 2 // Skip step 1 (order selection)
   selectedOrderForReturn.value = order
-  selectedItemForReturn.value = null
+  resetReturnItemSelection()
   returnReason.value = ''
 }
 
@@ -2892,10 +2869,10 @@ const submitRating = async () => {
       comment: ratingComment.value,
       order_id: ratingOrder.value.id
     })
-    alert(t('profile.thanks_for_rating'))
+    dialog.alert(t('profile.thanks_for_rating'), { type: 'success', title: t('profile.your_rating') })
     showRatingModal.value = false
   } catch (err) {
-    alert(err.response?.data?.message || t('profile.rating_failed'))
+    dialog.alert(err.response?.data?.message || t('profile.rating_failed'), { type: 'error', title: t('profile.your_rating') })
   } finally {
     loadingData.value = false
   }
@@ -3414,7 +3391,7 @@ const getImageUrl = (i) => {
 }
 
 .order-btn:hover {
-  background: #000000;
+  background: var(--color-button-hover);
   color: #FFFFFF;
 }
 
@@ -3515,7 +3492,9 @@ html[dir="ltr"] .input-relative select {
 }
 .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
 .save-btn { background: #000000; color: #fff; border: none; padding: 12px 35px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; }
-.save-btn:hover { opacity: 0.9; }
+.save-btn:hover {
+  background: var(--color-button-hover);
+}
 .change-pw-btn { background: none; border: none; color: #000000; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .cancel-btn { background: #f3f4f6; border: none; padding: 12px 25px; border-radius: 10px; color: #4b5563; font-weight: 700; cursor: pointer; transition: 0.3s; }
 .cancel-btn:hover { background: #e5e7eb; }
@@ -3536,9 +3515,9 @@ html[dir="ltr"] .input-relative select {
   box-shadow: 0 4px 12px rgba(135, 50, 96, 0.15);
 }
 .add-btn:hover {
-  background: #4a1936;
+  background: var(--color-button-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(135, 50, 96, 0.2);
+  box-shadow: 0 6px 15px rgba(100, 116, 139, 0.2);
 }
 
 .inner-subtitle {
@@ -3624,7 +3603,7 @@ html[dir="ltr"] .input-relative select {
 }
 
 .primary-add-button:hover {
-  opacity: 0.9;
+  background: var(--color-button-hover);
 }
 
 .primary-add-button:active {
@@ -5096,7 +5075,7 @@ html[dir="ltr"] .input-relative select {
 }
 
 .btn-primary-invoice:hover {
-  opacity: 0.88;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 
@@ -5368,7 +5347,7 @@ html[dir="ltr"] .input-relative select {
 }
 
 .print-inv-btn:hover {
-  opacity: 0.85;
+  background: var(--color-button-hover);
 }
 
 .close-btn-secondary {
@@ -5452,36 +5431,14 @@ html[dir="ltr"] .input-relative select {
   color: #64748B;
 }
 
-/* Wishlist */
-.wishlist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-.wish-card { border: 1.5px solid #f3f4f6; border-radius: 20px; padding: 15px; display: flex; gap: 15px; transition: 0.3s; }
-.wish-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
-.wish-card img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; cursor: pointer; }
-.wish-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.wish-body h4 { font-size: 16px; font-weight: 800; margin: 0; cursor: pointer; }
-.wish-price { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; color: #000000; font-size: 17px; }
-.wish-card .wish-price .wish-riyal { width: 14px; height: 16px; border-radius: 0; cursor: default; display: block; flex: 0 0 14px; }
-.wish-card-actions { display: flex; gap: 8px; }
-.wish-add-cart { flex: 1; border: none; background: #f3f4f6; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #000000; cursor: pointer; transition: 0.3s; }
-.wish-add-cart:hover { background: #000000; color: #fff; }
-.wish-remove { width: 35px; height: 35px; border: none; background: #fee2e2; color: #ef4444; border-radius: 8px; cursor: pointer; }
-
 /* Empty States */
 .empty-state, .placeholder-msg, .empty-view { text-align: center; color: #9ca3af; padding: 40px 0; }
 .empty-icon { font-size: 50px; margin-bottom: 15px; }
-.wishlist-empty-icon {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 18px;
-  border-radius: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  color: #94a3b8;
-  font-size: 32px;
-}
 .go-shop-btn { display: inline-block; background: #000000; color: #fff; padding: 10px 25px; border-radius: 10px; text-decoration: none; font-weight: 800; margin-top: 15px; }
+
+.go-shop-btn:hover:not(:disabled) {
+  background: var(--color-button-hover);
+}
 
 /* Country Readonly Input */
 .country-readonly-input {
@@ -5595,7 +5552,6 @@ html[dir="ltr"] .country-readonly-input {
   .account-sidebar, .sidebar-filter-panel { display: none !important; }
   .profile-mobile-tabs-container { display: block !important; }
   .account-main, .left-content-area { width: 100% !important; }
-  .wishlist-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
 }
 
@@ -5656,6 +5612,19 @@ html[dir="ltr"] .country-readonly-input {
 
 .return-form-box .char-count.invalid {
   color: #ef4444;
+}
+
+.return-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .return-options-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Notifications Styles (Figma pixel-perfect) */
@@ -5970,8 +5939,7 @@ html[dir="ltr"] .country-readonly-input {
 }
 
 .btn-save:hover {
-  background: #222222;
-  border-color: #222222;
+  background: var(--color-button-hover);
 }
 
 .btn-cancel {
@@ -6035,6 +6003,27 @@ html[dir="ltr"] .country-readonly-input {
 
 .personal-info-input:focus {
   border-color: #000000;
+}
+
+/* Phone row: same country selector as registration, sized like the other inputs */
+.profile-phone-input {
+  --phone-height: 42px;
+  --phone-radius: 6px;
+  --phone-border: #CBD5E1;
+  /* same type as the name and email inputs above it */
+  --phone-font-size: 15px;
+  --phone-font-weight: 400;
+  --phone-dial-size: 15px;
+  --phone-dial-weight: 400;
+  --phone-color: #000000;
+  max-width: 480px;
+}
+
+.personal-info-error {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  color: #E53333;
 }
 
 @media (max-width: 768px) {
@@ -6271,7 +6260,7 @@ html[dir="ltr"] .country-readonly-input {
 }
 
 .btn-save-password:hover {
-  background: #222222;
+  background: var(--color-button-hover);
 }
 
 .btn-save-password:disabled {
@@ -6426,14 +6415,23 @@ html[dir="ltr"] .country-readonly-input {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   padding: 0px 16px;
   width: 100%;
   height: 44px;
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 6px;
+  direction: ltr;
   transition: border-color 0.2s ease;
   direction: rtl;
+}
+
+.phone-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+  text-align: left;
 }
 
 .phone-input-container:focus-within {
@@ -6471,14 +6469,16 @@ html[dir="ltr"] .country-readonly-input {
   outline: none;
   background: transparent;
   width: 100%;
-  padding-right: 8px;
+  padding-left: 8px;
+  padding-right: 0;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 21px;
   color: #000000;
-  text-align: right;
+  direction: ltr;
+  text-align: left;
 }
 
 .phone-number-input::placeholder {
@@ -6639,7 +6639,7 @@ html[dir="ltr"] .country-readonly-input {
 }
 
 .btn-save-address:hover {
-  background: #222222;
+  background: var(--color-button-hover);
 }
 
 .btn-save-address:disabled {
@@ -6660,292 +6660,11 @@ html[dir="ltr"] .country-readonly-input {
   }
 }
 
-/* Wallet Styles - Figma Design */
-.wallet-view {
-  background: transparent;
-  min-height: 100%;
-}
-
-.wallet-container {
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Main Balance Card */
-.wallet-balance-card {
-  background: linear-gradient(135deg, #8E2DE2 0%, #C94B4B 100%);
-  color: #fff;
-  padding: 32px;
-  border-radius: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.wallet-balance-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.wallet-balance-card::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: 10%;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.balance-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1;
-}
-
-.balance-title {
-  font-size: 16px;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-.balance-value {
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.balance-subtitle {
-  font-size: 13px;
-  opacity: 0.8;
-  font-weight: 400;
-}
-
-.balance-icon {
-  font-size: 56px;
-  opacity: 0.3;
-  z-index: 1;
-}
-
-/* Stats Cards */
-.stats-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
 .stat-card {
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   position: relative;
-}
-
-.stat-header {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-}
-
-.stat-icon {
-  font-size: 16px;
-  opacity: 0.6;
-}
-
-.stat-title {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  margin-top: 8px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-
-.stat-count {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.refund-card {
-  background: #E6F4EA;
-}
-
-.refund-card .stat-title,
-.refund-card .stat-count {
-  color: #166534;
-}
-
-.refund-card .stat-value {
-  color: #15803d;
-}
-
-.refund-card .stat-icon {
-  color: #166534;
-}
-
-.purchase-card {
-  background: #FDECEC;
-}
-
-.purchase-card .stat-title,
-.purchase-card .stat-count {
-  color: #991b1b;
-}
-
-.purchase-card .stat-value {
-  color: #b91c1c;
-}
-
-.purchase-card .stat-icon {
-  color: #991b1b;
-}
-
-/* Transactions Section */
-.wallet-transactions {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-.transactions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.transactions-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.transaction-filters {
-  display: flex;
-  gap: 8px;
-}
-
-.filter-btn {
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.filter-btn:hover {
-  border-color: #8E2DE2;
-  color: #8E2DE2;
-}
-
-.filter-btn.active {
-  background: #8E2DE2;
-  color: #fff;
-  border-color: #8E2DE2;
-}
-
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: #fff;
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.transaction-item:hover {
-  border-color: #8E2DE2;
-  box-shadow: 0 4px 12px rgba(142, 45, 226, 0.1);
-}
-
-.transaction-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.transaction-icon.deposit {
-  background: #E6F4EA;
-  color: #166534;
-}
-
-.transaction-icon.purchase {
-  background: #FDECEC;
-  color: #991b1b;
-}
-
-.transaction-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.transaction-desc {
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 15px;
-}
-
-.transaction-subtext {
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-.transaction-amount {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.transaction-amount.deposit {
-  color: #166534;
-}
-
-.transaction-amount.purchase {
-  color: #991b1b;
 }
 
 @media (max-width: 768px) {
@@ -6983,33 +6702,6 @@ html[dir="ltr"] .country-readonly-input {
   .stat-val {
     font-size: 20px !important;
   }
-  .stats-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .transactions-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .wallet-container {
-    padding: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .wallet-balance-card {
-    padding: 20px 18px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    box-sizing: border-box;
-    width: 100%;
-  }
-
-  .balance-value {
-    font-size: 26px;
-  }
 }
 
 .product-selection-list {
@@ -7017,18 +6709,36 @@ html[dir="ltr"] .country-readonly-input {
   flex-direction: column;
   gap: 12px;
   margin: 15px 0;
-  max-height: 400px;
-  overflow-y: auto;
   padding: 5px;
 }
 
-.product-select-item {
-  display: flex;
+.return-help-text {
+  margin: 8px 0 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.return-selection-summary {
+  display: inline-flex;
   align-items: center;
-  gap: 15px;
-  padding: 12px;
-  border: 1.5px solid #f1f5f9;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.product-select-item {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px solid #e2e8f0;
   border-radius: 12px;
+  background: #ffffff;
   cursor: pointer;
   transition: 0.2s;
   position: relative;
@@ -7036,31 +6746,67 @@ html[dir="ltr"] .country-readonly-input {
 
 .product-select-item:hover {
   background: #fcfbff;
-  border-color: rgba(0,0,0,0.15);
+  border-color: rgba(0,0,0,0.25);
 }
 
 .product-select-item.selected {
   border-color: #000000;
-  background: #f3f4f6;
+  background: #f8fafc;
+}
+
+.product-select-item.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.return-item-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* The generic ".form-group input" rule (full width, no native look) must not hit these controls. */
+.form-group .product-select-item .return-item-checkbox {
+  flex: 0 0 auto;
+  width: 20px !important;
+  height: 20px;
+  min-width: 20px;
+  max-width: 20px !important;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  appearance: auto;
+  accent-color: #000000;
+  cursor: pointer;
 }
 
 .p-mini-img {
-  width: 50px;
-  height: 50px;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
   object-fit: cover;
+  background: #f1f5f9;
 }
 
 .p-mini-info {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
+  gap: 2px;
 }
 
 .p-mini-name {
   font-weight: 700;
   color: #1e293b;
   font-size: 14px;
+  line-height: 21px;
+  overflow-wrap: anywhere;
 }
 
 .p-mini-price {
@@ -7069,14 +6815,83 @@ html[dir="ltr"] .country-readonly-input {
   font-weight: 600;
 }
 
-.p-check {
-  color: #000000;
-  opacity: 0;
-  transition: 0.2s;
+.p-mini-max {
+  color: #64748b;
+  font-size: 12px;
 }
 
-.product-select-item.selected .p-check {
-  opacity: 1;
+.p-mini-max.is-empty {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.return-item-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #cbd5e1;
+  cursor: default;
+}
+
+.return-control-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.return-control-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.form-group .return-item-controls .return-quantity-input,
+.form-group .return-item-controls .return-condition-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  cursor: text;
+}
+
+.form-group .return-item-controls .return-condition-select {
+  cursor: pointer;
+  padding-inline-end: 34px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+}
+
+[dir="ltr"] .form-group .return-item-controls .return-condition-select {
+  background-position: right 12px center;
+}
+
+.form-group .return-item-controls .return-quantity-input:focus,
+.form-group .return-item-controls .return-condition-select:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.return-item-controls small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+@media (max-width: 480px) {
+  .return-item-controls { grid-template-columns: 1fr; }
 }
 
 .return-card {
@@ -7132,6 +6947,20 @@ html[dir="ltr"] .country-readonly-input {
   color: #64748b;
 }
 
+.ret-items-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.ret-items-summary span {
+  background: #eef2ff;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
 .ret-reason, .ret-notes {
   font-size: 14px;
   color: #4b5563;
@@ -7184,7 +7013,7 @@ html[dir="ltr"] .country-readonly-input {
   border: 1px solid rgba(0,0,0,0.15);
 }
 .btn-rate-v2:hover {
-  background: #000000;
+  background: var(--color-button-hover);
   color: #fff;
 }
 
@@ -7255,7 +7084,10 @@ html[dir="ltr"] .country-readonly-input {
 .submit-rating-btn {
   width: 100%; background: #000000; color: #fff; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s;
 }
-.submit-rating-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(135, 50, 96, 0.2); }
+.submit-rating-btn:hover {
+  background: var(--color-button-hover);
+ transform: translateY(-2px); box-shadow: 0 10px 20px rgba(100, 116, 139, 0.2);
+}
 
 .fixed-country-input {
   background-color: #ffffff !important;
@@ -7327,7 +7159,6 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
     width: 100% !important; 
     box-sizing: border-box !important; 
   }
-  .wishlist-grid { grid-template-columns: 1fr !important; }
   
   .form-container,
   .profile-form {
@@ -7366,9 +7197,7 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
   .wish-card,
   .return-card,
   .order-card-v2,
-  .wallet-balance-card,
   .stat-card,
-  .transaction-item,
   .return-form-box {
     width: 100% !important;
     box-sizing: border-box !important;
@@ -7933,7 +7762,7 @@ html[dir="rtl"] .input-relative select ~ .fa-chevron-down {
 }
 
 .primary-download-button:hover {
-  opacity: 0.9;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

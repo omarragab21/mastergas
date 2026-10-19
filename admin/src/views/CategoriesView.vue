@@ -4,15 +4,15 @@
     <!-- Header -->
     <div class="page-header">
       <div class="header-titles">
-        <h2 class="page-title">أقسام المنتجات</h2>
-        <p class="page-subtitle">إدارة الأقسام الرئيسية والفرعية للمنتجات</p>
+        <h2 class="page-title">{{ tx('أقسام المنتجات', 'Product Categories') }}</h2>
+        <p class="page-subtitle">{{ tx('إدارة الأقسام الرئيسية والفرعية للمنتجات', 'Manage main and sub-product categories') }}</p>
       </div>
       <button class="add-btn" @click="openAddModal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        إضافة قسم رئيسي
+        {{ tx('إضافة قسم رئيسي', 'Add Main Category') }}
       </button>
     </div>
 
@@ -26,7 +26,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">الأقسام النشطة</span>
+          <span class="stat-label">{{ tx('الأقسام النشطة', 'Active Categories') }}</span>
           <span class="stat-value">{{ activeCategoriesCount }}</span>
         </div>
       </div>
@@ -40,7 +40,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي المنتجات</span>
+          <span class="stat-label">{{ tx('إجمالي المنتجات', 'Total Products') }}</span>
           <span class="stat-value">{{ totalProductsCount }}</span>
         </div>
       </div>
@@ -52,7 +52,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">الأقسام الفرعية</span>
+          <span class="stat-label">{{ tx('الأقسام الفرعية', 'Subcategories') }}</span>
           <span class="stat-value">{{ subCategoriesCount }}</span>
         </div>
       </div>
@@ -63,7 +63,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">الأقسام الرئيسية</span>
+          <span class="stat-label">{{ tx('الأقسام الرئيسية', 'Main Categories') }}</span>
           <span class="stat-value">{{ mainCategoriesCount }}</span>
         </div>
       </div>
@@ -76,13 +76,13 @@
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="البحث عن اسم..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('البحث عن اسم...', 'Search by name...')" class="search-input" />
       </div>
       <div class="filter-select">
         <select v-model="statusFilter" class="form-select">
-          <option value="">جميع الحالات</option>
-          <option value="1">نشط</option>
-          <option value="0">غير نشط</option>
+          <option value="">{{ tx('جميع الحالات', 'All statuses') }}</option>
+          <option value="1">{{ tx('نشط', 'Active') }}</option>
+          <option value="0">{{ tx('غير نشط', 'Inactive') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="select-icon">
           <polyline points="6 9 12 15 18 9"/>
@@ -95,19 +95,19 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name">القسم</th>
-            <th class="col-products">المنتجات</th>
-            <th class="col-parent">القسم الرئيسي</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name">{{ tx('القسم', 'Category') }}</th>
+            <th class="col-products">{{ tx('المنتجات', 'Products') }}</th>
+            <th class="col-parent">{{ tx('القسم الرئيسي', 'Parent Category') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading" class="state-row">
-            <td colspan="5">جاري التحميل...</td>
+            <td colspan="5">{{ tx('جاري التحميل...', 'Loading...') }}</td>
           </tr>
           <tr v-else-if="filteredCategories.length === 0" class="state-row">
-            <td colspan="5">لا توجد أقسام مطابقة للبحث</td>
+            <td colspan="5">{{ tx('لا توجد أقسام مطابقة للبحث', 'No matching categories found') }}</td>
           </tr>
           <template v-else>
             <tr v-for="cat in filteredCategories" :key="cat.id" class="data-row">
@@ -121,7 +121,7 @@
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                     </svg>
                   </div>
-                  <span>{{ cat.name_i18n?.ar || cat.name }}</span>
+                  <span>{{ localizedName(cat.name_i18n, cat.name) }}</span>
                   <svg class="sub-indicator" v-if="cat.parent_id" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
                     <polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>
                   </svg>
@@ -134,32 +134,32 @@
                 <span class="products-count">{{ categoryProductCount(cat) }} <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1.73 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
               </td>
               <td class="col-parent">
-                <span v-if="cat.parent" class="parent-badge">{{ cat.parent.name_i18n?.ar || cat.parent.name }}</span>
+                <span v-if="cat.parent" class="parent-badge">{{ localizedName(cat.parent.name_i18n, cat.parent.name) }}</span>
                 <span v-else class="dash-mark">—</span>
               </td>
               <td class="col-status">
                 <span class="status-badge" :class="cat.is_active ? 'active' : 'inactive'">
-                  {{ cat.is_active ? 'نشط' : 'غير نشط' }}
+                  {{ cat.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
                 </span>
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn delete-btn" @click="confirmDelete(cat)" title="حذف">
+                  <button class="action-btn delete-btn" @click="confirmDelete(cat)" :title="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
                     </svg>
                   </button>
-                  <button class="action-btn edit-btn" @click="openEditModal(cat)" title="تعديل">
+                  <button class="action-btn edit-btn" @click="openEditModal(cat)" :title="tx('تعديل', 'Edit')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openViewModal(cat)" title="عرض">
+                  <button class="action-btn view-btn" @click="openViewModal(cat)" :title="tx('عرض', 'View')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                     </svg>
                   </button>
-                  <button class="action-btn add-sub-btn" v-if="!cat.parent_id" @click="openAddSubModal(cat)" title="إضافة قسم فرعي">
+                  <button class="action-btn add-sub-btn" v-if="!cat.parent_id" @click="openAddSubModal(cat)" :title="tx('إضافة قسم فرعي', 'Add subcategory')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
@@ -179,7 +179,7 @@
         <button class="modal-close" @click="closeModal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="form-header"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? 'تعديل قسم' : (form.parent_id ? 'إضافة قسم فرعي جديد' : 'إضافة قسم رئيسي جديد') }}</h3><p class="modal-subtitle-main">أدخل معلومات القسم لإتمام العملية</p></div>
+        <div class="form-header"><div class="header-icon-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><h3 class="modal-title-main">{{ isEdit ? tx('تعديل قسم', 'Edit Category') : (form.parent_id ? tx('إضافة قسم فرعي جديد', 'Add New Subcategory') : tx('إضافة قسم رئيسي جديد', 'Add New Main Category')) }}</h3><p class="modal-subtitle-main">{{ tx('أدخل معلومات القسم لإتمام العملية', 'Enter category information to continue') }}</p></div>
 
         <div class="i18n-toggle" role="tablist" aria-label="Language">
           <button type="button" class="i18n-btn" :class="{ active: activeLang === 'en' }" @click="activeLang = 'en'">English</button>
@@ -189,7 +189,7 @@
         <form @submit.prevent="submitForm" class="cat-form">
           <!-- Image Upload -->
           <div class="form-group" style="text-align: center;">
-            <label class="form-label" style="text-align: right; width: 100%;">صورة القسم <span class="req">*</span></label>
+            <label class="form-label" style="text-align: right; width: 100%;">{{ tx('صورة القسم', 'Category image') }} <span class="req">*</span></label>
             <div class="image-upload-box" @click="triggerFileInput">
               <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" class="hidden-input" />
               <div v-if="imagePreview" class="preview-area">
@@ -201,20 +201,20 @@
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                   </svg>
                 </div>
-                <p>إسحب وأفلت صورة القسم هنا</p>
-                <span>أو انقر للاختيار من جهازك - الحد الأقصى 1 ميجابايت</span>
+                <p>{{ tx('إسحب وأفلت صورة القسم هنا', 'Drag and drop the category image here') }}</p>
+                <span>{{ tx('أو انقر للاختيار من جهازك - الحد الأقصى 1 ميجابايت', 'Or click to choose a file - max 1 MB') }}</span>
               </div>
             </div>
           </div>
 
           <!-- Name -->
           <div class="form-group" v-show="activeLang === 'ar'">
-            <label class="form-label">الاسم (عربي) <span class="req">*</span></label>
-            <input type="text" v-model="form.name_ar" class="form-control" placeholder="اسم القسم بالعربي" />
+            <label class="form-label">{{ tx('الاسم (عربي)', 'Name (Arabic)') }} <span class="req">*</span></label>
+            <input type="text" v-model="form.name_ar" class="form-control" :placeholder="tx('اسم القسم بالعربي', 'Category name in Arabic')" />
           </div>
 
           <div class="form-group" v-show="activeLang === 'en'">
-            <label class="form-label">الاسم (English) <span class="req">*</span></label>
+            <label class="form-label">{{ tx('الاسم (English)', 'Name (English)') }} <span class="req">*</span></label>
             <input type="text" v-model="form.name_en" class="form-control" placeholder="Category name in English" />
           </div>
 
@@ -222,22 +222,22 @@
 
           <!-- Description -->
           <div class="form-group" v-show="activeLang === 'ar'">
-            <label class="form-label">الوصف (عربي)</label>
-            <textarea v-model="form.description_ar" class="form-control textarea" placeholder="وصف القسم بالعربي (اختياري)" rows="3"></textarea>
+            <label class="form-label">{{ tx('الوصف (عربي)', 'Description (Arabic)') }}</label>
+            <textarea v-model="form.description_ar" class="form-control textarea" :placeholder="tx('وصف القسم بالعربي (اختياري)', 'Category description in Arabic (optional)')" rows="3"></textarea>
           </div>
 
           <div class="form-group" v-show="activeLang === 'en'">
-            <label class="form-label">الوصف (English)</label>
+            <label class="form-label">{{ tx('الوصف (English)', 'Description (English)') }}</label>
             <textarea v-model="form.description_en" class="form-control textarea" placeholder="Category description in English (optional)" rows="3"></textarea>
           </div>
 
           <!-- Status -->
           <div class="form-group">
-            <label class="form-label">الحالة</label>
+            <label class="form-label">{{ tx('الحالة', 'Status') }}</label>
             <div class="select-wrapper">
               <select v-model="form.is_active" class="form-control">
-                <option :value="true">نشط</option>
-                <option :value="false">غير نشط</option>
+                <option :value="true">{{ tx('نشط', 'Active') }}</option>
+                <option :value="false">{{ tx('غير نشط', 'Inactive') }}</option>
               </select>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="select-icon"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
@@ -245,14 +245,14 @@
 
           <!-- Sort Order -->
           <div class="form-group">
-            <label class="form-label">الترتيب</label>
+            <label class="form-label">{{ tx('الترتيب', 'Sort order') }}</label>
             <input type="number" v-model="form.sort_order" class="form-control" placeholder="0" min="0" />
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn-cancel" @click="closeModal">إلغاء</button>
+            <button type="button" class="btn-cancel" @click="closeModal">{{ tx('إلغاء', 'Cancel') }}</button>
             <button type="submit" class="btn-submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'جاري الحفظ...' : (isEdit ? 'حفظ التعديلات' : 'إضافة القسم') }}
+              {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : (isEdit ? tx('حفظ التعديلات', 'Save changes') : tx('إضافة القسم', 'Add category')) }}
             </button>
           </div>
         </form>
@@ -265,8 +265,8 @@
         <button class="modal-close" @click="viewCategory = null; showViewModal = false;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <h3 class="modal-title" style="text-align: center;">تفاصيل القسم</h3>
-        <p class="modal-subtitle" style="text-align: center; margin-bottom: 2rem;">معلومات شاملة عن القسم</p>
+        <h3 class="modal-title" style="text-align: center;">{{ tx('تفاصيل القسم', 'Category details') }}</h3>
+        <p class="modal-subtitle" style="text-align: center; margin-bottom: 2rem;">{{ tx('معلومات شاملة عن القسم', 'Complete category information') }}</p>
         
         <div class="view-header" v-if="viewCategory">
           <div class="view-img-large">
@@ -275,24 +275,24 @@
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
             </svg>
           </div>
-          <h4 class="view-name">{{ viewCategory.name_i18n?.ar || viewCategory.name }}</h4>
+          <h4 class="view-name">{{ localizedName(viewCategory.name_i18n, viewCategory.name) }}</h4>
           <span class="status-badge" :class="viewCategory.is_active ? 'active' : 'inactive'" style="margin: 0.5rem auto;">
-            {{ viewCategory.is_active ? 'نشط' : 'غير نشط' }}
+            {{ viewCategory.is_active ? tx('نشط', 'Active') : tx('غير نشط', 'Inactive') }}
           </span>
         </div>
 
         <div class="view-details" v-if="viewCategory">
           <div class="detail-row">
-            <span class="detail-label">القسم الرئيسي:</span>
-            <span class="detail-value">{{ viewCategory.parent ? (viewCategory.parent.name_i18n?.ar || viewCategory.parent.name) : 'لا يوجد (قسم رئيسي)' }}</span>
+            <span class="detail-label">{{ tx('القسم الرئيسي:', 'Parent category:') }}</span>
+            <span class="detail-value">{{ viewCategory.parent ? localizedName(viewCategory.parent.name_i18n, viewCategory.parent.name) : tx('لا يوجد (قسم رئيسي)', 'None (main category)') }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">الوصف:</span>
-            <span class="detail-value">{{ viewCategory.description || 'لا يوجد وصف' }}</span>
+            <span class="detail-label">{{ tx('الوصف:', 'Description:') }}</span>
+            <span class="detail-value">{{ viewCategory.description || tx('لا يوجد وصف', 'No description') }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">عدد المنتجات:</span>
-            <span class="detail-value">{{ categoryProductCount(viewCategory) }} منتج</span>
+            <span class="detail-label">{{ tx('عدد المنتجات:', 'Product count:') }}</span>
+            <span class="detail-value">{{ categoryProductCount(viewCategory) }} {{ tx('منتج', 'products') }}</span>
           </div>
         </div>
       </div>
@@ -311,8 +311,16 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 import adminCatalogService from '../application/adminCatalogService';
 import { categoryMatchesSearch, toCategoryPayload } from '../domain/catalog/adminCatalog';
+import { visibleCategories, visibleProducts } from '../utils/catalogVisibility';
+import { validateAdminImageFile, safeObjectUrl } from '../utils/adminSecurity';
+
+const { locale, tx } = useAdminText();
+const localizedName = (i18nValue, fallback = '') => locale.value === 'en'
+  ? (i18nValue?.en || i18nValue?.ar || fallback)
+  : (i18nValue?.ar || i18nValue?.en || fallback);
 
 // State
 const categories = ref([]);
@@ -411,8 +419,8 @@ const fetchCategories = async () => {
       adminCatalogService.listCategories({ include_inactive: 1, show_all: 1 }),
       adminCatalogService.listAllProducts({ include_inactive: 1, show_all: 1 }),
     ]);
-    categories.value = categoryList;
-    allProducts.value = productList;
+    categories.value = visibleCategories(categoryList);
+    allProducts.value = visibleProducts(productList);
   } catch {
     triggerAlert('فشل جلب الأقسام', 'error');
   } finally {
@@ -478,15 +486,16 @@ const triggerFileInput = () => {
 };
 
 const handleFileChange = (e) => {
-  const file = e.target.files[0];
+  const file = e.target.files?.[0];
   if (!file) return;
-  if (file.size > 1 * 1024 * 1024) {
-    triggerAlert('حجم الصورة يجب أن لا يتجاوز 1 ميجابايت', 'error');
+  const check = validateAdminImageFile(file, { maxSizeMB: 1 });
+  if (!check.valid) {
+    triggerAlert(check.error, 'error');
     e.target.value = '';
     return;
   }
   form.value.image = file;
-  imagePreview.value = URL.createObjectURL(file);
+  imagePreview.value = safeObjectUrl(file, imagePreview.value);
 };
 
 // Submit form

@@ -1,5 +1,7 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import settingsService from '../services/settingsService';
+import { settingsToObject, vatPercentage } from '../utils/siteSettings';
 
 export const defaultSettings = {
   site_name: 'ماسترجاز | Mastergas',
@@ -13,7 +15,7 @@ export const defaultSettings = {
   shipping_cost: 25,
   tax_rate: 15,
   support_phone: '+966500000000',
-  support_email: 'info@mastergas.com',
+  support_email: 'info@mastergas.com.sa',
   address_ar: 'المملكة العربية السعودية',
   address_en: 'Saudi Arabia',
 };
@@ -31,9 +33,8 @@ const isIrisAsset = (value) => {
 
 const normalizeSettings = (data) => {
   const settingsObj = { ...defaultSettings };
-  const entries = Array.isArray(data)
-    ? data
-    : Object.entries(data || {}).map(([key, value]) => ({ key, value }));
+  const normalized = settingsToObject(data);
+  const entries = Object.entries(normalized).map(([key, value]) => ({ key, value }));
 
   entries.forEach((setting) => {
     if (!setting?.key) return;
@@ -43,6 +44,18 @@ const normalizeSettings = (data) => {
     }
     settingsObj[setting.key] = value;
   });
+  if (settingsObj.default_shipping_cost !== undefined) {
+    settingsObj.shipping_cost = settingsObj.default_shipping_cost;
+  }
+  if (settingsObj.vat_percentage !== undefined) {
+    settingsObj.tax_rate = vatPercentage(settingsObj.vat_percentage, settingsObj.tax_rate);
+  }
+  if (settingsObj.site_contact_phone !== undefined) {
+    settingsObj.support_phone = settingsObj.site_contact_phone;
+  }
+  if (settingsObj.social_links && typeof settingsObj.social_links === 'object') {
+    Object.assign(settingsObj, settingsObj.social_links);
+  }
   return settingsObj;
 };
 
@@ -55,7 +68,10 @@ export function useSettings() {
     if (fetchPromise) return fetchPromise;
 
     loading.value = true;
-    fetchPromise = Promise.resolve(normalizeSettings([]))
+    fetchPromise = settingsService.getSettings({
+      ttl: options.ttl ?? 300000,
+      signal: options.signal,
+    }).then((data) => normalizeSettings(data))
       .then((data) => {
         settings.value = data;
         fetchedAt = Date.now();

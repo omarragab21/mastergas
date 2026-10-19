@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { adminManagementService } from '../application/adminManagementService';
+import { useAdminText } from '../composables/useAdminText';
+import { sanitizeSpreadsheetCell } from '../utils/adminSecurity';
+
+const { tx } = useAdminText();
 
 // State
 const messages = ref([]);
@@ -20,7 +24,7 @@ const fetchMessages = async () => {
         });
     } catch (error) {
         console.error('Failed to fetch messages', error);
-        triggerAlert('فشل تحميل الرسائل', 'error');
+        triggerAlert(tx('فشل تحميل الرسائل', 'Failed to load messages'), 'error');
     } finally {
         loading.value = false;
     }
@@ -36,13 +40,13 @@ const openViewModal = (message) => {
 };
 
 const confirmDelete = async (message) => {
-    if (confirm(`هل أنت متأكد من حذف رسالة "${message.name}"؟`)) {
+    if (confirm(tx(`هل أنت متأكد من حذف رسالة "${message.name}"؟`, `Are you sure you want to delete the message from "${message.name}"?`))) {
         try {
             await adminManagementService.deleteContact(message.id);
-            triggerAlert('تم حذف الرسالة بنجاح');
+            triggerAlert(tx('تم حذف الرسالة بنجاح', 'Message deleted successfully'));
             fetchMessages();
         } catch (error) {
-            triggerAlert('فشل عملية الحذف', 'error');
+            triggerAlert(tx('فشل عملية الحذف', 'Delete failed'), 'error');
         }
     }
 };
@@ -50,10 +54,10 @@ const confirmDelete = async (message) => {
 const toggleReadStatus = (message) => {
     const newStatus = message.status === 'read' ? 'unread' : 'read';
     message.status = newStatus;
-    triggerAlert(newStatus === 'read' ? 'تم تعيين الرسالة كمقروءة' : 'تم تعيين الرسالة كغير مقروءة');
+    triggerAlert(newStatus === 'read' ? tx('تم تعيين الرسالة كمقروءة', 'Message marked as read') : tx('تم تعيين الرسالة كغير مقروءة', 'Message marked as unread'));
 };
 
-const escapeExcelCell = (value) => String(value ?? '')
+const escapeExcelCell = (value) => sanitizeSpreadsheetCell(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -61,7 +65,7 @@ const escapeExcelCell = (value) => String(value ?? '')
 
 // Excel-compatible workbook without adding a runtime dependency to the dashboard.
 const exportToExcel = () => {
-    const headers = ['رقم الرسالة', 'الاسم', 'رقم الجوال', 'البريد الإلكتروني', 'نوع الدعم', 'الرسالة', 'الحالة', 'التاريخ'];
+    const headers = [tx('رقم الرسالة', 'Message ID'), tx('الاسم', 'Name'), tx('رقم الجوال', 'Phone'), tx('البريد الإلكتروني', 'Email'), tx('نوع الدعم', 'Support Type'), tx('الرسالة', 'Message'), tx('الحالة', 'Status'), tx('التاريخ', 'Date')];
     const rows = messages.value.map((message) => [
         message.id,
         message.name,
@@ -85,7 +89,7 @@ const exportToExcel = () => {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    triggerAlert('تم تصدير رسائل العملاء إلى ملف Excel');
+    triggerAlert(tx('تم تصدير رسائل العملاء إلى ملف Excel', 'Customer messages exported to Excel'));
 };
 
 // Helpers
@@ -106,7 +110,7 @@ const formatDate = (dateString) => {
 };
 
 const formatStatus = (status) => {
-    return status === 'read' ? 'مقروءة' : 'غير مقروءة';
+    return status === 'read' ? tx('مقروءة', 'Read') : tx('غير مقروءة', 'Unread');
 };
 
 // Alert State
@@ -132,8 +136,8 @@ const triggerAlert = (message, type = 'success') => {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
              </div>
              <div>
-                <h1>رسائل العملاء</h1>
-                <p>إدارة رسائل العملاء من نموذج الاتصال في الموقع</p>
+                <h1>{{ tx('رسائل العملاء', 'Customer Messages') }}</h1>
+                <p>{{ tx('إدارة رسائل العملاء من نموذج الاتصال في الموقع', 'Manage customer messages submitted through the website contact form') }}</p>
              </div>
           </div>
        </div>
@@ -141,7 +145,7 @@ const triggerAlert = (message, type = 'success') => {
        <div class="left-actions">
            <button class="export-btn" @click="exportToExcel">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              تصدير Excel
+              {{ tx('تصدير Excel', 'Export Excel') }}
            </button>
        </div>
     </div>
@@ -152,21 +156,21 @@ const triggerAlert = (message, type = 'success') => {
           <div class="stat-icon total"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
           <div class="stat-info">
              <span class="stat-val">{{ totalMessages }}</span>
-             <span class="stat-label">إجمالي الرسائل</span>
+             <span class="stat-label">{{ tx('إجمالي الرسائل', 'Total Messages') }}</span>
           </div>
        </div>
        <div class="stat-card">
           <div class="stat-icon unread"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
           <div class="stat-info">
              <span class="stat-val">{{ unreadCount }}</span>
-             <span class="stat-label">غير مقروءة</span>
+             <span class="stat-label">{{ tx('غير مقروءة', 'Unread') }}</span>
           </div>
        </div>
        <div class="stat-card">
           <div class="stat-icon read"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="stat-info">
              <span class="stat-val">{{ readCount }}</span>
-             <span class="stat-label">مقروءة</span>
+             <span class="stat-label">{{ tx('مقروءة', 'Read') }}</span>
           </div>
        </div>
     </div>
@@ -177,14 +181,14 @@ const triggerAlert = (message, type = 'success') => {
            <div class="search-group flex-1">
               <div class="search-input-wrapper">
                  <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                 <input type="text" v-model="searchQuery" @input="fetchMessages" placeholder="البحث في الرسائل..." class="search-input" />
+                 <input type="text" v-model="searchQuery" @input="fetchMessages" :placeholder="tx('البحث في الرسائل...', 'Search messages...')" class="search-input" />
               </div>
            </div>
           <div class="filter-group">
              <select v-model="statusFilter" @change="fetchMessages" class="filter-select">
-                <option value="">جميع الرسائل</option>
-                <option value="unread">غير مقروءة</option>
-                <option value="read">مقروءة</option>
+                <option value="">{{ tx('جميع الرسائل', 'All Messages') }}</option>
+                <option value="unread">{{ tx('غير مقروءة', 'Unread') }}</option>
+                <option value="read">{{ tx('مقروءة', 'Read') }}</option>
              </select>
           </div>
        </div>
@@ -195,17 +199,17 @@ const triggerAlert = (message, type = 'success') => {
        <table class="data-table">
           <thead>
              <tr>
-                <th class="col-name text-right">الاسم</th>
-                <th class="col-phone">رقم الجوال</th>
-                <th class="col-email">البريد الإلكتروني</th>
-                <th class="col-subject">الموضوع</th>
-                <th class="col-status">الحالة</th>
-                <th class="col-actions">الإجراءات</th>
+                <th class="col-name text-right">{{ tx('الاسم', 'Name') }}</th>
+                <th class="col-phone">{{ tx('رقم الجوال', 'Phone') }}</th>
+                <th class="col-email">{{ tx('البريد الإلكتروني', 'Email') }}</th>
+                <th class="col-subject">{{ tx('الموضوع', 'Subject') }}</th>
+                <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+                <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
              </tr>
           </thead>
           <tbody>
-             <tr v-if="loading" class="state-row"><td colspan="6">جاري التحميل...</td></tr>
-             <tr v-else-if="messages.length === 0" class="state-row"><td colspan="6">لا توجد رسائل حالياً</td></tr>
+             <tr v-if="loading" class="state-row"><td colspan="6">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+             <tr v-else-if="messages.length === 0" class="state-row"><td colspan="6">{{ tx('لا توجد رسائل حالياً', 'No messages yet') }}</td></tr>
              <template v-else>
                 <tr v-for="msg in messages" :key="msg.id" class="data-row" :class="{ 'is-unread': msg.status === 'unread' }">
                    <td class="col-name text-right">
@@ -224,10 +228,10 @@ const triggerAlert = (message, type = 'success') => {
                    </td>
                    <td class="col-actions">
                       <div class="actions-group">
-                         <button class="action-btn view" title="عرض التفاصيل" @click="openViewModal(msg)">
+                         <button class="action-btn view" :title="tx('عرض التفاصيل', 'View Details')" @click="openViewModal(msg)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                          </button>
-                         <button class="action-btn delete" title="حذف" @click="confirmDelete(msg)">
+                         <button class="action-btn delete" :title="tx('حذف', 'Delete')" @click="confirmDelete(msg)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                          </button>
                       </div>
@@ -243,47 +247,47 @@ const triggerAlert = (message, type = 'success') => {
        <div class="modal-content info-modal fade-in">
           <div class="modal-header">
              <button class="close-modal-btn" @click="showViewModal = false">×</button>
-             <h2>تفاصيل الرسالة</h2>
-             <p>معلومات مرسلة من نموذج الاتصال</p>
+             <h2>{{ tx('تفاصيل الرسالة', 'Message Details') }}</h2>
+             <p>{{ tx('معلومات مرسلة من نموذج الاتصال', 'Information submitted through the contact form') }}</p>
           </div>
           
           <div class="modal-body">
              <div class="msg-detail-grid">
                 <div class="detail-item">
-                   <label>الاسم:</label>
+                   <label>{{ tx('الاسم', 'Name') }}:</label>
                    <span>{{ currentMessage.name }}</span>
                 </div>
                 <div class="detail-item">
-                   <label>رقم الجوال:</label>
+                   <label>{{ tx('رقم الجوال', 'Phone') }}:</label>
                    <span class="ltr-text" style="text-align: right !important;">{{ currentMessage.phone || '-' }}</span>
                 </div>
                 <div class="detail-item">
-                   <label>البريد الإلكتروني:</label>
+                   <label>{{ tx('البريد الإلكتروني', 'Email') }}:</label>
                    <span>{{ currentMessage.email || '-' }}</span>
                 </div>
                 <div class="detail-item">
-                   <label>التاريخ والوقت:</label>
+                   <label>{{ tx('التاريخ والوقت', 'Date and Time') }}:</label>
                    <span>{{ formatDate(currentMessage.created_at) }}</span>
                 </div>
                 <div class="detail-item full-width mt-4">
-                   <label>الموضوع:</label>
+                   <label>{{ tx('الموضوع', 'Subject') }}:</label>
                    <span class="subject-text">{{ currentMessage.subject || '-' }}</span>
                 </div>
                 <div class="detail-item full-width">
-                   <label>الرسالة:</label>
+                   <label>{{ tx('الرسالة', 'Message') }}:</label>
                    <div class="message-content-box">
                       {{ currentMessage.message }}
                    </div>
                 </div>
                 <div class="detail-item mt-4">
-                   <label>الحالة:</label>
+                   <label>{{ tx('الحالة', 'Status') }}:</label>
                    <span :class="['status-badge-table', currentMessage.status]">{{ formatStatus(currentMessage.status) }}</span>
                 </div>
              </div>
           </div>
           
           <div class="modal-footer">
-             <button class="btn-close-alt" @click="showViewModal = false">إغلاق</button>
+             <button class="btn-close-alt" @click="showViewModal = false">{{ tx('إغلاق', 'Close') }}</button>
           </div>
        </div>
     </div>
@@ -296,7 +300,7 @@ const triggerAlert = (message, type = 'success') => {
 </template>
 
 <style scoped>
-.messages-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.messages-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Header Section */
 .header-section { display: flex; justify-content: space-between; align-items: center; }

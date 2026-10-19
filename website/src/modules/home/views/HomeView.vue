@@ -151,7 +151,7 @@
     </section>
 
     <!-- 3. Shop by Category (تسوق حسب التصنيف) -->
-    <CategoryCarousel :categories="displayCategories" :loading="categoriesLoading" />
+    <CategoryCarousel :categories="homeCategories" :loading="categoriesLoading" :title="homeCategoryTitle" />
 
     <!-- 4. Featured Products (منتجات مميزة) -->
     <section class="home-section featured-products-section container">
@@ -188,16 +188,16 @@
     <section class="home-section offers-section container">
       <div class="section-header-flex">
         <div class="section-title-wrap">
-          <h2 class="section-title">{{ t('home.featured_offers') }}</h2>
+          <h2 class="section-title">{{ homeOffersTitle }}</h2>
           <p class="section-subtitle">{{ t('home.featured_offers_subtitle') }}</p>
         </div>
         <div class="section-nav-actions">
-          <button class="nav-circle-btn" @click="scrollOffersSlider('prev')" :aria-label="currentLang === 'ar' ? 'السابق' : 'Previous'">
+          <button class="nav-circle-btn" :class="{ 'is-hidden': !offersCanPrev, 'is-active': offersActiveDirection === 'prev' }" :disabled="!offersCanPrev" @click="scrollOffersSlider('prev')" :aria-label="currentLang === 'ar' ? 'السابق' : 'Previous'">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline :points="currentLang === 'ar' ? '9 18 15 12 9 6' : '15 18 9 12 15 6'"/>
             </svg>
           </button>
-          <button class="nav-circle-btn" @click="scrollOffersSlider('next')" :aria-label="currentLang === 'ar' ? 'التالي' : 'Next'">
+          <button class="nav-circle-btn" :class="{ 'is-hidden': !offersCanNext, 'is-active': offersActiveDirection === 'next' }" :disabled="!offersCanNext" @click="scrollOffersSlider('next')" :aria-label="currentLang === 'ar' ? 'التالي' : 'Next'">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline :points="currentLang === 'ar' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/>
             </svg>
@@ -210,27 +210,15 @@
           <PortraitCardSkeleton v-for="n in 4" :key="`sk-offer-${n}`" variant="offer" />
         </template>
         <template v-else>
-        <router-link 
-          v-for="offer in displayOffers" 
-          :key="offer.id" 
+        <PortraitCard
+          v-for="offer in displayOffers"
+          :key="offer.id"
           :to="offer.link"
-          class="offer-portrait-card"
-        >
-          <div class="card-bg-image" :style="{ backgroundImage: `url(${offer.image || '/brand/mastergas-icon.png'})` }"></div>
-          <div class="card-gradient-overlay"></div>
-          <div class="card-bottom-content">
-            <span class="card-count">{{ offer.badgeText }}</span>
-            <div class="card-title-row">
-              <h3 class="card-title">{{ offer.title }}</h3>
-              <div class="card-circle-arrow">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </router-link>
+          :image="offer.image"
+          :title="offer.title"
+          :count="offer.subtitle"
+          variant="offer"
+        />
         </template>
       </div>
     </section>
@@ -296,13 +284,17 @@ import { cartState } from '../../../store/cart';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useOffers } from '../../product/composables/useOffers';
 import { useSEO } from '../../../composables/useSEO';
+import { useSliderEdges } from '../../../composables/useSliderEdges';
 import { resolveLink } from '../../../utils/externalLink';
 import ProductCard from '../../product/components/ProductCard.vue';
 import ProductCardSkeleton from '../../../components/skeleton/ProductCardSkeleton.vue';
 import PortraitCardSkeleton from '../../../components/skeleton/PortraitCardSkeleton.vue';
 import CategoryCarousel from '../../category/components/CategoryCarousel.vue';
+import PortraitCard from '../../../components/PortraitCard.vue';
 import { productService } from '../../product/services/productService';
 import { settingsService } from '../../../services/settingsService';
+import { settingsToObject } from '../../../utils/siteSettings';
+import { formatPrice, isolateLtr } from '../../../utils/price';
 import { useCategories } from '../../category/composables/useCategories';
 
 const router = useRouter();
@@ -311,6 +303,25 @@ const { localized } = useLocalized();
 const { fetchOffers: fetchSharedOffers } = useOffers();
 const { displayCategories, categoriesLoading, fetchCategories } = useCategories();
 const currentLang = computed(() => locale.value);
+const homepageSettings = ref({});
+
+const homeCategories = computed(() => {
+  const selectedIds = ['home_category_1', 'home_category_2']
+    .map((key) => homepageSettings.value[key])
+    .filter((value) => value !== undefined && value !== null && value !== '')
+    .map((value) => String(value));
+  if (!selectedIds.length) return displayCategories.value;
+  const selected = displayCategories.value.filter((category) => selectedIds.includes(String(category.id)));
+  return selected.length ? selected : displayCategories.value;
+});
+
+const homeCategoryTitle = computed(() => currentLang.value === 'ar'
+  ? homepageSettings.value.home_section_category_title_ar || t('home.shop_by_category')
+  : homepageSettings.value.home_section_category_title_en || t('home.shop_by_category'));
+
+const homeOffersTitle = computed(() => currentLang.value === 'ar'
+  ? homepageSettings.value.home_section_offers_title_ar || t('home.featured_offers')
+  : homepageSettings.value.home_section_offers_title_en || t('home.featured_offers'));
 
 useSEO({
   title: 'ماسترجاز (Mastergas) - أجهزة مطبخ بمعايير إيطالية فاخرة',
@@ -319,6 +330,8 @@ useSEO({
 });
 
 const offersSliderRef = ref(null);
+const { canPrev: offersCanPrev, canNext: offersCanNext } = useSliderEdges(offersSliderRef);
+const offersActiveDirection = ref('next');
 
 const rawProducts = ref([]);
 const rawNewArrivals = ref([]);
@@ -459,12 +472,17 @@ const displayOffers = computed(() => {
       : (offer.name_i18n?.en || offer.name_en || localized(offer, 'name') || offer.name);
     let badgeText = isAr ? 'عرض خاص' : 'Special Offer';
     if (offer.savings) {
-      badgeText = isAr ? `وفّر ${Number(offer.savings).toLocaleString('en-US')}` : `Save ${Number(offer.savings).toLocaleString('en-US')}`;
+      const savings = isolateLtr(formatPrice(offer.savings));
+      badgeText = isAr ? `وفّر ${savings}` : `Save ${savings}`;
     }
+    const description = isAr
+      ? (offer.description_i18n?.ar || offer.description_ar || offer.description)
+      : (offer.description_i18n?.en || offer.description_en || offer.description);
     return {
       id: offer.id,
       title,
       badgeText,
+      subtitle: String(description || '').trim() || badgeText,
       image: normalizeStorageImage(offer.image, '/images/home/offer_clearance_pro.jpg'),
       link: `/offers?offer=${offer.id}`
     };
@@ -541,6 +559,7 @@ const whyItems = computed(() => {
 
 const scrollOffersSlider = (direction) => {
   if (!offersSliderRef.value) return;
+  offersActiveDirection.value = direction;
   const isRtl = currentLang.value === 'ar';
   const scrollAmount = offersSliderRef.value.clientWidth * 0.75;
   let sign = 1;
@@ -618,7 +637,17 @@ const fetchProducts = async () => {
   }
 };
 
+const fetchHomepageSettings = async () => {
+  try {
+    homepageSettings.value = settingsToObject(await settingsService.getSettings());
+  } catch (error) {
+    homepageSettings.value = {};
+    console.warn('Homepage settings unavailable:', error?.message);
+  }
+};
+
 onMounted(() => {
+  fetchHomepageSettings();
   fetchSliders();
   fetchCategories();
   fetchOffers();
@@ -1045,12 +1074,13 @@ onUnmounted(() => {
 }
 
 .nav-circle-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #111827;
-  color: #ffffff;
-  border: none;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #E2E8F0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1058,9 +1088,20 @@ onUnmounted(() => {
   transition: all 0.2s ease;
 }
 
-.nav-circle-btn:hover {
+.nav-circle-btn.is-active {
   background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.nav-circle-btn:hover {
   transform: scale(1.06);
+}
+
+.nav-circle-btn.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* 3. Category Portrait Cards */
@@ -1079,132 +1120,17 @@ onUnmounted(() => {
   display: none;
 }
 
-.category-portrait-card {
-  position: relative;
-  width: 236px;
-  height: 340px;
-  flex: 0 0 236px;
-  border-radius: 12px;
-  overflow: hidden;
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 18px 16px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #111827;
-}
-
-.category-portrait-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
-}
 
 /* 3.1 Special Offers Slider & Cards (العروض المميزة) */
 .offers-cards-slider {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   overflow-x: auto;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  padding: 4px 2px 16px;
-}
-
-.offer-portrait-card {
-  position: relative;
-  width: 280px;
-  height: 420px;
-  flex: 0 0 280px;
-  border-radius: 8px;
-  overflow: hidden;
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 24px 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #111827;
-  opacity: 1;
-  transform: rotate(0deg);
-}
-
-.offer-portrait-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
-}
-
-.card-bg-image {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  transition: transform 0.5s ease;
-}
-
-.category-portrait-card:hover .card-bg-image,
-.offer-portrait-card:hover .card-bg-image {
-  transform: scale(1.06);
-}
-
-.card-gradient-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.88) 100%);
-}
-
-.card-bottom-content {
-  position: relative;
-  z-index: 2;
-  color: #ffffff;
-}
-
-.card-count {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.card-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.card-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0;
-  line-height: 1.25;
-}
-
-.card-circle-arrow {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  flex-shrink: 0;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.home-view[dir="rtl"] .card-circle-arrow svg {
-  transform: rotate(180deg);
-}
-
-.category-portrait-card:hover .card-circle-arrow,
-.offer-portrait-card:hover .card-circle-arrow {
-  background: #ffffff;
-  color: #111827;
-  transform: scale(1.08);
+  /* room above/below for the card shadow (0 4px 16px) so the scroller does not clip it */
+  padding: 4px 0 24px;
 }
 
 /* 4. Products Grid 4 Columns */
@@ -1330,9 +1256,7 @@ onUnmounted(() => {
 
   .category-cards-slider,
   .offers-cards-slider {
-    grid-template-columns: repeat(3, 240px);
     gap: 14px;
-    padding-bottom: 12px;
   }
 
   .products-grid-four {
@@ -1417,20 +1341,11 @@ onUnmounted(() => {
     gap: 12px;
   }
 
-  .category-portrait-card {
-    height: 290px;
-  }
 
   .offers-cards-slider {
     gap: 16px;
   }
 
-  .offer-portrait-card {
-    width: 280px;
-    height: 420px;
-    flex: 0 0 280px;
-    border-radius: 8px;
-  }
 
   .products-grid-four {
     grid-template-columns: repeat(2, 1fr);
@@ -1456,22 +1371,8 @@ onUnmounted(() => {
     gap: 12px;
   }
 
-  .offer-portrait-card {
-    width: 260px;
-    height: 390px;
-    flex: 0 0 260px;
-    border-radius: 8px;
-    padding: 20px 16px;
-  }
 }
 
 @media (max-width: 360px) {
-  .offer-portrait-card {
-    width: 240px;
-    height: 360px;
-    flex: 0 0 240px;
-    border-radius: 8px;
-    padding: 16px 14px;
-  }
 }
 </style>

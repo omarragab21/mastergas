@@ -1,3 +1,5 @@
+import { pickText } from '../../utils/localeText.js';
+
 const NOTES_LIMIT = 1000;
 const PAYMENT_METHODS = { cod: 'cash_on_delivery', cash: 'cash_on_delivery', cash_on_delivery: 'cash_on_delivery', card: 'credit_card', credit_card: 'credit_card' };
 
@@ -8,12 +10,36 @@ const normalizeProductId = (id) => TIJARA_PRODUCT_IDS[id] ?? id;
 
 export const toSiteOrderPayload = (order = {}) => {
   const method = PAYMENT_METHODS[String(order.payment_method || '').toLowerCase()];
-  if (!method) throw new Error('طريقة الدفع غير مدعومة حالياً (المحفظة الإلكترونية غير متاحة في هذا النوع من الطلبات)');
-  if (!Array.isArray(order.items) || order.items.length === 0) throw new Error('السلة فارغة');
+  if (!method) throw new Error(pickText('طريقة الدفع غير مدعومة حالياً (المحفظة الإلكترونية غير متاحة في هذا النوع من الطلبات)', 'This payment method is not supported at the moment (the e-wallet is not available for this order type)'));
+  if (!Array.isArray(order.items) || order.items.length === 0) throw new Error(pickText('السلة فارغة', 'The cart is empty'));
 
   const code = order.coupon_code ? String(order.coupon_code).trim() : '';
   // The checkout view prepends "Coupon: CODE. " to the notes; the API has a coupon_code field for that.
   const notes = String(order.notes || '').replace(/^Coupon: [^.]*\.\s*/, '').trim().slice(0, NOTES_LIMIT);
+
+  const consolidatedItems = new Map();
+  for (const item of order.items) {
+    const sourceProductId = Number(item.product_id ?? item.id);
+    if (sourceProductId === 29) {
+      throw new Error(pickText('المنتج 29 غير متاح في كتالوج Tijara', 'Product 29 is not available in the Tijara catalog'));
+    }
+    const productId = normalizeProductId(sourceProductId);
+    const offerId = Number.isInteger(Number(item.offer_id)) && Number(item.offer_id) > 0
+      ? Number(item.offer_id)
+      : null;
+    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
+    const key = `${productId}:${offerId ?? ''}`;
+    const existing = consolidatedItems.get(key);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      consolidatedItems.set(key, {
+        product_id: productId,
+        quantity,
+        ...(offerId ? { offer_id: offerId } : {}),
+      });
+    }
+  }
 
   return {
     shipping_address: order.shipping_address,
@@ -25,20 +51,54 @@ export const toSiteOrderPayload = (order = {}) => {
     ...(code ? { coupon_code: code } : {}),
     ...(notes ? { notes } : {}),
     shipping_cost: Math.max(0, Number(order.shipping_cost) || 0),
-    items: order.items.map((item) => {
-      const sourceProductId = Number(item.product_id ?? item.id);
-      if (sourceProductId === 29) {
-        throw new Error('المنتج 29 غير متاح في كتالوج Tijara');
-      }
-      return {
-        product_id: normalizeProductId(sourceProductId),
-        quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
-        ...(Number.isInteger(Number(item.offer_id)) && Number(item.offer_id) > 0
-          ? { offer_id: Number(item.offer_id) }
-          : {}),
-      };
-    }),
+    items: [...consolidatedItems.values()],
   };
+};
+
+const getSessionCustomer = () => {
+  try {
+    const raw =
+      (typeof localStorage !== 'undefined' && localStorage.getItem('c_user')) ||
+      (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('c_user'));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.user || parsed?.customer || parsed;
+  } catch {
+    return null;
+  }
+};
+
+export const isOwnedByCurrentCustomer = (resource, currentUser = getSessionCustomer()) => {
+  if (!resource || typeof resource !== 'object') return false;
+  if (!currentUser || typeof currentUser !== 'object') return true;
+
+  const currentUserId = currentUser.id ?? currentUser.user_id ?? currentUser.customer_id;
+  const resourceOwnerId =
+    resource.user_id ??
+    resource.customer_id ??
+    resource.user?.id ??
+    resource.customer?.id ??
+    resource.order?.user_id ??
+    resource.order?.customer_id;
+
+  if (currentUserId != null && resourceOwnerId != null) {
+    return String(currentUserId).trim() === String(resourceOwnerId).trim();
+  }
+
+  const currentEmail = String(currentUser.email || '').trim().toLowerCase();
+  const resourceEmail = String(
+    resource.customer_email ||
+    resource.email ||
+    resource.user?.email ||
+    resource.customer?.email ||
+    ''
+  ).trim().toLowerCase();
+
+  if (currentEmail && resourceEmail && resourceEmail !== '—') {
+    return currentEmail === resourceEmail;
+  }
+
+  return true;
 };
 
 export const money = (value) => {

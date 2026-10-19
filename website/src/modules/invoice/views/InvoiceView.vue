@@ -10,13 +10,12 @@
       <!-- Header -->
       <div class="invoice-header">
         <div class="header-info">
-          <div class="invoice-badge-tax">فاتورة ضريبية مبسطة | Simplified Tax Invoice</div>
-          <h2 class="invoice-title">ماسترجاز لتجارة الأجهزة الإيطالية</h2>
-          <p class="invoice-company-desc">Mastergas Italian Appliances Trading Est.</p>
+          <div class="invoice-badge-tax">{{ t('invoice.tax_badge') }}</div>
+          <h2 class="invoice-title">{{ t('invoice.company_name') }}</h2>
           <div class="tax-info-grid">
-            <p class="tax-detail-item"><strong>الرقم الضريبي (VAT ID):</strong> <span class="tax-mono">301204567800003</span></p>
-            <p class="tax-detail-item"><strong>السجل التجاري (CR):</strong> <span class="tax-mono">1010654321</span></p>
-            <p class="tax-detail-item"><strong>العنوان:</strong> الرياض - المملكة العربية السعودية</p>
+            <p class="tax-detail-item"><strong>{{ t('invoice.vat_id') }}:</strong> <span class="tax-mono">301204567800003</span></p>
+            <p class="tax-detail-item"><strong>{{ t('invoice.cr') }}:</strong> <span class="tax-mono">1010654321</span></p>
+            <p class="tax-detail-item"><strong>{{ t('invoice.address') }}:</strong> {{ t('invoice.company_address') }}</p>
           </div>
         </div>
 
@@ -64,7 +63,7 @@
               <rect x="60" y="86" width="6" height="6" fill="#000000" />
               <rect x="74" y="82" width="16" height="10" fill="#000000" />
             </svg>
-            <span class="zatca-label">معتمد من ZATCA</span>
+            <span class="zatca-label">{{ t('invoice.zatca_approved') }}</span>
           </div>
         </div>
       </div>
@@ -72,31 +71,31 @@
       <!-- Invoice Meta Row -->
       <div class="invoice-meta-banner">
         <div class="meta-item">
-          <span class="meta-label">رقم الفاتورة:</span>
+          <span class="meta-label">{{ t('invoice.invoice_number') }}:</span>
           <span class="meta-val font-mono">#{{ order.orderNumber || order.order_number || order.id }}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">تاريخ الإصدار:</span>
-          <span class="meta-val">{{ order.date || new Date().toLocaleDateString('ar-SA') }}</span>
+          <span class="meta-label">{{ t('invoice.issue_date') }}:</span>
+          <span class="meta-val">{{ order.date || new Date().toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') }}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">طريقة الدفع:</span>
-          <span class="meta-val">{{ order.payment_method || 'دفع إلكتروني معتمد (مدى / فيزا)' }}</span>
+          <span class="meta-label">{{ t('invoice.payment_method') }}:</span>
+          <span class="meta-val">{{ order.payment_method || t('invoice.default_payment') }}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">حالة الطلب:</span>
+          <span class="meta-label">{{ t('invoice.order_status') }}:</span>
           <span class="meta-val status-confirmed">{{ formatOrderStatus(order.status) }}</span>
         </div>
       </div>
 
       <!-- Customer -->
       <div class="invoice-customer">
-        <h4 class="section-title">بيانات العميل والمستلم</h4>
+        <h4 class="section-title">{{ t('invoice.customer_recipient') }}</h4>
         <div class="customer-info-grid">
-          <p class="customer-info"><strong>الاسم:</strong> {{ order.customerName || order.customer?.name || 'عميل ماسترجاز' }}</p>
-          <p class="customer-info"><strong>الجوال:</strong> {{ order.customerPhone || order.customer?.phone || '-' }}</p>
-          <p class="customer-info"><strong>البريد الإلكتروني:</strong> {{ order.customerEmail || order.customer?.email || '-' }}</p>
-          <p class="customer-info"><strong>عنوان التوصيل:</strong> {{ order.customerAddress || order.shipping_address || 'المملكة العربية السعودية' }}</p>
+          <p class="customer-info"><strong>{{ t('invoice.name') }}:</strong> {{ order.customerName || order.customer?.name || t('invoice.default_customer') }}</p>
+          <p class="customer-info"><strong>{{ t('invoice.mobile') }}:</strong> {{ order.customerPhone || order.customer?.phone || '-' }}</p>
+          <p class="customer-info"><strong>{{ t('invoice.email') }}:</strong> {{ order.customerEmail || order.customer?.email || '-' }}</p>
+          <p class="customer-info"><strong>{{ t('invoice.delivery_address') }}:</strong> {{ order.customerAddress || order.shipping_address || t('invoice.default_country') }}</p>
         </div>
       </div>
 
@@ -105,11 +104,11 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>تفاصيل المنتج والضمان</th>
-            <th>الكمية</th>
-            <th>سعر الوحدة</th>
-            <th>الضريبة (15%)</th>
-            <th>المجموع شامل الضريبة</th>
+            <th>{{ t('invoice.product_warranty') }}</th>
+            <th>{{ t('invoice.quantity') }}</th>
+            <th>{{ t('invoice.unit_price') }}</th>
+            <th>{{ t('invoice.vat_col') }}</th>
+            <th>{{ t('invoice.total_incl_vat') }}</th>
           </tr>
         </thead>
 
@@ -118,12 +117,12 @@
             <td class="col-index">{{ idx + 1 }}</td>
             <td>
               <div class="prod-title-inv">{{ localized(item.product || item, 'name') }}</div>
-              <span class="prod-warranty-inv">ضمان شامل سنتين (SASO / CE)</span>
+              <span class="prod-warranty-inv">{{ t('invoice.warranty_two_years') }}</span>
             </td>
             <td class="text-center font-bold">{{ item.quantity }}</td>
-            <td class="text-center">{{ (item.price || item.unit_price).toFixed(2) }} {{ currency }}</td>
-            <td class="text-center">{{ (((item.price || item.unit_price) * item.quantity) * 0.15 / 1.15).toFixed(2) }} {{ currency }}</td>
-            <td class="text-end font-bold">{{ ((item.price || item.unit_price) * item.quantity).toFixed(2) }} {{ currency }}</td>
+            <td class="text-center"><PriceText :value="item.price || item.unit_price" :currency="currency" /></td>
+            <td class="text-center"><PriceText :value="((item.price || item.unit_price) * item.quantity) * 0.15 / 1.15" :currency="currency" /></td>
+            <td class="text-end font-bold"><PriceText :value="(item.price || item.unit_price) * item.quantity" :currency="currency" /></td>
           </tr>
         </tbody>
       </table>
@@ -131,31 +130,31 @@
       <!-- Totals -->
       <div class="invoice-totals">
         <div class="total-row">
-          <span>المجموع الفرعي (غير شامل الضريبة):</span>
-          <strong>{{ Number(order.subtotal || 0).toFixed(2) }} {{ currency }}</strong>
+          <span>{{ t('invoice.subtotal_excl_vat') }}:</span>
+          <strong><PriceText :value="order.subtotal || 0" :currency="currency" /></strong>
         </div>
         <div class="total-row">
-          <span>ضريبة القيمة المضافة (15%):</span>
-          <strong>{{ Number(order.tax || 0).toFixed(2) }} {{ currency }}</strong>
+          <span>{{ t('invoice.vat_15') }}:</span>
+          <strong><PriceText :value="order.tax || 0" :currency="currency" /></strong>
         </div>
         <div class="total-row" v-if="order.shipping > 0">
-          <span>تكلفة الشحن والتوصيل:</span>
-          <strong>{{ (order.shipping || 0).toFixed(2) }} {{ currency }}</strong>
+          <span>{{ t('invoice.shipping_cost') }}:</span>
+          <strong><PriceText :value="order.shipping || 0" :currency="currency" /></strong>
         </div>
         <div class="total-row discount" v-if="order.discount > 0">
-          <span>الخصم:</span>
-          <strong>-{{ (order.discount || 0).toFixed(2) }} {{ currency }}</strong>
+          <span>{{ t('invoice.discount') }}:</span>
+          <strong><PriceText :value="order.discount || 0" :currency="currency" negative /></strong>
         </div>
         <div class="total-row grand-total">
-          <span>الإجمالي النهائي المستحق:</span>
-          <strong>{{ (order.total || order.total_amount).toFixed(2) }} {{ currency }}</strong>
+          <span>{{ t('invoice.grand_total_due') }}:</span>
+          <strong><PriceText :value="order.total || order.total_amount || 0" :currency="currency" /></strong>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="invoice-footer">
-        <p class="footer-thank">شكراً لتسوقكم من ماسترجاز - أجهزة الطهي الإيطالية الأولى في المملكة</p>
-        <p class="footer-legal">هذه الفاتورة تم إنشاؤها إلكترونياً وتعد صالحة دون توقيع بموجب أنظمة هيئة الزكاة والضريبة والجمارك (ZATCA).</p>
+        <p class="footer-thank">{{ t('invoice.footer_thanks') }}</p>
+        <p class="footer-legal">{{ t('invoice.footer_legal') }}</p>
       </div>
 
     </div>
@@ -169,7 +168,7 @@
     <div class="invoice-actions" v-if="order && !loading">
       <button class="print-btn" @click="printInvoice">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        طباعة الفاتورة الضريبية
+        {{ t('invoice.print_tax_invoice') }}
       </button>
 
       <button class="back-btn" @click="goBack">
@@ -187,10 +186,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLocalized } from '../../../composables/useLocalized'
 import { useSettings } from '../../../composables/useSettings'
 import { escapeHtml } from '../../../utils/sanitize'
+import { formatPriceHtml } from '../../../utils/price'
+import PriceText from '../../../components/PriceText.vue'
 import { useInvoiceStore } from '../store/invoiceStore'
 
 export default {
   name: 'InvoiceView',
+  components: { PriceText },
   setup() {
     const route = useRoute()
     const router = useRouter()
@@ -200,25 +202,28 @@ export default {
     const invoiceStore = useInvoiceStore()
     const { order, loading, siteLogo, siteName } = storeToRefs(invoiceStore)
 
-    const orderStatusLabels = {
-      pending: 'قيد المراجعة',
-      confirmed: 'تم تأكيد الطلب',
-      paid_confirmed: 'تم تأكيد الدفع',
-      processing: 'قيد التجهيز',
-      shipped: 'الطلب في الطريق',
-      shipping: 'قيد التوصيل',
-      delivering: 'قيد التوصيل',
-      in_delivery: 'قيد التوصيل',
-      delivered: 'مكتملة',
-      completed: 'مكتملة',
-      cancelled: 'ملغاة',
-      failed: 'فشل الطلب',
-      returned: 'مرتجع',
-      refunded: 'مسترد',
+    const orderStatusKeys = {
+      pending: 'status_pending',
+      confirmed: 'status_confirmed',
+      paid_confirmed: 'status_paid_confirmed',
+      processing: 'status_processing',
+      shipped: 'status_shipped',
+      shipping: 'status_shipping',
+      delivering: 'status_shipping',
+      in_delivery: 'status_shipping',
+      delivered: 'status_delivered',
+      completed: 'status_delivered',
+      cancelled: 'status_cancelled',
+      failed: 'status_failed',
+      returned: 'status_returned',
+      refunded: 'status_refunded',
     }
 
-    const formatOrderStatus = (status) => orderStatusLabels[String(status || 'pending').toLowerCase()] || String(status || 'قيد المراجعة')
-    const formatPaymentMethod = (method) => method === 'cash_on_delivery' ? 'الدفع عند الاستلام' : (method || 'غير محدد')
+    const formatOrderStatus = (status) => {
+      const key = orderStatusKeys[String(status || 'pending').toLowerCase()]
+      return key ? t(`invoice.${key}`) : String(status || t('invoice.status_pending'))
+    }
+    const formatPaymentMethod = (method) => method === 'cash_on_delivery' ? t('invoice.payment_cod') : (method || t('invoice.not_specified'))
 
     const printInvoice = () => {
       const isRtl = locale.value === 'ar'
@@ -226,24 +231,26 @@ export default {
       const textAlign = isRtl ? 'right' : 'left'
       const totalsMargin = isRtl ? 'margin-right: auto;' : 'margin-left: auto;'
       const safeOrderNumber = escapeHtml(order.value.orderNumber || order.value.order_number || order.value.id)
-      const safeInvoiceDate = escapeHtml(order.value.date || new Date().toLocaleDateString('ar-SA'))
+      const safeInvoiceDate = escapeHtml(order.value.date || new Date().toLocaleDateString(isRtl ? 'ar-SA' : 'en-US'))
       const safePaymentMethod = escapeHtml(formatPaymentMethod(order.value.payment_method))
       const safeOrderStatus = escapeHtml(formatOrderStatus(order.value.status))
-      const safeCustomerName = escapeHtml(order.value.customerName || order.value.customer?.name || 'عميل ماسترجاز')
+      const safeCustomerName = escapeHtml(order.value.customerName || order.value.customer?.name || t('invoice.default_customer'))
       const safeCustomerPhone = escapeHtml(order.value.customerPhone || order.value.customer?.phone || '-')
       const safeCustomerEmail = escapeHtml(order.value.customerEmail || order.value.customer?.email || '-')
-      const safeCustomerAddress = escapeHtml(order.value.customerAddress || order.value.shipping_address || 'المملكة العربية السعودية')
+      const safeCustomerAddress = escapeHtml(order.value.customerAddress || order.value.shipping_address || t('invoice.default_country'))
       const safeCurrency = escapeHtml(currency.value ?? currency)
-      const subtotalWithoutVat = Number(order.value.subtotal || 0).toFixed(2);
-      const vatAmount = Number(order.value.tax || 0).toFixed(2);
-      const grandTotal = (order.value.total || order.value.total_amount || 0).toFixed(2);
+      const subtotalWithoutVat = formatPriceHtml(order.value.subtotal || 0, safeCurrency);
+      const vatAmount = formatPriceHtml(order.value.tax || 0, safeCurrency);
+      const grandTotal = formatPriceHtml(order.value.total || order.value.total_amount || 0, safeCurrency);
 
       const printWindow = window.open('', '_blank')
+      if (!printWindow) return
+      printWindow.opener = null
       printWindow.document.write(`
         <!DOCTYPE html>
-        <html dir="${dir}">
+        <html dir="${dir}" lang="${isRtl ? 'ar' : 'en'}">
         <head>
-          <title>فاتورة ضريبية مبسطة - ${safeOrderNumber}</title>
+          <title>${t('invoice.tax_badge')} - ${safeOrderNumber}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: 'IBM Plex Sans Arabic', Arial, sans-serif; direction: ${dir}; text-align: ${textAlign}; padding: 30px; background: #ffffff; color: #111827; }
@@ -271,36 +278,35 @@ export default {
         <body>
           <div class="header">
             <div>
-              <span class="badge-tax">فاتورة ضريبية مبسطة | Simplified Tax Invoice</span>
-              <h1 class="title">ماسترجاز لتجارة الأجهزة الإيطالية</h1>
-              <p class="subtitle">Mastergas Italian Appliances Trading Est.</p>
+              <span class="badge-tax">${t('invoice.tax_badge')}</span>
+              <h1 class="title">${t('invoice.company_name')}</h1>
               <div class="tax-details">
-                <p><strong>الرقم الضريبي (VAT ID):</strong> 301204567800003</p>
-                <p><strong>السجل التجاري (CR):</strong> 1010654321</p>
-                <p><strong>العنوان:</strong> الرياض - المملكة العربية السعودية</p>
+                <p><strong>${t('invoice.vat_id')}:</strong> 301204567800003</p>
+                <p><strong>${t('invoice.cr')}:</strong> 1010654321</p>
+                <p><strong>${t('invoice.address')}:</strong> ${t('invoice.company_address')}</p>
               </div>
             </div>
             <div class="logo-area">
               <div class="logo-title">MASTERGAS</div>
               <div style="font-size: 11px; color: #6b7280; letter-spacing: 1px;">ITALIAN LUXURY APPLIANCES</div>
-              <div style="margin-top: 10px; font-size: 11px; font-weight: 700; color: #059669;">معتمد من هيئة ZATCA</div>
+              <div style="margin-top: 10px; font-size: 11px; font-weight: 700; color: #059669;">${t('invoice.zatca_authority_approved')}</div>
             </div>
           </div>
 
           <div class="meta-banner">
-            <div><strong>رقم الفاتورة:</strong> #${safeOrderNumber}</div>
-            <div><strong>تاريخ الإصدار:</strong> ${safeInvoiceDate}</div>
-            <div><strong>طريقة الدفع:</strong> ${safePaymentMethod}</div>
-            <div><strong>حالة الطلب:</strong> ${safeOrderStatus}</div>
+            <div><strong>${t('invoice.invoice_number')}:</strong> #${safeOrderNumber}</div>
+            <div><strong>${t('invoice.issue_date')}:</strong> ${safeInvoiceDate}</div>
+            <div><strong>${t('invoice.payment_method')}:</strong> ${safePaymentMethod}</div>
+            <div><strong>${t('invoice.order_status')}:</strong> ${safeOrderStatus}</div>
           </div>
 
           <div class="customer-box">
-            <div class="customer-title">بيانات العميل</div>
+            <div class="customer-title">${t('invoice.customer_details')}</div>
             <div class="customer-grid">
-              <div><strong>الاسم:</strong> ${safeCustomerName}</div>
-              <div><strong>الجوال:</strong> ${safeCustomerPhone}</div>
-              <div><strong>البريد:</strong> ${safeCustomerEmail}</div>
-              <div><strong>العنوان:</strong> ${safeCustomerAddress}</div>
+              <div><strong>${t('invoice.name')}:</strong> ${safeCustomerName}</div>
+              <div><strong>${t('invoice.mobile')}:</strong> ${safeCustomerPhone}</div>
+              <div><strong>${t('invoice.email_short')}:</strong> ${safeCustomerEmail}</div>
+              <div><strong>${t('invoice.address')}:</strong> ${safeCustomerAddress}</div>
             </div>
           </div>
 
@@ -308,11 +314,11 @@ export default {
             <thead>
               <tr>
                 <th>#</th>
-                <th>المنتج</th>
-                <th>الكمية</th>
-                <th>سعر الوحدة</th>
-                <th>الضريبة (15%)</th>
-                <th>الإجمالي شامل الضريبة</th>
+                <th>${t('invoice.product')}</th>
+                <th>${t('invoice.quantity')}</th>
+                <th>${t('invoice.unit_price')}</th>
+                <th>${t('invoice.vat_col')}</th>
+                <th>${t('invoice.total_incl_vat_short')}</th>
               </tr>
             </thead>
             <tbody>
@@ -321,23 +327,23 @@ export default {
                   <td>${idx + 1}</td>
                   <td>${escapeHtml(localized(item.product || item, 'name'))}</td>
                   <td style="text-align: center;">${escapeHtml(item.quantity)}</td>
-                  <td style="text-align: center;">${(item.price || item.unit_price).toFixed(2)} ${safeCurrency}</td>
-                  <td style="text-align: center;">${(((item.price || item.unit_price) * item.quantity) * 0.15 / 1.15).toFixed(2)} ${safeCurrency}</td>
-                  <td style="text-align: end; font-weight: bold;">${((item.price || item.unit_price) * item.quantity).toFixed(2)} ${safeCurrency}</td>
+                  <td style="text-align: center;">${formatPriceHtml(item.price || item.unit_price, safeCurrency)}</td>
+                  <td style="text-align: center;">${formatPriceHtml(((item.price || item.unit_price) * item.quantity) * 0.15 / 1.15, safeCurrency)}</td>
+                  <td style="text-align: end; font-weight: bold;">${formatPriceHtml((item.price || item.unit_price) * item.quantity, safeCurrency)}</td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
 
           <div class="totals">
-            <div class="total-row"><span>المجموع الفرعي (غير شامل الضريبة):</span><strong>${subtotalWithoutVat} ${safeCurrency}</strong></div>
-            <div class="total-row"><span>ضريبة القيمة المضافة (15%):</span><strong>${vatAmount} ${safeCurrency}</strong></div>
-            ${order.value.shipping > 0 ? `<div class="total-row"><span>الشحن:</span><strong>${(order.value.shipping || 0).toFixed(2)} ${safeCurrency}</strong></div>` : ''}
-            <div class="total-row grand"><span>الإجمالي النهائي المستحق:</span><strong>${grandTotal} ${safeCurrency}</strong></div>
+            <div class="total-row"><span>${t('invoice.subtotal_excl_vat')}:</span><strong>${subtotalWithoutVat}</strong></div>
+            <div class="total-row"><span>${t('invoice.vat_15')}:</span><strong>${vatAmount}</strong></div>
+            ${order.value.shipping > 0 ? `<div class="total-row"><span>${t('invoice.shipping_short')}:</span><strong>${formatPriceHtml(order.value.shipping || 0, safeCurrency)}</strong></div>` : ''}
+            <div class="total-row grand"><span>${t('invoice.grand_total_due')}:</span><strong>${grandTotal}</strong></div>
           </div>
 
           <div class="footer">
-            <p>شكراً لتعاملكم مع ماسترجاز | هذه الفاتورة صادرة إلكترونياً ومعتمدة نظاماً وفق متطلبات هيئة الزكاة والضريبة والجمارك</p>
+            <p>${t('invoice.print_footer')}</p>
           </div>
         </body>
         </html>
@@ -363,6 +369,7 @@ export default {
       printInvoice,
       goBack,
       t,
+      locale,
       localized,
       formatOrderStatus
     }
@@ -660,7 +667,7 @@ export default {
 }
 
 .print-btn:hover {
-  background: #262626;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 

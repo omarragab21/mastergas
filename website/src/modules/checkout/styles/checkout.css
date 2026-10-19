@@ -641,6 +641,13 @@
   color: #64748B;
 }
 
+.address-details .phone-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+  text-align: left;
+}
+
 /* State 2: Form Fields */
 .form-fields {
   display: flex;
@@ -709,7 +716,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  direction: ltr;
   align-items: center;
   padding: 0px 16px;
   width: 100%;
@@ -754,7 +762,8 @@
   font-size: 14px;
   line-height: 21px;
   color: #000000;
-  text-align: right;
+  direction: ltr;
+  text-align: left;
 }
 
 .phone-input-field::placeholder {
@@ -945,7 +954,7 @@
 }
 
 .submit-continue-btn:hover {
-  opacity: 0.9;
+  background: var(--color-button-hover);
 }
 
 .submit-continue-btn:active {
@@ -1608,7 +1617,8 @@
 
 .review-address-line.is-phone {
   direction: ltr;
-  text-align: right;
+  unicode-bidi: isolate;
+  text-align: left;
 }
 
 /* Card 3: Payment details */
@@ -1695,9 +1705,9 @@
 }
 
 .btn-checkout-primary:hover {
-  background: #4a1936;
+  background: var(--color-button-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(135, 50, 96, 0.2);
+  box-shadow: 0 8px 20px rgba(100, 116, 139, 0.2);
 }
 
 .btn-checkout-secondary {
@@ -1758,7 +1768,10 @@
   transition: all 0.3s;
 }
 
-.next-btn:hover { background: #4a1936; box-shadow: 0 10px 20px rgba(135, 50, 96, 0.2); }
+.next-btn:hover {
+  background: var(--color-button-hover);
+box-shadow: 0 10px 20px rgba(100, 116, 139, 0.2);
+}
 
 /* summary-card (Figma 1:1 Design) */
 .summary-card {
@@ -1954,7 +1967,7 @@
 }
 
 .summary-card .primary-button:hover:not(:disabled) {
-  background: #1f2937;
+  background: var(--color-button-hover);
 }
 
 .summary-card .primary-button:disabled {
@@ -2437,7 +2450,7 @@
 }
 
 .receipt-btn-primary:hover {
-  opacity: 0.88;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 
@@ -2568,6 +2581,10 @@
 }
 
 .apply-btn { background: #000000; color: #fff; }
+
+.apply-btn:hover:not(:disabled) {
+  background: var(--color-button-hover);
+}
 .remove-btn { background: #fee2e2; color: #ef4444; }
 
 .coupon-msg { font-size: 12px; margin-top: 8px; font-weight: 600; }
@@ -2883,7 +2900,7 @@
 }
 
 .save-addr-v3-btn:hover:not(:disabled) {
-  background: #000000;
+  background: var(--color-button-hover);
 }
 
 .save-addr-v3-btn:disabled {

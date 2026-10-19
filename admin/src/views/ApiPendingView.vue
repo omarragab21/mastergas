@@ -4,21 +4,21 @@
     <div class="page-header">
       <div class="header-titles">
         <div class="title-with-icon">
-          <h2 class="page-title">العروض والباقات</h2>
+          <h2 class="page-title">{{ tx('العروض والباقات', 'Offers & Bundles') }}</h2>
           <div class="tag-icon-wrapper">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
             </svg>
           </div>
         </div>
-        <p class="page-subtitle">إنشاء وإدارة العروض والباقات وربطها بالمنتجات</p>
+        <p class="page-subtitle">{{ tx('إنشاء وإدارة العروض والباقات وربطها بالمنتجات', 'Create and manage bundles linked to products') }}</p>
       </div>
       <button class="add-btn" @click="openCreate">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        إضافة عرض
+        {{ tx('إضافة عرض', 'Add Offer') }}
       </button>
     </div>
 
@@ -31,7 +31,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي العروض</span>
+          <span class="stat-label">{{ tx('إجمالي العروض', 'Total Offers') }}</span>
           <h3 class="stat-value">{{ offers.length }}</h3>
         </div>
       </div>
@@ -43,7 +43,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">العروض النشطة</span>
+          <span class="stat-label">{{ tx('العروض النشطة', 'Active Offers') }}</span>
           <h3 class="stat-value">{{ activeOffers }}</h3>
         </div>
       </div>
@@ -55,7 +55,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">المنتهية</span>
+          <span class="stat-label">{{ tx('المنتهية', 'Expired') }}</span>
           <h3 class="stat-value">{{ expiredOffers }}</h3>
         </div>
       </div>
@@ -67,7 +67,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <span class="stat-label">إجمالي الاستخدام</span>
+          <span class="stat-label">{{ tx('إجمالي الاستخدام', 'Total Usage') }}</span>
           <h3 class="stat-value">{{ totalUsageCount }}</h3>
         </div>
       </div>
@@ -79,25 +79,25 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" v-model="searchQuery" placeholder="البحث باسم العرض..." class="search-input" />
+        <input type="text" v-model="searchQuery" :placeholder="tx('البحث باسم العرض...', 'Search offers...')" class="search-input" />
       </div>
 
       <div class="filter-select">
         <select v-model="statusFilter" class="form-select">
-          <option value="">كل الحالات</option>
-          <option value="active">نشط</option>
-          <option value="paused">متوقف</option>
-          <option value="expired">منتهي</option>
-          <option value="scheduled">مجدول</option>
+          <option value="">{{ tx('كل الحالات', 'All statuses') }}</option>
+          <option value="active">{{ tx('نشط', 'Active') }}</option>
+          <option value="paused">{{ tx('متوقف', 'Paused') }}</option>
+          <option value="expired">{{ tx('منتهي', 'Expired') }}</option>
+          <option value="scheduled">{{ tx('مجدول', 'Scheduled') }}</option>
         </select>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="select-icon" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
 
       <div class="date-comp">
-        <input type="date" v-model="startDateFilter" class="date-input" title="من تاريخ" />
+        <input type="date" v-model="startDateFilter" class="date-input" :title="tx('من تاريخ', 'From date')" />
       </div>
       <div class="date-comp">
-        <input type="date" v-model="endDateFilter" class="date-input" title="إلى تاريخ" />
+        <input type="date" v-model="endDateFilter" class="date-input" :title="tx('إلى تاريخ', 'To date')" />
       </div>
     </div>
 
@@ -106,19 +106,19 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-name text-right">اسم العرض</th>
-            <th class="col-price">سعر الباقة</th>
-            <th class="col-items">المنتجات</th>
-            <th class="col-start">تاريخ البداية</th>
-            <th class="col-end">تاريخ النهاية</th>
-            <th class="col-used">استخدم</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-name text-right">{{ tx('اسم العرض', 'Offer name') }}</th>
+            <th class="col-price">{{ tx('سعر الباقة', 'Bundle price') }}</th>
+            <th class="col-items">{{ tx('المنتجات', 'Products') }}</th>
+            <th class="col-start">{{ tx('تاريخ البداية', 'Start date') }}</th>
+            <th class="col-end">{{ tx('تاريخ النهاية', 'End date') }}</th>
+            <th class="col-used">{{ tx('استخدم', 'Used') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="8">جاري التحميل...</td></tr>
-          <tr v-else-if="filteredOffers.length === 0" class="state-row"><td colspan="8">لا توجد عروض مطابقة</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="8">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="filteredOffers.length === 0" class="state-row"><td colspan="8">{{ tx('لا توجد عروض مطابقة', 'No matching offers found') }}</td></tr>
           <template v-else>
             <tr v-for="offer in filteredOffers" :key="offer.id" class="data-row">
               <td class="col-name text-right">
@@ -140,13 +140,13 @@
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn edit-btn" @click="openEdit(offer)" title="تعديل" aria-label="تعديل">
+                  <button class="action-btn edit-btn" @click="openEdit(offer)" :title="tx('تعديل', 'Edit')" :aria-label="tx('تعديل', 'Edit')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn view-btn" @click="openView(offer)" title="عرض" aria-label="عرض">
+                  <button class="action-btn view-btn" @click="openView(offer)" :title="tx('عرض', 'View')" :aria-label="tx('عرض', 'View')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button class="action-btn delete-btn" @click="confirmDelete(offer)" title="حذف" aria-label="حذف">
+                  <button class="action-btn delete-btn" @click="confirmDelete(offer)" :title="tx('حذف', 'Delete')" :aria-label="tx('حذف', 'Delete')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -167,22 +167,22 @@
           <div class="header-icon-main">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
           </div>
-          <h3 class="modal-title-main">{{ isView ? 'تفاصيل العرض' : (editingId ? 'تعديل العرض' : 'إضافة عرض جديد') }}</h3>
-          <p class="modal-subtitle-main">{{ isView ? 'عرض البيانات فقط — للتعديل استخدم زر التعديل' : 'أدخل تفاصيل العرض' }}</p>
+          <h3 class="modal-title-main">{{ isView ? tx('تفاصيل العرض', 'Offer Details') : (editingId ? tx('تعديل العرض', 'Edit Offer') : tx('إضافة عرض جديد', 'Add New Offer')) }}</h3>
+          <p class="modal-subtitle-main">{{ isView ? tx('عرض البيانات فقط — للتعديل استخدم زر التعديل', 'Read-only view — use Edit to make changes') : tx('أدخل تفاصيل العرض', 'Enter offer details') }}</p>
         </div>
 
         <form @submit.prevent="saveOffer" class="offer-form">
           <fieldset class="form-fieldset" :disabled="isView">
             <div class="form-section">
-              <label class="form-label">صورة العرض</label>
+              <label class="form-label">{{ tx('صورة العرض', 'Offer image') }}</label>
               <div class="upload-wrapper" @click="fileInputRef?.click()">
                 <input type="file" ref="fileInputRef" @change="handleImageUpload" accept="image/*" hidden />
                 <div class="upload-box">
                   <img v-if="imagePreview" :src="imagePreview" class="preview-image" alt="Preview" />
                   <div v-else class="upload-placeholder">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <p>انقر لرفع صورة العرض</p>
-                    <span>الحد الأقصى 1 ميجابايت</span>
+                    <p>{{ tx('انقر لرفع صورة العرض', 'Click to upload offer image') }}</p>
+                    <span>{{ tx('الحد الأقصى 1 ميجابايت', 'Maximum 1 MB') }}</span>
                   </div>
                 </div>
               </div>
@@ -194,51 +194,51 @@
                 <button type="button" class="i18n-btn" :class="{ active: activeLang === 'ar' }" @click="activeLang = 'ar'">العربية</button>
               </div>
 
-              <label class="form-label">اسم العرض <span class="req">*</span></label>
+              <label class="form-label">{{ tx('اسم العرض', 'Offer name') }} <span class="req">*</span></label>
               <input v-show="activeLang === 'ar'" type="text" v-model.trim="form.name_ar" class="form-control" placeholder="مثلاً: باقة التوفير الكبرى" />
               <input v-show="activeLang === 'en'" type="text" v-model.trim="form.name_en" class="form-control ltr-text" placeholder="Offer name in English" />
             </div>
 
             <div class="form-section">
-              <label class="form-label">وصف العرض (اختياري)</label>
+              <label class="form-label">{{ tx('وصف العرض (اختياري)', 'Offer description (optional)') }}</label>
               <textarea v-show="activeLang === 'ar'" v-model="form.description_ar" class="form-control" placeholder="وصف قصير للعرض بالعربي..." rows="3"></textarea>
               <textarea v-show="activeLang === 'en'" v-model="form.description_en" class="form-control ltr-text" placeholder="Short offer description in English..." rows="3"></textarea>
             </div>
 
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">سعر الباقة (د.أ) <span class="req">*</span></label>
+                <label class="form-label">{{ tx('سعر الباقة (ر.س)', 'Bundle price (SAR)') }} <span class="req">*</span></label>
                 <input type="number" min="0" step="0.01" v-model.number="form.bundle_price" class="form-control" placeholder="0.00" required />
               </div>
               <div class="form-group">
-                <label class="form-label">الحد الأقصى للاستخدام (عدد المرات)</label>
+                <label class="form-label">{{ tx('الحد الأقصى للاستخدام (عدد المرات)', 'Maximum uses') }}</label>
                 <input type="number" min="0" step="1" inputmode="numeric" v-model.number="form.max_uses" class="form-control" placeholder="مثلاً: 100" />
               </div>
               <div class="form-group">
-                <label class="form-label">الحد الأقصى للاستخدام للعميل</label>
+                <label class="form-label">{{ tx('الحد الأقصى للاستخدام للعميل', 'Maximum uses per customer') }}</label>
                 <input type="number" min="0" step="1" inputmode="numeric" v-model.number="form.max_per_customer" class="form-control" placeholder="مثلاً: 1" />
               </div>
             </div>
 
             <div class="form-grid mt-1">
               <div class="form-group">
-                <label class="form-label">تاريخ البدء <span class="req">*</span></label>
+                <label class="form-label">{{ tx('تاريخ البدء', 'Start date') }} <span class="req">*</span></label>
                 <input type="date" v-model="form.start_date" class="form-control" required />
               </div>
               <div class="form-group">
-                <label class="form-label">تاريخ الانتهاء <span class="req" v-if="!form.no_end_date">*</span></label>
+                <label class="form-label">{{ tx('تاريخ الانتهاء', 'End date') }} <span class="req" v-if="!form.no_end_date">*</span></label>
                 <input type="date" v-model="form.end_date" class="form-control" :required="!form.no_end_date" :disabled="form.no_end_date" />
                 <label class="chk-item mt-2">
                   <input type="checkbox" v-model="form.no_end_date">
-                  <span>مفتوح (غير محدد المدة)</span>
+                  <span>{{ tx('مفتوح (غير محدد المدة)', 'Open-ended') }}</span>
                 </label>
               </div>
             </div>
 
             <div class="form-section items-section">
               <div class="items-heading">
-                <label class="form-label">منتجات الباقة <span class="req">*</span></label>
-                <span class="items-count">تم تحديد {{ form.items.length }} منتج</span>
+                <label class="form-label">{{ tx('منتجات الباقة', 'Bundle products') }} <span class="req">*</span></label>
+                <span class="items-count">{{ tx('تم تحديد', 'Selected') }} {{ form.items.length }} {{ tx('منتج', 'products') }}</span>
               </div>
 
               <div class="selection-box-area">
@@ -247,16 +247,16 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="search-icon">
                       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
-                    <input type="text" v-model="productSearch" class="form-control search-control" placeholder="ابحث عن منتج..." />
+                    <input type="text" v-model="productSearch" class="form-control search-control" :placeholder="tx('ابحث عن منتج...', 'Search products...')" />
                   </div>
                   <label class="chk-item select-all">
                     <input type="checkbox" :checked="allFilteredSelected" :disabled="!filteredProducts.length" @change="toggleAllProducts" />
-                    <span>تحديد الكل</span>
+                    <span>{{ tx('تحديد الكل', 'Select all') }}</span>
                   </label>
                 </div>
 
                 <div class="product-pick-list">
-                  <p v-if="!filteredProducts.length" class="hint">لا توجد منتجات مطابقة.</p>
+                  <p v-if="!filteredProducts.length" class="hint">{{ tx('لا توجد منتجات مطابقة.', 'No matching products.') }}</p>
                   <div v-for="product in filteredProducts" :key="product.id" class="product-pick-row" :class="{ selected: isSelected(product.id) }" @click="toggleProduct(product.id)">
                     <input type="checkbox" :checked="isSelected(product.id)" @click.stop @change="toggleProduct(product.id)" />
                     <div class="product-thumb">
@@ -265,8 +265,8 @@
                     </div>
                     <span class="product-pick-name">{{ productName(product) }}</span>
                     <div class="qty-box" @click.stop>
-                      <span class="qty-label">الكمية</span>
-                      <input type="number" min="1" class="form-control qty-input" :value="quantityOf(product.id)" :disabled="!isSelected(product.id)" @input="setQuantity(product.id, $event.target.value)" aria-label="الكمية" />
+                      <span class="qty-label">{{ tx('الكمية', 'Quantity') }}</span>
+                      <input type="number" min="1" class="form-control qty-input" :value="quantityOf(product.id)" :disabled="!isSelected(product.id)" @input="setQuantity(product.id, $event.target.value)" :aria-label="tx('الكمية', 'Quantity')" />
                     </div>
                   </div>
                 </div>
@@ -274,7 +274,7 @@
             </div>
 
             <div class="form-section-toggle">
-              <span class="toggle-lbl">تفعيل العرض</span>
+                <span class="toggle-lbl">{{ tx('تفعيل العرض', 'Enable offer') }}</span>
               <label class="toggle-switch">
                 <input type="checkbox" v-model="form.is_active" hidden>
                 <div class="t-slider" :class="{ on: form.is_active }">
@@ -285,10 +285,10 @@
           </fieldset>
 
           <div class="form-footer-btns">
-            <button type="button" class="btn-cancel-form" @click="closeModal">{{ isView ? 'إغلاق' : 'إلغاء' }}</button>
-            <button v-if="isView" type="button" class="btn-submit-form" @click="openEdit(viewedOffer)">تعديل العرض</button>
+            <button type="button" class="btn-cancel-form" @click="closeModal">{{ isView ? tx('إغلاق', 'Close') : tx('إلغاء', 'Cancel') }}</button>
+            <button v-if="isView" type="button" class="btn-submit-form" @click="openEdit(viewedOffer)">{{ tx('تعديل العرض', 'Edit Offer') }}</button>
             <button v-else type="submit" class="btn-submit-form" :disabled="saving">
-              {{ saving ? 'جاري الحفظ...' : (editingId ? 'حفظ التعديلات' : 'إنشاء العرض') }}
+              {{ saving ? tx('جاري الحفظ...', 'Saving...') : (editingId ? tx('حفظ التعديلات', 'Save changes') : tx('إنشاء العرض', 'Create Offer')) }}
             </button>
           </div>
         </form>
@@ -304,14 +304,14 @@
           </svg>
         </div>
         <div class="delete-copy">
-          <h2 id="delete-offer-title">تأكيد حذف العرض</h2>
-          <p>هل أنت متأكد من حذف العرض «{{ displayName(deleteTarget) }}»؟ لا يمكن التراجع عن هذا الإجراء.</p>
+          <h2 id="delete-offer-title">{{ tx('تأكيد حذف العرض', 'Confirm offer deletion') }}</h2>
+          <p>{{ tx('هل أنت متأكد من حذف العرض', 'Are you sure you want to delete offer') }} «{{ displayName(deleteTarget) }}»؟ {{ tx('لا يمكن التراجع عن هذا الإجراء.', 'This action cannot be undone.') }}</p>
         </div>
         <div class="delete-footer">
-          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">إلغاء</button>
+          <button class="btn-cancel-form" type="button" :disabled="isDeleting" @click="cancelDelete">{{ tx('إلغاء', 'Cancel') }}</button>
           <button class="btn-delete-confirm" type="button" :disabled="isDeleting" @click="executeDelete">
             <span v-if="isDeleting" class="delete-spinner" aria-hidden="true"></span>
-            {{ isDeleting ? 'جاري الحذف...' : 'حذف العرض' }}
+            {{ isDeleting ? tx('جاري الحذف...', 'Deleting...') : tx('حذف العرض', 'Delete offer') }}
           </button>
         </div>
       </div>
@@ -330,8 +330,12 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 import adminCatalogService from '../application/adminCatalogService';
 import { toOfferPayload } from '../domain/catalog/adminCatalog';
+import { validateAdminImageFile, safeObjectUrl, sanitizeAssetUrl } from '../utils/adminSecurity';
+
+const { tx, locale } = useAdminText();
 
 const offers = ref([]);
 const products = ref([]);
@@ -343,7 +347,7 @@ const viewedOffer = ref(null);
 const editingId = ref(null);
 const deleteTarget = ref(null);
 const isDeleting = ref(false);
-const activeLang = ref('ar');
+const activeLang = ref(locale.value);
 
 const searchQuery = ref('');
 const statusFilter = ref('');
@@ -363,11 +367,12 @@ const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'https://backend-tij
 const normalizeOfferImage = (value) => {
   if (!value) return null;
   const raw = String(value);
-  if (raw.startsWith('/storage/')) return `${backendOrigin}/public${raw}`;
-  if (raw.includes('/storage/') && !raw.includes('/public/storage/')) {
-    return raw.replace('/storage/', '/public/storage/');
-  }
-  return raw;
+  const resolved = raw.startsWith('/storage/')
+    ? `${backendOrigin}/public${raw}`
+    : (raw.includes('/storage/') && !raw.includes('/public/storage/')
+      ? raw.replace('/storage/', '/public/storage/')
+      : raw);
+  return sanitizeAssetUrl(resolved, '');
 };
 
 const emptyForm = () => ({
@@ -386,9 +391,15 @@ const triggerAlert = (msg, type = 'success') => {
 };
 
 const formatDate = (value) => (value ? String(value).slice(0, 10) : '—');
-const money = (value) => `${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} د.أ`;
-const displayName = (offer) => offer.name_i18n?.ar || offer.name_ar || offer.name || `عرض #${offer.id}`;
-const displayDescription = (offer) => offer.description_i18n?.ar || offer.description_ar || offer.description || '';
+const money = (value) => `${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tx('ر.س', 'SAR')}`;
+const displayName = (offer) => {
+  const lang = locale.value === 'en' ? 'en' : 'ar';
+  return offer.name_i18n?.[lang] || offer.name_i18n?.ar || offer.name_i18n?.en || offer.name_ar || offer.name || `${tx('عرض', 'Offer')} #${offer.id}`;
+};
+const displayDescription = (offer) => {
+  const lang = locale.value === 'en' ? 'en' : 'ar';
+  return offer.description_i18n?.[lang] || offer.description_i18n?.ar || offer.description_i18n?.en || offer.description_ar || offer.description || '';
+};
 
 const offerStatus = (offer) => {
   const today = new Date().toISOString().slice(0, 10);
@@ -399,7 +410,10 @@ const offerStatus = (offer) => {
   if (start && start > today) return 'scheduled';
   return 'active';
 };
-const formatStatus = (status) => ({ active: 'نشط', paused: 'متوقف', expired: 'منتهي', scheduled: 'مجدول' }[status] || status);
+const formatStatus = (status) => {
+  const labels = { active: ['نشط', 'Active'], paused: ['متوقف', 'Paused'], expired: ['منتهي', 'Expired'], scheduled: ['مجدول', 'Scheduled'] };
+  return labels[status] ? tx(...labels[status]) : status;
+};
 const usagePercent = (offer) => Math.min(100, Math.round(((offer.total_uses || 0) / offer.max_uses) * 100));
 
 const activeOffers = computed(() => offers.value.filter((offer) => offerStatus(offer) === 'active').length);
@@ -516,15 +530,16 @@ const toggleAllProducts = () => {
 };
 
 const handleImageUpload = (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files?.[0];
   if (!file) return;
-  if (file.size > 1 * 1024 * 1024) {
-    triggerAlert('حجم الصورة يجب أن لا يتجاوز 1 ميجابايت', 'error');
+  const check = validateAdminImageFile(file, { maxSizeMB: 1 });
+  if (!check.valid) {
+    triggerAlert(check.error, 'error');
     event.target.value = '';
     return;
   }
   form.value.image = file;
-  imagePreview.value = URL.createObjectURL(file);
+  imagePreview.value = safeObjectUrl(file, imagePreview.value);
 };
 
 const saveOffer = async () => {

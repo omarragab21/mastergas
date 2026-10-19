@@ -95,7 +95,7 @@
                 <button
                   type="button"
                   class="cookie-toggle disabled"
-                  aria-label="ضرورية"
+                  :aria-label="isRtl ? 'ضرورية' : 'Required'"
                   disabled
                 >
                   <span class="cookie-toggle-thumb"></span>
@@ -412,7 +412,7 @@ defineExpose({
 }
 
 .btn-accept-all:hover {
-  background: #000000;
+  background: var(--color-button-hover);
 }
 
 /* consent-text-side */
@@ -735,7 +735,7 @@ defineExpose({
 }
 
 .btn-save-preferences:hover {
-  background: #000000;
+  background: var(--color-button-hover);
 }
 
 /* ============================================================

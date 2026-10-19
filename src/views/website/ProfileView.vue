@@ -1723,7 +1723,8 @@ import { useLocalized } from '../../composables/useLocalized'
 import { useSettings } from '../../composables/useSettings'
 import { findCountryByCode } from '../../data/countries'
 import { products as fallbackProducts } from '../../data/catalogData'
-import { escapeHtml } from '../../utils/sanitize'
+import { escapeHtml, sanitizeUrl } from '../../utils/sanitize'
+import { getCustomerToken } from '../../utils/customerSession'
 import returnsService from '../../services/returnsService'
 
 const route = useRoute()
@@ -2655,7 +2656,7 @@ watch(() => authState.user, (u) => {
 }, { immediate: true })
 
 const fetchData = async () => {
-  if (!authState.token && !route.query.mockAuth) return router.push('/')
+  if (!authState.token && !getCustomerToken()) return router.push('/')
   loadingData.value = true
   try {
     // Fresh User Data
@@ -2717,7 +2718,7 @@ const fetchWallet = async () => {
 }
 
 onMounted(async () => {
-  if (!authState.token && !route.query.mockAuth) {
+  if (!authState.token && !getCustomerToken()) {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
@@ -2750,7 +2751,7 @@ onMounted(async () => {
 
 // RE-FETCH ON TAB CHANGE OR URL CHANGE
 watch(() => route.query.tab, (newTab) => {
-  if (!authState.token && !route.query.mockAuth) {
+  if (!authState.token && !getCustomerToken()) {
     router.replace({ path: '/', query: { openAuth: 'true' } })
     return
   }
@@ -3079,7 +3080,7 @@ const printInvoice = async (order) => {
     const safeCurrency = escapeHtml(t('currency'))
     const safeDate = escapeHtml(order.date || '')
     const safeSiteName = escapeHtml(siteName)
-    const safeSiteLogo = escapeHtml(siteLogo)
+    const safeSiteLogo = sanitizeUrl(siteLogo, '/brand/mastergas-logo.png')
     const safeCustomerName = escapeHtml(order.customerName || order.customer?.name || '')
     const safeCustomerPhone = escapeHtml(order.customerPhone || order.customer?.phone || '')
     const safeCustomerEmail = escapeHtml(order.customerEmail || order.customer?.email || '')
@@ -3087,6 +3088,8 @@ const printInvoice = async (order) => {
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+    printWindow.opener = null
     printWindow.document.write(`
       <!DOCTYPE html>
       <html dir="${dir}">

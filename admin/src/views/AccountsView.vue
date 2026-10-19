@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { useAdminText } from '../composables/useAdminText';
 
 const developerName = "Antigravity Dev Team";
+const { tx } = useAdminText();
 </script>
 
 <template>
@@ -17,9 +18,9 @@ const developerName = "Antigravity Dev Team";
 
        <!-- Text -->
        <div class="content">
-          <h1>التقارير المالية</h1>
-          <div class="status-badge">قيد التطوير</div>
-          <p>هذا القسم يخضع حالياً لعمليات تحسين تقنية لضمان أفضل تجربة لإدارة الحسابات والبيانات المالية. سنكون جاهزين قريباً!</p>
+          <h1>{{ tx('التقارير المالية', 'Financial Reports') }}</h1>
+          <div class="status-badge">{{ tx('قيد التطوير', 'Under development') }}</div>
+          <p>{{ tx('هذا القسم يخضع حالياً لعمليات تحسين تقنية لضمان أفضل تجربة لإدارة الحسابات والبيانات المالية. سنكون جاهزين قريباً!', 'This section is being improved to provide a better experience for managing accounts and financial data. We will be ready soon!') }}</p>
        </div>
 
        <!-- Progress Bar -->
@@ -27,14 +28,14 @@ const developerName = "Antigravity Dev Team";
           <div class="progress-bar">
              <div class="progress-fill"></div>
           </div>
-          <div class="progress-text">جاري العمل... 75%</div>
+          <div class="progress-text">{{ tx('جاري العمل... 75%', 'In progress... 75%') }}</div>
        </div>
 
        <!-- Features Hint -->
        <div class="features-list">
-          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> تقارير الأرباح</div>
-          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> سجل السحوبات</div>
-          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> الرسوم البيانية</div>
+          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> {{ tx('تقارير الأرباح', 'Profit reports') }}</div>
+          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> {{ tx('سجل السحوبات', 'Withdrawal history') }}</div>
+          <div class="f-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> {{ tx('الرسوم البيانية', 'Charts') }}</div>
        </div>
     </div>
   </div>
@@ -47,7 +48,7 @@ const developerName = "Antigravity Dev Team";
   align-items: center;
   justify-content: center;
   font-family: 'IBM Plex Sans Arabic', sans-serif;
-  direction: rtl;
+  direction: inherit;
   padding: 20px;
 }
 

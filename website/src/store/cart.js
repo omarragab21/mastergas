@@ -47,9 +47,6 @@ const loadWithMigration = (key, legacyKey) => {
 };
 
 const loadCart = () => {
-  // Cart data belongs to an authenticated customer. A guest must always start
-  // with an empty cart instead of receiving demo/fallback products.
-  if (!getCustomerToken()) return [];
   return normalizeCartItems(loadWithMigration(getCartKey(), 'cart'));
 };
 const loadWishlist = () => loadWithMigration(getWishlistKey(), 'wishlist');
@@ -82,11 +79,6 @@ export const cartState = reactive({
 
   // Simple methods
   addToCart(product, quantity = 1, selectedAttributes = null) {
-    const token = getCustomerToken();
-    if (!token) {
-      if (window.openAuthModal) window.openAuthModal();
-      return;
-    }
     const safeQuantity = Math.min(999, Math.max(1, Math.floor(Number(quantity) || 1)));
     
     // Normalize attributes
@@ -257,7 +249,7 @@ export const cartState = reactive({
         content_ids: [String(product.id || '')],
         content_type: 'product',
         value: parseFloat(product.sale_price || product.price || 0),
-        currency: 'JOD',
+        currency: 'SAR',
       });
     }
     this.save();
@@ -387,10 +379,22 @@ export const cartState = reactive({
     }
   },
 
-  // Guest carts are no longer supported. Remove stale guest cart data so old
-  // demo/legacy items cannot reappear after a later login.
+  // Merge the guest cart into the authenticated customer's cart on login.
   migrateToToken(token) {
     if (!token) return;
+    const guestCart = normalizeCartItems(loadWithMigration('cart_guest', 'cart'));
+    const tokenCartKey = `cart_${token}`;
+    const tokenCart = parseStoredList(localStorage.getItem(tokenCartKey), tokenCartKey);
+    if (guestCart.length) {
+      const merged = normalizeCartItems(tokenCart);
+      guestCart.forEach((guestItem) => {
+        const key = guestItem.cart_item_key || `id:${guestItem.id}`;
+        const existing = merged.find((item) => (item.cart_item_key || `id:${item.id}`) === key);
+        if (existing) existing.quantity = Math.min(999, existing.quantity + guestItem.quantity);
+        else merged.push(guestItem);
+      });
+      localStorage.setItem(tokenCartKey, JSON.stringify(merged));
+    }
     const guestWishlist = parseStoredList(localStorage.getItem('wishlist_guest'), 'wishlist_guest');
     const tokenWishlistKey = `wishlist_${token}`;
     if (guestWishlist.length && !localStorage.getItem(tokenWishlistKey)) {

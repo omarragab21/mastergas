@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { profileService } from '../services/profileService';
+import { authState } from '../../../store/auth';
+import { pickText } from '../../../utils/localeText.js';
 
 const normalizeNotification = (notification, { localized, formatDate }) => ({
   id: notification.id,
   title: notification.title || notification.message || localized(notification, 'title'),
-  time: notification.time || (notification.created_at ? formatDate(notification.created_at) : 'اليوم'),
+  time: notification.time || (notification.created_at ? formatDate(notification.created_at) : pickText('اليوم', 'Today')),
   is_read: !!notification.is_read,
 });
 
@@ -16,8 +18,6 @@ export const useProfileStore = defineStore('profileFeature', {
     ordersList: [],
     notificationsList: [],
     returnsList: [],
-    walletData: { balance: 0, transactions: [] },
-    loadingWallet: false,
     countries: [],
     cities: [],
   }),
@@ -29,15 +29,26 @@ export const useProfileStore = defineStore('profileFeature', {
   actions: {
     async load({ localized, formatDate }) {
       this.loadingData = true;
-      const [userResult, addressesResult, ordersResult, notificationsResult, returnsResult] = await Promise.allSettled([
-        profileService.getUser(),
+      // Resolve the profile first so order/return ownership checks have the
+      // current customer id before their requests are normalized in parallel.
+      const userResult = await Promise.allSettled([profileService.getUser()]).then(([result]) => result);
+      if (userResult.status === 'fulfilled') {
+        this.user = userResult.value;
+        authState.user = userResult.value;
+        try {
+          localStorage.setItem('c_user', JSON.stringify(userResult.value || {}));
+        } catch {
+          // Storage can be unavailable in private/embedded browser contexts.
+        }
+      }
+
+      const [addressesResult, ordersResult, notificationsResult, returnsResult] = await Promise.allSettled([
         profileService.getAddresses(),
         profileService.getOrders(),
         profileService.getNotifications(),
         profileService.getReturns(),
       ]);
 
-      if (userResult.status === 'fulfilled') this.user = userResult.value;
       this.addressesList = addressesResult.status === 'fulfilled' ? addressesResult.value : [];
       this.ordersList = ordersResult.status === 'fulfilled' ? ordersResult.value : [];
       this.notificationsList = notificationsResult.status === 'fulfilled'
@@ -46,19 +57,6 @@ export const useProfileStore = defineStore('profileFeature', {
       this.returnsList = returnsResult.status === 'fulfilled' ? returnsResult.value : [];
       this.loadingData = false;
       return this.user;
-    },
-
-    async fetchWallet() {
-      this.loadingWallet = true;
-      try {
-        const payload = await profileService.getWallet();
-        this.walletData = {
-          balance: Number(payload.balance || 0),
-          transactions: Array.isArray(payload.transactions) ? payload.transactions : [],
-        };
-      } finally {
-        this.loadingWallet = false;
-      }
     },
 
     getCountries() {
@@ -124,6 +122,10 @@ export const useProfileStore = defineStore('profileFeature', {
 
     updateAddress(id, payload) {
       return profileService.updateAddress(id, payload);
+    },
+
+    setDefaultAddress(id) {
+      return profileService.setDefaultAddress(id);
     },
 
     deleteAddress(id) {

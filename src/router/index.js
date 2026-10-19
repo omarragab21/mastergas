@@ -217,20 +217,42 @@ if (typeof window !== 'undefined') {
   window.__appRouter = router;
 }
 
+const hasValidAdminSession = () => {
+  const rawToken = String(localStorage.getItem('token') ?? '').trim();
+  if (!rawToken || rawToken === 'undefined' || rawToken === 'null') return false;
+  try {
+    const rawAdmin = localStorage.getItem('admin');
+    if (rawAdmin) {
+      const parsed = JSON.parse(rawAdmin);
+      const user = parsed?.user || parsed?.admin || parsed;
+      const role = String(user?.role || '').trim().toLowerCase();
+      if (['customer', 'user', 'client', 'guest'].includes(role) && !user?.is_super_admin && !user?.is_admin) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('admin');
+        return false;
+      }
+    }
+  } catch {
+    localStorage.removeItem('admin');
+  }
+  return true;
+};
+
 // Auth Guard
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
+  const isAdminAuthenticated = hasValidAdminSession();
   const customerToken = getCustomerToken();
   const isAdminPath = to.path.startsWith('/admin');
+  const requiresAdminAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresCustomerAuth = to.matched.some(record => record.meta.requiresCustomerAuth);
 
   if (requiresCustomerAuth && !customerToken) {
     // Keep the original destination so the auth modal can take the customer
     // back there after a successful login or registration.
     next({ path: '/', query: { openAuth: 'true', redirect: to.fullPath } });
-  } else if (isAdminPath && to.meta.requiresAuth && !token && to.name !== 'Login') {
+  } else if ((isAdminPath || requiresAdminAuth) && !isAdminAuthenticated && to.name !== 'Login') {
     next('/admin/login');
-  } else if (to.name === 'Login' && token) {
+  } else if (to.name === 'Login' && isAdminAuthenticated) {
     next('/admin/dashboard');
   } else {
     next();

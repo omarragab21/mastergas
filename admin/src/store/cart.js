@@ -214,7 +214,7 @@ export const cartState = reactive({
         content_ids: [String(product.id || '')],
         content_type: 'product',
         value: parseFloat(product.sale_price || product.price || 0),
-        currency: 'JOD',
+        currency: 'SAR',
       });
     }
     this.save();

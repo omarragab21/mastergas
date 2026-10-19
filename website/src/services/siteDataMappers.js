@@ -1,4 +1,5 @@
 import { localizedText } from '../utils/productAttributes.js';
+import { isTestCategory, isTestProduct } from '../utils/catalogVisibility.js';
 
 const asArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -38,11 +39,16 @@ export const normalizeSiteCategory = (category = {}) => {
   };
 };
 
+export { isTestCategory, isTestProduct };
+
 export const normalizeSiteProduct = (product = {}) => {
   const translations = product.translations || {};
   const arabic = translations.ar || {};
   const english = translations.en || {};
-  const nameI18n = localizedPair(translations, 'name', product.name || '');
+  const nameI18n = {
+    ar: translations?.ar?.name ?? product.name_ar ?? product.name ?? '',
+    en: translations?.en?.name ?? product.name_en ?? product.name ?? '',
+  };
   const descriptionAr = textList(arabic.product_description ?? product.product_description);
   const descriptionEn = textList(english.product_description ?? product.product_description);
   const featuresAr = textList(arabic.key_features ?? product.key_features);

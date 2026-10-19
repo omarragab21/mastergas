@@ -5,7 +5,7 @@
     <section class="about-hero-section">
       <div class="hero-bg-wrapper">
         <img 
-          src="/images/about/hero_banner.jpg" 
+          :src="aboutImage('hero', '/images/about/hero_banner.jpg')"
           alt="Mastergas Luxury Kitchen" 
           class="hero-bg-image"
           loading="eager"
@@ -25,14 +25,12 @@
 
           <!-- Main Title -->
           <h1 class="hero-main-title">
-            {{ currentLang === 'ar' ? 'لماذا Mastergas؟' : 'Why Mastergas?' }}
+            {{ aboutHeroTitle }}
           </h1>
 
           <!-- Subtitle -->
           <p class="hero-subtitle-desc">
-            {{ currentLang === 'ar' 
-              ? 'رحلة شغف بالتميز، نجمع بين عراقة الطهي الإيطالي وجودة لا تضاهى في منزلك' 
-              : 'A passionate journey of excellence, combining authentic Italian culinary heritage with unmatched quality in your home.' }}
+            {{ aboutHeroSubtitle }}
           </p>
         </div>
       </div>
@@ -54,19 +52,15 @@
               </div>
               
               <h2 class="showcase-heading">
-                {{ currentLang === 'ar' ? 'عن Mastergas' : 'About Mastergas' }}
+                {{ aboutSectionTitle }}
               </h2>
 
               <div class="showcase-paragraphs">
                 <p>
-                  {{ currentLang === 'ar'
-                    ? 'تأسست Mastergas لتكون رائدة في تقديم أحدث تقنيات أجهزة ومطابخ الطهي الإيطالية الفاخرة، حيث نجمع بين عراقة الحرفية الأوروبية وأعلى معايير الأمان والجودة العالمية.'
-                    : 'Mastergas was founded to lead in providing cutting-edge luxury Italian culinary appliances, combining authentic European craftsmanship with the highest global safety and quality standards.' }}
+                  {{ aboutContentParagraphs[0] }}
                 </p>
                 <p>
-                  {{ currentLang === 'ar'
-                    ? 'نسعى دائماً لتلبية تطلعات واحتياجات عملائنا بتوفير حلول طهي متكاملة ومبتكرة، تمكنهم من الحصول على تجربة طهي استثنائية تدوم لسنوات طويلة.'
-                    : 'We continuously strive to exceed our clients’ expectations by offering integrated, innovative cooking solutions that deliver an exceptional culinary experience built to last for years.' }}
+                  {{ aboutContentParagraphs[1] }}
                 </p>
               </div>
             </div>
@@ -75,8 +69,8 @@
             <div class="showcase-image-col">
               <div class="image-frame-card">
                 <img 
-                  src="/images/about/sec1_modern_kitchen.jpg" 
-                  alt="عن Mastergas - مطبخ مودرن فاخر" 
+                  :src="aboutImage('section-1', '/images/about/sec1_modern_kitchen.jpg')"
+                  :alt="currentLang === 'ar' ? 'عن Mastergas - مطبخ مودرن فاخر' : 'About Mastergas - Luxury modern kitchen'" 
                   class="showcase-visual-img"
                   loading="lazy"
                 />
@@ -96,8 +90,8 @@
             <div class="showcase-image-col">
               <div class="image-frame-card">
                 <img 
-                  src="/images/about/sec2_italian_cooker.jpg" 
-                  alt="الحرفية الإيطالية والتكنولوجيا المعاصرة - موقد غاز إيطالي احترافي" 
+                  :src="aboutImage('section-2', '/images/about/sec2_italian_cooker.jpg')"
+                  :alt="currentLang === 'ar' ? 'الحرفية الإيطالية والتكنولوجيا المعاصرة - موقد غاز إيطالي احترافي' : 'Italian craftsmanship and modern technology - professional Italian gas hob'" 
                   class="showcase-visual-img"
                   loading="lazy"
                 />
@@ -112,20 +106,11 @@
               </div>
               
               <h2 class="showcase-heading">
-                {{ currentLang === 'ar' ? 'الحرفية الإيطالية والتكنولوجيا المعاصرة' : 'Italian Craftsmanship & Contemporary Technology' }}
+                {{ sectionTitle(2) }}
               </h2>
 
               <div class="showcase-paragraphs">
-                <p>
-                  {{ currentLang === 'ar'
-                    ? 'نتميز بأننا نجمع بين عراقة الحرفية اليدوية والتكنولوجيا الصناعية المتقدمة لنقدم أجهزة طهي إيطالية متطورة تضمن أداءً لا يُضاهى وسهولة تامة في الاستخدام.'
-                    : 'We uniquely blend traditional artisanal heritage with cutting-edge industrial technology to engineer sophisticated Italian cooking appliances offering unmatched performance and intuitive ease of use.' }}
-                </p>
-                <p>
-                  {{ currentLang === 'ar'
-                    ? 'تخضع منتجاتنا لأدق اختبارات الجودة والسلامة لتلائم استخدامات الطهي المكثف وتوفر كفاءة حرارية عالية مع الحفاظ على استهلاك اقتصادي للطاقة لسنوات عديدة.'
-                    : 'Our products undergo rigorous quality and safety testing to withstand intensive culinary demands, delivering exceptional thermal efficiency and economical energy consumption over decades.' }}
-                </p>
+                <p v-for="(text, index) in sectionParagraphs(2)" :key="index">{{ text }}</p>
               </div>
             </div>
 
@@ -146,20 +131,11 @@
               </div>
               
               <h2 class="showcase-heading">
-                {{ currentLang === 'ar' ? 'مصمم لثقافتنا واحتياجاتنا المحلية' : 'Designed for Our Local Culture & Needs' }}
+                {{ sectionTitle(3) }}
               </h2>
 
               <div class="showcase-paragraphs">
-                <p>
-                  {{ currentLang === 'ar'
-                    ? 'صُممت أجهزة ماستر غاز لتلبي متطلبات الطهي العربي والسعودي، بتوفير شعلات قوية ذات كفاءة نارية فائقة تناسب الأواني الكبيرة وحفلات الضيافة العائلية بكل سلاسة.'
-                    : 'Mastergas appliances are purposefully engineered for Arabian and Saudi culinary requirements, featuring powerful high-efficiency burners that handle large cookware and grand family banquets with total ease.' }}
-                </p>
-                <p>
-                  {{ currentLang === 'ar'
-                    ? 'مع الالتزام الكامل بأعلى معايير الهيئة السعودية للمواصفات والمقاييس والجودة (SASO)، لتضمن لمنزلك أعلى درجات الأمان وراحة البال مع ضمان شامل معتمد.'
-                    : 'With full compliance to the rigorous standards of the Saudi Standards, Metrology and Quality Organization (SASO), ensuring maximum safety, absolute peace of mind, and certified warranty for your home.' }}
-                </p>
+                <p v-for="(text, index) in sectionParagraphs(3)" :key="index">{{ text }}</p>
               </div>
             </div>
 
@@ -167,8 +143,8 @@
             <div class="showcase-image-col">
               <div class="image-frame-card">
                 <img 
-                  src="/images/about/sec3_villa_kitchen.jpg" 
-                  alt="مصمم لثقافتنا واحتياجاتنا المحلية - مطبخ فلل عربي فاخر" 
+                  :src="aboutImage('section-3', '/images/about/sec3_villa_kitchen.jpg')"
+                  :alt="currentLang === 'ar' ? 'مصمم لثقافتنا واحتياجاتنا المحلية - مطبخ فلل عربي فاخر' : 'Designed for our culture and local needs - luxury Arabic villa kitchen'" 
                   class="showcase-visual-img"
                   loading="lazy"
                 />
@@ -341,10 +317,142 @@
 </template>
 
 <script setup>
+import { computed, onMounted, ref } from 'vue';
 import { useLocalized } from '../../../composables/useLocalized';
 import { useSEO } from '../../../composables/useSEO';
+import { settingsService } from '../../../services/settingsService';
+import { settingsToObject } from '../../../utils/siteSettings';
 
 const { currentLang } = useLocalized();
+
+const aboutSettings = ref({});
+const siteImages = ref([]);
+const fallbackContent = {
+  ar: [
+    'تأسست Mastergas لتكون رائدة في تقديم أحدث تقنيات أجهزة ومطابخ الطهي الإيطالية الفاخرة، حيث نجمع بين عراقة الحرفية الأوروبية وأعلى معايير الأمان والجودة العالمية.',
+    'نسعى دائماً لتلبية تطلعات واحتياجات عملائنا بتوفير حلول طهي متكاملة ومبتكرة، تمكنهم من الحصول على تجربة طهي استثنائية تدوم لسنوات طويلة.',
+  ],
+  en: [
+    'Mastergas was founded to lead in providing cutting-edge luxury Italian culinary appliances, combining authentic European craftsmanship with the highest global safety and quality standards.',
+    'We continuously strive to exceed our clients’ expectations by offering integrated, innovative cooking solutions that deliver an exceptional culinary experience built to last for years.',
+  ],
+};
+
+const localizedAbout = (arKey, enKey, fallbackAr, fallbackEn) => {
+  const ar = aboutSettings.value[arKey] || fallbackAr;
+  const en = aboutSettings.value[enKey] || fallbackEn;
+  return currentLang.value === 'ar' ? ar : en;
+};
+
+const aboutHeroTitle = computed(() => localizedAbout(
+  'about_hero_title_ar', 'about_hero_title_en', 'لماذا Mastergas؟', 'Why Mastergas?'
+));
+const aboutHeroSubtitle = computed(() => localizedAbout(
+  'about_hero_subtitle_ar',
+  'about_hero_subtitle_en',
+  'رحلة شغف بالتميز، نجمع بين عراقة الطهي الإيطالي وجودة لا تضاهى في منزلك',
+  'A passionate journey of excellence, combining authentic Italian culinary heritage with unmatched quality in your home.'
+));
+const aboutSectionTitle = computed(() => localizedAbout(
+  'about_title_ar', 'about_title_en', 'عن Mastergas', 'About Mastergas'
+));
+const aboutContentParagraphs = computed(() => {
+  const content = localizedAbout(
+    'about_content_ar',
+    'about_content_en',
+    fallbackContent.ar.join('\n\n'),
+    fallbackContent.en.join('\n\n')
+  );
+  const paragraphs = String(content).split(/\n\s*\n|\r?\n/).map((item) => item.trim()).filter(Boolean);
+  return [paragraphs[0] || fallbackContent[currentLang.value][0], paragraphs[1] || fallbackContent[currentLang.value][1]];
+});
+
+const sectionFallbacks = {
+  2: {
+    title: { ar: 'الحرفية الإيطالية والتكنولوجيا المعاصرة', en: 'Italian Craftsmanship & Contemporary Technology' },
+    paragraphs: {
+      ar: [
+        'نتميز بأننا نجمع بين عراقة الحرفية اليدوية والتكنولوجيا الصناعية المتقدمة لنقدم أجهزة طهي إيطالية متطورة تضمن أداءً لا يُضاهى وسهولة تامة في الاستخدام.',
+        'تخضع منتجاتنا لأدق اختبارات الجودة والسلامة لتلائم استخدامات الطهي المكثف وتوفر كفاءة حرارية عالية مع الحفاظ على استهلاك اقتصادي للطاقة لسنوات عديدة.',
+      ],
+      en: [
+        'We uniquely blend traditional artisanal heritage with cutting-edge industrial technology to engineer sophisticated Italian cooking appliances offering unmatched performance and intuitive ease of use.',
+        'Our products undergo rigorous quality and safety testing to withstand intensive culinary demands, delivering exceptional thermal efficiency and economical energy consumption over decades.',
+      ],
+    },
+  },
+  3: {
+    title: { ar: 'مصمم لثقافتنا واحتياجاتنا المحلية', en: 'Designed for Our Local Culture & Needs' },
+    paragraphs: {
+      ar: [
+        'صُممت أجهزة ماستر غاز لتلبي متطلبات الطهي العربي والسعودي، بتوفير شعلات قوية ذات كفاءة نارية فائقة تناسب الأواني الكبيرة وحفلات الضيافة العائلية بكل سلاسة.',
+        'مع الالتزام الكامل بأعلى معايير الهيئة السعودية للمواصفات والمقاييس والجودة (SASO)، لتضمن لمنزلك أعلى درجات الأمان وراحة البال مع ضمان شامل معتمد.',
+      ],
+      en: [
+        'Mastergas appliances are purposefully engineered for Arabian and Saudi culinary requirements, featuring powerful high-efficiency burners that handle large cookware and grand family banquets with total ease.',
+        'With full compliance to the rigorous standards of the Saudi Standards, Metrology and Quality Organization (SASO), ensuring maximum safety, absolute peace of mind, and certified warranty for your home.',
+      ],
+    },
+  },
+};
+
+// Sections 2 and 3 are editable from the dashboard (Settings > About Us); the copy above is the fallback.
+const sectionTitle = (n) => localizedAbout(
+  `about_section_${n}_title_ar`,
+  `about_section_${n}_title_en`,
+  sectionFallbacks[n].title.ar,
+  sectionFallbacks[n].title.en
+);
+
+const sectionParagraphs = (n) => {
+  const lang = currentLang.value === 'ar' ? 'ar' : 'en';
+  const configured = String(aboutSettings.value[`about_section_${n}_content_${lang}`] || '')
+    .split(/\n\s*\n|\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return configured.length ? configured : sectionFallbacks[n].paragraphs[lang];
+};
+
+const imageValue = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  return item.image_url || item.url || item.image || item.path || item.file || '';
+};
+
+const aboutImage = (role, fallback) => {
+  const settingKey = {
+    hero: 'about_hero_image',
+    'section-1': 'about_image_1',
+    'section-2': 'about_image_2',
+    'section-3': 'about_image_3',
+  }[role];
+  const configured = settingKey ? imageValue(aboutSettings.value[settingKey]) : '';
+  if (configured) return configured;
+
+  const match = siteImages.value.find((item) => {
+    const searchable = [item.key, item.slug, item.type, item.section, item.name, item.title]
+      .filter(Boolean).join(' ').toLowerCase();
+    return searchable.includes('about') && (
+      role === 'hero' ? /hero|banner/.test(searchable) : searchable.includes(role)
+    );
+  });
+  return imageValue(match) || fallback;
+};
+
+const fetchAboutContent = async () => {
+  const [settingsResult, imagesResult] = await Promise.allSettled([
+    settingsService.getSettings(),
+    settingsService.getSiteImages(),
+  ]);
+  if (settingsResult.status === 'fulfilled') {
+    aboutSettings.value = settingsToObject(settingsResult.value);
+  }
+  if (imagesResult.status === 'fulfilled') {
+    siteImages.value = Array.isArray(imagesResult.value) ? imagesResult.value : [];
+  }
+};
+
+onMounted(fetchAboutContent);
 
 // Dynamic SEO Tags
 useSEO({
@@ -761,7 +869,7 @@ useSEO({
 }
 
 .cta-black-btn:hover {
-  background-color: #1F2937;
+  background: var(--color-button-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
@@ -841,4 +949,3 @@ useSEO({
   }
 }
 </style>
-

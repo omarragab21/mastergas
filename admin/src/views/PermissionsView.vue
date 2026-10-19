@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import api from '../config/axios';
+import { useAdminText } from '../composables/useAdminText';
+
+const { tx } = useAdminText();
 
 // State
 const permissions = ref([]);
@@ -137,9 +140,9 @@ const triggerAlert = (message, type = 'success') => {
   <div class="permissions-page p-6">
     <!-- Breadcrumbs -->
     <div class="breadcrumb mb-4">
-       <span>لوحة التحكم الرئيسية</span>
+       <span>{{ tx('لوحة التحكم الرئيسية', 'Dashboard') }}</span>
        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-       <span class="active">إدارة الصلاحيات</span>
+       <span class="active">{{ tx('إدارة الصلاحيات', 'Permissions') }}</span>
     </div>
 
     <!-- Header -->
@@ -150,15 +153,15 @@ const triggerAlert = (message, type = 'success') => {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
-                    <h1>إدارة الصلاحيات</h1>
-                    <p>إنشاء وإدارة صلاحيات النظام وتعيينها للمستخدمين</p>
+                    <h1>{{ tx('إدارة الصلاحيات', 'Permissions') }}</h1>
+                    <p>{{ tx('إنشاء وإدارة صلاحيات النظام وتعيينها للمستخدمين', 'Create and manage system permissions assigned to users') }}</p>
                 </div>
             </div>
         </div>
         <div class="left-actions">
             <button class="add-btn" @click="openAddModal">
                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-               إنشاء صلاحية جديدة
+               {{ tx('إنشاء صلاحية جديدة', 'Create Permission') }}
             </button>
         </div>
     </div>
@@ -167,19 +170,19 @@ const triggerAlert = (message, type = 'success') => {
     <div class="stats-row mb-6">
        <div class="stat-card">
           <span class="stat-val">{{ totalPermissions }}</span>
-          <span class="stat-label">إجمالي الصلاحيات</span>
+          <span class="stat-label">{{ tx('إجمالي الصلاحيات', 'Total Permissions') }}</span>
        </div>
        <div class="stat-card">
           <span class="stat-val">{{ activeCount }}</span>
-          <span class="stat-label">مفعلة</span>
+          <span class="stat-label">{{ tx('مفعلة', 'Active') }}</span>
        </div>
        <div class="stat-card">
           <span class="stat-val">{{ inactiveCount }}</span>
-          <span class="stat-label">غير مفعلة</span>
+          <span class="stat-label">{{ tx('غير مفعلة', 'Inactive') }}</span>
        </div>
        <div class="stat-card">
           <span class="stat-val">{{ totalAssignedUsers }}</span>
-          <span class="stat-label">إجمالي المستخدمين</span>
+          <span class="stat-label">{{ tx('إجمالي المستخدمين', 'Total Users') }}</span>
        </div>
     </div>
 
@@ -188,11 +191,11 @@ const triggerAlert = (message, type = 'success') => {
        <div class="flex-row gap-4">
           <div class="search-wrapper flex-1">
              <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-             <input type="text" v-model="searchQuery" @input="fetchData" placeholder="البحث باسم الصلاحية أو المستخدم..." class="search-input" />
+             <input type="text" v-model="searchQuery" @input="fetchData" :placeholder="tx('البحث باسم الصلاحية أو المستخدم...', 'Search permission or user...')" class="search-input" />
           </div>
           <div class="select-wrapper">
              <select class="form-select">
-                <option>جميع المستخدمين</option>
+                <option>{{ tx('جميع المستخدمين', 'All Users') }}</option>
              </select>
           </div>
        </div>
@@ -203,17 +206,17 @@ const triggerAlert = (message, type = 'success') => {
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-id">رقم الصلاحية</th>
-            <th class="col-name text-right">اسم الصلاحية</th>
-            <th class="col-desc">الوصف</th>
-            <th class="col-users">المستخدمون المخصص لهم</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-id">{{ tx('رقم الصلاحية', 'Permission ID') }}</th>
+            <th class="col-name text-right">{{ tx('اسم الصلاحية', 'Permission Name') }}</th>
+            <th class="col-desc">{{ tx('الوصف', 'Description') }}</th>
+            <th class="col-users">{{ tx('المستخدمون المخصص لهم', 'Assigned Users') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="6">جاري التحميل...</td></tr>
-          <tr v-else-if="permissions.length === 0" class="state-row"><td colspan="6">لا توجد صلاحيات حالياً</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="6">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="permissions.length === 0" class="state-row"><td colspan="6">{{ tx('لا توجد صلاحيات حالياً', 'No permissions yet') }}</td></tr>
           <template v-else>
             <tr v-for="permission in permissions" :key="permission.id" class="data-row">
               <td class="col-id">#{{ permission.id }}</td>
@@ -233,18 +236,18 @@ const triggerAlert = (message, type = 'success') => {
                        <div class="avatar-placeholder-inline" v-else :title="admin.name">{{ admin.name.charAt(0) }}</div>
                     </div>
                     <span class="user-count-badge" v-if="permission.admins_count > 0">({{ permission.admins_count }})</span>
-                    <span class="user-count-badge" v-else>لا يوجد</span>
+                    <span class="user-count-badge" v-else>{{ tx('لا يوجد', 'None') }}</span>
                  </div>
               </td>
               <td class="col-status">
-                 <span class="status-badge-new active">مفعلة</span>
+                 <span class="status-badge-new active">{{ tx('مفعلة', 'Active') }}</span>
               </td>
               <td class="col-actions">
                 <div class="actions-group">
-                  <button class="action-btn edit" title="تعديل" @click="openEditModal(permission)">
+                  <button class="action-btn edit" :title="tx('تعديل', 'Edit')" @click="openEditModal(permission)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn delete" title="حذف" @click="confirmDelete(permission)">
+                  <button class="action-btn delete" :title="tx('حذف', 'Delete')" @click="confirmDelete(permission)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -261,27 +264,27 @@ const triggerAlert = (message, type = 'success') => {
           <button class="close-btn-x" @click="showFormModal = false">×</button>
           
           <div class="modal-header-perm">
-             <h2>إنشاء صلاحية جديدة</h2>
-             <p>أدخل بيانات الصلاحية من للمستخدمين التي سيتم منحهم إياها</p>
+             <h2>{{ isEditing ? tx('تعديل الصلاحية', 'Edit Permission') : tx('إنشاء صلاحية جديدة', 'Create Permission') }}</h2>
+             <p>{{ tx('أدخل بيانات الصلاحية من للمستخدمين التي سيتم منحهم إياها', 'Enter the permission details and assign users') }}</p>
           </div>
 
           <form @submit.prevent="submitForm">
              <div class="modal-body-perm">
                 <div class="form-group-perm mb-4">
-                   <label>اسم الصلاحية <span class="req">*</span></label>
-                   <input type="text" v-model="form.name" required placeholder="مثال: إدارة المنتجات" />
+                   <label>{{ tx('اسم الصلاحية', 'Permission Name') }} <span class="req">*</span></label>
+                   <input type="text" v-model="form.name" required :placeholder="tx('مثال: إدارة المنتجات', 'e.g. Product Management')" />
                 </div>
                 <div class="form-group-perm mb-4">
-                   <label>الوصف</label>
-                   <textarea v-model="form.description" rows="3" placeholder="وصف موجز للصلاحية..."></textarea>
+                   <label>{{ tx('الوصف', 'Description') }}</label>
+                   <textarea v-model="form.description" rows="3" :placeholder="tx('وصف موجز للصلاحية...', 'Brief permission description...')"></textarea>
                 </div>
 
                 <!-- Admin Selection Search -->
                 <div class="admin-selector">
-                   <label class="mb-2 block font-bold">المستخدمين المخصص لهم</label>
+                   <label class="mb-2 block font-bold">{{ tx('المستخدمين المخصص لهم', 'Assigned Users') }}</label>
                    <div class="search-admins-box mb-3">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                      <input type="text" v-model="adminSearch" placeholder="البحث عن اسم مستخدم..." />
+                      <input type="text" v-model="adminSearch" :placeholder="tx('البحث عن اسم مستخدم...', 'Search user name...')" />
                    </div>
                    
                    <div class="admins-list-box">
@@ -301,9 +304,9 @@ const triggerAlert = (message, type = 'success') => {
              </div>
 
              <div class="modal-footer-perm">
-                <button type="button" class="btn-cancel-new" @click="showFormModal = false">إلغاء</button>
+                <button type="button" class="btn-cancel-new" @click="showFormModal = false">{{ tx('إلغاء', 'Cancel') }}</button>
                 <button type="submit" class="btn-submit-new" :disabled="isSubmitting">
-                   {{ isSubmitting ? 'جاري الحفظ...' : 'إنشاء الصلاحية' }}
+                   {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : tx('إنشاء الصلاحية', 'Create Permission') }}
                 </button>
              </div>
           </form>
@@ -318,7 +321,7 @@ const triggerAlert = (message, type = 'success') => {
 </template>
 
 <style scoped>
-.permissions-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.permissions-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Breadcrumbs */
 .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #9ca3af; }

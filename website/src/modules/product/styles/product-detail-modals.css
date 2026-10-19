@@ -136,21 +136,112 @@
   cursor: pointer;
 }
 
-.share-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+.share-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.12);
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.share-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.share-card-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  text-align: start;
+}
+
+.share-card-close {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border: none;
+  border-radius: 9999px;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #ffffff;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-.share-icon.whatsapp { background: #25d366; }
-.share-icon.facebook { background: #1877f2; }
-.share-icon.twitter { background: #000000; }
-.share-icon.copy { background: #6b7280; }
+.share-card-options {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.share-card-option {
+  width: 84px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.share-card-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.share-card-circle img {
+  display: block;
+}
+
+/* Exported brand icons are stored vertically flipped; the design flips them back */
+.share-card-circle img.flip {
+  transform: scaleY(-1);
+}
+
+.share-card-circle.whatsapp { background: #25d366; }
+.share-card-circle.facebook { background: #1877f2; }
+.share-card-circle.instagram { background: #e1306c; }
+.share-card-circle.copy { background: #f8fafc; border: 1px solid #e2e8f0; }
+
+.share-card-label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .share-card {
+    padding: 24px;
+  }
+
+  .share-card-option {
+    width: 64px;
+  }
+}
 
 .copy-feedback {
   text-align: center;
@@ -217,7 +308,7 @@
 }
 
 .submit-review-btn:hover {
-  background: #1f2937;
+  background: var(--color-button-hover);
 }
 
 .review-msg.success {

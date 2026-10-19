@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import adminManagementService from '../application/adminManagementService';
+import { useAdminText } from '../composables/useAdminText';
+import { validateAdminImageFile, safeObjectUrl } from '../utils/adminSecurity';
+
+const { tx } = useAdminText();
 
 // State
 const admins = ref([]);
@@ -66,10 +70,16 @@ const openEditModal = (admin) => {
 };
 
 const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
+        const check = validateAdminImageFile(file, { maxSizeMB: 2 });
+        if (!check.valid) {
+            triggerAlert(check.error, 'error');
+            e.target.value = '';
+            return;
+        }
         avatarFile.value = file;
-        previewAvatar.value = URL.createObjectURL(file);
+        previewAvatar.value = safeObjectUrl(file, previewAvatar.value);
     }
 };
 
@@ -159,8 +169,8 @@ const getRoleBadge = (role) => {
                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
               <div>
-                 <h1>إدارة المديرين</h1>
-                 <p>إدارة فريق العمل، الصلاحيات، وحسابات المشرفين</p>
+                <h1>{{ tx('إدارة المديرين', 'Admin Management') }}</h1>
+                <p>{{ tx('إدارة فريق العمل، الصلاحيات، وحسابات المشرفين', 'Manage staff, permissions, and administrator accounts') }}</p>
               </div>
            </div>
         </div>
@@ -170,7 +180,7 @@ const getRoleBadge = (role) => {
            <line x1="12" y1="5" x2="12" y2="19"/>
            <line x1="5" y1="12" x2="19" y2="12"/>
          </svg>
-         إضافة مدير جديد
+         {{ tx('إضافة مدير جديد', 'Add Administrator') }}
        </button>
        
     </div>
@@ -181,14 +191,14 @@ const getRoleBadge = (role) => {
           <div class="stat-icon users"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div class="stat-info">
              <span class="stat-val">{{ admins.length }}</span>
-             <span class="stat-label">إجمالي المديرين</span>
+             <span class="stat-label">{{ tx('إجمالي المديرين', 'Total Admins') }}</span>
           </div>
        </div>
        <div class="stat-card">
           <div class="stat-icon active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           <div class="stat-info">
              <span class="stat-val">{{ admins.filter(a => a.is_active).length }}</span>
-             <span class="stat-label">نشط الآن</span>
+             <span class="stat-label">{{ tx('نشط الآن', 'Active Now') }}</span>
           </div>
        </div>
     </div>
@@ -197,7 +207,7 @@ const getRoleBadge = (role) => {
     <div class="filters-card shadow-sm mb-6">
         <div class="search-box">
             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" v-model="searchQuery" @input="fetchAdmins" placeholder="البحث عن اسم، بريد، أو رقم هاتف..." />
+            <input type="text" v-model="searchQuery" @input="fetchAdmins" :placeholder="tx('البحث عن اسم، بريد، أو رقم هاتف...', 'Search by name, email, or phone...')" />
         </div>
     </div>
 
@@ -206,19 +216,19 @@ const getRoleBadge = (role) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-avatar">الصورة</th>
-            <th class="col-name text-right">الاسم</th>
-            <th class="col-phone">رقم الجوال</th>
-            <th class="col-email">البريد الإلكتروني</th>
-            <th class="col-role">الصلاحية</th>
-            <th class="col-status">الحالة</th>
-            <th class="col-date">وقت التسجيل</th>
-            <th class="col-actions">الإجراءات</th>
+            <th class="col-avatar">{{ tx('الصورة', 'Avatar') }}</th>
+            <th class="col-name text-right">{{ tx('الاسم', 'Name') }}</th>
+            <th class="col-phone">{{ tx('رقم الجوال', 'Phone') }}</th>
+            <th class="col-email">{{ tx('البريد الإلكتروني', 'Email') }}</th>
+            <th class="col-role">{{ tx('الصلاحية', 'Role') }}</th>
+            <th class="col-status">{{ tx('الحالة', 'Status') }}</th>
+            <th class="col-date">{{ tx('وقت التسجيل', 'Registered At') }}</th>
+            <th class="col-actions">{{ tx('الإجراءات', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="loading" class="state-row"><td colspan="9">جاري التحميل...</td></tr>
-          <tr v-else-if="admins.length === 0" class="state-row"><td colspan="9">لا يوجد مديرون حالياً</td></tr>
+          <tr v-if="loading" class="state-row"><td colspan="9">{{ tx('جاري التحميل...', 'Loading...') }}</td></tr>
+          <tr v-else-if="admins.length === 0" class="state-row"><td colspan="9">{{ tx('لا يوجد مديرون حالياً', 'No administrators yet') }}</td></tr>
           <template v-else>
             <tr v-for="admin in admins" :key="admin.id" class="data-row" @click="openEditModal(admin)">
               <td class="col-avatar">
@@ -249,10 +259,10 @@ const getRoleBadge = (role) => {
               </td>
               <td class="col-actions" @click.stop>
                 <div class="actions-group">
-                  <button class="action-btn edit" title="تعديل" @click="openEditModal(admin)">
+                  <button class="action-btn edit" :title="tx('تعديل', 'Edit')" @click="openEditModal(admin)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button class="action-btn delete" title="حذف" @click="confirmDelete(admin)">
+                  <button class="action-btn delete" :title="tx('حذف', 'Delete')" @click="confirmDelete(admin)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -268,8 +278,8 @@ const getRoleBadge = (role) => {
       <div class="modal-content side-panel">
         <div class="modal-header">
            <button class="close-btn" @click="showFormModal = false">×</button>
-           <h2>{{ isEditing ? 'تعديل بيانات المدير' : 'إضافة مدير جديد' }}</h2>
-           <p>{{ isEditing ? 'تحديث معلومات حساب المدير المختار' : 'إنشاء حساب مدير جديد بصلاحيات محددة' }}</p>
+           <h2>{{ isEditing ? tx('تعديل بيانات المدير', 'Edit Administrator') : tx('إضافة مدير جديد', 'Add Administrator') }}</h2>
+           <p>{{ isEditing ? tx('تحديث معلومات حساب المدير المختار', 'Update the selected administrator account') : tx('إنشاء حساب مدير جديد بصلاحيات محددة', 'Create a new administrator account with selected permissions') }}</p>
         </div>
         
         <div class="modal-body">
@@ -284,64 +294,64 @@ const getRoleBadge = (role) => {
               </div>
               <input type="file" ref="avatarInput" @change="handleAvatarChange" hidden accept="image/*" />
               <div class="upload-text">
-                 <span>الصورة الشخصية</span>
-                 <small>بصيغة JPG أو PNG (بحد أقصى 2MB)</small>
+                 <span>{{ tx('الصورة الشخصية', 'Profile Image') }}</span>
+                 <small>{{ tx('بصيغة JPG أو PNG (بحد أقصى 2MB)', 'JPG or PNG (maximum 2MB)') }}</small>
               </div>
            </div>
 
            <!-- Form Fields -->
            <div class="form-group mb-4">
-              <label class="form-label">الاسم الكامل *</label>
-              <input type="text" v-model="form.name" class="form-control" placeholder="اسم المدير..." />
+              <label class="form-label">{{ tx('الاسم الكامل', 'Full Name') }} *</label>
+              <input type="text" v-model="form.name" class="form-control" :placeholder="tx('اسم المدير...', 'Administrator name...')" />
            </div>
 
            <div class="form-row mb-4">
               <div class="form-group flex-1">
-                 <label class="form-label">البريد الإلكتروني *</label>
+                 <label class="form-label">{{ tx('البريد الإلكتروني', 'Email') }} *</label>
                  <input type="email" v-model="form.email" class="form-control ltr-text" placeholder="admin@example.jo" />
               </div>
            </div>
 
            <div class="form-row mb-4">
               <div class="form-group flex-1">
-                 <label class="form-label">رقم الجوال</label>
+                 <label class="form-label">{{ tx('رقم الجوال', 'Phone') }}</label>
                  <input type="text" v-model="form.phone" class="form-control ltr-text" placeholder="07xxxxxxxx" />
               </div>
            </div>
 
            <div class="form-group mb-4">
-              <label class="form-label">{{ isEditing ? 'كلمة المرور (اتركها فارغة للتخطي)' : 'كلمة المرور *' }}</label>
+              <label class="form-label">{{ isEditing ? tx('كلمة المرور (اتركها فارغة للتخطي)', 'Password (leave blank to keep current)') : tx('كلمة المرور', 'Password') }}{{ isEditing ? '' : ' *' }}</label>
               <input type="password" v-model="form.password" class="form-control" placeholder="********" />
            </div>
 
            <div class="form-row mb-6">
               <div class="form-group flex-1">
-                 <label class="form-label">الدور / الصلاحية</label>
+                 <label class="form-label">{{ tx('الدور / الصلاحية', 'Role / Permission') }}</label>
                  <select v-model="form.role" class="form-control">
-                    <option value="super_admin">مدير عام (Super Admin)</option>
-                    <option value="admin">مدير (Admin)</option>
-                    <option value="editor">محرر (Editor)</option>
+                    <option value="super_admin">{{ tx('مدير عام (Super Admin)', 'Super Admin') }}</option>
+                    <option value="admin">{{ tx('مدير (Admin)', 'Admin') }}</option>
+                    <option value="editor">{{ tx('محرر (Editor)', 'Editor') }}</option>
                  </select>
               </div>
            </div>
 
            <div class="form-group">
               <label class="toggle-control">
-                 <span class="form-label">حالة الحساب</span>
+                 <span class="form-label">{{ tx('حالة الحساب', 'Account Status') }}</span>
                  <div class="status-toggle-wrapper" @click="form.is_active = !form.is_active">
                     <div :class="['toggle-track', { 'active': form.is_active }]">
                        <div class="toggle-thumb"></div>
                     </div>
-                    <span class="status-text">{{ form.is_active ? 'نشط' : 'معطل' }}</span>
+                    <span class="status-text">{{ form.is_active ? tx('نشط', 'Active') : tx('معطل', 'Disabled') }}</span>
                  </div>
               </label>
            </div>
         </div>
 
         <div class="modal-footer">
-           <button class="btn-cancel" @click="showFormModal = false">إلغاء</button>
+           <button class="btn-cancel" @click="showFormModal = false">{{ tx('إلغاء', 'Cancel') }}</button>
            <button class="btn-save" :disabled="isSubmitting" @click="submitForm">
-              {{ isSubmitting ? 'جاري الحفظ...' : 'حفظ المدير' }}
+              {{ isSubmitting ? tx('جاري الحفظ...', 'Saving...') : tx('حفظ المدير', 'Save Administrator') }}
            </button>
         </div>
       </div>
@@ -355,7 +365,7 @@ const getRoleBadge = (role) => {
 </template>
 
 <style scoped>
-.admins-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; }
+.admins-page { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: inherit; }
 
 /* Header Section */
 .header-section { display: flex; justify-content: space-between; align-items: center; }

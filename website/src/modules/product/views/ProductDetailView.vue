@@ -4,7 +4,7 @@
     <!-- 1. Breadcrumbs Section -->
     <div class="breadcrumb-section" v-if="product">
       <div class="container breadcrumb-container">
-        <nav class="breadcrumb-flow" aria-label="breadcrumb">
+        <nav class="breadcrumb-flow" :aria-label="$t('common.breadcrumb')">
           <router-link to="/" class="crumb-link">{{ t('nav.home') }}</router-link>
           <span class="crumb-separator" aria-hidden="true">
             <svg class="crumb-arrow-svg" width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -55,7 +55,6 @@
             :product="product"
             :locale="locale"
             :localized="localized"
-            :localized-value="localizedValue"
             :computed-rating-count="computedRatingCount"
             :computed-average-rating="computedAverageRating"
             :format-price="formatPrice"
@@ -70,9 +69,7 @@
             :selected-attributes="selectedAttributes"
             :is-product-in-stock="isProductInStock"
             :quantity="quantity"
-            :is-favorite="isFavorite"
             @open-share="showShareModal = true"
-            @toggle-favorite="toggleFavorite"
             @select-color="selectColor"
             @select-attribute="selectAttribute($event.key, $event.value)"
             @update:quantity="quantity = $event"
@@ -172,7 +169,7 @@ import ProductCard from '../components/ProductCard.vue';
 import ProductLightbox from '../components/ProductLightbox.vue';
 import ProductShareModal from '../components/ProductShareModal.vue';
 import ProductReviewModal from '../components/ProductReviewModal.vue';
-const { t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, isFavorite, toggleFavorite, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick } = useProductDetail();
+const { t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick } = useProductDetail();
 </script>
 
 <style src="../styles/product-detail-layout.css"></style>

@@ -62,13 +62,9 @@
                 tabindex="-1"
                 aria-label="إظهار أو إخفاء كلمة المرور"
               >
-                <svg v-if="!showPassword" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
+                <PasswordEyeIcon v-if="showPassword" />
+                <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M6.57943 11.571C5.44335 11.0866 4.45814 10.4145 3.65023 9.73485L2.10996 11.2751C1.9883 11.3968 1.82831 11.4585 1.66831 11.4585H1.66742C1.50742 11.4585 1.34743 11.3976 1.22577 11.2751C0.981602 11.031 0.981602 10.6352 1.22577 10.391L2.7285 8.88828C1.75823 7.91822 1.20211 7.09769 1.14624 7.01356C0.954573 6.72606 1.032 6.33853 1.3195 6.14686C1.607 5.9552 1.99453 6.0327 2.1862 6.3202C2.21786 6.36687 5.40118 11.0419 9.99951 11.0419C14.5978 11.0419 17.7812 6.36689 17.8129 6.31939C18.0046 6.03272 18.3929 5.9552 18.6795 6.14686C18.9662 6.33853 19.0437 6.72608 18.8529 7.01275C18.797 7.09684 18.2413 7.9167 17.2718 8.88622L18.7766 10.391C19.0208 10.6352 19.0208 11.031 18.7766 11.2751C18.655 11.3968 18.495 11.4585 18.335 11.4585H18.3341C18.1741 11.4585 18.0141 11.3976 17.8924 11.2751L16.3502 9.73289C15.5425 10.4125 14.5574 11.0847 13.4215 11.5694L14.2868 13.0116C14.4643 13.3074 14.3684 13.6916 14.0726 13.8691C13.9718 13.9291 13.861 13.9583 13.7518 13.9583C13.5393 13.9583 13.3326 13.85 13.2151 13.655L12.2164 11.9904C11.5208 12.1801 10.7803 12.2911 9.99951 12.2911C9.21947 12.2911 8.47965 12.1811 7.78474 11.9917L6.78681 13.655C6.66931 13.85 6.4626 13.9583 6.2501 13.9583C6.14094 13.9583 6.03014 13.9299 5.9293 13.8691C5.63347 13.6916 5.53761 13.3074 5.71511 13.0116L6.57943 11.571Z" />
                 </svg>
               </button>
             </div>
@@ -170,13 +166,24 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '../config/axios';
 import { useRouter } from 'vue-router';
+import PasswordEyeIcon from '../components/PasswordEyeIcon.vue';
+import {
+  checkLoginRateLimit,
+  recordLoginFailure,
+  resetLoginRateLimit,
+  isExplicitNonAdminUser,
+  clearAdminSessionArtifacts,
+  hasControlCharacters,
+} from '../utils/adminSecurity';
 
 const router = useRouter();
 
-const savedEmail = localStorage.getItem('remembered_email');
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const rawSavedEmail = String(localStorage.getItem('remembered_email') || '').trim();
+const savedEmail = EMAIL_REGEX.test(rawSavedEmail) ? rawSavedEmail : '';
 
 const form = ref({
-  email: savedEmail || '',
+  email: savedEmail,
   password: '',
   remember: Boolean(savedEmail),
 });
@@ -205,7 +212,7 @@ const validate = () => {
 
   if (!form.value.email) {
     errors.value.email = 'البريد الإلكتروني مطلوب';
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
+  } else if (!EMAIL_REGEX.test(form.value.email.trim())) {
     errors.value.email = 'البريد الإلكتروني غير صحيح';
   }
 
@@ -221,23 +228,48 @@ const validate = () => {
 const handleLogin = async () => {
   error.value = '';
 
+  const rateLimit = checkLoginRateLimit();
+  if (rateLimit.blocked) {
+    error.value = `تم تجاوز الحد المسموح لمحاولات الدخول. يرجى الانتظار ${rateLimit.remainingSeconds} ثانية ثم المحاولة مجدداً`;
+    return;
+  }
+
   if (!validate()) return;
 
   loading.value = true;
 
   try {
+    const cleanEmail = form.value.email.trim();
     const response = await api.post('/v1/admin/login', {
-      email: form.value.email,
+      email: cleanEmail,
       password: form.value.password,
     });
 
+    const rawToken = String(response.data?.token ?? response.data?.access_token ?? '').trim();
+    const user = response.data?.user || response.data?.admin || response.data?.customer || {};
+
+    if (!rawToken || rawToken === 'undefined' || rawToken === 'null' || hasControlCharacters(rawToken)) {
+      error.value = 'تعذر التحقق من جلسة الدخول، يرجى المحاولة مرة أخرى';
+      return;
+    }
+
+    if (isExplicitNonAdminUser(user)) {
+      clearAdminSessionArtifacts(localStorage);
+      form.value.password = '';
+      error.value = 'غير مصرح لهذا الحساب بالدخول إلى لوحة الإدارة';
+      return;
+    }
+
+    resetLoginRateLimit();
+    clearAdminSessionArtifacts(localStorage);
+
     // حفظ الـ token والمعلومات
-    localStorage.setItem('token', response.data.token);
-    const user = response.data.user || response.data.admin || response.data.customer || {};
+    localStorage.setItem('token', rawToken);
     localStorage.setItem('admin', JSON.stringify(user));
+    form.value.password = '';
 
     if (form.value.remember) {
-      localStorage.setItem('remembered_email', form.value.email);
+      localStorage.setItem('remembered_email', cleanEmail);
     } else {
       localStorage.removeItem('remembered_email');
     }
@@ -245,7 +277,13 @@ const handleLogin = async () => {
     // الانتقال للوحة التحكم
     router.push('/admin/dashboard');
   } catch (err) {
-    error.value = err.response?.data?.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    form.value.password = '';
+    const failure = recordLoginFailure();
+    if (failure.blocked) {
+      error.value = `تم تجاوز الحد المسموح لمحاولات الدخول. يرجى الانتظار ${failure.remainingSeconds} ثانية ثم المحاولة مجدداً`;
+    } else {
+      error.value = err.response?.data?.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    }
   } finally {
     loading.value = false;
   }
@@ -375,18 +413,18 @@ const handleLogin = async () => {
 .toggle-password {
   position: absolute;
   left: 0.85rem;
-  color: #94a3b8;
+  color: #161616;
   cursor: pointer;
   background: none;
   border: none;
   padding: 0;
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  transition: opacity 0.2s;
 }
 
 .toggle-password:hover {
-  color: #111827;
+  opacity: 0.7;
 }
 
 .error-msg {

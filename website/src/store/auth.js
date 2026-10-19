@@ -97,10 +97,13 @@ export const authActions = {
   // ─── Private Helpers ────────────────────────────────────────────────────────
   _setSession(token, user, remember = true) {
     authState.token = token;
-    authState.user = user;
+    const safeUser = user && typeof user === 'object'
+      ? (({ password, remember_token, token: _t, access_token: _a, ...rest }) => rest)(user)
+      : null;
+    authState.user = safeUser;
     setCustomerToken(token, remember);
     const storage = remember ? localStorage : sessionStorage;
-    storage.setItem(CUSTOMER_USER_KEY, JSON.stringify(user || {}));
+    storage.setItem(CUSTOMER_USER_KEY, JSON.stringify(safeUser || {}));
     // Preserve any guest cart/wishlist by moving it to the new token key
     cartState.migrateToToken(token);
     cartState.syncWithToken();

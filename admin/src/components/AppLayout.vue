@@ -9,11 +9,12 @@
     ></div>
 
     <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'mobile-open': mobileSidebarOpen }">
+    <aside class="sidebar" :class="{ 'sidebar-collapsed': collapsed, 'mobile-open': mobileSidebarOpen }">
       <!-- Logo -->
       <div class="sidebar-logo">
         <div class="logo-icon">
-          <img src="/brand/mastergas-logo-white.png" alt="Mastergas" class="logo-img" />
+          <img v-if="!collapsed" src="/brand/mastergas-logo-white.png" alt="Mastergas" class="logo-img" />
+          <img v-else src="/brand/mastergas-icon.png" alt="Mastergas" class="logo-mark" />
         </div>
         <button
           class="mobile-close-btn"
@@ -36,20 +37,34 @@
             :to="item.route"
             class="nav-item"
             :class="{ active: route.path === item.route || route.path.startsWith(item.route + '/') }"
+            :aria-label="collapsed ? localizeMenuLabel(item.label) : undefined"
             @click="mobileSidebarOpen = false"
+            @mouseenter="showTip($event, localizeMenuLabel(item.label))"
+            @mouseleave="hideTip"
+            @focus="showTip($event, localizeMenuLabel(item.label))"
+            @blur="hideTip"
           >
             <span class="nav-icon" v-html="item.icon"></span>
-            <span class="nav-label" v-show="!sidebarCollapsed">{{ item.label }}</span>
-            <span v-if="item.route === '/admin/orders' && !sidebarCollapsed && ordersCount > 0" class="nav-badge">{{ ordersCount }}</span>
+            <span class="nav-label" v-show="!collapsed">{{ localizeMenuLabel(item.label) }}</span>
+            <span v-if="item.route === '/admin/orders' && !collapsed && ordersCount > 0" class="nav-badge">{{ ordersCount }}</span>
+            <span v-if="item.route === '/admin/orders' && collapsed && ordersCount > 0" class="nav-badge-dot" aria-hidden="true"></span>
           </router-link>
 
           <!-- Dropdown Group -->
           <div v-else class="nav-group" :class="{ expanded: expandedGroup === item.label, active: isGroupActive(item) }">
-            <button class="nav-group-header" @click="toggleGroup(item.label)">
+            <button
+              class="nav-group-header"
+              :aria-label="collapsed ? localizeMenuLabel(item.label) : undefined"
+              @click="toggleGroup(item.label)"
+              @mouseenter="showTip($event, localizeMenuLabel(item.label))"
+              @mouseleave="hideTip"
+              @focus="showTip($event, localizeMenuLabel(item.label))"
+              @blur="hideTip"
+            >
               <span class="nav-icon" v-html="item.icon"></span>
-              <span class="nav-label" v-show="!sidebarCollapsed">{{ item.label }}</span>
+              <span class="nav-label" v-show="!collapsed">{{ localizeMenuLabel(item.label) }}</span>
               <svg
-                v-show="!sidebarCollapsed"
+                v-show="!collapsed"
                 class="nav-chevron"
                 width="16"
                 height="16"
@@ -63,7 +78,7 @@
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
-            <div v-show="expandedGroup === item.label && !sidebarCollapsed" class="nav-group-children">
+            <div v-show="expandedGroup === item.label && !collapsed" class="nav-group-children">
               <router-link
                 v-for="child in item.children"
                 :key="child.route"
@@ -72,7 +87,7 @@
                 :class="{ active: route.path === child.route || route.path.startsWith(child.route + '/') }"
                 @click="mobileSidebarOpen = false"
               >
-                <span class="nav-label">{{ child.label }}</span>
+                <span class="nav-label">{{ localizeMenuLabel(child.label) }}</span>
               </router-link>
             </div>
           </div>
@@ -80,12 +95,16 @@
       </nav>
     </aside>
 
+    <!-- Name tooltip for the icon-only sidebar -->
+    <div v-if="tip.visible" class="sidebar-tip" :class="{ 'is-rtl': tip.rtl }" :style="{ top: tip.y + 'px', left: tip.x + 'px' }" role="tooltip">{{ tip.text }}</div>
+
     <!-- ===== MAIN AREA ===== -->
     <div class="main-area">
       <!-- Topbar -->
       <header class="topbar">
         <!-- Left: user -->
         <div class="topbar-left">
+          <!-- Phones / tablets: burger opens the drawer -->
           <button
             class="mobile-toggle-btn"
             @click="mobileSidebarOpen = !mobileSidebarOpen"
@@ -99,15 +118,38 @@
             </svg>
           </button>
           <nav class="breadcrumb">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rotate-180">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-            <span class="breadcrumb-item home">لوحة التحكم الرئيسية</span>
+            <!-- Desktop: this arrow collapses / expands the sidebar -->
+            <button
+              class="sidebar-toggle-btn"
+              :class="{ 'points-end': pointsToEnd }"
+              @click="toggleSidebar"
+              :aria-expanded="!collapsed"
+              :aria-label="collapsed ? (currentLang === 'ar' ? 'توسيع القائمة' : 'Expand menu') : (currentLang === 'ar' ? 'تصغير القائمة' : 'Collapse menu')"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <span class="breadcrumb-item home">{{ t('admin.profile.dashboard') }}</span>
           </nav>
         </div>
 
         <!-- Right: breadcrumb -->
         <div class="topbar-right">
+          <!-- Reload the data of the current screen -->
+          <button
+            class="refresh-btn"
+            :class="{ spinning: refreshing }"
+            :disabled="refreshing"
+            @click="refreshCurrentPage"
+            :title="currentLang === 'ar' ? 'تحديث البيانات' : 'Refresh data'"
+            :aria-label="currentLang === 'ar' ? 'تحديث البيانات' : 'Refresh data'"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+          </button>
             <!-- Notification -->
           <button class="notification-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -136,7 +178,7 @@
                 <div class="user-info">
                   <span class="user-role">{{ adminName }}</span>
                   <span class="user-email">{{ adminEmail }}</span>
-                  <span class="user-badge">{{ adminRole }}</span>
+                  <span class="user-badge">{{ displayAdminRole }}</span>
                 </div>
                 <div class="user-avatar-large">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -147,13 +189,26 @@
               
               <div class="dropdown-divider"></div>
 
-              <div class="dropdown-item split-item" @click="toggleLanguage">
-                <span class="lang-text">{{ currentLang === 'ar' ? 'ع' : 'En' }}</span>
-                <div class="lang-switch-container">
-                  <span class="en-text">{{ currentLang === 'ar' ? 'English' : 'العربية' }}</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M4 5h16M4 12h16M4 19h16"/>
-                  </svg>
+              <div class="lang-row">
+                <span class="lang-row-label">{{ t('admin.profile.language') }}</span>
+                <!-- Fixed LTR so English is always on the left and Arabic on the right. -->
+                <div class="lang-switch" dir="ltr" role="radiogroup" :aria-label="t('admin.profile.language')">
+                  <button
+                    type="button"
+                    role="radio"
+                    class="lang-option"
+                    :class="{ active: currentLang === 'en' }"
+                    :aria-checked="currentLang === 'en'"
+                    @click.stop="setLanguage('en')"
+                  >English</button>
+                  <button
+                    type="button"
+                    role="radio"
+                    class="lang-option lang-option-ar"
+                    :class="{ active: currentLang === 'ar' }"
+                    :aria-checked="currentLang === 'ar'"
+                    @click.stop="setLanguage('ar')"
+                  >عربي</button>
                 </div>
               </div>
 
@@ -177,7 +232,7 @@
 
               <!-- Logout -->
               <button @click="handleLogout" class="dropdown-item logout-item justify-end">
-                <span>تسجيل الخروج</span>
+                <span>{{ t('admin.profile.logout') }}</span>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                   <polyline points="16 17 21 12 16 7"/>
@@ -191,19 +246,30 @@
 
       <!-- Page Content -->
       <main class="page-content">
-        <router-view />
+        <!-- Pages stay alive after the first visit: switching tabs never refetches.
+             A page is rebuilt (and refetched) only after a write, a manual
+             refresh or a language change, see pageKey(). -->
+        <router-view v-slot="{ Component, route: viewRoute }">
+          <keep-alive :max="CACHED_PAGES_MAX" exclude="ReturnDetailView">
+            <component :is="Component" :key="pageKey(viewRoute)" />
+          </keep-alive>
+        </router-view>
       </main>
     </div>
+    <AppDialog />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import api from '../config/axios';
+import AppDialog from './AppDialog.vue';
 import adminOrderService from '../application/adminOrderService';
 import { useTheme } from '../composables/useTheme';
+import { freshness, markDataChanged } from '../utils/dataFreshness';
+import { clearAdminSessionArtifacts, sanitizeAssetUrl } from '../utils/adminSecurity';
 
 const { isDark, toggleTheme } = useTheme();
 
@@ -212,7 +278,43 @@ const route = useRoute();
 const adminName = ref('المسؤول');
 const adminEmail = ref('admin@store.com');
 const adminRole = ref('مدير النظام');
-const sidebarCollapsed = ref(false);
+const SIDEBAR_KEY = 'admin_sidebar_collapsed';
+const readCollapsed = () => {
+  try { return localStorage.getItem(SIDEBAR_KEY) === '1'; } catch { return false; }
+};
+const sidebarCollapsed = ref(readCollapsed());
+// On phones/tablets the sidebar is a drawer, so "collapsed" only applies to the desktop layout
+const isMobile = ref(typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches);
+const collapsed = computed(() => sidebarCollapsed.value && !isMobile.value);
+let mobileQuery = null;
+const onMobileChange = (e) => { isMobile.value = e.matches; hideTip(); };
+
+// The arrow points toward the sidebar's edge while it is open (collapse) and away from it once it is collapsed
+const pointsToEnd = computed(() => (currentLang.value === 'ar') !== collapsed.value);
+
+const toggleSidebar = () => {
+  if (isMobile.value) {
+    mobileSidebarOpen.value = !mobileSidebarOpen.value;
+    return;
+  }
+  sidebarCollapsed.value = !sidebarCollapsed.value;
+  hideTip();
+  try { localStorage.setItem(SIDEBAR_KEY, sidebarCollapsed.value ? '1' : '0'); } catch { /* storage unavailable */ }
+};
+
+// Name tooltip beside the hovered icon while the sidebar is collapsed
+const tip = reactive({ visible: false, text: '', x: 0, y: 0, rtl: true });
+const showTip = (event, text) => {
+  if (!collapsed.value) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  const rtl = currentLang.value === 'ar';
+  tip.text = text;
+  tip.y = rect.top + rect.height / 2;
+  tip.x = rtl ? rect.left - 10 : rect.right + 10;
+  tip.rtl = rtl;
+  tip.visible = true;
+};
+const hideTip = () => { tip.visible = false; };
 const mobileSidebarOpen = ref(false);
 const userMenuOpen = ref(false);
 const ordersCount = ref(0);
@@ -224,6 +326,14 @@ const expandedGroup = ref('');
 const legacyDashboardEnabled = import.meta.env.DEV && import.meta.env.VITE_ADMIN_LEGACY_DASHBOARD === 'true';
 
 const toggleGroup = (label) => {
+  // A group's pages are not visible in the icon rail, so open the sidebar first
+  if (collapsed.value) {
+    sidebarCollapsed.value = false;
+    hideTip();
+    try { localStorage.setItem(SIDEBAR_KEY, '0'); } catch { /* storage unavailable */ }
+    expandedGroup.value = label;
+    return;
+  }
   expandedGroup.value = expandedGroup.value === label ? '' : label;
 };
 
@@ -234,10 +344,46 @@ const isGroupActive = (item) => {
   );
 };
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const currentLang = computed(() => locale.value);
+const displayAdminRole = computed(() => {
+  if (!adminRole.value || ['admin', 'administrator', 'super_admin', 'المدير', 'مدير النظام', 'مدير النظام (سوبر)'].includes(String(adminRole.value).toLowerCase())) {
+    return t('admin.profile.admin');
+  }
+  return adminRole.value;
+});
 
 const adminInitial = computed(() => adminName.value?.charAt(0)?.toUpperCase() || 'A');
+
+const menuLabelKeys = {
+  'لوحة القيادة': 'admin.nav.dashboard',
+  'أقسام المنتجات': 'admin.nav.categories',
+  'العلامات التجارية': 'admin.nav.brands',
+  'المنتجات': 'admin.nav.products',
+  'خصائص المنتجات': 'admin.nav.attributes',
+  'تغذية المنتجات (Feeds)': 'admin.nav.feeds',
+  'الطلبات': 'admin.nav.orders',
+  'المرتجعات': 'admin.nav.returns',
+  'الصفحات الديناميكية': 'admin.nav.pages',
+  'تقييمات المنتجات': 'admin.nav.reviews',
+  'العملاء': 'admin.nav.customers',
+  'أكواد الخصم': 'admin.nav.coupons',
+  'العروض والخصومات': 'admin.nav.discounts',
+  'إعلانات السلايدر': 'admin.nav.sliders',
+  'بوابات الدفع': 'admin.nav.payments',
+  'إدارة مناطق التوصيل': 'admin.nav.shipping',
+  'الدول': 'admin.nav.countries',
+  'المدن': 'admin.nav.cities',
+  'أسعار الشحن': 'admin.nav.shipping',
+  'رسائل العملاء': 'admin.nav.messages',
+  'المسؤولون': 'admin.nav.admins',
+  'الفروع': 'admin.nav.branches',
+  'سجل النشاطات': 'admin.nav.activity',
+  'إدارة الصلاحيات': 'admin.nav.permissions',
+  'التقارير المالية': 'admin.nav.accounts',
+  'الإعدادات': 'admin.nav.settings',
+};
+const localizeMenuLabel = (label) => t(menuLabelKeys[label] || label);
 
 let lastOrdersFetchTime = 0;
 const ORDERS_CACHE_TTL = 30000; // 30 seconds
@@ -259,12 +405,42 @@ const handleOrdersUpdated = () => {
     fetchOrdersCount(true);
 };
 
-const toggleLanguage = () => {
-  const newLang = locale.value === 'ar' ? 'en' : 'ar';
+// ─── Page cache (keep-alive) ───────────────────────────────────────────────────
+// Every visited screen is kept in memory, so its API calls run once per session.
+// pageGen[path] is part of the component key: bumping it throws the cached copy
+// away, and the next visit builds it again with fresh data.
+const CACHED_PAGES_MAX = 20;
+const pageGen = reactive({});
+const visitedPaths = new Set();
+const pageKey = (r) => `${r.path}#${pageGen[r.path] || 0}`;
+const invalidatePage = (path) => { pageGen[path] = (pageGen[path] || 0) + 1; };
+
+watch(() => route.path, (path) => visitedPaths.add(path), { immediate: true });
+
+// Another screen changed data: every cached screen except the one on display is
+// stale. The visible screen already updates itself after its own write.
+watch(() => freshness.version, () => {
+  visitedPaths.forEach((path) => { if (path !== route.path) invalidatePage(path); });
+});
+
+const refreshing = ref(false);
+const refreshCurrentPage = () => {
+  if (refreshing.value) return;
+  refreshing.value = true;
+  markDataChanged();
+  invalidatePage(route.path);
+  setTimeout(() => { refreshing.value = false; }, 800);
+};
+
+const setLanguage = (newLang) => {
+  if (newLang === locale.value) return;
   locale.value = newLang;
   localStorage.setItem('lang', newLang);
   document.documentElement.lang = newLang;
   document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+  // Responses are localised through Accept-Language, so cached screens reload.
+  markDataChanged();
+  invalidatePage(route.path);
 };
 
 const updateFaviconFromSettings = async () => {
@@ -293,7 +469,7 @@ const updateFaviconFromSettings = async () => {
             document.head.appendChild(link);
         }
         if (logoEntry && logoEntry.value && logoEntry.value !== '[]' && !isIrisAsset(logoEntry.value)) {
-            link.href = logoEntry.value;
+            link.href = sanitizeAssetUrl(logoEntry.value, '/brand/mastergas-icon.png');
         } else {
             link.href = '/brand/mastergas-icon.png';
         }
@@ -314,12 +490,21 @@ watch(() => route.path, () => {
 });
 
 onMounted(() => {
-  const adminInner = JSON.parse(localStorage.getItem('admin') || '{}');
+  let adminInner = {};
+  try {
+    adminInner = JSON.parse(localStorage.getItem('admin') || '{}') || {};
+  } catch {
+    adminInner = {};
+  }
   if (adminInner?.name) adminName.value = adminInner.name;
   if (adminInner?.email) adminEmail.value = adminInner.email;
   if (adminInner?.is_super_admin) adminRole.value = 'مدير النظام (سوبر)';
   else if (adminInner?.role) adminRole.value = adminInner.role;
   else if (adminInner?.id) adminRole.value = 'المدير';
+
+  mobileQuery = window.matchMedia('(max-width: 1024px)');
+  isMobile.value = mobileQuery.matches;
+  mobileQuery.addEventListener('change', onMobileChange);
 
   document.addEventListener('click', closeUserMenu);
   window.addEventListener('keydown', handleKeydown);
@@ -329,6 +514,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  mobileQuery?.removeEventListener('change', onMobileChange);
   document.removeEventListener('click', closeUserMenu);
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('orders-updated', handleOrdersUpdated);
@@ -344,8 +530,9 @@ const handleLogout = async () => {
   } catch (err) {
     console.error(err);
   } finally {
-    localStorage.removeItem('token');
-    localStorage.removeItem('admin');
+    clearAdminSessionArtifacts(localStorage);
+    visitedPaths.forEach((path) => invalidatePage(path));
+    visitedPaths.clear();
     router.push('/admin/login');
   }
 };
@@ -416,11 +603,11 @@ const menuItems = [
     label: 'إعلانات السلايدر',
     icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
   },
-  {
-    route: '/admin/payments',
-    label: 'بوابات الدفع',
-    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
-  },
+  // {
+  //   route: '/admin/payments',
+  //   label: 'بوابات الدفع',
+  //   icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  // },
   /*
   {
     label: 'إدارة مناطق التوصيل',
@@ -449,11 +636,6 @@ const menuItems = [
     route: '/admin/messages',
     label: 'رسائل العملاء',
     icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
-  },
-  {
-    route: '/admin/topics',
-    label: 'صفحات الموقع',
-    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
   },
   // {
   //   route: '/admin/accounts',
@@ -496,6 +678,51 @@ const menuItems = [
   height: 100%;
   overflow: hidden;
 }
+
+.sidebar-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar-toggle-btn:hover {
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+/* The chevron is drawn pointing left; flip it when it has to point right */
+.sidebar-toggle-btn svg {
+  transition: transform 0.25s ease;
+}
+.sidebar-toggle-btn.points-end svg {
+  transform: rotate(180deg);
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-inline-end: 0.35rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.refresh-btn:hover:not(:disabled) { background: var(--bg-main); }
+.refresh-btn:disabled { cursor: default; }
+.refresh-btn.spinning svg { animation: refresh-spin 0.8s linear infinite; }
+@keyframes refresh-spin { to { transform: rotate(360deg); } }
 
 .mobile-toggle-btn {
   display: none;
@@ -540,7 +767,7 @@ const menuItems = [
   width: 260px;
   min-width: 260px;
   background: var(--bg-sidebar);
-  border-left: 1px solid var(--border-color);
+  border-inline-end: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -554,9 +781,62 @@ const menuItems = [
 }
 .sidebar::-webkit-scrollbar { display: none; }
 
+/* Icon rail (desktop): only the icons show; the name appears in a tooltip on hover */
 .sidebar-collapsed {
-  width: 64px;
-  min-width: 64px;
+  width: 72px;
+  min-width: 72px;
+}
+.sidebar-collapsed .sidebar-logo {
+  padding: 1.25rem 0;
+}
+/* The dark brand mark is turned white so it reads on the dark sidebar */
+.sidebar-collapsed .logo-mark {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.sidebar-collapsed .sidebar-nav {
+  padding: 1rem 0.6rem;
+}
+.sidebar-collapsed .nav-item,
+.sidebar-collapsed .nav-group-header {
+  justify-content: center;
+  gap: 0;
+  padding: 0.7rem 0;
+  position: relative;
+}
+.sidebar-collapsed .nav-label {
+  display: none;
+}
+.sidebar-collapsed .nav-badge-dot {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid var(--bg-sidebar);
+}
+
+.sidebar-tip {
+  position: fixed;
+  z-index: 2000;
+  transform: translateY(-50%);
+  padding: 0.35rem 0.7rem;
+  background: #000000;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+.sidebar-tip.is-rtl {
+  transform: translate(-100%, -50%);
 }
 
 /* Logo */
@@ -746,10 +1026,6 @@ const menuItems = [
   color: var(--text-main);
   font-weight: 500;
 }
-.breadcrumb svg {
-  color: #9ca3af;
-  transform: rotate(180deg); /* RTL arrow */
-}
 
 /* Notification */
 .notification-btn {
@@ -827,7 +1103,9 @@ const menuItems = [
 .user-dropdown {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  /* Anchor to the menu's outer edge in both directions so it never runs off-screen. */
+  inset-inline-end: 0;
+  max-width: calc(100vw - 16px);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -847,7 +1125,7 @@ const menuItems = [
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  text-align: right;
+  text-align: start;
 }
 .user-role {
   font-size: 0.85rem;
@@ -894,17 +1172,45 @@ const menuItems = [
   justify-content: space-between;
 }
 
-.lang-text {
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.lang-switch-container {
+.lang-row {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: var(--text-main);
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
 }
+.lang-row-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.lang-switch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+}
+.lang-option {
+  min-width: 64px;
+  padding: 0.3rem 0.8rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.lang-option:hover:not(.active) { color: var(--text-main); }
+.lang-option.active {
+  background: #000000;
+  color: #ffffff;
+}
+.lang-option:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
 
 .theme-switch-container {
   display: flex;
@@ -971,6 +1277,9 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 1024px) {
+  .sidebar-toggle-btn {
+    display: none;
+  }
   .mobile-toggle-btn {
     display: inline-flex;
   }
@@ -1001,6 +1310,9 @@ input:checked + .slider:before {
     left: 0;
     transform: translateX(-100%);
     box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .sidebar:not(.mobile-open) {
+    box-shadow: none;
   }
   .sidebar.mobile-open {
     transform: translateX(0);

@@ -1,5 +1,5 @@
 import api from '../../../config/axios';
-import { toSiteOrder } from '../../../domain/orders/siteOrder';
+import { isOwnedByCurrentCustomer, toSiteOrder } from '../../../domain/orders/siteOrder';
 
 const MAX_PAGES = 20;
 
@@ -11,11 +11,15 @@ export const listSiteOrders = async () => {
     const next = await api.get('/v1/site/orders', { params: { page } });
     orders.push(...(next.data?.data || []));
   }
-  return orders.map(toSiteOrder);
+  return orders.filter((raw) => isOwnedByCurrentCustomer(raw)).map(toSiteOrder);
 };
 
 export const getSiteOrder = async (id) => {
-  const response = await api.get(`/v1/site/orders/${id}`);
+  const safeId = encodeURIComponent(String(id ?? '').trim());
+  if (!safeId) return null;
+  const response = await api.get(`/v1/site/orders/${safeId}`);
   const data = response.data?.data;
-  return data && typeof data === 'object' && !Array.isArray(data) ? toSiteOrder(data) : null;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  if (!isOwnedByCurrentCustomer(data)) return null;
+  return toSiteOrder(data);
 };

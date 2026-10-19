@@ -115,7 +115,7 @@
 }
 
 .home-btn:hover {
-  background: #6d264c;
+  background: var(--color-button-hover);
   transform: translateY(-1px);
 }
 
@@ -136,7 +136,7 @@
 }
 
 .retry-btn:hover {
-  background: #d97706;
+  background: var(--color-button-hover);
 }
 
 @media (max-width: 640px) {

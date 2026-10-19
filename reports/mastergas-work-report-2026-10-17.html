@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تقرير عمل اليوم - Mastergas - 17 أكتوبر 2026</title>
+<style>
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "SF Arabic", "Geeza Pro", "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; color: #0f172a; font-size: 11.5pt; line-height: 1.65; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 14px; }
+  h1 { margin: 0; font-size: 20pt; line-height: 1.3; }
+  .meta { color: #475569; font-size: 10pt; text-align: left; line-height: 1.6; }
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; text-align: center; background: #f8fafc; }
+  .stat b { display: block; font-size: 15pt; line-height: 1.3; }
+  .stat span { font-size: 9.5pt; color: #64748b; }
+  section { margin-bottom: 12px; break-inside: avoid; }
+  h2 { margin: 0 0 4px; font-size: 13.5pt; display: flex; align-items: center; gap: 8px; }
+  h2 i { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: #000; color: #fff; font-style: normal; font-size: 10pt; align-items: center; justify-content: center; }
+  ul { margin: 0; padding-inline-start: 20px; }
+  li { margin-bottom: 2px; }
+  .open { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 14px 6px; }
+  .open h2 { color: #92400e; }
+  footer { margin-top: 10px; color: #64748b; font-size: 9.5pt; border-top: 1px solid #e2e8f0; padding-top: 6px; }
+  code { font-family: Menlo, monospace; font-size: 9.5pt; direction: ltr; unicode-bidi: embed; background: #f1f5f9; padding: 0 4px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>تقرير عمل اليوم</h1>
+    <div>مشروع Mastergas — الموقع ولوحة التحكم</div>
+  </div>
+  <div class="meta">السبت 17 أكتوبر 2026<br>المحور: المرتجعات · الإعدادات · أداء الـ APIs</div>
+</header>
+
+<div class="summary">
+  <div class="stat"><b>43 / 43</b><span>اختبار ناجح</span></div>
+  <div class="stat"><b>2</b><span>تطبيق: الموقع + اللوحة</span></div>
+  <div class="stat"><b>✓</b><span>Build ناجح للتطبيقين</span></div>
+  <div class="stat"><b>4</b><span>محاور عمل</span></div>
+</div>
+
+<section>
+  <h2><i>1</i> المرتجعات</h2>
+  <ul>
+    <li>ربط صفحة المرتجعات في لوحة التحكم بـ <code>/v1/returns</code> (عرض الطلبات، قبول، رفض بسبب)، وفي الموقع بـ <code>/v1/site/returns</code> مع إنشاء طلب الإرجاع.</li>
+    <li>نموذج طلب الإرجاع: اختيار أكثر من منتج، تحديد الكمية وحالة كل منتج، ومنع إرجاع كمية سبق طلب إرجاعها.</li>
+    <li>إصلاح تصميم شاشة اختيار المنتجات (الكروت كانت فاضية) بشكل متجاوب على الموبايل.</li>
+    <li>إزالة تبويب المحفظة من صفحة الحساب، وإصلاح عرض اسم المنتج والمبلغ في كروت المرتجعات.</li>
+    <li>نوافذ تنبيه وتأكيد بتصميم الموقع بدل رسائل المتصفح (في الموقع واللوحة)، وترجمة نصوص الإرجاع عربي/إنجليزي.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><i>2</i> الإعدادات</h2>
+  <ul>
+    <li>لوحة التحكم: قراءة الإعدادات من <code>GET /v1/settings</code> وحفظها عبر <code>POST /v1/settings/bulk</code> مع تصنيفها (عام، تواصل اجتماعي، الرئيسية، من نحن).</li>
+    <li>منع رفع صور الإعدادات حتى يدعمها الباك إند، بدل إظهار رسالة نجاح دون حفظ فعلي.</li>
+    <li>الموقع: خدمات الإعدادات وبيانات الحساب أصبحت من الـ API بدل قيم فارغة ثابتة.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><i>3</i> أداء الـ APIs</h2>
+  <ul>
+    <li>تخزين مؤقت للطلبات مع منع تكرار الطلب نفسه في نفس اللحظة، وإعادة محاولة واحدة عند أخطاء 5xx، ودعم إلغاء الطلب.</li>
+    <li>عرض آخر بيانات الكتالوج فورًا مع تحديثها في الخلفية لتجنب شاشة التحميل.</li>
+    <li>لوحة القيادة: قراءة كل صفحات الطلبات (الـ API يرجّع 20 طلبًا فقط في الصفحة)، وإصلاح الأرقام والمخططات وأفضل المنتجات والمرتجعات، ونقل العنوان لليمين.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><i>4</i> التأمين والحماية</h2>
+  <ul>
+    <li>تنظيف المحتوى والروابط (XSS)، وتعطيل الدخول التجريبي <code>mockAuth</code> خارج البيئة المحلية.</li>
+    <li>فصل توكن العميل عن الأدمن وتنظيف الجلسة عند 401، ومنع الوصول لطلبات أو مرتجعات عميل آخر.</li>
+    <li>إضافة ترويسات أمان (CSP، HSTS وغيرها) في إعدادات النشر.</li>
+  </ul>
+</section>
+
+<section class="open">
+  <h2><i>!</i> متابعة</h2>
+  <ul>
+    <li>الاختبار البصري تم على بيانات تجريبية؛ لم يُجرَّب على الباك إند الحقيقي بحساب عميل لديه طلبات مستلمة ومرتجعات.</li>
+    <li>قسم "أفضل المنتجات" قد يظهر فارغًا إذا كانت قائمة الطلبات لا ترجع أصناف الطلب.</li>
+    <li>رسائل <code>alert / confirm</code> الافتراضية لا تزال موجودة خارج المرتجعات (الـ checkout، حفظ العنوان، حذف الأقسام وغيرها).</li>
+  </ul>
+</section>
+
+<footer>ملاحظة: لا توجد commits بتاريخ اليوم؛ التقرير مبني على الملفات المعدلة اليوم ونتائج الاختبارات، والتعديلات لم تُرفع إلى GitHub بعد.</footer>
+</body>
+</html>
