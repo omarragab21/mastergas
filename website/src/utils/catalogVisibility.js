@@ -2,7 +2,7 @@
 // explicitly approved for publication. This is presentation-only filtering;
 // it does not delete or modify records in the backend.
 const TEST_PRODUCT_IDS = new Set([42, 55]);
-const TEST_CATEGORY_IDS = new Set([61]);
+const TEST_CATEGORY_IDS = new Set([61, 85, 86, 87]);
 
 const searchableText = (record = {}) => [
   record.name,
@@ -22,8 +22,8 @@ export const isTestProduct = (product = {}) => {
 
 export const isTestCategory = (category = {}) => {
   const id = Number(category.id ?? category.category_id);
-  if (TEST_CATEGORY_IDS.has(id)) return true;
-  return /(?:^|\s)test(?:\s|$)/i.test(searchableText(category));
+  // Only categories listed by id; a "test" word in the name does not hide one.
+  return TEST_CATEGORY_IDS.has(id);
 };
 
 export const visibleProducts = (products = []) => products.filter((product) => !isTestProduct(product));
