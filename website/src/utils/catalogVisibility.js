@@ -15,7 +15,9 @@ const searchableText = (record = {}) => [
 export const isTestProduct = (product = {}) => {
   const id = Number(product.id ?? product.product_id);
   if (TEST_PRODUCT_IDS.has(id)) return true;
-  return /(?:^|\s)(?:test|qa)(?:\s|$)|single-stock-qa|single stock qa/i.test(searchableText(product));
+  // Only explicit QA markers. A plain "test"/"qa" word is not enough: products
+  // the team adds from the dashboard (e.g. "Hussein Test") must still appear.
+  return /single-stock-qa|single stock qa|do not ship/i.test(searchableText(product));
 };
 
 export const isTestCategory = (category = {}) => {
