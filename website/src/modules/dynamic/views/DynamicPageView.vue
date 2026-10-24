@@ -18,12 +18,7 @@
      <p>{{ t('common.loading') }}</p>
   </div>
 
-  <div class="not-found-state" v-else>
-     <div class="icon">🔍</div>
-     <h2>{{ t('dynamic_page.not_found') }}</h2>
-     <p>{{ t('dynamic_page.not_found_hint') }}</p>
-     <router-link to="/" class="btn-home">{{ t('dynamic_page.back_home') }}</router-link>
-  </div>
+  <NotFoundView v-else />
 </template>
 
 <script setup>
@@ -31,6 +26,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import api from '../../../config/axios';
+import NotFoundView from '../../../views/NotFoundView.vue';
 import { settingsService } from '../../../services/settingsService';
 import { useLocalized } from '../../../composables/useLocalized';
 import { escapeHtml, sanitizeHtml } from '../../../utils/sanitize';

@@ -32,11 +32,11 @@ const routes = [
       { path: 'page/terms-and-conditions', name: 'PageTermsAndConditions', component: () => import('../modules/terms/views/TermsView.vue') },
       { path: 'page/:id', name: 'Page', component: () => import('../modules/dynamic/views/DynamicPageView.vue') },
       { path: ':slug', name: 'DynamicPage', component: () => import('../modules/dynamic/views/DynamicPageView.vue') },
+      { path: 'admin', name: 'WebsiteAdminBlocked', component: NotFoundView },
+      { path: 'admin/:pathMatch(.*)*', name: 'WebsiteAdminBlockedChild', component: NotFoundView },
+      { path: ':pathMatch(.*)*', name: 'WebsiteNotFound', component: NotFoundView },
     ],
   },
-  { path: '/admin', name: 'WebsiteAdminBlocked', component: NotFoundView },
-  { path: '/admin/:pathMatch(.*)*', name: 'WebsiteAdminBlockedChild', component: NotFoundView },
-  { path: '/:pathMatch(.*)*', name: 'WebsiteNotFound', component: NotFoundView },
 ];
 
 const router = createRouter({

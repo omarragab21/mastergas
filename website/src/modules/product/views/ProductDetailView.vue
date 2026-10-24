@@ -34,7 +34,9 @@
     <ProductDetailSkeleton v-if="loading" />
 
     <!-- 2. Product Main Section -->
-    <div v-else-if="product" class="product-main-section">
+    <NotFoundView v-else-if="!product" />
+
+    <div v-else class="product-main-section">
       <div class="container main-section-container">
         
         <div class="product-grid-layout">
@@ -162,6 +164,7 @@
 <script setup>
 import { useProductDetail } from '../composables/useProductDetail';
 import ProductGallery from '../components/ProductGallery.vue';
+import NotFoundView from '../../../views/NotFoundView.vue';
 import ProductDetailSkeleton from '../../../components/skeleton/ProductDetailSkeleton.vue';
 import ProductInfoPanel from '../components/ProductInfoPanel.vue';
 import ProductTabs from '../components/ProductTabs.vue';
