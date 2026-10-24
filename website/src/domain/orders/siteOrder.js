@@ -1,4 +1,5 @@
 import { pickText } from '../../utils/localeText.js';
+import { fitOrderNotes } from '../order/orderOptions.js';
 
 const NOTES_LIMIT = 1000;
 const PAYMENT_METHODS = { cod: 'cash_on_delivery', cash: 'cash_on_delivery', cash_on_delivery: 'cash_on_delivery', card: 'credit_card', credit_card: 'credit_card' };
@@ -15,7 +16,8 @@ export const toSiteOrderPayload = (order = {}) => {
 
   const code = order.coupon_code ? String(order.coupon_code).trim() : '';
   // The checkout view prepends "Coupon: CODE. " to the notes; the API has a coupon_code field for that.
-  const notes = String(order.notes || '').replace(/^Coupon: [^.]*\.\s*/, '').trim().slice(0, NOTES_LIMIT);
+  // The chosen-options block at the end is kept whole (see domain/order/orderOptions.js).
+  const notes = fitOrderNotes(String(order.notes || '').replace(/^Coupon: [^.]*\.\s*/, ''), NOTES_LIMIT);
 
   const consolidatedItems = new Map();
   for (const item of order.items) {
@@ -124,6 +126,8 @@ const toItem = (item = {}) => ({
   price: money(item.unit_price),
   total: money(item.total_price),
   image: normalizeImageUrl(item.product?.image_url),
+  // Every option of the product; the order's notes say which ones were chosen.
+  options: Array.isArray(item.product?.options) ? item.product.options : [],
 });
 
 // Keeps the snake_case keys Profile/Invoice already read, plus the camelCase aliases.

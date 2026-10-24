@@ -86,7 +86,8 @@ export const classifyApiError = (error) => {
 api.interceptors.request.use(config => {
   const storage = getStorage();
   const lang = storage?.getItem('lang') || 'ar';
-  config.headers['Accept-Language'] = lang;
+  // A request may ask for a specific language (e.g. a product's labels in both languages).
+  config.headers['Accept-Language'] = config.headers['Accept-Language'] || lang;
 
   const requestId = config.headers['X-Request-ID'] || `mg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   config.headers['X-Request-ID'] = requestId;

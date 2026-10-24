@@ -217,6 +217,7 @@ export const cartState = reactive({
           ...(item.selectedAttributes && typeof item.selectedAttributes === 'object'
             ? { selectedAttributes: item.selectedAttributes }
             : {}),
+          ...(Array.isArray(item.selectedOptions) ? { selectedOptions: item.selectedOptions } : {}),
           ...(item.cart_item_key ? { cart_item_key: item.cart_item_key } : {}),
         };
       });
@@ -355,10 +356,15 @@ export const cartState = reactive({
     }
 
     const latestPersistedItems = loadCart();
+    // An order item may cover several lines of one product (one per option
+    // choice), so its quantity is consumed line by line.
     this.items = latestPersistedItems.flatMap((item) => {
-      const purchasedQuantity = purchasedQuantities.get(String(item.id)) || 0;
+      const productKey = String(item.id);
+      const purchasedQuantity = purchasedQuantities.get(productKey) || 0;
       if (purchasedQuantity <= 0) return [item];
-      const remainingQuantity = (Number(item.quantity) || 0) - purchasedQuantity;
+      const lineQuantity = Number(item.quantity) || 0;
+      purchasedQuantities.set(productKey, Math.max(0, purchasedQuantity - lineQuantity));
+      const remainingQuantity = lineQuantity - purchasedQuantity;
       return remainingQuantity > 0 ? [{ ...item, quantity: remainingQuantity }] : [];
     });
     this.saveCart();

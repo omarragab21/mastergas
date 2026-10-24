@@ -63,6 +63,7 @@
           :in-stock-only="inStockOnly"
           :has-discount-only="hasDiscountOnly"
           :italian-only="italianOnly"
+          :show-italian="italianAvailable"
           :localized="localized"
           :select-category="selectCategory"
           :toggle-in-stock="toggleInStock"
@@ -130,6 +131,8 @@ const selectedCategory = ref(null);
 const inStockOnly = ref(false);
 const hasDiscountOnly = ref(false);
 const italianOnly = ref(false);
+// Whether any product states an Italian origin (decides if the filter is shown).
+const italianAvailable = ref(false);
 
 const totalAllCount = computed(() => {
   return allProductsCount.value || totalCount.value || 0;
@@ -247,6 +250,7 @@ const fetchProducts = async () => {
     if (sequence !== requestSequence || controller.signal.aborted) return;
     products.value = result.items;
     totalCount.value = result.total;
+    italianAvailable.value = Boolean(result.facets?.italian);
     totalPages.value = Math.max(1, result.last_page || 1);
     currentPage.value = result.current_page || currentPage.value;
     if (result.stale) {
@@ -273,8 +277,9 @@ const fetchProducts = async () => {
 };
 
 let routeSearchTimeout = null;
-watch(() => [route.query.category_id, route.query.search, route.query.q, route.query.keyword, route.query.page, route.query.sort_by], () => {
-  selectedCategory.value = route.query.category_id ? parseInt(route.query.category_id, 10) : null;
+const queryCategoryId = () => route.query.category_id || route.query.subcategory_id;
+watch(() => [route.query.category_id, route.query.subcategory_id, route.query.search, route.query.q, route.query.keyword, route.query.page, route.query.sort_by], () => {
+  selectedCategory.value = queryCategoryId() ? parseInt(queryCategoryId(), 10) : null;
   currentPage.value = route.query.page ? Math.max(1, parseInt(route.query.page, 10) || 1) : 1;
   sortBy.value = route.query.sort_by || 'relevant';
   clearTimeout(routeSearchTimeout);
@@ -283,8 +288,8 @@ watch(() => [route.query.category_id, route.query.search, route.query.q, route.q
 }, { immediate: true });
 
 onMounted(async () => {
-  if (route.query.category_id) {
-    selectedCategory.value = parseInt(route.query.category_id, 10);
+  if (queryCategoryId()) {
+    selectedCategory.value = parseInt(queryCategoryId(), 10);
   }
   await Promise.allSettled([fetchCategories(), fetchOffers()]);
 });

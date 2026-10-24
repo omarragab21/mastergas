@@ -472,7 +472,7 @@ const messages = {
       specifications: 'المواصفات',
       reviews: 'التقييمات',
       in_stock: 'متوفر',
-      out_of_stock: 'نفذت الكمية',
+      out_of_stock: 'غير متوفر',
       quantity: 'الكمية',
       only_left: 'باقي {count} قطع فقط',
       save: 'وفر',

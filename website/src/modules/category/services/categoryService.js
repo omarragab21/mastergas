@@ -1,10 +1,10 @@
 import { productService } from '../../product/services/productService';
 
 export const categoryService = {
-  getCategories(params = {}) {
-    return productService.getCategories(params);
+  getCategories(params = {}, options = {}) {
+    return productService.getCategories(params, options);
   },
-  getCategoriesWithProductCounts(params = {}) {
-    return productService.getCategoriesWithProductCounts(params);
+  getCategoriesWithProductCounts(params = {}, options = {}) {
+    return productService.getCategoriesWithProductCounts(params, options);
   },
 };

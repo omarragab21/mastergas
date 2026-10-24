@@ -16,9 +16,8 @@
 
       <ProductOverviewTab
         v-if="activeTab === 'overview'"
-        :dynamic-overview-title="dynamicOverviewTitle"
+        :locale="locale"
         :dynamic-overview-desc="dynamicOverviewDesc"
-        :dynamic-overview-features="dynamicOverviewFeatures"
       />
       <ProductSpecificationsTab
         v-if="activeTab === 'specs'"

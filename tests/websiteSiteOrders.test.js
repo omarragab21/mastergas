@@ -101,7 +101,7 @@ test('DOMAIN toSiteOrder maps Tijara order to the fields Profile and Invoice rea
   assert.equal(order.date, '2026-10-14');
   assert.equal(order.customerAddress, '12 Rainbow St, Amman');
   assert.equal(order.payment_method, 'cash_on_delivery');
-  assert.deepEqual(order.items[0], { id: 1, product_id: 14, name: 'Hob', quantity: 2, price: 974.35, total: 1948.7, image: 'https://backend-tijara.be-kite.com/public/storage/products/a.jpg' });
+  assert.deepEqual(order.items[0], { id: 1, product_id: 14, name: 'Hob', quantity: 2, price: 974.35, total: 1948.7, image: 'https://backend-tijara.be-kite.com/public/storage/products/a.jpg', options: [] });
 });
 
 test('DOMAIN toSiteOrder survives empty payloads', () => {

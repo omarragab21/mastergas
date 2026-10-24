@@ -117,6 +117,7 @@
             <td class="col-index">{{ idx + 1 }}</td>
             <td>
               <div class="prod-title-inv">{{ localized(item.product || item, 'name') }}</div>
+              <span v-for="(line, lineIndex) in itemChoiceLines(item)" :key="lineIndex" class="prod-options-inv">{{ line }}</span>
               <span class="prod-warranty-inv">{{ t('invoice.warranty_two_years') }}</span>
             </td>
             <td class="text-center font-bold">{{ item.quantity }}</td>
@@ -189,6 +190,7 @@ import { escapeHtml } from '../../../utils/sanitize'
 import { formatPriceHtml } from '../../../utils/price'
 import PriceText from '../../../components/PriceText.vue'
 import { useInvoiceStore } from '../store/invoiceStore'
+import { orderItemChoices, parseOrderOptions } from '../../../domain/order/orderOptions'
 
 export default {
   name: 'InvoiceView',
@@ -201,6 +203,16 @@ export default {
     const { currency } = useSettings()
     const invoiceStore = useInvoiceStore()
     const { order, loading, siteLogo, siteName } = storeToRefs(invoiceStore)
+
+    // "Color: Royal Black، Size: 60 cm" per chosen combination (×quantity when several).
+    const itemChoiceLines = (item) => {
+      const choices = orderItemChoices(item, parseOrderOptions(order.value?.notes))
+      const separator = locale.value === 'ar' ? '، ' : ', '
+      return choices.map((choice) => {
+        const text = choice.options.map((option) => `${option.group}: ${option.name}`).join(separator)
+        return choices.length > 1 ? `${text} (×${choice.quantity})` : text
+      })
+    }
 
     const orderStatusKeys = {
       pending: 'status_pending',
@@ -325,7 +337,7 @@ export default {
               ${(order.value.items || order.value.products || []).map((item, idx) => `
                 <tr>
                   <td>${idx + 1}</td>
-                  <td>${escapeHtml(localized(item.product || item, 'name'))}</td>
+                  <td>${escapeHtml(localized(item.product || item, 'name'))}${itemChoiceLines(item).map((line) => `<div style="font-size: 11px; color: #4b5563;">${escapeHtml(line)}</div>`).join('')}</td>
                   <td style="text-align: center;">${escapeHtml(item.quantity)}</td>
                   <td style="text-align: center;">${formatPriceHtml(item.price || item.unit_price, safeCurrency)}</td>
                   <td style="text-align: center;">${formatPriceHtml(((item.price || item.unit_price) * item.quantity) * 0.15 / 1.15, safeCurrency)}</td>
@@ -371,6 +383,7 @@ export default {
       t,
       locale,
       localized,
+      itemChoiceLines,
       formatOrderStatus
     }
   }
@@ -587,6 +600,13 @@ export default {
 .prod-title-inv {
   font-weight: 700;
   color: #111827;
+}
+
+.prod-options-inv {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #4b5563;
 }
 
 .prod-warranty-inv {

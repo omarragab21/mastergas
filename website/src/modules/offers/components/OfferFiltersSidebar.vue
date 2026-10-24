@@ -71,8 +71,8 @@
                 <span class="checkbox-text">{{ currentLang === 'ar' ? 'عروض وتخفيضات' : 'Offers & Discounts' }}</span>
               </label>
 
-              <!-- 3. Italian Made -->
-              <label class="sidebar-checkbox-item" @click="emit('toggle-italian')">
+              <!-- 3. Italian Made: only offered when some product states an Italian origin -->
+              <label v-if="showItalian || italianOnly" class="sidebar-checkbox-item" @click="emit('toggle-italian')">
                 <span class="custom-checkbox" :class="{ checked: italianOnly }">
                   <svg v-if="italianOnly" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -86,7 +86,8 @@
 
 </template>
 <script setup>
-import { toRefs } from 'vue';
+import { computed, toRefs } from 'vue';
+import { isItalianMade } from '../../../domain/product/productFilters';
 
 const props = defineProps({
   currentLang: { type: String, required: true },
@@ -102,5 +103,6 @@ const props = defineProps({
 });
 const emit = defineEmits(['toggle-in-stock', 'toggle-discount', 'toggle-italian']);
 const { currentLang, selectedOfferId, offers, allProducts, inStockOnly, hasDiscountOnly, italianOnly, localized, getOfferCount, selectOffer } = toRefs(props);
+const showItalian = computed(() => allProducts.value.some(isItalianMade));
 </script>
 

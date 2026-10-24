@@ -1,5 +1,4 @@
 import {
-  API_TTL,
   getCached,
   parseCollectionResponse,
   parseDataResponse,
@@ -12,6 +11,8 @@ import {
 } from '../../../services/siteDataMappers';
 import api from '../../../config/axios';
 import { isTestProduct, visibleCategories, visibleProducts } from '../../../utils/catalogVisibility.js';
+import { isItalianMade, matchesExtraFilters } from '../../../domain/product/productFilters.js';
+import { isOfferActive } from '../../../domain/product/offerRules.js';
 
 const cleanParams = (params = {}) => Object.fromEntries(
   Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -59,13 +60,47 @@ const paginate = (items, params) => {
   };
 };
 
+// The site API paginates (10 categories / 15 products per page) and ignores per_page,
+// so every page must be read or the storefront silently drops the rest.
+const MAX_CATALOG_PAGES = 50;
+const getAllPagesCached = async (endpoint, params, requestOptions) => {
+  const first = await getCached(endpoint, params, requestOptions);
+  const firstPage = parseCollectionResponse(first);
+  const lastPage = Math.min(firstPage.last_page || 1, MAX_CATALOG_PAGES);
+  if (lastPage <= 1) return first;
+  const rest = await Promise.all(Array.from({ length: lastPage - 1 }, (_, index) => (
+    getCached(endpoint, { ...params, page: index + 2 }, requestOptions)
+  )));
+  const items = [firstPage.items, ...rest.map((body) => parseCollectionResponse(body).items)].flat();
+  const unique = [...new Map(items.map((item) => [String(item?.id ?? Math.random()), item])).values()];
+  return { data: unique, meta: { total: unique.length, current_page: 1, last_page: 1, per_page: unique.length } };
+};
+
+// A product assigned to a sub-category also belongs to that sub-category's parent.
+const productBelongsToCategory = (product, categoryId) => {
+  const wanted = String(categoryId);
+  return String(product.category_id) === wanted || String(product.category?.parent_id ?? '') === wanted;
+};
+
+// Parents first, each followed by its own sub-categories (depth marks the level).
+const arrangeCategoryTree = (categories = []) => {
+  const ids = new Set(categories.map((category) => String(category.id)));
+  const isChild = (category) => category.parent_id !== null && category.parent_id !== undefined && ids.has(String(category.parent_id));
+  const parents = categories.filter((category) => !isChild(category));
+  return parents.flatMap((parent) => [
+    { ...parent, depth: 0 },
+    ...categories.filter((category) => isChild(category) && String(category.parent_id) === String(parent.id)).map((child) => ({ ...child, depth: 1 })),
+  ]);
+};
+
 const fetchProductsEndpoint = async (endpoint, params = {}, options = {}) => {
-  const body = await getCached(endpoint, cleanParams(params), {
-    ttl: options.ttl ?? API_TTL.products,
+  const fetchBody = endpoint.endsWith('/all_products') ? getAllPagesCached : getCached;
+  const body = await fetchBody(endpoint, cleanParams(params), {
+    cache: options.cache,
+      refresh: options.refresh,
     signal: options.signal,
     retries: options.retries ?? 2,
     timeout: options.timeout ?? 6000,
-    staleWhileRevalidate: options.staleWhileRevalidate ?? true,
   });
   return visibleProducts(listFromBody(body, normalizeSiteProduct));
 };
@@ -81,14 +116,33 @@ export const productService = {
     const products = await fetchProductsEndpoint('/v1/site/products/all_products', {
       is_active: clean.is_active ?? 1,
     }, options);
+    // "Offers & Discounts" also counts products that belong to an active offer.
+    const wantsDiscounted = String(clean.has_discount) === '1' || String(clean.has_offer) === '1';
+    let activeOffers = [];
+    if (wantsDiscounted) {
+      try {
+        activeOffers = (await this.getOffers({ is_active: 1 }, options)).filter(isOfferActive);
+      } catch {
+        activeOffers = [];
+      }
+    }
+    const extraFilters = {
+      inStock: String(clean.in_stock) === '1',
+      discounted: wantsDiscounted,
+      italian: Boolean(clean.origin) && /ital/i.test(String(clean.origin)),
+    };
     const filtered = products.filter((product) => {
-      if (clean.category_id && String(product.category_id) !== String(clean.category_id)) return false;
+      if (clean.category_id && !productBelongsToCategory(product, clean.category_id)) return false;
       if (clean.is_active !== undefined && Boolean(product.is_active) !== Boolean(Number(clean.is_active))) return false;
-      if (String(clean.has_discount) === '1' && !product.has_discount) return false;
-      if (String(clean.in_stock) === '1' && product.stock !== undefined && Number(product.stock) <= 0) return false;
+      if (!matchesExtraFilters(product, extraFilters, activeOffers)) return false;
       return matchesSearch(product, clean.search);
     });
-    return paginate(sortProducts(filtered, clean.sort_by), clean);
+    return {
+      ...paginate(sortProducts(filtered, clean.sort_by), clean),
+      // Whether the catalog has any product with a stated Italian origin, so the
+      // page can offer the "Made in Italy" filter only when it can actually apply.
+      facets: { italian: products.some(isItalianMade) },
+    };
   },
 
   async getFeaturedProducts(options = {}) {
@@ -101,11 +155,12 @@ export const productService = {
 
   async getProductById(id, options = {}) {
     const body = await getCached(`/v1/site/products/${encodeURIComponent(id)}`, {}, {
-      ttl: options.ttl ?? API_TTL.productDetail,
+      cache: options.cache,
+      refresh: options.refresh,
+      lang: options.lang,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     const product = parseDataResponse(body);
     if (isTestProduct(product)) return null;
@@ -115,27 +170,27 @@ export const productService = {
   },
 
   async getCategories(params = {}, options = {}) {
-    const body = await getCached('/v1/site/categories', cleanParams(params), {
-      ttl: options.ttl ?? API_TTL.categories,
+    const body = await getAllPagesCached('/v1/site/categories', cleanParams(params), {
+      cache: options.cache,
+      refresh: options.refresh,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     return visibleCategories(listFromBody(body, normalizeSiteCategory));
   },
 
   async getCategoryProductCounts(categories = [], options = {}) {
     const requestOptions = {
-      ttl: options.ttl ?? API_TTL.products,
+      cache: options.cache,
+      refresh: options.refresh,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     };
 
     try {
-      const body = await getCached('/v1/site/products/all_products', { is_active: 1 }, requestOptions);
+      const body = await getAllPagesCached('/v1/site/products/all_products', { is_active: 1 }, requestOptions);
       const collection = parseCollectionResponse(body);
       if (collection.last_page <= 1 || collection.items.length >= collection.total) {
         const counts = collection.items.reduce((result, product) => {
@@ -173,11 +228,11 @@ export const productService = {
 
   async getProductCount(params = {}, options = {}) {
     const body = await getCached('/v1/site/products/all_products', cleanParams(params), {
-      ttl: options.ttl ?? API_TTL.products,
+      cache: options.cache,
+      refresh: options.refresh,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     return Number(parseCollectionResponse(body).total) || 0;
   },
@@ -185,30 +240,34 @@ export const productService = {
   async getCategoriesWithProductCounts(params = {}, options = {}) {
     const categories = await this.getCategories(params, options);
     const counts = await this.getCategoryProductCounts(categories, options);
-    return categories.map((category) => ({
+    const own = (category) => counts[String(category.id)] ?? (Number(category.products_count) || 0);
+    return arrangeCategoryTree(categories).map((category) => ({
       ...category,
-      products_count: counts[String(category.id)] ?? (Number(category.products_count) || 0),
+      // A main category also counts the products of its sub-categories.
+      products_count: category.depth === 0
+        ? categories.filter((child) => String(child.parent_id) === String(category.id)).reduce((sum, child) => sum + own(child), own(category))
+        : own(category),
     }));
   },
 
   async getOffers(params = {}, options = {}) {
     const body = await getCached('/v1/site/offers', cleanParams(params), {
-      ttl: options.ttl ?? API_TTL.offers,
+      cache: options.cache,
+      refresh: options.refresh,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     return listFromBody(body, normalizeSiteOffer);
   },
 
   async getProductReviews(productId, options = {}) {
     const body = await getCached(`/v1/site/products/${encodeURIComponent(productId)}`, {}, {
-      ttl: options.ttl ?? API_TTL.productDetail,
+      cache: options.cache,
+      refresh: options.refresh,
       signal: options.signal,
       retries: options.retries ?? 2,
       timeout: options.timeout ?? 6000,
-      staleWhileRevalidate: options.staleWhileRevalidate ?? true,
     });
     const product = parseDataResponse(body);
     return Array.isArray(product?.reviews) ? product.reviews.map(normalizeSiteReview) : [];

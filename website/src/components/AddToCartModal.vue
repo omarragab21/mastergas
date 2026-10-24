@@ -41,6 +41,7 @@
         <!-- product-info -->
         <div class="product-info">
           <h4 class="product-name" :title="productName">{{ productName }}</h4>
+          <SelectedOptionsChips :options="productOptions" compact />
           <!-- meta -->
           <div class="meta">
             <!-- price-unit -->
@@ -90,12 +91,15 @@ import { useRouter } from 'vue-router';
 import { cartState } from '../store/cart';
 import { useLocalized } from '../composables/useLocalized';
 import { formatPrice } from '../utils/price';
+import SelectedOptionsChips from './SelectedOptionsChips.vue';
+import { describeSelectedOptions } from '../domain/product/productOptions';
 
 const router = useRouter();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { currentLang, localized } = useLocalized();
 
 const product = computed(() => cartState.lastAddedProduct);
+const productOptions = computed(() => describeSelectedOptions(product.value?.selectedOptions, locale.value === 'en' ? 'en' : 'ar'));
 
 const productName = computed(() => {
   if (!product.value) return '';
@@ -129,6 +133,10 @@ const handleImageError = (e) => {
 
 const displayPrice = computed(() => {
   if (!product.value) return '0';
+  // The API's final price already includes the discount; the product page also
+  // passes an already-discounted `price`, so discounting again would show too little.
+  const apiFinalPrice = Number(product.value.final_price);
+  if (apiFinalPrice > 0) return formatPrice(apiFinalPrice, { fraction: 'none' });
   const price = Number(product.value.price) || 0;
   const discount = Number(product.value.discount) || 0;
   const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;

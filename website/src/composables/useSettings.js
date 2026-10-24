@@ -23,7 +23,6 @@ export const defaultSettings = {
 const settings = ref(null);
 const loading = ref(false);
 let fetchPromise = null;
-let fetchedAt = 0;
 
 const isIrisAsset = (value) => {
   if (!value) return false;
@@ -63,18 +62,15 @@ export function useSettings() {
   const { locale } = useI18n();
 
   const fetchSettings = async (options = {}) => {
-    const fresh = settings.value && Date.now() - fetchedAt < (options.ttl ?? 300000);
-    if (fresh && !options.force) return settings.value;
+    // Settings are fetched fresh on every page; concurrent callers share one request.
     if (fetchPromise) return fetchPromise;
 
     loading.value = true;
     fetchPromise = settingsService.getSettings({
-      ttl: options.ttl ?? 300000,
       signal: options.signal,
     }).then((data) => normalizeSettings(data))
       .then((data) => {
         settings.value = data;
-        fetchedAt = Date.now();
         return settings.value;
       })
       .finally(() => {

@@ -37,7 +37,7 @@
                 v-for="cat in categories" 
                 :key="cat.id" 
                 class="sidebar-radio-item" 
-                :class="{ active: selectedCategory === cat.id }"
+                :class="{ active: selectedCategory === cat.id, 'is-sub': cat.depth === 1 }"
                 @click="selectCategory(cat.id)"
               >
                 <div class="radio-main-col">
@@ -79,8 +79,8 @@
                 <span class="checkbox-text">{{ currentLang === 'ar' ? 'عروض وتخفيضات' : 'Offers & Discounts' }}</span>
               </label>
 
-              <!-- 3. Italian Made -->
-              <label class="sidebar-checkbox-item" @click="toggleItalian">
+              <!-- 3. Italian Made: only offered when some product states an Italian origin -->
+              <label v-if="showItalian || italianOnly" class="sidebar-checkbox-item" @click="toggleItalian">
                 <span class="custom-checkbox" :class="{ checked: italianOnly }">
                   <svg v-if="italianOnly" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -95,6 +95,6 @@
 </template>
 <script setup>
 import { toRefs } from 'vue';
-const props = defineProps({ loading: { type: Boolean, default: false }, categories: { type: Array, default: () => [] }, selectedCategory: { type: [Number, String], default: null }, totalAllCount: { type: Number, default: 0 }, currentLang: { type: String, required: true }, inStockOnly: { type: Boolean, default: false }, hasDiscountOnly: { type: Boolean, default: false }, italianOnly: { type: Boolean, default: false }, localized: { type: Function, required: true }, selectCategory: { type: Function, required: true }, toggleInStock: { type: Function, required: true }, toggleDiscount: { type: Function, required: true }, toggleItalian: { type: Function, required: true } });
-const { loading, categories, selectedCategory, totalAllCount, currentLang, inStockOnly, hasDiscountOnly, italianOnly, localized, selectCategory, toggleInStock, toggleDiscount, toggleItalian } = toRefs(props);
+const props = defineProps({ loading: { type: Boolean, default: false }, categories: { type: Array, default: () => [] }, selectedCategory: { type: [Number, String], default: null }, totalAllCount: { type: Number, default: 0 }, currentLang: { type: String, required: true }, inStockOnly: { type: Boolean, default: false }, hasDiscountOnly: { type: Boolean, default: false }, italianOnly: { type: Boolean, default: false }, showItalian: { type: Boolean, default: false }, localized: { type: Function, required: true }, selectCategory: { type: Function, required: true }, toggleInStock: { type: Function, required: true }, toggleDiscount: { type: Function, required: true }, toggleItalian: { type: Function, required: true } });
+const { loading, categories, selectedCategory, totalAllCount, currentLang, inStockOnly, hasDiscountOnly, italianOnly, showItalian, localized, selectCategory, toggleInStock, toggleDiscount, toggleItalian } = toRefs(props);
 </script>

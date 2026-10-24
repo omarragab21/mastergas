@@ -8,7 +8,7 @@ import router from './router/index.js';
 import i18n from './i18n/index.js';
 import { createPinia } from 'pinia';
 import { useTheme } from './composables/useTheme.js';
-import { warmCriticalData, installLinkPrefetch, installRefreshOnReturn } from './services/cacheWarmup.js';
+import { installLinkPrefetch } from './services/cacheWarmup.js';
 import { registerServiceWorker } from './pwa/registerServiceWorker.js';
 
 const { initTheme } = useTheme();
@@ -29,7 +29,5 @@ app.use(router);
 app.mount('#app');
 
 // Speed-ups that must never block or break the first render.
-warmCriticalData();
 installLinkPrefetch(router);
-installRefreshOnReturn();
 registerServiceWorker();

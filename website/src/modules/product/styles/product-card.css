@@ -161,8 +161,27 @@
   text-align: center;
 }
 
-.product-overlay.out-of-stock {
-  background: rgba(17, 24, 39, 0.9);
+.product-out-of-stock {
+  position: absolute;
+  bottom: 8px;
+  inset-inline: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: normal;
+  color: #E53333;
+}
+
+.out-of-stock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E53333;
+  flex-shrink: 0;
 }
 
 .product-info {

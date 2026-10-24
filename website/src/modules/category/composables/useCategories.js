@@ -11,7 +11,7 @@ export function useCategories() {
   const displayCategories = computed(() => {
     if (!rawCategories.value.length) return [];
 
-    return rawCategories.value.map((cat) => {
+    return rawCategories.value.filter((cat) => !cat.parent_id).map((cat) => {
       const isAr = currentLang.value === 'ar';
       const name = isAr
         ? (cat.name_i18n?.ar || localized(cat, 'name') || cat.name)
@@ -21,20 +21,22 @@ export function useCategories() {
         id: cat.id,
         name,
         countText: isAr ? `${cat.products_count ?? 0} منتجات` : `${cat.products_count ?? 0} Products`,
-        image: cat.image || '/images/home/cat_cookers.png',
+        image: cat.image || '',
         link: `/products?category_id=${cat.id}`,
       };
     });
   });
 
-  const fetchCategories = async () => {
-    categoriesLoading.value = true;
+  // options.refresh: a background refresh, so keep the current list on screen
+  // (no skeleton) and keep it if the request fails.
+  const fetchCategories = async (options = {}) => {
+    if (!options.refresh) categoriesLoading.value = true;
     try {
-      const list = await categoryService.getCategoriesWithProductCounts({ is_active: 1 });
+      const list = await categoryService.getCategoriesWithProductCounts({ is_active: 1 }, options);
       rawCategories.value = Array.isArray(list) ? list : [];
     } catch (error) {
       console.error('Failed to fetch categories from API:', error);
-      rawCategories.value = [];
+      if (!options.refresh) rawCategories.value = [];
     } finally {
       categoriesLoading.value = false;
     }

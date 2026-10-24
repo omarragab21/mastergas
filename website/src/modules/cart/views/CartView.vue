@@ -112,7 +112,8 @@
                   <div class="item-details" :class="{ 'is-unavailable': item.unavailable }" @click="!item.unavailable && goToProduct(item)">
                     <h3 class="item-title">{{ getItemName(item) }}</h3>
                     <p class="item-code" v-if="getItemSku(item)">{{ getItemSku(item) }}</p>
-                    <p class="item-features" v-if="getItemSubtitle(item)">{{ getItemSubtitle(item) }}</p>
+                    <SelectedOptionsChips v-if="item.selectedOptions?.length" :options="getItemOptions(item)" :label="isRtl ? 'المواصفات المختارة' : 'Selected options'" />
+                    <p class="item-features" v-else-if="getItemSubtitle(item)">{{ getItemSubtitle(item) }}</p>
                   </div>
 
                   <!-- Product Thumbnail (80x80px on far right in RTL) -->
@@ -257,6 +258,8 @@ import { useLocalized } from '../../../composables/useLocalized';
 import { useSettings } from '../../../composables/useSettings';
 import { formatPrice } from '../../../utils/price';
 import { useCartSummary } from '../../../composables/useCartSummary';
+import SelectedOptionsChips from '../../../components/SelectedOptionsChips.vue';
+import { describeSelectedOptions } from '../../../domain/product/productOptions';
 import { getCartItemSku, getCartItemSubtitle } from '../../../domain/cart/cartItemPresentation';
 import { calculateBundleCartPricing, cartItemKey } from '../../../composables/useBundlePricing.js';
 
@@ -324,6 +327,7 @@ const getItemName = (item) => localized(item, 'name')
   || item?.name
   || '';
 const getItemSubtitle = (item) => getCartItemSubtitle(item, { isEnglish: !isRtl.value });
+const getItemOptions = (item) => describeSelectedOptions(item.selectedOptions, isRtl.value ? 'ar' : 'en');
 const {
   subtotalWithDiscount,
   shippingAmount,

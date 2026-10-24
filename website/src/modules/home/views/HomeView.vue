@@ -296,6 +296,7 @@ import { settingsService } from '../../../services/settingsService';
 import { settingsToObject } from '../../../utils/siteSettings';
 import { formatPrice, isolateLtr } from '../../../utils/price';
 import { useCategories } from '../../category/composables/useCategories';
+import { HOME_REFRESH_INTERVAL_MS } from '../../../config/cache';
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -586,78 +587,124 @@ const addToCart = (product) => {
   }
 };
 
-const fetchSliders = async () => {
-  slidersLoading.value = true;
+// The home page is the only page that caches API data: it renders from the
+// last response instantly, then asks the API again every refresh interval.
+// Loaders take { cache: true } on first load and { cache: true, refresh: true }
+// on a periodic refresh, which updates the page silently (no skeletons) and
+// keeps what is on screen if the request fails.
+const HOME_LOAD = { cache: true };
+const HOME_REFRESH = { cache: true, refresh: true };
+
+// Re-rendering cards and the hero every few seconds is wasted work when
+// nothing changed, so only replace data that actually differs.
+const replaceIfChanged = (target, next) => {
+  if (JSON.stringify(target.value) === JSON.stringify(next)) return false;
+  target.value = next;
+  return true;
+};
+
+const fetchSliders = async (options = HOME_LOAD) => {
+  if (!options.refresh) slidersLoading.value = true;
   try {
-    const list = await settingsService.getSliders({ is_active: 1 });
-    if (Array.isArray(list) && list.length > 0) {
-      const activeSlides = list.filter(s => s.status === 'active' || s.is_active !== 0);
+    const list = await settingsService.getSliders({ is_active: 1 }, options);
+    const activeSlides = Array.isArray(list)
+      ? list.filter(s => s.status === 'active' || s.is_active !== 0)
+      : [];
+    if (replaceIfChanged(rawSliders, activeSlides)) {
       preloadHeroImages(activeSlides);
-      rawSliders.value = activeSlides;
+      if (currentHeroIndex.value >= activeSlides.length) currentHeroIndex.value = 0;
       startHeroAutoplay();
-    } else {
-      rawSliders.value = [];
     }
   } catch (err) {
     console.error('Failed to fetch sliders from API:', err);
-    rawSliders.value = [];
+    if (!options.refresh) rawSliders.value = [];
   } finally {
     slidersLoading.value = false;
   }
 };
 
-const fetchOffers = async () => {
-  offersLoading.value = true;
+const fetchOffers = async (options = HOME_LOAD) => {
+  if (!options.refresh) offersLoading.value = true;
   try {
-    const result = await productService.getOffers({ is_active: 1 });
-    rawOffers.value = Array.isArray(result) ? result : [];
+    const result = await productService.getOffers({ is_active: 1 }, options);
+    replaceIfChanged(rawOffers, Array.isArray(result) ? result : []);
   } catch (err) {
     console.error('Failed to fetch offers from API:', err);
-    rawOffers.value = [];
+    if (!options.refresh) rawOffers.value = [];
   } finally {
     offersLoading.value = false;
   }
 };
 
-const fetchProducts = async () => {
-  productsLoading.value = true;
+const fetchProducts = async (options = HOME_LOAD) => {
+  if (!options.refresh) productsLoading.value = true;
   try {
     const [featured, newArrivals] = await Promise.all([
-      productService.getFeaturedProducts(),
-      productService.getNewArrivals(),
+      productService.getFeaturedProducts(options),
+      productService.getNewArrivals(options),
     ]);
-    rawProducts.value = Array.isArray(featured) ? featured : [];
-    rawNewArrivals.value = Array.isArray(newArrivals) ? newArrivals : [];
+    replaceIfChanged(rawProducts, Array.isArray(featured) ? featured : []);
+    replaceIfChanged(rawNewArrivals, Array.isArray(newArrivals) ? newArrivals : []);
   } catch (err) {
     console.error('Failed to fetch products from API:', err);
-    rawProducts.value = [];
-    rawNewArrivals.value = [];
+    if (!options.refresh) {
+      rawProducts.value = [];
+      rawNewArrivals.value = [];
+    }
   } finally {
     productsLoading.value = false;
   }
 };
 
-const fetchHomepageSettings = async () => {
+const fetchHomepageSettings = async (options = HOME_LOAD) => {
   try {
-    homepageSettings.value = settingsToObject(await settingsService.getSettings());
+    replaceIfChanged(homepageSettings, settingsToObject(await settingsService.getSettings(options)));
   } catch (error) {
-    homepageSettings.value = {};
+    if (!options.refresh) homepageSettings.value = {};
     console.warn('Homepage settings unavailable:', error?.message);
   }
 };
 
+const loadHomeData = (options = HOME_LOAD) => Promise.allSettled([
+  fetchHomepageSettings(options),
+  fetchSliders(options),
+  fetchCategories(options),
+  fetchOffers(options),
+  fetchSharedOffers(options),
+  fetchProducts(options),
+]);
+
+// Periodic refresh: runs only while the tab is visible, never overlaps itself,
+// and catches up as soon as the visitor returns to the tab.
+let homeRefreshTimer = null;
+let homeRefreshRunning = false;
+
+const refreshHomeData = async () => {
+  if (homeRefreshRunning || document.visibilityState === 'hidden') return;
+  homeRefreshRunning = true;
+  try {
+    await loadHomeData(HOME_REFRESH);
+  } finally {
+    homeRefreshRunning = false;
+  }
+};
+
+const handleHomeVisibility = () => {
+  if (document.visibilityState === 'visible') refreshHomeData();
+};
+
 onMounted(() => {
-  fetchHomepageSettings();
-  fetchSliders();
-  fetchCategories();
-  fetchOffers();
-  fetchSharedOffers();
-  fetchProducts();
+  loadHomeData();
   startHeroAutoplay();
+  homeRefreshTimer = setInterval(refreshHomeData, HOME_REFRESH_INTERVAL_MS);
+  document.addEventListener('visibilitychange', handleHomeVisibility);
 });
 
 onUnmounted(() => {
   stopHeroAutoplay();
+  clearInterval(homeRefreshTimer);
+  homeRefreshTimer = null;
+  document.removeEventListener('visibilitychange', handleHomeVisibility);
 });
 </script>
 

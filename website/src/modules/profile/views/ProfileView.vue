@@ -688,6 +688,10 @@
                     <div class="prod-titles-col">
                       <span class="prod-main-name">{{ item.name }}</span>
                       <span class="prod-model-num">{{ item.model || item.product_id || '—' }}</span>
+                      <div v-for="(choice, choiceIndex) in (item.choices || [])" :key="choiceIndex" class="prod-choice">
+                        <span v-if="item.choices.length > 1" class="prod-choice-qty" dir="ltr">×{{ choice.quantity }}</span>
+                        <SelectedOptionsChips :options="choice.options" compact />
+                      </div>
                     </div>
                   </div>
 
@@ -1551,6 +1555,8 @@ import { countries as phoneCountries, findCountryByCode, validatePhoneByCountry 
 import { escapeHtml, sanitizeUrl } from '../../../utils/sanitize'
 import { getCustomerToken } from '../../../utils/customerSession'
 import { useProfileStore } from '../store/profileStore'
+import SelectedOptionsChips from '../../../components/SelectedOptionsChips.vue'
+import { orderItemChoices, parseOrderOptions } from '../../../domain/order/orderOptions'
 
 const route = useRoute()
 const router = useRouter()
@@ -2074,8 +2080,10 @@ const allOrdersMapped = computed(() => {
       const meta = getOrderStatusMeta(o.status)
       const items = o.items || o.products || []
       const count = items.length || 1
+      const optionEntries = parseOrderOptions(o.notes)
       const mappedItems = items.map(item => ({
         ...item,
+        choices: orderItemChoices(item, optionEntries),
         name: item.name || item.product?.name || t('profile.product_fallback'),
         unitPrice: formatPrice(item.price || item.unit_price || 0),
         totalPrice: formatPrice(item.total || item.total_price || (Number(item.price || item.unit_price || 0) * (item.quantity || 1))),
@@ -6961,6 +6969,9 @@ html[dir="ltr"] .country-readonly-input {
   padding: 4px 8px;
 }
 
+.prod-choice { display: flex; align-items: flex-start; gap: 6px; }
+.prod-choice > ul { flex: 1; min-width: 0; }
+.prod-choice-qty { margin-top: 7px; font-size: 11px; font-weight: 700; color: #6b7280; }
 .ret-reason, .ret-notes {
   font-size: 14px;
   color: #4b5563;

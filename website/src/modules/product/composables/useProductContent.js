@@ -9,23 +9,10 @@ export function useProductContent({ product, locale, localized, selectedAttribut
       .filter(Boolean);
   };
 
-  // Bullet specs matching Figma inspect (excluding warranty, dimensions, materials, origin, and burner specs)
+  // Header bullet points: every point entered under Features in the dashboard.
   const productFeatures = computed(() => {
     const rawFeat = localized(product.value, 'features') || product.value?.features;
-    let list = contentLines(rawFeat);
-  
-    const excludedPatterns = [
-      /ضمان/i, /warranty/i,
-      /خامة/i, /خامات/i, /material/i,
-      /أبعاد/i, /ابعاد/i, /dimensions/i,
-      /بلد المنشأ/i, /صنع بالكامل في إيطاليا/i, /صنع في/i, /made in/i,
-      /شعلات/i, /شعلة/i, /burners/i,
-      /قدرة حرارية/i, /btu/i
-    ];
-  
-    list = list.filter(item => !excludedPatterns.some(regex => regex.test(item)));
-  
-    return list.slice(0, 6);
+    return contentLines(rawFeat);
   });
   
   // Dynamic Overview Data

@@ -255,6 +255,26 @@
   transition: color 0.15s ease;
 }
 
+.sidebar-radio-item.is-sub {
+  padding-inline-start: 22px;
+  position: relative;
+}
+
+.sidebar-radio-item.is-sub::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 8px;
+  top: 50%;
+  width: 8px;
+  height: 1.5px;
+  background: #cbd5e1;
+}
+
+.sidebar-radio-item.is-sub .radio-title {
+  font-size: 13px;
+  color: #475569;
+}
+
 .sidebar-radio-item.active .radio-title {
   font-weight: 700;
   color: #000000;

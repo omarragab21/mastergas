@@ -517,7 +517,12 @@
 }
 
 .stock-pill.is-out-stock {
-  color: #EF4444;
+  color: #E53333;
+}
+
+/* Figma: label first, then the dot (dot sits on the visual left in Arabic). */
+html[dir="rtl"] .stock-pill.is-out-stock {
+  flex-direction: row-reverse;
 }
 
 .stock-dot {

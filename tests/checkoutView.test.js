@@ -394,7 +394,7 @@ test('CheckoutView order submission safety scenarios', async (t) => {
     assert.equal(checkout.calls[0].payload.checkout_attempt_id, attemptId);
     assert.equal(checkout.calls[0].payload.cart_id, attemptId);
     assert.deepEqual(checkout.calls[0].payload.order_data.items, [
-      { product_id: 28, quantity: 1, unit_price: 10, attributes: null },
+      { product_id: 28, quantity: 1, unit_price: 10 },
     ]);
     assert.match(checkout.calls[0].payload.return_url, new RegExp(`attempt=${attemptId}`));
     assert.equal(window.location.href, 'https://pay.example.test/session/1');

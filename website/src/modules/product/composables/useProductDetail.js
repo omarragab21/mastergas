@@ -15,6 +15,12 @@ import { useProductContent } from './useProductContent';
 import { useProductVisuals } from './useProductVisuals';
 import riyalIcon from '../../../assets/riyal.svg';
 import { formatPrice } from '../../../utils/price';
+import {
+  buildSelectedOptions,
+  completeOptionSelection,
+  extractOptionGroups,
+  withBilingualLabels,
+} from '../../../domain/product/productOptions';
 export function useProductDetail() {
 const { getActiveOfferForProduct, calculatePriceWithOffer, fetchOffers } = useOffers();
 const { t, locale } = useI18n();
@@ -32,7 +38,12 @@ let productRequestSequence = 0;
 const currentImageIndex = ref(0);
 const quantity = ref(1);
 const selectedAttributes = ref({});
+// Selectable options (color, size, energy type…): groups with both languages'
+// labels, and the chosen option id per group.
+const optionGroups = ref([]);
+const optionSelection = ref({});
 const activeTab = ref('overview');
+const parentCategory = ref(null);
 
 // Lightbox
 const showLightbox = ref(false);
@@ -110,7 +121,7 @@ const hasProductAttributes = computed(() => {
 
 const tabOptions = computed(() => {
   const tabs = [];
-  if (hasProductContent('description') || hasProductContent('features')) {
+  if (hasProductContent('description')) {
     tabs.push({ id: 'overview', label: locale.value === 'ar' ? 'نظرة عامة' : 'Overview' });
   }
   if (hasProductAttributes.value) {
@@ -125,6 +136,12 @@ const tabOptions = computed(() => {
   tabs.push({ id: 'reviews', label: locale.value === 'ar' ? 'التقييمات' : 'Reviews' });
   return tabs;
 });
+
+// Tabs are rebuilt once the product arrives; always open on the first one (Overview in the design).
+watch(() => product.value?.id, () => {
+  const first = tabOptions.value[0]?.id;
+  if (first) activeTab.value = first;
+}, { flush: 'post' });
 
 watch(tabOptions, (tabs) => {
   if (!Array.isArray(tabs) || tabs.length === 0) return;
@@ -255,12 +272,42 @@ const {
 });
 
 const { isLightColor, isColorSpec, getSpecColorsList } = useProductVisuals(colorOptions);
+const selectOption = (groupKey, optionId) => {
+  optionSelection.value = { ...optionSelection.value, [groupKey]: optionId };
+};
+
+// Groups render at once in the current language; the other language's labels
+// arrive with a second request so a cart line reads right after switching.
+const loadOptionGroups = async (loaded, signal) => {
+  const lang = locale.value === 'en' ? 'en' : 'ar';
+  const groups = extractOptionGroups(loaded);
+  optionGroups.value = withBilingualLabels(groups, null, lang);
+  optionSelection.value = completeOptionSelection(groups);
+  if (!groups.length) return;
+  try {
+    const other = await productService.getProductById(loaded.id, { lang: lang === 'ar' ? 'en' : 'ar', signal });
+    if (product.value?.id !== loaded.id) return;
+    optionGroups.value = withBilingualLabels(groups, extractOptionGroups(other), lang);
+  } catch {
+    // Labels stay in the current language only.
+  }
+};
+
 const handleAddToCart = () => {
   const payload = {
     ...product.value,
     price: currentPrice.value
   };
-  cartState.addToCart(payload, quantity.value, selectedAttributes.value);
+  if (!optionGroups.value.length) {
+    cartState.addToCart(payload, quantity.value, selectedAttributes.value);
+    return;
+  }
+  // Every group always has a choice (the first option by default), and the
+  // line is keyed by option ids so each combination is its own cart line.
+  const selection = completeOptionSelection(optionGroups.value, optionSelection.value);
+  optionSelection.value = selection;
+  payload.selectedOptions = buildSelectedOptions(optionGroups.value, selection);
+  cartState.addToCart(payload, quantity.value, selection);
 };
 
 const goToProduct = (p) => {
@@ -283,6 +330,7 @@ const fetchProduct = async (id) => {
       product.value = pData;
       reviews.value = Array.isArray(pData.reviews) ? pData.reviews.map(normalizeSiteReview) : [];
       selectColor(colorOptions.value[0]?.name);
+      loadOptionGroups(pData, controller.signal);
 
       useSEO({
         title: localized(product.value, 'name'),
@@ -291,6 +339,7 @@ const fetchProduct = async (id) => {
         image: getImageUrl(product.value.image, product.value.id)
       });
 
+      resolveParentCategory(product.value);
       trackViewContent(product.value, currency.value);
       fetchRelated(product.value.category_id);
     } else {
@@ -307,9 +356,24 @@ const fetchProduct = async (id) => {
   }
 };
 
+// A product in a sub-category shows its main category in the breadcrumb.
+const resolveParentCategory = async (currentProduct) => {
+  const parentId = currentProduct?.category?.parent_id;
+  parentCategory.value = null;
+  if (!parentId) return;
+  try {
+    const list = await productService.getCategories({ is_active: 1 });
+    if (product.value?.id !== currentProduct.id) return;
+    parentCategory.value = (Array.isArray(list) ? list : []).find((category) => String(category.id) === String(parentId)) || null;
+  } catch {
+    parentCategory.value = null;
+  }
+};
+
 const fetchRelated = async (categoryId) => {
   try {
-    const catId = categoryId || product.value?.category_id || product.value?.category?.id;
+    // Related items come from the whole main category, so sibling sub-categories count too.
+    const catId = product.value?.category?.parent_id || categoryId || product.value?.category_id || product.value?.category?.id;
     if (catId) {
       const res = await productService.getProducts({ category_id: catId, per_page: 8 });
       const list = res.items || [];
@@ -393,6 +457,6 @@ onUnmounted(() => {
 });
   const addToCart = (productToAdd) => cartState.addToCart(productToAdd);
   return {
-    t, locale, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
+    t, locale, parentCategory, product, relatedProducts, loading, localized, localizedValue, allImages, currentImageIndex, handleImageError, openLightbox, showLightbox, lightboxIndex, closeLightbox, nextLightbox, prevLightbox, showShareModal, linkCopied, shareTo, copyLink, user, reviewForm, isSubmittingReview, reviewMessage, reviewStatus, openLoginModal, submitReview, showAddReviewModal, tabOptions, activeTab, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, installationItems, shippingItems, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, optionGroups, optionSelection, selectOption, isProductInStock, selectColor, selectAttribute, quantity, handleAddToCart, addToCart, goToProduct, dynamicOverviewTitle, dynamicOverviewDesc, dynamicOverviewFeatures, specRows, isColorSpec, getSpecColorsList, getRatingPercentage, displayReviews, formatDate, handleAddReviewClick
   };
 }

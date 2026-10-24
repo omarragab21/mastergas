@@ -66,6 +66,11 @@ export const normalizeSiteProduct = (product = {}) => {
       : 0
   );
 
+  const rawStock = product.number ?? product.stock ?? product.quantity;
+  const stockCount = rawStock === undefined || rawStock === null || rawStock === '' || !Number.isFinite(Number(rawStock))
+    ? undefined
+    : Number(rawStock);
+
   return {
     ...product,
     id: normalizeId(product.id),
@@ -93,6 +98,9 @@ export const normalizeSiteProduct = (product = {}) => {
     discount: discountPercentage,
     has_discount: Boolean(product.has_discount || discountPercentage > 0),
     is_new: Boolean(product.is_new || product.is_new_arrival),
+    // The API stores inventory in `number`; expose it under the names the storefront reads.
+    stock: stockCount,
+    quantity: stockCount,
     category: product.category ? normalizeSiteCategory(product.category) : product.category,
   };
 };

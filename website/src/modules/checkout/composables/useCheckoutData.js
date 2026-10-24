@@ -108,7 +108,7 @@ export function useCheckoutData({
 
   const fetchSettings = async () => {
     try {
-      const response = await settingsService.getSettings({ ttl: 300000, retries: 1 });
+      const response = await settingsService.getSettings({ retries: 1 });
       const siteSettings = settingsToObject(response);
       const threshold = firstSetting(siteSettings, 'free_delivery_threshold', 'delivery_range');
       const shipping = firstSetting(siteSettings, 'default_shipping_cost', 'shipping_cost');

@@ -49,8 +49,9 @@
       <div class="product-overlay" v-if="product.stock > 0 && product.stock <= 5">
         <span class="stock-warning">{{ t('product.only_left', { count: product.stock }) }}</span>
       </div>
-      <div class="product-overlay out-of-stock" v-else-if="product.stock === 0">
-        <span class="stock-warning">{{ t('product.out_of_stock') }}</span>
+      <div class="product-out-of-stock" v-else-if="product.stock <= 0">
+        <span>{{ t('product.out_of_stock') }}</span>
+        <span class="out-of-stock-dot"></span>
       </div>
     </div>
     

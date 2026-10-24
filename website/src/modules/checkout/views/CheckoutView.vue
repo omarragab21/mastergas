@@ -333,7 +333,8 @@
                         <div class="review-item-details">
                           <span class="review-item-name" :title="prod.name">{{ prod.name }}</span>
                           <span class="review-item-sku">{{ prod.sku }}</span>
-                          <span class="review-item-specs">{{ prod.specs }}</span>
+                          <SelectedOptionsChips v-if="prod.options?.length" :options="prod.options" :label="L('المواصفات المختارة', 'Selected options')" />
+                          <span v-else class="review-item-specs">{{ prod.specs }}</span>
                         </div>
 
                         <!-- Quantity display box -->
@@ -456,10 +457,11 @@
                       <path d="M8.51992 13.5541C8.27563 14.0957 8.11415 14.6836 8.05229 15.3L13.2219 14.2011C13.4662 13.6595 13.6275 13.0716 13.6895 12.4552L8.51992 13.5541Z"/>
                       <path d="M13.2219 10.9088C13.4662 10.3673 13.6276 9.77934 13.6895 9.1629L9.66256 10.0194V8.37293L13.2217 7.61657C13.466 7.07503 13.6275 6.48709 13.6894 5.87065L9.66243 6.72638V0.805314C9.04539 1.15177 8.49739 1.61294 8.05193 2.15692V7.06882L6.44142 7.41113V0C5.82437 0.346335 5.27637 0.807628 4.83091 1.35161V7.75333L1.2274 8.51906C0.98311 9.06061 0.821511 9.64855 0.759526 10.265L4.83091 9.39976V11.4731L0.467625 12.4004C0.22334 12.9419 0.061863 13.5298 0 14.1463L4.56714 13.1757C4.93893 13.0984 5.25847 12.8786 5.46623 12.5761L6.30381 11.3343V11.3341C6.39076 11.2056 6.44142 11.0507 6.44142 10.8839V9.05744L8.05193 8.71513V12.008L13.2217 10.9086L13.2219 10.9088Z"/>
                     </svg>
-                    <span class="price-val">{{ formatPrice(item.price * (item.quantity || 1)) }}</span>
+                    <span class="price-val">{{ formatPrice(item.lineTotal ?? item.price * (item.quantity || 1)) }}</span>
                   </div>
                   <div class="receipt-product-name-qty">
                     {{ item.name }} <bdi class="price-num" dir="ltr">×{{ item.quantity || 1 }}</bdi>
+                    <SelectedOptionsChips v-if="item.options?.length" :options="item.options" compact />
                   </div>
                 </div>
               </div>
@@ -688,6 +690,9 @@ import {
 import { trackPurchase } from '../../../utils/metaPixel';
 import { formatPrice as formatPriceBase, formatPriceWithCurrency } from '../../../utils/price';
 import PriceText from '../../../components/PriceText.vue';
+import SelectedOptionsChips from '../../../components/SelectedOptionsChips.vue';
+import { describeSelectedOptions } from '../../../domain/product/productOptions';
+import { appendOrderOptions, mergeOrderItems } from '../../../domain/order/orderOptions';
 import { logPayment } from '../../../utils/terminalLogger.js';
 
 const router = useRouter();
@@ -890,6 +895,8 @@ const getReviewItemSpecs = (item) => {
   return item.short_description || L('أمان إيطالي', 'Italian safety');
 };
 
+const itemOptions = (item) => describeSelectedOptions(item.selectedOptions, locale.value === 'en' ? 'en' : 'ar');
+
 const displayReviewItems = computed(() => {
   if (cartState.items && cartState.items.length > 0) {
     return cartState.items.map(item => ({
@@ -897,6 +904,7 @@ const displayReviewItems = computed(() => {
       name: localized(item, 'name') || item.name_ar || item.name || t('checkout.unknown_product'),
       sku: item.sku || item.model || 'O604S',
       specs: getReviewItemSpecs(item),
+      options: itemOptions(item),
       quantity: item.quantity || 1,
       price: getItemPriceWithDiscount(item, cartState.items) || item.price || 0,
       image: getImageUrl(item.image || item.images?.[0], item.id)
@@ -994,7 +1002,9 @@ const receiptProducts = computed(() => {
     return cartState.items.map(item => ({
       id: item.cart_item_key || item.id,
       name: localized(item, 'name') || item.name_ar || item.name || t('checkout.unknown_product'),
+      options: itemOptions(item),
       quantity: item.quantity || 1,
+      lineTotal: getItemPriceWithDiscount(item, cartState.items) || item.price || 0,
       price: getItemPriceWithDiscount(item, cartState.items) || item.price || 0
     }));
   }
@@ -1184,17 +1194,19 @@ const buildOrderData = () => {
     use_wallet: useWallet.value,
     wallet_amount: walletPayment.value,
     coupon_code: appliedCoupon.value?.code || null,
-    notes: (appliedCoupon.value ? `Coupon: ${appliedCoupon.value.code}. ` : '') + (customerInfo.value.notes || ''),
+    // Chosen options ride in the notes: the order API has no field for them.
+    notes: appendOrderOptions((appliedCoupon.value ? `Coupon: ${appliedCoupon.value.code}. ` : '') + (customerInfo.value.notes || ''), cartState.items),
     is_gift: isGift.value,
     gift_message: isGift.value ? giftMessage.value : null,
     ...(offerId ? { offer_id: offerId } : {}),
-    items: cartState.items.map(item => ({
+    // The API rejects a product listed twice, so option lines of one product
+    // become a single item.
+    items: mergeOrderItems(cartState.items.map(item => ({
       product_id: item.id,
       quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
       unit_price: getItemUnitPrice(item, cartState.items),
       ...(item.offer_id ? { offer_id: Number(item.offer_id) } : {}),
-      attributes: item.selectedAttributes || item.attributes || null
-    }))
+    })))
   };
 };
 
@@ -1302,7 +1314,10 @@ const confirmOrder = async () => {
     lastPurchasedItems.value = displayReviewItems.value.map(it => ({
       id: it.id,
       name: it.name,
+      options: it.options,
       quantity: it.quantity,
+      // Review prices are already line totals (price × quantity).
+      lineTotal: it.price,
       price: it.price
     }));
     const serverOrder = createdOrder?.order || createdOrder;

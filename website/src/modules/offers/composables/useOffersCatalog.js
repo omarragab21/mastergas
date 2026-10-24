@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useLocalized } from '../../../composables/useLocalized';
 import { isOfferActive } from '../../product/composables/useOffers';
 import { productService } from '../../product/services/productService';
+import { matchesExtraFilters } from '../../../domain/product/productFilters';
 
 export function useOffersCatalog() {
   const router = useRouter();
@@ -71,27 +72,10 @@ export function useOffersCatalog() {
       }
     }
   
-    // 2. Extra Filter: In Stock Only
-    if (inStockOnly.value) {
-      list = list.filter(p => (Number(p.stock) > 0 || Number(p.quantity) > 0));
-    }
-  
-    // 3. Extra Filter: Discounts Only
-    if (hasDiscountOnly.value) {
-      list = list.filter(p => {
-        const price = parseFloat(p.price) || 0;
-        const sale = parseFloat(p.sale_price) || 0;
-        return (sale > 0 && sale < price) || (parseFloat(p.discount) > 0) || (selectedOfferId.value !== null);
-      });
-    }
-  
-    // 4. Extra Filter: Italian Made
-    if (italianOnly.value) {
-      list = list.filter(p => {
-        const origin = p.country_of_manufacture || p.origin || p.country_of_origin || '';
-        return origin.includes('إيطال') || origin.toLowerCase().includes('ital');
-      });
-    }
+    // 2. Extra filters (shared with the products page): in stock, discounted or in an offer, Italian origin
+    const offerScope = selectedOfferId.value ? offers.value.filter(o => String(o.id) === String(selectedOfferId.value)) : offers.value;
+    const extraFilters = { inStock: inStockOnly.value, discounted: hasDiscountOnly.value, italian: italianOnly.value };
+    list = list.filter(p => matchesExtraFilters(p, extraFilters, offerScope));
   
     // 5. Sorting
     if (sortBy.value === 'price_asc') {

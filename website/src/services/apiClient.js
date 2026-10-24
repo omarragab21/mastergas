@@ -1,4 +1,4 @@
-import { API_TTL } from '../config/cache';
+import { HOME_CACHE_TTL_MS } from '../config/cache';
 import api, {
   classifyApiError,
   isCancelledRequest,
@@ -135,6 +135,7 @@ const requestWithRetry = async (endpoint, params, options) => {
         params,
         signal: options.signal,
         timeout: options.timeout,
+        ...(options.lang ? { headers: { 'Accept-Language': options.lang } } : {}),
         __retryCount: attempt,
       });
       return response.data;
@@ -162,11 +163,14 @@ const recordCacheMetric = (endpoint, params, cache) => {
 };
 
 // ─── Persistent (cross-reload) cache ──────────────────────────────────────────
-// Public catalogue data is also kept in localStorage so a reload, a new tab or
-// a return visit renders instantly from the last good response while a fresh
-// copy is fetched in the background. Only an allow-list of public endpoints is
-// ever persisted: customer data (orders, returns, wallet, profile) never is.
-const PERSIST_PREFIX = 'mg:api:v1:';
+// Home page data is also kept in localStorage so a reload, a new tab or a
+// return visit renders the home page instantly from the last good response
+// while a fresh copy is fetched in the background. Only an allow-list of
+// public endpoints is ever persisted: customer data (orders, returns, wallet,
+// profile) never is.
+const PERSIST_PREFIX = 'mg:api:v2:';
+// Entries written before caching was limited to the home page.
+const LEGACY_PERSIST_PREFIXES = ['mg:api:v1:'];
 const PERSIST_MAX_AGE = 7 * 24 * 60 * 60 * 1000;   // never serve data older than a week
 const PERSIST_MAX_ENTRY_CHARS = 700 * 1000;         // skip pathological payloads
 const PERSIST_MAX_TOTAL_CHARS = 3 * 1000 * 1000;    // ~3M chars of the ~5M quota
@@ -194,7 +198,8 @@ const currentLang = () => {
   }
 };
 
-const cacheKeyFor = (endpoint, params) => `${createRequestKey(endpoint, params)}|${currentLang()}`;
+// options.lang fetches in a language other than the visitor's current one.
+const cacheKeyFor = (endpoint, params, lang) => `${createRequestKey(endpoint, params)}|${lang || currentLang()}`;
 
 const isPersistable = (endpoint) => PERSISTABLE_ENDPOINTS.some((pattern) => pattern.test(endpoint));
 
@@ -274,6 +279,20 @@ const removePersisted = (matches) => {
   } catch { /* storage unavailable */ }
 };
 
+const removeLegacyPersisted = () => {
+  const storage = getStorage();
+  if (!storage) return;
+  try {
+    const legacy = [];
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (key && LEGACY_PERSIST_PREFIXES.some((prefix) => key.startsWith(prefix))) legacy.push(key);
+    }
+    legacy.forEach((key) => storage.removeItem(key));
+  } catch { /* storage unavailable */ }
+};
+removeLegacyPersisted();
+
 // Memory first, then the persisted copy (hydrated into memory for next time).
 const lookupCache = (key) => {
   const inMemory = responseCache.get(key);
@@ -285,33 +304,63 @@ const lookupCache = (key) => {
   return entry;
 };
 
+const storeEntry = (key, endpoint, value, options) => {
+  if (!options.cache) return value;
+  const savedAt = Date.now();
+  const entry = { value, expiresAt: savedAt + Math.max(0, Number(options.ttl ?? HOME_CACHE_TTL_MS)), savedAt };
+  responseCache.set(key, entry);
+  if (options.persist !== false && isPersistable(endpoint)) {
+    // Serialising a large catalogue is not free; keep it off the render path.
+    setTimeout(() => writePersisted(key, entry), 0);
+  }
+  return value;
+};
+
+// A cached (home) caller may join a request another caller started without
+// caching, e.g. the layout's settings request; store its response all the same.
+const joinInflight = (key, endpoint, params, options) => {
+  recordCacheMetric(endpoint, params, 'inflight');
+  return inflightRequests.get(key).then((value) => storeEntry(key, endpoint, value, options));
+};
+
 const startCachedRequest = (key, endpoint, params, options, cache = 'miss') => {
   recordCacheMetric(endpoint, params, cache);
   const promise = requestWithRetry(endpoint, params, options)
-    .then((value) => {
-      const savedAt = Date.now();
-      const entry = { value, expiresAt: savedAt + Math.max(0, Number(options.ttl ?? 0)), savedAt };
-      responseCache.set(key, entry);
-      if (options.persist !== false && isPersistable(endpoint)) {
-        // Serialising a large catalogue is not free; keep it off the render path.
-        setTimeout(() => writePersisted(key, entry), 0);
-      }
-      return value;
-    })
+    .then((value) => storeEntry(key, endpoint, value, options))
     .finally(() => {
-      inflightRequests.delete(key);
+      if (inflightRequests.get(key) === promise) inflightRequests.delete(key);
     });
 
-  inflightRequests.set(key, promise);
+  // A request with its own AbortSignal is never shared: when its owner cancels
+  // it (a newer filter click), everyone who joined it would be cancelled too and
+  // the page would be left showing stale results.
+  if (!options.signal) inflightRequests.set(key, promise);
   return promise;
 };
 
+/**
+ * GET a public endpoint.
+ *
+ * Without `cache: true` (every page except home) the request always goes to
+ * the API; identical requests running at the same time share one response.
+ *
+ * With `cache: true` (home page only) the last response is served while it is
+ * fresh, an expired one is served instantly while a new copy is fetched, and
+ * `refresh: true` skips the cached copy and fetches a new one (used by the
+ * home page's periodic refresh).
+ */
 export const getCached = (endpoint, params = {}, options = {}) => {
-  const key = cacheKeyFor(endpoint, params);
+  const key = cacheKeyFor(endpoint, params, options.lang);
+
+  if (!options.cache) {
+    if (!options.signal && inflightRequests.has(key)) return joinInflight(key, endpoint, params, options);
+    return startCachedRequest(key, endpoint, params, options, 'bypass');
+  }
+
   const now = Date.now();
   const cached = options.persist === false ? responseCache.get(key) : lookupCache(key);
 
-  if (cached && cached.expiresAt > now) {
+  if (cached && cached.expiresAt > now && !options.refresh) {
     recordCacheMetric(endpoint, params, 'hit');
     return Promise.resolve(cached.value);
   }
@@ -319,7 +368,7 @@ export const getCached = (endpoint, params = {}, options = {}) => {
   // Public catalog data can be rendered from the last successful response
   // while a refresh runs in the background. This removes a blank/loading
   // state after the TTL expires without serving stale data forever.
-  if (cached && options.staleWhileRevalidate) {
+  if (cached && !options.refresh && options.staleWhileRevalidate !== false) {
     if (!inflightRequests.has(key)) {
       startCachedRequest(key, endpoint, params, options, 'revalidate').catch(() => {
         // The previous successful value remains available until the next
@@ -327,18 +376,15 @@ export const getCached = (endpoint, params = {}, options = {}) => {
         // promise rejections or interrupt rendering.
       });
     } else {
-      recordCacheMetric(endpoint, params, 'inflight');
+      joinInflight(key, endpoint, params, options).catch(() => {});
     }
     recordCacheMetric(endpoint, params, 'stale');
     return Promise.resolve(cached.value);
   }
 
-  if (inflightRequests.has(key)) {
-    recordCacheMetric(endpoint, params, 'inflight');
-    return inflightRequests.get(key);
-  }
-
-  const request = startCachedRequest(key, endpoint, params, options);
+  const request = !options.signal && inflightRequests.has(key)
+    ? joinInflight(key, endpoint, params, options)
+    : startCachedRequest(key, endpoint, params, options);
   if (!cached) return request;
   // stale-if-error: an expired copy beats an error page when the API is down.
   return request.catch((error) => {
@@ -346,11 +392,6 @@ export const getCached = (endpoint, params = {}, options = {}) => {
     recordCacheMetric(endpoint, params, 'stale-error');
     return cached.value;
   });
-};
-
-// Fire-and-forget warm-up: fills the cache so the next navigation is instant.
-export const prefetch = (endpoint, params = {}, options = {}) => {
-  getCached(endpoint, params, { staleWhileRevalidate: true, ...options }).catch(() => {});
 };
 
 export const getStaleCached = (endpoint, params = {}) => lookupCache(cacheKeyFor(endpoint, params))?.value;
@@ -382,17 +423,12 @@ export const getCacheState = () => ({
   inflight: [...inflightRequests.keys()],
 });
 
-// Refresh intervals live in config/cache.js; re-exported for existing imports.
-export { API_TTL };
-
 export default {
   getCached,
-  prefetch,
   getStaleCached,
   invalidateCache,
   clearApiCache,
   parseCollectionResponse,
   parseDataResponse,
   createRequestKey,
-  API_TTL,
 };

@@ -3,11 +3,9 @@ export { orderService } from './orderService';
 export { authService } from './authService';
 export { settingsService } from './settingsService';
 export {
-  API_TTL,
   clearApiCache,
   createRequestKey,
   getCached,
-  prefetch,
   getCacheState,
   getStaleCached,
   invalidateCache,

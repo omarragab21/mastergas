@@ -5,9 +5,7 @@
             <div class="brand-and-title">
               <!-- image-actions-bar -->
               <div class="image-actions-bar">
-                <span v-if="localized(product.category, 'name')" class="category-name">{{ localized(product.category, 'name') }}</span>
-                <span v-if="localized(product.category, 'name')" class="v-line v-line-sm"></span>
-                <span class="origin-badge">{{ locale === 'ar' ? 'إيطالي الصنع' : 'Made in Italy' }}</span>
+                <span v-if="categoryLabel" class="category-name">{{ categoryLabel }}</span>
                 <button class="share-action-btn" @click.stop="emit('open-share')" type="button" :title="locale === 'ar' ? 'مشاركة المنتج' : 'Share product'">
                   <span class="share-icon-box"><span class="share-icon-inset"><img :src="shareIcon" alt="" class="share-icon-svg" /></span></span>
                   <span>{{ locale === 'ar' ? 'مشاركة' : 'Share' }}</span>
@@ -66,10 +64,57 @@
             </ul>
 
             <!-- Divider Line -->
-            <div v-if="colorOptions.length > 0 || selectableAttributes.length > 0" class="section-divider"></div>
+            <div v-if="optionGroups.length > 0 || colorOptions.length > 0 || selectableAttributes.length > 0" class="section-divider"></div>
+
+            <!-- Selectable options from the API (color, size, energy type…): one choice per group -->
+            <template v-if="optionGroups.length > 0">
+              <div
+                v-for="group in optionGroups"
+                :key="group.key"
+                :class="group.isColor ? 'color-picker-block' : 'attribute-picker-block'"
+                role="radiogroup"
+                :aria-label="groupLabel(group)"
+              >
+                <div v-if="group.isColor" class="color-picker-title">{{ groupLabel(group) }}: {{ chosenOptionLabel(group) }}</div>
+                <div v-else class="attribute-picker-title">
+                  <span class="ap-label">{{ groupLabel(group) }}:</span>
+                  <span class="ap-val">{{ chosenOptionLabel(group) }}</span>
+                </div>
+                <div :class="group.isColor ? 'color-swatches-wrap' : 'attribute-options-wrap'">
+                  <template v-if="group.isColor">
+                    <button
+                      v-for="option in group.options"
+                      :key="option.id"
+                      type="button"
+                      role="radio"
+                      class="color-swatch-ring"
+                      :class="{ active: isChosen(group, option) }"
+                      :aria-checked="isChosen(group, option)"
+                      :title="optionLabel(option)"
+                      :aria-label="optionLabel(option)"
+                      @click="emit('select-option', { group: group.key, option: option.id })"
+                    >
+                      <span class="swatch-circle" :style="{ backgroundColor: option.hex || '#e5e7eb' }" :class="{ 'is-light': isLightColor(option.hex) }"></span>
+                    </button>
+                  </template>
+                  <template v-else>
+                    <button
+                      v-for="option in group.options"
+                      :key="option.id"
+                      type="button"
+                      role="radio"
+                      class="attribute-btn"
+                      :class="{ active: isChosen(group, option) }"
+                      :aria-checked="isChosen(group, option)"
+                      @click="emit('select-option', { group: group.key, option: option.id })"
+                    >{{ optionLabel(option) }}</button>
+                  </template>
+                </div>
+              </div>
+            </template>
 
             <!-- Color Picker -->
-            <div class="color-picker-block" v-if="colorOptions.length > 0">
+            <div class="color-picker-block" v-if="!optionGroups.length && colorOptions.length > 0">
               <div class="color-picker-title">{{ locale === 'ar' ? 'اللون' : 'Color' }}: {{ selectedColorName }}</div>
               <div class="color-swatches-wrap">
                 <button 
@@ -89,7 +134,7 @@
 
             <!-- Dynamic selectable attributes (Size, Capacity, etc.) -->
             <div
-              v-for="attribute in selectableAttributes"
+              v-for="attribute in (optionGroups.length ? [] : selectableAttributes)"
               :key="attribute.key"
               class="attribute-picker-block"
             >
@@ -141,9 +186,26 @@ import starEmptyIcon from '../../../assets/pd-star-empty.svg';
 import checkIcon from '../../../assets/pd-check.svg';
 import bagIcon from '../../../assets/pd-bag.svg';
 import priceRiyalIcon from '../../../assets/pd-riyal.svg';
-const props = defineProps({ product: { type: Object, required: true }, locale: { type: String, required: true }, localized: { type: Function, required: true }, computedRatingCount: { type: [Number, String], default: 0 }, computedAverageRating: { type: [Number, String], default: 0 }, formatPrice: { type: Function, required: true }, currentPrice: { type: [Number, String], default: 0 }, currency: { type: String, default: '' }, riyalIcon: { type: String, default: '' }, productFeatures: { type: Array, default: () => [] }, colorOptions: { type: Array, default: () => [] }, selectedColorName: { type: String, default: '' }, isLightColor: { type: Function, required: true }, selectableAttributes: { type: Array, default: () => [] }, selectedAttributes: { type: Object, default: () => ({}) }, isProductInStock: { type: Boolean, default: false }, quantity: { type: Number, default: 1 } });
-const emit = defineEmits(['open-share', 'select-image', 'select-color', 'select-attribute', 'update:quantity', 'add-to-cart']);
-const { product, locale, localized, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, isProductInStock, quantity } = toRefs(props);
+const props = defineProps({ product: { type: Object, required: true }, locale: { type: String, required: true }, localized: { type: Function, required: true }, computedRatingCount: { type: [Number, String], default: 0 }, computedAverageRating: { type: [Number, String], default: 0 }, formatPrice: { type: Function, required: true }, currentPrice: { type: [Number, String], default: 0 }, currency: { type: String, default: '' }, riyalIcon: { type: String, default: '' }, productFeatures: { type: Array, default: () => [] }, colorOptions: { type: Array, default: () => [] }, selectedColorName: { type: String, default: '' }, isLightColor: { type: Function, required: true }, selectableAttributes: { type: Array, default: () => [] }, selectedAttributes: { type: Object, default: () => ({}) }, optionGroups: { type: Array, default: () => [] }, optionSelection: { type: Object, default: () => ({}) }, isProductInStock: { type: Boolean, default: false }, quantity: { type: Number, default: 1 } });
+const emit = defineEmits(['open-share', 'select-image', 'select-color', 'select-attribute', 'select-option', 'update:quantity', 'add-to-cart']);
+const { product, locale, localized, computedRatingCount, computedAverageRating, formatPrice, currentPrice, currency, riyalIcon, productFeatures, colorOptions, selectedColorName, isLightColor, selectableAttributes, selectedAttributes, optionGroups, optionSelection, isProductInStock, quantity } = toRefs(props);
+const inLang = (labels, fallback) => labels?.[locale.value] || fallback;
+const groupLabel = (group) => inLang(group.name_i18n, group.name);
+const optionLabel = (option) => inLang(option.name_i18n, option.name);
+const isChosen = (group, option) => Number(optionSelection.value[group.key]) === option.id;
+const chosenOptionLabel = (group) => {
+  const option = group.options.find((item) => isChosen(group, item)) || group.options[0];
+  return option ? optionLabel(option) : '';
+};
+// Show the sub-category when the product has one, otherwise its category.
+const categoryLabel = computed(() => {
+  const candidates = [product.value?.subcategory, product.value?.sub_category, product.value?.category];
+  for (const candidate of candidates) {
+    const name = candidate && typeof candidate === 'object' ? localized.value(candidate, 'name') : '';
+    if (name) return name;
+  }
+  return '';
+});
 const showRiyalIcon = computed(() => locale.value === 'ar' || !currency.value || currency.value === 'SAR');
 const hasDiscount =computed(() => Number(product.value?.price) > Number(currentPrice.value));
 const increaseQuantity = () => emit('update:quantity', quantity.value + 1);
